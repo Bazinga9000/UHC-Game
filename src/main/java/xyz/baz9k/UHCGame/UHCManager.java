@@ -14,6 +14,7 @@ public class UHCManager {
     private final UHCTeamManager teamManager = new UHCTeamManager();
     
     private UHCHUDManager hudManager;
+    private UHCTickManager tickManager;
 
     public UHCManager(UHCGame plugin) {
         this.plugin = plugin;
@@ -48,6 +49,9 @@ public class UHCManager {
         }
         
         hudManager.start();
+        // begin uhc tick events
+        tickManager = new UHCTickManager(plugin);
+        tickManager.runTaskTimer(plugin, 0L, 1L);
     }
     
     public void endUHC() {
@@ -62,6 +66,7 @@ public class UHCManager {
 
         teamManager.resetAllPlayers();
         hudManager.cleanup();
+        tickManager.cancel();
     }
 
     public UHCTeamManager getTeamManager() {
