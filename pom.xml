@@ -17,6 +17,10 @@
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>commandapi</id>
+            <url>https://raw.githubusercontent.com/JorelAli/CommandAPI/mvn-repo/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -24,6 +28,12 @@
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.16.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>dev.jorel</groupId>
+            <artifactId>commandapi-core</artifactId>
+            <version>5.4</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

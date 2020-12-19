@@ -12,11 +12,16 @@ import org.bukkit.scoreboard.Team;
 import java.awt.*;
 
 public class UHCGame extends JavaPlugin {
+    private UHCManager uhcManager;
+
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(new TestListener(), this);
+        uhcManager = new UHCManager(this);
+        getServer().getPluginManager().registerEvents(new UHCListeners(this), this);
         ScoreboardManager sbm = getServer().getScoreboardManager();
         Scoreboard scoreboard = sbm.getMainScoreboard();
+        Commands commands = new Commands(this);
+        commands.registerAll();
 
         //register teams with colors
         for (int i = 0; i < TeamColors.getNumTeamColors(); i++) {
@@ -45,5 +50,9 @@ public class UHCGame extends JavaPlugin {
         teamPrefix.setColor(ChatColor.AQUA);
         t.setPrefix(teamPrefix.toLegacyText());
 
+    }
+
+    public UHCManager getUHCManager() {
+        return uhcManager;
     }
 }
