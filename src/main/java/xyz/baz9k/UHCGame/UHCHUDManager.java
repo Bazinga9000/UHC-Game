@@ -13,7 +13,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-public class UHCHUDManager implements Listener  {
+public class UHCHUDManager implements Listener {
     private UHCGame plugin;
     UHCHUDManager(UHCGame plugin){
         this.plugin = plugin;
@@ -21,6 +21,17 @@ public class UHCHUDManager implements Listener  {
 
     private String createEmptyName(char c){
         return ChatColor.translateAlternateColorCodes('&', "&"+c);
+    }
+
+    String formatState(Player p) {
+        UHCTeamManager tm = plugin.getUHCManager().getTeamManager();
+
+        PlayerState state = tm.getPlayerState(p);
+        int team = tm.getTeam(p);
+
+        if (state == PlayerState.SPECTATOR) return ChatColor.AQUA.toString() + ChatColor.ITALIC + "Spectator";
+        if (state == PlayerState.COMBATANT_UNASSIGNED) return ChatColor.ITALIC + "Unassigned";
+        return TeamColors.getTeamChatColor(team) + "Team " + team;
     }
 
     String formatPos(Location loc){
@@ -36,20 +47,35 @@ public class UHCHUDManager implements Listener  {
 
 
     private void setupPlayerHUD(Player p){
+        // give player scoreboard & objective
         Scoreboard newBoard = Bukkit.getScoreboardManager().getNewScoreboard();
         p.setScoreboard(newBoard);
 
         Objective hud = newBoard.registerNewObjective("hud", "dummy", p.getName());
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
 
+        Team state = newBoard.registerNewTeam("state");
         Team position = newBoard.registerNewTeam("position");
         Team rotation = newBoard.registerNewTeam("rotation");
+        
+        // create entries
+        String stateEntry = createEmptyName('a');
+        String newLineEntry = createEmptyName('b');
+        String posEntry = createEmptyName('c');
+        String rotEntry = createEmptyName('d');
 
-        position.addEntry(createEmptyName('a'));
-        rotation.addEntry(createEmptyName('b'));
+        state.addEntry(stateEntry);
+        position.addEntry(posEntry);
+        rotation.addEntry(rotEntry);
+        
+        // change state display
+        state.setPrefix(formatState(p));
 
-        hud.getScore(createEmptyName('a')).setScore(15);
-        hud.getScore(createEmptyName('b')).setScore(14);
+        // display entries
+        hud.getScore(stateEntry).setScore(15);
+        hud.getScore(newLineEntry).setScore(14);
+        hud.getScore(posEntry).setScore(13);
+        hud.getScore(rotEntry).setScore(12);
 
     }
 

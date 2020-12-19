@@ -23,6 +23,7 @@ public class TeamColors {
     }
 
     public static Color getTeamColor(int teamIndex) {
+        if (teamIndex == 0) throw new IllegalArgumentException("Team index must be greater than 0.");
         return teamColors[teamIndex - 1];
     }
 
