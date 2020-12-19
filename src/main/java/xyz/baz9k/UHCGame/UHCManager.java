@@ -14,9 +14,13 @@ public class UHCManager {
     private final HashMap<Player, String> previousDisplayNames;
     private final UHCTeamManager teamManager = new UHCTeamManager();
 
+    private UHCHUDManager hudManager;
+
     public UHCManager(UHCGame plugin) {
         uhcPlugin = plugin;
         previousDisplayNames = new HashMap<>();
+        hudManager = new UHCHUDManager(plugin);
+        uhcPlugin.getServer().getPluginManager().registerEvents(hudManager, uhcPlugin);
     }
 
 
@@ -43,6 +47,7 @@ public class UHCManager {
 
         }
 
+        hudManager.start();
     }
 
     public void endUHC() {
@@ -55,6 +60,7 @@ public class UHCManager {
         }
 
         teamManager.resetAllPlayers();
+        hudManager.cleanup();
     }
 
     public UHCTeamManager getTeamManager() {

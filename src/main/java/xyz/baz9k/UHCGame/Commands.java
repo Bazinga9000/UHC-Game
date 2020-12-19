@@ -25,33 +25,33 @@ public class Commands {
 
     private void startUHC() {
         new CommandAPICommand("startuhc")
-                .executes(
-                        (sender, args) -> {
-                            plugin.getUHCManager().startUHC();
-                        }
-                ).register();
+        .executes(
+            (sender, args) -> {
+                plugin.getUHCManager().startUHC();
+            }
+        ).register();
     }
 
     private void endUHC() {
         new CommandAPICommand("enduhc")
-                .executes(
-                        (sender, args) -> {
-                            plugin.getUHCManager().endUHC();
-                        }
-                ).register();
-    }
+        .executes(
+            (sender, args) -> {
+                plugin.getUHCManager().endUHC();
+            }
+        ).register();
+}
 
     private void spectator() {
         ArrayList<Argument> arguments = new ArrayList<>();
         arguments.add(new PlayerArgument("player"));
 
         new CommandAPICommand("spectator")
-                .withArguments(arguments)
-                .executes(
-                        (sender, args) -> {
-                            plugin.getUHCManager().getTeamManager().setSpectator((Player) args[0]);
-                        }
-                ).register();
+        .withArguments(arguments)
+        .executes(
+            (sender, args) -> {
+                plugin.getUHCManager().getTeamManager().setSpectator((Player) args[0]);
+            }
+        ).register();
     }
 
     private void combatant() {
@@ -59,13 +59,13 @@ public class Commands {
         arguments.add(new PlayerArgument("player"));
 
         new CommandAPICommand("combatant")
-                .withArguments(arguments)
-                .executes(
-                        (sender, args) -> {
-                            plugin.getUHCManager().getTeamManager().setUnassignedCombatant((Player) args[0]);
-                        }
-                ).register();
-    }
+        .withArguments(arguments)
+        .executes(
+            (sender, args) -> {
+                plugin.getUHCManager().getTeamManager().setUnassignedCombatant((Player) args[0]);
+            }
+        ).register();
+}
 
     private void setTeam() {
         ArrayList<Argument> arguments = new ArrayList<>();
@@ -74,12 +74,12 @@ public class Commands {
         arguments.add(new IntegerArgument("team",1,numTeams));
 
         new CommandAPICommand("setteam")
-                .withArguments(arguments)
-                .executes(
-                        (sender, args) -> {
-                            plugin.getUHCManager().getTeamManager().assignPlayerTeam((Player) args[0], (int) args[1]);
-                        }
-                ).register();
+        .withArguments(arguments)
+        .executes(
+            (sender, args) -> {
+                plugin.getUHCManager().getTeamManager().assignPlayerTeam((Player) args[0], (int) args[1]);
+            }
+        ).register();
     }
 
     private void getTeamData() {
@@ -87,16 +87,16 @@ public class Commands {
         arguments.add(new PlayerArgument("player"));
 
         new CommandAPICommand("getteamdata")
-                .withArguments(arguments)
-                .executes(
-                        (sender, args) -> {
-                            UHCTeamManager tm = plugin.getUHCManager().getTeamManager();
-                            Player p = (Player) args[0];
-                            int team = tm.getTeam(p);
-                            PlayerState state = tm.getPlayerState(p);
-                            sender.sendMessage(p.getName() + " is a " + state + " on team " + team);
-                        }
-                ).register();
+        .withArguments(arguments)
+        .executes(
+            (sender, args) -> {
+                UHCTeamManager tm = plugin.getUHCManager().getTeamManager();
+                Player p = (Player) args[0];
+                int team = tm.getTeam(p);
+                PlayerState state = tm.getPlayerState(p);
+                sender.sendMessage(p.getName() + " is a " + state + " on team " + team);
+            }
+        ).register();
     }
 
     void registerAll() {
