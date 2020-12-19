@@ -24,6 +24,7 @@ public class UHCManager {
 
 
     public void startUHC() {
+        if (isUHCStarted) throw new IllegalStateException("UHC has already started.");
         isUHCStarted = true;
         
         for (Player p : plugin.getServer().getOnlinePlayers()) {
@@ -50,6 +51,7 @@ public class UHCManager {
     }
     
     public void endUHC() {
+        if (!isUHCStarted) throw new IllegalStateException("UHC has not begun.");
         isUHCStarted = false;
 
         //update display names
