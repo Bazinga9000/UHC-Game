@@ -3,7 +3,8 @@ package xyz.baz9k.UHCGame;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
-import dev.jorel.commandapi.arguments.PlayerArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class Commands {
 
     private void spectator() {
         ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new PlayerArgument("player"));
+        arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
 
         new CommandAPICommand("spectator")
         .withArguments(arguments)
@@ -56,7 +57,7 @@ public class Commands {
 
     private void combatant() {
         ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new PlayerArgument("player"));
+        arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
 
         new CommandAPICommand("combatant")
         .withArguments(arguments)
@@ -69,7 +70,7 @@ public class Commands {
 
     private void setTeam() {
         ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new PlayerArgument("player"));
+        arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
         int numTeams = plugin.getUHCManager().getTeamManager().getNumTeams();
         arguments.add(new IntegerArgument("team",1,numTeams));
 
@@ -84,7 +85,7 @@ public class Commands {
 
     private void getTeamData() {
         ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new PlayerArgument("player"));
+        arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
 
         new CommandAPICommand("getteamdata")
         .withArguments(arguments)
