@@ -13,7 +13,7 @@ public class ColoredStringBuilder {
     }
 
     public void append(String s, ChatColor... c) {
-        for (ChatColor cc : c) sb.append(cc);
+        for (ChatColor cc : c) sb.append(cc.toString());
         sb.append(s).append(ChatColor.RESET);
     }
 
