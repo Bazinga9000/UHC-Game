@@ -19,7 +19,7 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        plugin.getUHCManager().getTeamManager().addPlayer(event.getPlayer());
+        plugin.getGameManager().getTeamManager().addPlayer(event.getPlayer());
     }
 
     private class DelayedMessageSender extends BukkitRunnable {
@@ -36,9 +36,9 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        GameManager uhcManager = plugin.getUHCManager();
-        if (uhcManager.isUHCStarted()) {
-            TeamManager teamManager = uhcManager.getTeamManager();
+        GameManager gameManager = plugin.getGameManager();
+        if (gameManager.isUHCStarted()) {
+            TeamManager teamManager = gameManager.getTeamManager();
             Player deadPlayer = event.getEntity();
             if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
                 teamManager.setCombatantAliveStatus(deadPlayer, false);
@@ -60,8 +60,8 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        GameManager uhcManager = plugin.getUHCManager();
-        if (uhcManager.isUHCStarted()) {
+        GameManager gameManager = plugin.getGameManager();
+        if (gameManager.isUHCStarted()) {
             event.getPlayer().setGameMode(GameMode.SPECTATOR);
         }
     }

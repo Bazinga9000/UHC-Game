@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -43,15 +44,34 @@ public class HUDManager implements Listener {
         return TeamColors.getTeamChatColor(team) + "Team " + team;
     }
 
-    String formatPos(Location loc){
+    private String formatPos(Location loc){
         return ChatColor.GREEN.toString() + loc.getBlockX() + ", " + loc.getBlockZ();
     }
 
-    String formatRot(Location loc){
+    private String formatRot(Location loc){
         double yaw = ((loc.getYaw() % 360) + 360) % 360;
         String xf = yaw < 180 ? "+" : "-";
         String zf = yaw < 90 || yaw > 270 ? "+" : "-";
         return ChatColor.RED + xf + "X " + ChatColor.BLUE + zf + "Z";
+    }
+
+    private String formatCombsAlive() {
+        TeamManager tm = gameManager.getTeamManager();
+        ColoredStringBuilder s = new ColoredStringBuilder();
+        s.append("Combatants: ", ChatColor.WHITE);
+        s.append(tm.countLivingCombatants());
+        s.append(" / ");
+        s.append(tm.countCombatants());
+        return s.toString();
+    }
+    private String formatTeamsAlive() {
+        TeamManager tm = gameManager.getTeamManager();
+        ColoredStringBuilder s = new ColoredStringBuilder();
+        s.append("Teams: ", ChatColor.WHITE);
+        s.append(tm.countLivingTeams());
+        s.append(" / ");
+        s.append(tm.getNumTeams());
+        return s.toString();
     }
 
     public static void createHUDScoreboard(Player p){
@@ -65,7 +85,8 @@ public class HUDManager implements Listener {
 
     public static void addHUDLine(Player p, String name, int position){
         Scoreboard b = p.getScoreboard();
-        Team team = b.registerNewTeam(name);
+        Team team = b.getTeam(name);
+        if (team == null) team = b.registerNewTeam(name);
         if (position < 1 || position > 15) throw new IllegalArgumentException("Position needs to be between 1 and 15.");
         String pname = createEmptyName(Integer.toString(position, 16).charAt(0));
         team.addEntry(pname);
@@ -88,9 +109,17 @@ public class HUDManager implements Listener {
 
         addHUDLine(p, "state",      15);
         addHUDLine(p, "newline",    14);
-        addHUDLine(p, "position",   13);
-        addHUDLine(p, "rotation",   12);
+        addHUDLine(p, "newline",     9);
+        addHUDLine(p, "position",    8);
+        addHUDLine(p, "rotation",    7);
+        addHUDLine(p, "newline",     6);
+        addHUDLine(p, "combsalive",  5);
+        addHUDLine(p, "teamsalive",  4);
+        addHUDLine(p, "kills",       3);
+        addHUDLine(p, "newline",     2);
         addHUDLine(p, "elapsedTime", 1);
+
+        setHUDLine(p, "state", formatState(p));
     }
 
 
@@ -107,8 +136,6 @@ public class HUDManager implements Listener {
             p.setScoreboard(main);
         }
     }
-
-
 
     private void updateMovementHUD(Player p){
         Location loc = p.getLocation();
@@ -132,6 +159,15 @@ public class HUDManager implements Listener {
 
     }
 
+    private void updateCombatantsAliveHUD(Player p) {
+        setHUDLine(p, "combsalive", formatCombsAlive());
+    }
+
+    private void updateTeamsAliveHUD(Player p) {
+        setHUDLine(p, "teamsalive", formatTeamsAlive());
+
+    }
+
     @EventHandler
     public void onJoin(PlayerJoinEvent join){
         if(gameManager.isUHCStarted()){
@@ -144,5 +180,16 @@ public class HUDManager implements Listener {
     public void onMove(PlayerMoveEvent movement){
         if(gameManager.isUHCStarted())
             updateMovementHUD(movement.getPlayer());
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent death) {
+        if(gameManager.isUHCStarted()) {
+            for (Player p : plugin.getServer().getOnlinePlayers()) {
+                updateCombatantsAliveHUD(p);
+                updateTeamsAliveHUD(p);
+
+            }
+        }
     }
 }

@@ -35,7 +35,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    plugin.getUHCManager().startUHC();
+                    plugin.getGameManager().startUHC();
                 } catch (IllegalStateException e) {
                     CommandAPI.fail("UHC has already started!");
                 }
@@ -50,7 +50,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    plugin.getUHCManager().endUHC();
+                    plugin.getGameManager().endUHC();
                 } catch (IllegalStateException e) {
                     CommandAPI.fail("UHC has not started!");
                 }
@@ -66,7 +66,7 @@ public class Commands {
         .withArguments(arguments)
         .executes(
             (sender, args) -> {
-                plugin.getUHCManager().getTeamManager().setSpectator((Player) args[0]);
+                plugin.getGameManager().getTeamManager().setSpectator((Player) args[0]);
             }
         ).register();
     }
@@ -79,7 +79,7 @@ public class Commands {
         .withArguments(arguments)
         .executes(
             (sender, args) -> {
-                plugin.getUHCManager().getTeamManager().setUnassignedCombatant((Player) args[0]);
+                plugin.getGameManager().getTeamManager().setUnassignedCombatant((Player) args[0]);
             }
         ).register();
 }
@@ -87,14 +87,14 @@ public class Commands {
     private void setTeam() {
         ArrayList<Argument> arguments = new ArrayList<>();
         arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
-        int numTeams = plugin.getUHCManager().getTeamManager().getNumTeams();
+        int numTeams = plugin.getGameManager().getTeamManager().getNumTeams();
         arguments.add(new IntegerArgument("team",1,numTeams));
 
         new CommandAPICommand("setteam")
         .withArguments(arguments)
         .executes(
             (sender, args) -> {
-                plugin.getUHCManager().getTeamManager().assignPlayerTeam((Player) args[0], (int) args[1]);
+                plugin.getGameManager().getTeamManager().assignPlayerTeam((Player) args[0], (int) args[1]);
             }
         ).register();
     }
@@ -107,7 +107,7 @@ public class Commands {
         .withArguments(arguments)
         .executes(
             (sender, args) -> {
-                TeamManager tm = plugin.getUHCManager().getTeamManager();
+                TeamManager tm = plugin.getGameManager().getTeamManager();
                 Player p = (Player) args[0];
                 int team = tm.getTeam(p);
                 PlayerState state = tm.getPlayerState(p);

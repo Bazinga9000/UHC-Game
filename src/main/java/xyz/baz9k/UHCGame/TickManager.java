@@ -8,7 +8,7 @@ public class TickManager extends BukkitRunnable {
     private GameManager manager;
     public TickManager(UHCGame plugin) {
         this.plugin = plugin;
-        manager = plugin.getUHCManager();
+        manager = plugin.getGameManager();
     }
 
     @Override

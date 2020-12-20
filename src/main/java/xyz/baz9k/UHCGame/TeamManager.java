@@ -85,7 +85,7 @@ public class TeamManager {
         return count;
     }
 
-    public int countLivingPlayers() {
+    public int countLivingCombatants() {
         int count = 0;
         for (Node v : playerMap.values()) {
             if (v.state == PlayerState.COMBATANT_ALIVE) {
@@ -104,7 +104,7 @@ public class TeamManager {
         }
         return count;
     }
-    public int countLivingPlayersInTeam(int team) {
+    public int countLivingCombatantsInTeam(int team) {
         if (team <= 0 || team > numTeams) {
             throw new IllegalArgumentException("Team must be positive and less than the team count.");
         }
@@ -157,7 +157,7 @@ public class TeamManager {
     }
 
     public boolean isTeamEliminated(int team) {
-        return countLivingPlayersInTeam(team) == 0;
+        return countLivingCombatantsInTeam(team) == 0;
     }
 
     public boolean isPlayerSpectator(Player player) {
