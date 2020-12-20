@@ -13,12 +13,12 @@ import org.bukkit.scoreboard.Team;
 import java.awt.*;
 
 public class UHCGame extends JavaPlugin {
-    private UHCManager uhcManager;
+    private GameManager uhcManager;
 
     @Override
     public void onEnable() {
-        uhcManager = new UHCManager(this);
-        getServer().getPluginManager().registerEvents(new UHCListeners(this), this);
+        uhcManager = new GameManager(this);
+        getServer().getPluginManager().registerEvents(new Listeners(this), this);
         ScoreboardManager sbm = getServer().getScoreboardManager();
         Scoreboard scoreboard = sbm.getMainScoreboard();
         Commands commands = new Commands(this);
@@ -53,7 +53,7 @@ public class UHCGame extends JavaPlugin {
 
     }
 
-    public UHCManager getUHCManager() {
+    public GameManager getUHCManager() {
         return uhcManager;
     }
 }

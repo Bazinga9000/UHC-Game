@@ -15,9 +15,9 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-public class UHCHUDManager implements Listener {
+public class HUDManager implements Listener {
     private UHCGame plugin;
-    UHCHUDManager(UHCGame plugin){
+    HUDManager(UHCGame plugin){
         this.plugin = plugin;
     }
 
@@ -26,7 +26,7 @@ public class UHCHUDManager implements Listener {
     }
 
     String formatState(Player p) {
-        UHCTeamManager tm = plugin.getUHCManager().getTeamManager();
+        TeamManager tm = plugin.getUHCManager().getTeamManager();
 
         PlayerState state = tm.getPlayerState(p);
         int team = tm.getTeam(p);

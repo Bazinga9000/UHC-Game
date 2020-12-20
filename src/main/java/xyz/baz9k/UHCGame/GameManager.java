@@ -7,23 +7,23 @@ import org.bukkit.potion.PotionEffect;
 import java.time.*;
 import java.util.HashMap;
 
-public class UHCManager {
+public class GameManager {
     private UHCGame plugin;
 
     private boolean isUHCStarted = false;
     private final HashMap<Player, String> previousDisplayNames;
-    private final UHCTeamManager teamManager = new UHCTeamManager();
+    private final TeamManager teamManager = new TeamManager();
     
-    private UHCHUDManager hudManager;
-    private UHCTickManager tickManager;
+    private HUDManager hudManager;
+    private TickManager tickManager;
 
     private Instant startTime = null;
     private Duration timeElapsed = null;
 
-    public UHCManager(UHCGame plugin) {
+    public GameManager(UHCGame plugin) {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
-        hudManager = new UHCHUDManager(plugin);
+        hudManager = new HUDManager(plugin);
         plugin.getServer().getPluginManager().registerEvents(hudManager, plugin);
     }
 
@@ -54,7 +54,7 @@ public class UHCManager {
         
         hudManager.start();
         // begin uhc tick events
-        tickManager = new UHCTickManager(plugin);
+        tickManager = new TickManager(plugin);
         tickManager.runTaskTimer(plugin, 0L, 1L);
     }
     
@@ -73,7 +73,7 @@ public class UHCManager {
         tickManager.cancel();
     }
 
-    public UHCTeamManager getTeamManager() {
+    public TeamManager getTeamManager() {
         return teamManager;
     }
 

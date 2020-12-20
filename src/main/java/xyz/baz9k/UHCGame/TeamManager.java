@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class UHCTeamManager {
+public class TeamManager {
     private class Node {
         public int team;
         public PlayerState state;
@@ -19,7 +19,7 @@ public class UHCTeamManager {
     int numTeams = 2;
     private final HashMap<Player, Node> playerMap;
 
-    public UHCTeamManager() {
+    public TeamManager() {
         playerMap = new HashMap<>();
     }
 

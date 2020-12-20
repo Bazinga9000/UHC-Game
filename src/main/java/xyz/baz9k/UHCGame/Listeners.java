@@ -10,10 +10,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class UHCListeners implements Listener {
+public class Listeners implements Listener {
     UHCGame plugin;
 
-    public UHCListeners(UHCGame plugin) {
+    public Listeners(UHCGame plugin) {
         this.plugin = plugin;
     }
 
@@ -36,9 +36,9 @@ public class UHCListeners implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        UHCManager uhcManager = plugin.getUHCManager();
+        GameManager uhcManager = plugin.getUHCManager();
         if (uhcManager.isUHCStarted()) {
-            UHCTeamManager teamManager = uhcManager.getTeamManager();
+            TeamManager teamManager = uhcManager.getTeamManager();
             Player deadPlayer = event.getEntity();
             if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
                 teamManager.setCombatantAliveStatus(deadPlayer, false);
@@ -60,7 +60,7 @@ public class UHCListeners implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        UHCManager uhcManager = plugin.getUHCManager();
+        GameManager uhcManager = plugin.getUHCManager();
         if (uhcManager.isUHCStarted()) {
             event.getPlayer().setGameMode(GameMode.SPECTATOR);
         }

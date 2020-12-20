@@ -9,9 +9,7 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.ScoreboardManager;
 
 import java.util.ArrayList;
 
@@ -109,7 +107,7 @@ public class Commands {
         .withArguments(arguments)
         .executes(
             (sender, args) -> {
-                UHCTeamManager tm = plugin.getUHCManager().getTeamManager();
+                TeamManager tm = plugin.getUHCManager().getTeamManager();
                 Player p = (Player) args[0];
                 int team = tm.getTeam(p);
                 PlayerState state = tm.getPlayerState(p);
