@@ -19,7 +19,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.awt.*;
-import java.util.logging.Level;
 
 public class HUDManager implements Listener {
     private UHCGame plugin;
@@ -53,25 +52,6 @@ public class HUDManager implements Listener {
         String xf = yaw < 180 ? "+" : "-";
         String zf = yaw < 90 || yaw > 270 ? "+" : "-";
         return ChatColor.RED + xf + "X " + ChatColor.BLUE + zf + "Z";
-    }
-
-    private String formatCombsAlive() {
-        TeamManager tm = gameManager.getTeamManager();
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Combatants: ", ChatColor.WHITE);
-        s.append(tm.countLivingCombatants());
-        s.append(" / ");
-        s.append(tm.countCombatants());
-        return s.toString();
-    }
-    private String formatTeamsAlive() {
-        TeamManager tm = gameManager.getTeamManager();
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Teams: ", ChatColor.WHITE);
-        s.append(tm.countLivingTeams());
-        s.append(" / ");
-        s.append(tm.getNumTeams());
-        return s.toString();
     }
 
     public static void createHUDScoreboard(Player p){
@@ -160,11 +140,25 @@ public class HUDManager implements Listener {
     }
 
     private void updateCombatantsAliveHUD(Player p) {
-        setHUDLine(p, "combsalive", formatCombsAlive());
+        TeamManager tm = gameManager.getTeamManager();
+        ColoredStringBuilder s = new ColoredStringBuilder();
+        s.append("Combatants: ", ChatColor.WHITE);
+        s.append(tm.countLivingCombatants());
+        s.append(" / ");
+        s.append(tm.countCombatants());
+
+        setHUDLine(p, "combsalive", s.toString());
     }
 
     private void updateTeamsAliveHUD(Player p) {
-        setHUDLine(p, "teamsalive", formatTeamsAlive());
+        TeamManager tm = gameManager.getTeamManager();
+        ColoredStringBuilder s = new ColoredStringBuilder();
+        s.append("Teams: ", ChatColor.WHITE);
+        s.append(tm.countLivingTeams());
+        s.append(" / ");
+        s.append(tm.getNumTeams());
+
+        setHUDLine(p, "teamsalive", s.toString());
 
     }
 
