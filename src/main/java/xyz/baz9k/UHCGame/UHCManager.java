@@ -77,6 +77,10 @@ public class UHCManager {
         return teamManager;
     }
 
+    public UHCHUDManager getHUDManager() {
+        return hudManager;
+    }
+
     public boolean isUHCStarted() {
         return isUHCStarted;
     }
