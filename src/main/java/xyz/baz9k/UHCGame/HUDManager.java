@@ -162,7 +162,9 @@ public class HUDManager implements Listener {
         TeamManager tm = gameManager.getTeamManager();
 
         int team = tm.getTeam(p);
-        List<Player> teammates = tm.getAllCombatantsOnTeam(team);
+        List<Player> teammates;
+        if (tm.getPlayerState(p) == PlayerState.SPECTATOR) teammates = tm.getAllCombatants();
+        else teammates = tm.getAllCombatantsOnTeam(team);
         Collections.sort(teammates, (t1, t2) -> (int)Math.ceil(t1.getHealth()) - (int)Math.ceil(t2.getHealth()));
 
         int len = Math.min(5, teammates.size());
