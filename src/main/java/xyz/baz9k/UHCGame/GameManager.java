@@ -165,7 +165,12 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        Player p = event.getPlayer();
         teamManager.addPlayer(event.getPlayer());
+        if(isUHCStarted()) {
+            hudManager.initializePlayerHUD(p);
+            hudManager.addPlayerToTeams(p);
+        }
     }
 
     @EventHandler

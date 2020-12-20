@@ -74,22 +74,34 @@ public class HUDManager implements Listener {
         return s.toString();
     }
 
+    private void addPlayerToScoreboardTeam(Scoreboard s, Player p, int team){
+        String name = "team_" + team;
+        Team t = s.getTeam(String.valueOf(team));
+        if(t == null){
+            t = s.registerNewTeam(String.valueOf(team));
+            if(team != 0)
+                t.setPrefix(TeamColors.getTeamChatColor(team) + "" + ChatColor.BOLD + "["+team+"] ");
+            else
+                t.setPrefix(ChatColor.AQUA + "" + ChatColor.ITALIC + "Spectator ");
+        }
+        t.addEntry(p.getName());
+    }
+
     private void setTeams(Player player){
         Scoreboard s = player.getScoreboard();
         TeamManager tm = gameManager.getTeamManager();
         for(Player p : plugin.getServer().getOnlinePlayers()){
             int team = tm.getTeam(p);
-            String name = "team_" + team;
-            Team t = s.getTeam(String.valueOf(team));
-            if(t == null){
-                t = s.registerNewTeam(String.valueOf(team));
-                if(team != 0)
-                    t.setPrefix(TeamColors.getTeamChatColor(team) + "" + ChatColor.BOLD + "["+team+"] ");
-                else
-                    t.setPrefix(ChatColor.AQUA + "" + ChatColor.ITALIC + "Spectator ");
-            }
+            addPlayerToScoreboardTeam(s, p, team);
+        }
+    }
 
-            t.addEntry(p.getName());
+    public void addPlayerToTeams(Player player){
+        TeamManager tm = gameManager.getTeamManager();
+        int team = tm.getTeam(player);
+        for(Player p : plugin.getServer().getOnlinePlayers()){
+            Scoreboard s = p.getScoreboard();
+            addPlayerToScoreboardTeam(s, player, team);
         }
     }
 
@@ -248,7 +260,7 @@ public class HUDManager implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent join){
         Player p = join.getPlayer();
-        if(gameManager.isUHCStarted()) initializePlayerHUD(p);
+
     }
 
     @EventHandler
