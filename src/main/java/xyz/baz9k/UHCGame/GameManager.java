@@ -77,7 +77,7 @@ public class GameManager {
         return teamManager;
     }
 
-    public UHCHUDManager getHUDManager() {
+    public HUDManager getHUDManager() {
         return hudManager;
     }
 
