@@ -56,10 +56,11 @@ public class HUDManager implements Listener {
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
-    public static void addHUDLine(Player p, String name, int position, char c){
+    public static void addHUDLine(Player p, String name, int position){
         Scoreboard b = p.getScoreboard();
         Team team = b.registerNewTeam(name);
-        String pname = createEmptyName(c);
+        if (position < 1 || position > 15) throw new IllegalArgumentException("Position needs to be between 1 and 15.");
+        String pname = createEmptyName(Integer.toString(position, 16).charAt(0));
         team.addEntry(pname);
 
         Objective hud = b.getObjective("hud");
@@ -78,10 +79,10 @@ public class HUDManager implements Listener {
     private void setupPlayerHUD(Player p){
         createHUDScoreboard(p);
 
-        addHUDLine(p, "state", 15, 'a');
-        addHUDLine(p, "newline", 14, 'b');
-        addHUDLine(p, "position", 13, 'c');
-        addHUDLine(p, "rotation", 12, 'd');
+        addHUDLine(p, "state",    15);
+        addHUDLine(p, "newline",  14);
+        addHUDLine(p, "position", 13);
+        addHUDLine(p, "rotation", 12);
     }
 
 
