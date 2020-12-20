@@ -16,7 +16,7 @@ public class UHCGame extends JavaPlugin {
     @Override
     public void onEnable() {
         gameManager = new GameManager(this);
-        getServer().getPluginManager().registerEvents(new Listeners(this), this);
+        getServer().getPluginManager().registerEvents(gameManager, this);
         ScoreboardManager sbm = getServer().getScoreboardManager();
         Scoreboard scoreboard = sbm.getMainScoreboard();
         Commands commands = new Commands(this);
