@@ -92,7 +92,7 @@ public class GameManager {
         long s = timeElapsed.getSeconds();
         long m = timeElapsed.toMillis() % 1000;
 
-        return String.format("%d:%02d:%02d.%03d", s / 3600, (s % 3600) / 60, (s % 60), m);
+        return String.format("%d:%02d:%02d.%02d", s / 3600, (s % 3600) / 60, (s % 60), m);
     }
 
 }
