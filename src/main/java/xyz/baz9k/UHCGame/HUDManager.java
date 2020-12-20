@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -41,17 +40,6 @@ public class HUDManager implements Listener {
         if (state == PlayerState.SPECTATOR) return ChatColor.AQUA.toString() + ChatColor.ITALIC + "Spectator";
         if (state == PlayerState.COMBATANT_UNASSIGNED) return ChatColor.ITALIC + "Unassigned";
         return TeamColors.getTeamChatColor(team) + "Team " + team;
-    }
-
-    private String formatPos(Location loc){
-        return ChatColor.GREEN.toString() + loc.getBlockX() + ", " + loc.getBlockZ();
-    }
-
-    private String formatRot(Location loc){
-        double yaw = ((loc.getYaw() % 360) + 360) % 360;
-        String xf = yaw < 180 ? "+" : "-";
-        String zf = yaw < 90 || yaw > 270 ? "+" : "-";
-        return ChatColor.RED + xf + "X " + ChatColor.BLUE + zf + "Z";
     }
 
     public static void createHUDScoreboard(Player p){
@@ -87,10 +75,9 @@ public class HUDManager implements Listener {
         createHUDScoreboard(p);
 
         addHUDLine(p, "state",      15);
-        addHUDLine(p, "newline",    14);
         addHUDLine(p, "newline",     9);
-        addHUDLine(p, "position",    8);
-        addHUDLine(p, "rotation",    7);
+        addHUDLine(p, "posrot",      8);
+        addHUDLine(p, "wbpos",       7);
         addHUDLine(p, "newline",     6);
         addHUDLine(p, "combsalive",  5);
         addHUDLine(p, "teamsalive",  4);
@@ -118,8 +105,20 @@ public class HUDManager implements Listener {
 
     private void updateMovementHUD(Player p){
         Location loc = p.getLocation();
-        setHUDLine(p, "position", formatPos(loc));
-        setHUDLine(p, "rotation", formatRot(loc));
+
+        ColoredStringBuilder s = new ColoredStringBuilder();
+        // position format
+        s.append(loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ChatColor.GREEN);
+        
+        // rotation format
+        s.append("(", ChatColor.WHITE);
+        double yaw = ((loc.getYaw() % 360) + 360) % 360;
+        String xf = yaw < 180 ? "+" : "-";
+        String zf = yaw < 90 || yaw > 270 ? "+" : "-";
+        s.append(ChatColor.RED + xf + "X " + ChatColor.BLUE + zf + "Z");
+        s.append(")", ChatColor.WHITE);
+
+        setHUDLine(p, "posrot", s.toString());
     }
 
     public void updateElapsedTimeHUD(Player p){
@@ -169,7 +168,7 @@ public class HUDManager implements Listener {
             }
         }
     }
-    
+
     public void updateKillsHUD(Player p) {
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Kills: ", ChatColor.WHITE);
