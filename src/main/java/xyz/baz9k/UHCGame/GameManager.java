@@ -77,6 +77,10 @@ public class GameManager {
         return teamManager;
     }
 
+    public UHCHUDManager getHUDManager() {
+        return hudManager;
+    }
+
     public boolean isUHCStarted() {
         return isUHCStarted;
     }

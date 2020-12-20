@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame;
 
 import net.md_5.bungee.api.ChatColor;
+import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
 import xyz.baz9k.UHCGame.util.TeamColors;
 
 import org.bukkit.Bukkit;
@@ -79,10 +80,11 @@ public class HUDManager implements Listener {
     private void setupPlayerHUD(Player p){
         createHUDScoreboard(p);
 
-        addHUDLine(p, "state",    15);
-        addHUDLine(p, "newline",  14);
-        addHUDLine(p, "position", 13);
-        addHUDLine(p, "rotation", 12);
+        addHUDLine(p, "state",      15);
+        addHUDLine(p, "newline",    14);
+        addHUDLine(p, "position",   13);
+        addHUDLine(p, "rotation",   12);
+        addHUDLine(p, "elapsedTime", 1);
     }
 
 
@@ -106,6 +108,15 @@ public class HUDManager implements Listener {
         Location loc = p.getLocation();
         setHUDLine(p, "position", formatPos(loc));
         setHUDLine(p, "rotation", formatRot(loc));
+    }
+
+    public void updateElapsedTimeHUD(Player p){
+        String elapsed = plugin.getUHCManager().getTimeElapsedString();
+        ColoredStringBuilder s = new ColoredStringBuilder();
+        s.append("Elapsed Time: ",ChatColor.RED);
+        s.append(elapsed);
+        setHUDLine(p, "elapsedTime", s.toString());
+
     }
 
     @EventHandler

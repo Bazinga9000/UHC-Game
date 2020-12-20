@@ -1,5 +1,6 @@
 package xyz.baz9k.UHCGame;
 
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TickManager extends BukkitRunnable {
@@ -12,6 +13,11 @@ public class TickManager extends BukkitRunnable {
 
     @Override
     public void run() {
-        manager.updateElapsedTime();
+        if (manager.isUHCStarted()) {
+            manager.updateElapsedTime();
+            for (Player p : plugin.getServer().getOnlinePlayers()) {
+                manager.getHUDManager().updateElapsedTimeHUD(p);
+            }
+        }
     }
 }
