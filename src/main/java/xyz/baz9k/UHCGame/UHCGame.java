@@ -10,8 +10,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
-import java.awt.*;
-
 public class UHCGame extends JavaPlugin {
     private GameManager uhcManager;
 
