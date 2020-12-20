@@ -173,8 +173,10 @@ public class GameManager implements Listener {
                 if (teamManager.getPlayerState(killer) != PlayerState.SPECTATOR) {
                     int nKills = this.kills.get(killer);
                     this.kills.put(killer, nKills + 1);
+                    hudManager.updateKillsHUD(killer);
                 }
             }
+            hudManager.updateDeathCounters();
         }
     }
 

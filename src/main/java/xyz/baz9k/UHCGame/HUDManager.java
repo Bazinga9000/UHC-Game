@@ -83,7 +83,6 @@ public class HUDManager implements Listener {
         team.setPrefix(text);
     }
 
-
     private void setupPlayerHUD(Player p){
         createHUDScoreboard(p);
 
@@ -159,7 +158,24 @@ public class HUDManager implements Listener {
         s.append(tm.getNumTeams());
 
         setHUDLine(p, "teamsalive", s.toString());
-
+        
+    }
+    
+    public void updateDeathCounters() {
+        if(gameManager.isUHCStarted()) {
+            for (Player p : plugin.getServer().getOnlinePlayers()) {
+                updateCombatantsAliveHUD(p);
+                updateTeamsAliveHUD(p);
+            }
+        }
+    }
+    
+    public void updateKillsHUD(Player p) {
+        ColoredStringBuilder s = new ColoredStringBuilder();
+        s.append("Kills: ", ChatColor.WHITE);
+        s.append(gameManager.getKills(p));
+        
+        setHUDLine(p, "kills", s.toString());
     }
 
     @EventHandler
@@ -176,14 +192,4 @@ public class HUDManager implements Listener {
             updateMovementHUD(movement.getPlayer());
     }
 
-    @EventHandler
-    public void onDeath(PlayerDeathEvent death) {
-        if(gameManager.isUHCStarted()) {
-            for (Player p : plugin.getServer().getOnlinePlayers()) {
-                updateCombatantsAliveHUD(p);
-                updateTeamsAliveHUD(p);
-
-            }
-        }
-    }
 }
