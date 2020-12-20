@@ -1,9 +1,12 @@
 package xyz.baz9k.UHCGame;
 
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
+import xyz.baz9k.UHCGame.util.TeamColors;
 
 import java.time.*;
 import java.util.HashMap;
@@ -44,6 +47,7 @@ public class GameManager {
             
             //fully heal, adequately saturate, remove XP
             p.setHealth(20.0f);
+            p.setFoodLevel(20);
             p.setSaturation(5.0f);
             p.setExp(0.0f);
             
@@ -55,6 +59,18 @@ public class GameManager {
             if (teamManager.isPlayerSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
             }
+
+            //set player display name
+            ColoredStringBuilder cs = new ColoredStringBuilder();
+            if (teamManager.isPlayerSpectator(p)) {
+                cs.append("[S]",ChatColor.AQUA, ChatColor.ITALIC);
+            } else {
+                int team = teamManager.getTeam(p);
+                cs.append("[" + team + "]", TeamColors.getTeamChatColor(team), ChatColor.BOLD);
+            }
+
+            cs.append(" " + p.getName());
+            p.setDisplayName(cs.toString());
 
         }
 
