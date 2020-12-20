@@ -250,6 +250,8 @@ public class HUDManager implements Listener {
     }
 
     public void updateKillsHUD(Player p) {
+        TeamManager tm = gameManager.getTeamManager();
+        if (tm.getPlayerState(p) == PlayerState.SPECTATOR) return;
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Kills: ", ChatColor.WHITE);
         s.append(gameManager.getKills(p));
