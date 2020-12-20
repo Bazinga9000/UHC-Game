@@ -9,6 +9,7 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class Commands {
             (sender, args) -> {
                 try {
                     plugin.getGameManager().startUHC();
+                    Bukkit.broadcastMessage("UHC start");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail("UHC has already started!");
                 }
@@ -51,6 +53,7 @@ public class Commands {
             (sender, args) -> {
                 try {
                     plugin.getGameManager().endUHC();
+                    Bukkit.broadcastMessage("UHC end");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail("UHC has not started!");
                 }
