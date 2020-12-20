@@ -149,7 +149,9 @@ public class HUDManager implements Listener {
         for(Player p : plugin.getServer().getOnlinePlayers()){
             setupPlayerHUD(p);
             updateMovementHUD(p);
+            updateKillsHUD(p);
         }
+        updateDeathCounters();
     }
 
     public void cleanup(){
