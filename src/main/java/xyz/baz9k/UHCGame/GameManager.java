@@ -100,14 +100,13 @@ public class GameManager implements Listener {
             cs.append(" " + p.getName());
             p.setDisplayName(cs.toString());
 
+            // activate hud things for all
+            hudManager.initializePlayerHUD(p);
         }
 
         // set time to 0 and delete rain
         uhcWorld.setTime(0);
         uhcWorld.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again.
-
-        // start hud things
-        hudManager.start();
 
         // begin uhc tick events
         tickManager = new TickManager(plugin);
@@ -197,7 +196,11 @@ public class GameManager implements Listener {
                     hudManager.updateKillsHUD(killer);
                 }
             }
-            hudManager.updateDeathCounters();
+
+            for (Player p : plugin.getServer().getOnlinePlayers()) {
+                hudManager.updateCombatantsAliveHUD(p);
+                hudManager.updateTeamsAliveHUD(p);
+            }
         }
     }
 

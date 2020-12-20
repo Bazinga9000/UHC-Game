@@ -125,7 +125,7 @@ public class HUDManager implements Listener {
         team.setPrefix(text);
     }
 
-    private void setupPlayerHUD(Player p){
+    public void initializePlayerHUD(Player p) {
         createHUDScoreboard(p);
 
         addHUDLine(p, "state",      15);
@@ -140,19 +140,14 @@ public class HUDManager implements Listener {
         addHUDLine(p, "newline",     2);
         addHUDLine(p, "elapsedTime", 1);
 
-    }
-
-
-    public void start(){
-        for(Player p : plugin.getServer().getOnlinePlayers()){
-            setupPlayerHUD(p);
-            setHUDLine(p, "state", formatState(p));
-            updateTeammateHUD(p);
-            updateMovementHUD(p);
-            updateKillsHUD(p);
-            updateElapsedTimeHUD(p);
-        }
-        updateDeathCounters();
+        setHUDLine(p, "state", formatState(p));
+        updateTeammateHUD(p);
+        updateMovementHUD(p);
+        // update WB POS hud //
+        updateCombatantsAliveHUD(p);
+        updateTeamsAliveHUD(p);
+        updateKillsHUD(p);
+        updateElapsedTimeHUD(p);
     }
 
     public void cleanup(){
@@ -239,15 +234,6 @@ public class HUDManager implements Listener {
         setHUDLine(p, "teamsalive", s.toString());
         
     }
-    
-    public void updateDeathCounters() {
-        if(gameManager.isUHCStarted()) {
-            for (Player p : plugin.getServer().getOnlinePlayers()) {
-                updateCombatantsAliveHUD(p);
-                updateTeamsAliveHUD(p);
-            }
-        }
-    }
 
     public void updateKillsHUD(Player p) {
         ColoredStringBuilder s = new ColoredStringBuilder();
@@ -260,10 +246,7 @@ public class HUDManager implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent join){
         Player p = join.getPlayer();
-        if(gameManager.isUHCStarted()){
-            setupPlayerHUD(p);
-            updateMovementHUD(p);
-        }
+        if(gameManager.isUHCStarted()) initializePlayerHUD(p);
     }
 
     @EventHandler
