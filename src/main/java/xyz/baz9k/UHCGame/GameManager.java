@@ -65,8 +65,14 @@ public class GameManager implements Listener {
             }
 
         }
-        
+
+        //set time to 0 and delete rain
+        uhcWorld.setTime(0);
+        uhcWorld.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again.
+
+        //start hud things
         hudManager.start();
+
         // begin uhc tick events
         tickManager = new TickManager(plugin);
         tickManager.runTaskTimer(plugin, 0L, 1L);
