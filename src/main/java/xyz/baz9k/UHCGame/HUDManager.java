@@ -18,11 +18,13 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.awt.*;
+import java.util.List;
+import java.util.Collections;
 
 public class HUDManager implements Listener {
     private UHCGame plugin;
     private GameManager gameManager;
-    HUDManager(UHCGame plugin, GameManager gameManager){
+    HUDManager(UHCGame plugin, GameManager gameManager) {
         this.plugin = plugin;
         this.gameManager = gameManager;
     }
@@ -31,7 +33,7 @@ public class HUDManager implements Listener {
         return ChatColor.translateAlternateColorCodes('&', "&"+c);
     }
 
-    String formatState(Player p) {
+    private String formatState(Player p) {
         TeamManager tm = gameManager.getTeamManager();
 
         PlayerState state = tm.getPlayerState(p);
@@ -40,6 +42,38 @@ public class HUDManager implements Listener {
         if (state == PlayerState.SPECTATOR) return ChatColor.AQUA.toString() + ChatColor.ITALIC + "Spectator";
         if (state == PlayerState.COMBATANT_UNASSIGNED) return ChatColor.ITALIC + "Unassigned";
         return TeamColors.getTeamChatColor(team) + "Team " + team;
+    }
+
+    private String formatTeammate(Player you, Player teammate) {
+        TeamManager tm = gameManager.getTeamManager();
+        
+        ColoredStringBuilder s = new ColoredStringBuilder();
+
+        // health
+        s.append("♥ " + (int)Math.ceil(teammate.getHealth()) + " ", ChatColor.RED);
+
+        // direction
+        Location youLoc = you.getLocation();
+        Location teammateLoc = teammate.getLocation();
+        double dx = youLoc.getX() - teammateLoc.getX();
+        double dz = youLoc.getZ() - teammateLoc.getZ();
+
+        double angle = Math.toDegrees(Math.atan2(dz, dx)); // angle btwn you & teammate
+        double yeYaw = youLoc.getYaw();
+
+        double relAngle = (((angle - yeYaw) % 360) + 360) % 360 - 180;
+        String arrow;
+        if (112.5 < relAngle && relAngle < 157.5) arrow = "↙";
+        else if (67.5 < relAngle && relAngle < 112.5) arrow = "←";
+        else if (22.5 < relAngle && relAngle < 67.5) arrow = "↖";
+        else if (-22.5 < relAngle && relAngle < 22.5) arrow = "↑";
+        else if (-67.5 < relAngle && relAngle < -22.5) arrow = "↗";
+        else if (-112.5 < relAngle && relAngle < -67.5) arrow = "→";
+        else if (-157.5 < relAngle && relAngle < -112.5) arrow = "↘";
+        else arrow = "↓";
+        s.append(arrow, ChatColor.GOLD);
+
+        return s.toString();
     }
 
     public static void createHUDScoreboard(Player p){
@@ -103,6 +137,17 @@ public class HUDManager implements Listener {
         }
     }
 
+    private void updateTeammateHUD(Player p) {
+        TeamManager tm = gameManager.getTeamManager();
+        int team = tm.getTeam(p);
+        List<Player> teammates = tm.getAllCombatantsOnTeam(team);
+        Collections.sort(teammates, (a, b) -> (int)Math.ceil(a.getHealth()) - (int)Math.ceil(b.getHealth()));
+
+        int len = Math.min(5, teammates.size());
+        for (int i = 0; i < len; i++) {
+            Player teammate = teammates.get(i);
+        }
+    }
     private void updateMovementHUD(Player p){
         Location loc = p.getLocation();
 
