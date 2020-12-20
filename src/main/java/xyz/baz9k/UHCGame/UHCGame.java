@@ -22,22 +22,6 @@ public class UHCGame extends JavaPlugin {
         Commands commands = new Commands(this);
         commands.registerAll();
 
-        //register teams with colors
-        for (int i = 0; i < TeamColors.getNumTeamColors(); i++) {
-            int index = i+1;
-            String teamName = "uhc_" + index;
-            Team t = scoreboard.getTeam(teamName);
-            if (t == null) {
-                t = scoreboard.registerNewTeam(teamName);
-            }
-
-            t.setAllowFriendlyFire(false);
-            BaseComponent teamPrefix = new TextComponent("[" + index + "] ");
-            teamPrefix.setBold(true);
-            teamPrefix.setColor(TeamColors.getTeamChatColor(index));
-            t.setPrefix(teamPrefix.toLegacyText());
-        }
-
         //register spectator team
         Team t = scoreboard.getTeam("uhc_spectators");
         if (t == null) {

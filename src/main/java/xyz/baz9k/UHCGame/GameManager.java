@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame;
 
 import org.bukkit.Bukkit;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -11,6 +12,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
+import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
+import xyz.baz9k.UHCGame.util.TeamColors;
 
 import java.time.*;
 import java.util.HashMap;
@@ -64,6 +67,7 @@ public class GameManager implements Listener {
             
             //fully heal, adequately saturate, remove XP
             p.setHealth(20.0f);
+            p.setFoodLevel(20);
             p.setSaturation(5.0f);
             p.setExp(0.0f);
             
@@ -72,13 +76,25 @@ public class GameManager implements Listener {
                 p.removePotionEffect(effect.getType());
             }
             
+            if (teamManager.getPlayerState(p) != PlayerState.SPECTATOR) {
+                kills.put(p, 0);
+            }
+
             if (teamManager.isPlayerSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
             }
 
-            if (teamManager.getPlayerState(p) != PlayerState.SPECTATOR) {
-                kills.put(p, 0);
+            //set player display name
+            ColoredStringBuilder cs = new ColoredStringBuilder();
+            if (teamManager.isPlayerSpectator(p)) {
+                cs.append("[S]",ChatColor.AQUA, ChatColor.ITALIC);
+            } else {
+                int team = teamManager.getTeam(p);
+                cs.append("[" + team + "]", TeamColors.getTeamChatColor(team), ChatColor.BOLD);
             }
+
+            cs.append(" " + p.getName());
+            p.setDisplayName(cs.toString());
 
         }
 
