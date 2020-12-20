@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame;
+package xyz.baz9k.UHCGame.util;
 
 import net.md_5.bungee.api.ChatColor;
 

@@ -1,6 +1,8 @@
 package xyz.baz9k.UHCGame;
 
 import net.md_5.bungee.api.ChatColor;
+import xyz.baz9k.UHCGame.util.TeamColors;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
