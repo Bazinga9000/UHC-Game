@@ -4,6 +4,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
+import java.time.*;
 import java.util.HashMap;
 
 public class UHCManager {
@@ -16,6 +17,9 @@ public class UHCManager {
     private UHCHUDManager hudManager;
     private UHCTickManager tickManager;
 
+    private Instant startTime = null;
+    private Duration timeElapsed = null;
+
     public UHCManager(UHCGame plugin) {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
@@ -27,7 +31,7 @@ public class UHCManager {
     public void startUHC() {
         if (isUHCStarted) throw new IllegalStateException("UHC has already started.");
         isUHCStarted = true;
-        
+        startTime = Instant.now();
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             //archive previous display name
             previousDisplayNames.put(p, p.getDisplayName());
@@ -75,6 +79,20 @@ public class UHCManager {
 
     public boolean isUHCStarted() {
         return isUHCStarted;
+    }
+
+    public void updateElapsedTime() {
+        if (!isUHCStarted) {
+            throw new IllegalStateException("UHC has not started.");
+        }
+        timeElapsed = Duration.between(startTime, Instant.now());
+    }
+
+    public String getTimeElapsedString() {
+        long s = timeElapsed.getSeconds();
+        long m = timeElapsed.toMillis() % 1000;
+
+        return String.format("%d:%02d:%02d.%03d", s / 3600, (s % 3600) / 60, (s % 60), m);
     }
 
 }
