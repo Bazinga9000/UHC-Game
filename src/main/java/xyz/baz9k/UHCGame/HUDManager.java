@@ -45,8 +45,6 @@ public class HUDManager implements Listener {
     }
 
     private String formatTeammate(Player you, Player teammate) {
-        TeamManager tm = gameManager.getTeamManager();
-        
         ColoredStringBuilder s = new ColoredStringBuilder();
 
         // health
@@ -131,6 +129,7 @@ public class HUDManager implements Listener {
         createHUDScoreboard(p);
 
         addHUDLine(p, "state",      15);
+        // 14 - 10 are tmate
         addHUDLine(p, "newline",     9);
         addHUDLine(p, "posrot",      8);
         addHUDLine(p, "wbpos",       7);
@@ -141,15 +140,17 @@ public class HUDManager implements Listener {
         addHUDLine(p, "newline",     2);
         addHUDLine(p, "elapsedTime", 1);
 
-        setHUDLine(p, "state", formatState(p));
     }
 
 
     public void start(){
         for(Player p : plugin.getServer().getOnlinePlayers()){
             setupPlayerHUD(p);
+            setHUDLine(p, "state", formatState(p));
+            updateTeammateHUD(p);
             updateMovementHUD(p);
             updateKillsHUD(p);
+            updateElapsedTimeHUD(p);
         }
         updateDeathCounters();
     }
@@ -161,18 +162,28 @@ public class HUDManager implements Listener {
         }
     }
 
-    private void updateTeammateHUD(Player p) {
+    public void updateTeammateHUD(Player p) {
+        Scoreboard b = p.getScoreboard();
         TeamManager tm = gameManager.getTeamManager();
+
         int team = tm.getTeam(p);
         List<Player> teammates = tm.getAllCombatantsOnTeam(team);
-        Collections.sort(teammates, (a, b) -> (int)Math.ceil(a.getHealth()) - (int)Math.ceil(b.getHealth()));
+        Collections.sort(teammates, (t1, t2) -> (int)Math.ceil(t1.getHealth()) - (int)Math.ceil(t2.getHealth()));
 
         int len = Math.min(5, teammates.size());
         for (int i = 0; i < len; i++) {
+            String rowName = "tmate" + i;
+            Team row = b.getTeam(rowName);
             Player teammate = teammates.get(i);
+
+            if (row == null)  { // if row has not been created before
+                addHUDLine(p, rowName, 14 - i);
+                row = b.getTeam(rowName);
+            }
+            setHUDLine(p, rowName, formatTeammate(p, teammate));
         }
     }
-    private void updateMovementHUD(Player p){
+    public void updateMovementHUD(Player p){
         Location loc = p.getLocation();
 
         ColoredStringBuilder s = new ColoredStringBuilder();
@@ -206,7 +217,7 @@ public class HUDManager implements Listener {
 
     }
 
-    private void updateCombatantsAliveHUD(Player p) {
+    public void updateCombatantsAliveHUD(Player p) {
         TeamManager tm = gameManager.getTeamManager();
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Combatants: ", ChatColor.WHITE);
@@ -217,7 +228,7 @@ public class HUDManager implements Listener {
         setHUDLine(p, "combsalive", s.toString());
     }
 
-    private void updateTeamsAliveHUD(Player p) {
+    public void updateTeamsAliveHUD(Player p) {
         TeamManager tm = gameManager.getTeamManager();
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Teams: ", ChatColor.WHITE);
@@ -248,16 +259,19 @@ public class HUDManager implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent join){
+        Player p = join.getPlayer();
         if(gameManager.isUHCStarted()){
-            setupPlayerHUD(join.getPlayer());
-            updateMovementHUD(join.getPlayer());
+            setupPlayerHUD(p);
+            updateMovementHUD(p);
         }
     }
 
     @EventHandler
     public void onMove(PlayerMoveEvent movement){
+        Player p = movement.getPlayer();
         if(gameManager.isUHCStarted())
-            updateMovementHUD(movement.getPlayer());
+            updateTeammateHUD(p);
+            updateMovementHUD(p);
     }
 
 }

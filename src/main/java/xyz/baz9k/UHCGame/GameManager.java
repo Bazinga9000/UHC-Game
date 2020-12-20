@@ -4,9 +4,12 @@ import org.bukkit.Bukkit;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -24,7 +27,7 @@ public class GameManager implements Listener {
     private boolean isUHCStarted = false;
     private final HashMap<Player, String> previousDisplayNames;
     private final TeamManager teamManager = new TeamManager();
-    
+
     private HUDManager hudManager;
     private TickManager tickManager;
 
@@ -35,6 +38,7 @@ public class GameManager implements Listener {
 
     private class DelayedMessageSender extends BukkitRunnable {
         private final String message;
+
         public DelayedMessageSender(String message) {
             this.message = message;
         }
@@ -46,36 +50,36 @@ public class GameManager implements Listener {
     }
 
     private HashMap<Player, Integer> kills;
-    
+
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
         hudManager = new HUDManager(plugin, this);
         plugin.getServer().getPluginManager().registerEvents(hudManager, plugin);
-        uhcWorld = plugin.getServer().getWorld("world"); //TODO MULTIVERSE
+        uhcWorld = plugin.getServer().getWorld("world"); // TODO MULTIVERSE
     }
 
-
     public void startUHC() {
-        if (isUHCStarted) throw new IllegalStateException("UHC has already started.");
+        if (isUHCStarted)
+            throw new IllegalStateException("UHC has already started.");
         isUHCStarted = true;
         startTime = Instant.now();
         this.kills = new HashMap<>();
         for (Player p : plugin.getServer().getOnlinePlayers()) {
-            //archive previous display name
+            // archive previous display name
             previousDisplayNames.put(p, p.getDisplayName());
-            
-            //fully heal, adequately saturate, remove XP
+
+            // fully heal, adequately saturate, remove XP
             p.setHealth(20.0f);
             p.setFoodLevel(20);
             p.setSaturation(5.0f);
             p.setExp(0.0f);
-            
-            //clear all potion effects
+
+            // clear all potion effects
             for (PotionEffect effect : p.getActivePotionEffects()) {
                 p.removePotionEffect(effect.getType());
             }
-            
+
             if (teamManager.getPlayerState(p) != PlayerState.SPECTATOR) {
                 kills.put(p, 0);
             }
@@ -84,10 +88,10 @@ public class GameManager implements Listener {
                 p.setGameMode(GameMode.SPECTATOR);
             }
 
-            //set player display name
+            // set player display name
             ColoredStringBuilder cs = new ColoredStringBuilder();
             if (teamManager.isPlayerSpectator(p)) {
-                cs.append("[S]",ChatColor.AQUA, ChatColor.ITALIC);
+                cs.append("[S]", ChatColor.AQUA, ChatColor.ITALIC);
             } else {
                 int team = teamManager.getTeam(p);
                 cs.append("[" + team + "]", TeamColors.getTeamChatColor(team), ChatColor.BOLD);
@@ -98,23 +102,24 @@ public class GameManager implements Listener {
 
         }
 
-        //set time to 0 and delete rain
+        // set time to 0 and delete rain
         uhcWorld.setTime(0);
         uhcWorld.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again.
 
-        //start hud things
+        // start hud things
         hudManager.start();
 
         // begin uhc tick events
         tickManager = new TickManager(plugin);
         tickManager.runTaskTimer(plugin, 0L, 1L);
     }
-    
+
     public void endUHC() {
-        if (!isUHCStarted) throw new IllegalStateException("UHC has not begun.");
+        if (!isUHCStarted)
+            throw new IllegalStateException("UHC has not begun.");
         isUHCStarted = false;
 
-        //update display names
+        // update display names
         for (Player p : previousDisplayNames.keySet()) {
             p.setDisplayName(previousDisplayNames.get(p));
             p.setGameMode(GameMode.SURVIVAL);
@@ -179,7 +184,7 @@ public class GameManager implements Listener {
                 deadPlayer.setBedSpawnLocation(deadPlayer.getLocation(), true);
 
                 if (teamManager.countLivingTeams() == 1) {
-                    String winnerMessage = "Only one team is left, this is when the game would end."; //TODO FANCY
+                    String winnerMessage = "Only one team is left, this is when the game would end."; // TODO FANCY
                     (new DelayedMessageSender(winnerMessage)).runTaskLater(plugin, 1);
                 }
             }
@@ -203,4 +208,26 @@ public class GameManager implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerDamaged(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+        Player p = (Player) event.getEntity();
+
+        if (this.isUHCStarted()) {
+            // cancel friendlyFire
+            if (event instanceof EntityDamageByEntityEvent) {
+                EntityDamageByEntityEvent entDmgEvent = (EntityDamageByEntityEvent) event;
+                Entity damager = entDmgEvent.getDamager(); 
+                if (damager instanceof Player) {
+                    Player playerDamager = (Player) damager;
+                    if (teamManager.getTeam(p) == teamManager.getTeam(playerDamager)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+            // update hud if dmg taken
+            hudManager.updateTeammateHUD(p);
+        }
+    }
 }
