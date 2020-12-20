@@ -112,6 +112,8 @@ public class HUDManager implements Listener {
         addHUDLine(p, "kills",       3);
         addHUDLine(p, "newline",     2);
         addHUDLine(p, "elapsedTime", 1);
+
+        setHUDLine(p, "state", formatState(p));
     }
 
 
