@@ -74,16 +74,38 @@ public class HUDManager implements Listener {
         return s.toString();
     }
 
-    public static void createHUDScoreboard(Player p){
+    private void setTeams(Player player){
+        Scoreboard s = player.getScoreboard();
+        TeamManager tm = gameManager.getTeamManager();
+        for(Player p : plugin.getServer().getOnlinePlayers()){
+            int team = tm.getTeam(p);
+            String name = "team_" + team;
+            Team t = s.getTeam(String.valueOf(team));
+            if(t == null){
+                t = s.registerNewTeam(String.valueOf(team));
+                if(team != 0)
+                    t.setPrefix(TeamColors.getTeamChatColor(team) + "" + ChatColor.BOLD + "["+team+"] ");
+                else
+                    t.setPrefix(ChatColor.AQUA + "" + ChatColor.ITALIC + "Spectator ");
+            }
+
+            t.addEntry(p.getName());
+        }
+    }
+
+    public void createHUDScoreboard(Player p){
         // give player scoreboard & objective
         Scoreboard newBoard = Bukkit.getScoreboardManager().getNewScoreboard();
         p.setScoreboard(newBoard);
 
         Objective hud = newBoard.registerNewObjective("hud", "dummy", p.getName());
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        setTeams(p);
+
     }
 
-    public static void addHUDLine(Player p, String name, int position){
+    public void addHUDLine(Player p, String name, int position){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(name);
         if (team == null) team = b.registerNewTeam(name);
@@ -96,7 +118,7 @@ public class HUDManager implements Listener {
         hud.getScore(pname).setScore(position);
     }
 
-    public static void setHUDLine(Player p, String field, String text){
+    public void setHUDLine(Player p, String field, String text){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(field);
         if(team == null) return;
