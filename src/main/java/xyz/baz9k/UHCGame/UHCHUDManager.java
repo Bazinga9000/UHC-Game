@@ -21,7 +21,7 @@ public class UHCHUDManager implements Listener {
         this.plugin = plugin;
     }
 
-    private String createEmptyName(char c){
+    private static String createEmptyName(char c){
         return ChatColor.translateAlternateColorCodes('&', "&"+c);
     }
 
@@ -47,38 +47,41 @@ public class UHCHUDManager implements Listener {
         return ChatColor.RED + xf + "X " + ChatColor.BLUE + zf + "Z";
     }
 
-
-    private void setupPlayerHUD(Player p){
+    public static void createHUDScoreboard(Player p){
         // give player scoreboard & objective
         Scoreboard newBoard = Bukkit.getScoreboardManager().getNewScoreboard();
         p.setScoreboard(newBoard);
 
         Objective hud = newBoard.registerNewObjective("hud", "dummy", p.getName());
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
 
-        Team state = newBoard.registerNewTeam("state");
-        Team position = newBoard.registerNewTeam("position");
-        Team rotation = newBoard.registerNewTeam("rotation");
-        
-        // create entries
-        String stateEntry = createEmptyName('a');
-        String newLineEntry = createEmptyName('b');
-        String posEntry = createEmptyName('c');
-        String rotEntry = createEmptyName('d');
+    public static void addHUDLine(Player p, String name, int position, char c){
+        Scoreboard b = p.getScoreboard();
+        Team team = b.registerNewTeam(name);
+        String pname = createEmptyName(c);
+        team.addEntry(pname);
 
-        state.addEntry(stateEntry);
-        position.addEntry(posEntry);
-        rotation.addEntry(rotEntry);
-        
-        // change state display
-        state.setPrefix(formatState(p));
+        Objective hud = b.getObjective("hud");
+        if(hud == null) return;
+        hud.getScore(pname).setScore(position);
+    }
 
-        // display entries
-        hud.getScore(stateEntry).setScore(15);
-        hud.getScore(newLineEntry).setScore(14);
-        hud.getScore(posEntry).setScore(13);
-        hud.getScore(rotEntry).setScore(12);
+    public static void setHUDLine(Player p, String field, String text){
+        Scoreboard b = p.getScoreboard();
+        Team team = b.getTeam(field);
+        if(team == null) return;
+        team.setPrefix(text);
+    }
 
+
+    private void setupPlayerHUD(Player p){
+        createHUDScoreboard(p);
+
+        addHUDLine(p, "state", 15, 'a');
+        addHUDLine(p, "newline", 14, 'b');
+        addHUDLine(p, "position", 13, 'c');
+        addHUDLine(p, "rotation", 12, 'd');
     }
 
 
@@ -100,13 +103,8 @@ public class UHCHUDManager implements Listener {
 
     private void updateMovementHUD(Player p){
         Location loc = p.getLocation();
-        Scoreboard scoreboard = p.getScoreboard();
-
-        Team position = scoreboard.getTeam("position");
-        Team rotation = scoreboard.getTeam("rotation");
-
-        position.setPrefix(formatPos(loc));
-        rotation.setPrefix(formatRot(loc));
+        setHUDLine(p, "position", formatPos(loc));
+        setHUDLine(p, "rotation", formatRot(loc));
     }
 
     @EventHandler
