@@ -30,12 +30,15 @@ public class GameManager implements Listener {
 
     private World uhcWorld;
 
+    private HashMap<Player, Integer> kills;
+
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
         hudManager = new HUDManager(plugin, this);
         plugin.getServer().getPluginManager().registerEvents(hudManager, plugin);
         uhcWorld = plugin.getServer().getWorld("world"); //TODO MULTIVERSE
+        this.kills = new HashMap<>();
     }
 
 
