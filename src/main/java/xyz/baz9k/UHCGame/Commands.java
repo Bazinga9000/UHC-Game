@@ -1,11 +1,17 @@
 package xyz.baz9k.UHCGame;
 
+import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.ScoreboardManager;
 
 import java.util.ArrayList;
 
@@ -16,28 +22,40 @@ public class Commands {
         this.plugin = plugin;
     }
     /*
-    /startuhc
-    /enduhc
+    /uhc start
+    /uhc end
     /spectator <player>
     /combatant <player>
-    /setTeam <player> <team : int>
-    /getTeamData <player>
+    /setteam <player> <team : int>
+    /getteamdata <player>
      */
 
     private void startUHC() {
-        new CommandAPICommand("startuhc")
+        new CommandAPICommand("uhc")
+        .withPermission(CommandPermission.OP)
+        .withArguments(new LiteralArgument("start"))
         .executes(
             (sender, args) -> {
-                plugin.getUHCManager().startUHC();
+                try {
+                    plugin.getUHCManager().startUHC();
+                } catch (IllegalStateException e) {
+                    CommandAPI.fail("UHC has already started!");
+                }
             }
         ).register();
     }
 
     private void endUHC() {
-        new CommandAPICommand("enduhc")
+        new CommandAPICommand("uhc")
+        .withPermission(CommandPermission.OP)
+        .withArguments(new LiteralArgument("end"))
         .executes(
             (sender, args) -> {
-                plugin.getUHCManager().endUHC();
+                try {
+                    plugin.getUHCManager().endUHC();
+                } catch (IllegalStateException e) {
+                    CommandAPI.fail("UHC has not started!");
+                }
             }
         ).register();
 }
