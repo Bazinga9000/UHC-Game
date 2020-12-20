@@ -3,7 +3,7 @@ package xyz.baz9k.UHCGame;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.HashMap;
 
 public class TeamManager {
@@ -118,7 +118,7 @@ public class TeamManager {
         return count;
     }
 
-    public Collection<Player> getAllSpectators() {
+    public List<Player> getAllSpectators() {
         ArrayList<Player> players = new ArrayList<>();
         for (Player p : playerMap.keySet()) {
             if (playerMap.get(p).state == PlayerState.SPECTATOR) {
@@ -129,7 +129,7 @@ public class TeamManager {
         return players;
     }
 
-    public Collection<Player> getAllCombatants() {
+    public List<Player> getAllCombatants() {
         ArrayList<Player> players = new ArrayList<>();
         for (Player p : playerMap.keySet()) {
             if (playerMap.get(p).state != PlayerState.SPECTATOR) {
@@ -140,7 +140,7 @@ public class TeamManager {
         return players;
     }
 
-    public Collection<Player> getAllCombatantsOnTeam(int team) {
+    public List<Player> getAllCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
             throw new IllegalArgumentException("Team must be positive and less than the team count.");
         }
