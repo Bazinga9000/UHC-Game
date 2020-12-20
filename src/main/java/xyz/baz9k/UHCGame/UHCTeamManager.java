@@ -2,6 +2,8 @@ package xyz.baz9k.UHCGame;
 
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class UHCTeamManager {
@@ -114,6 +116,44 @@ public class UHCTeamManager {
             }
         }
         return count;
+    }
+
+    public Collection<Player> getAllSpectators() {
+        ArrayList<Player> players = new ArrayList<>();
+        for (Player p : playerMap.keySet()) {
+            if (playerMap.get(p).state == PlayerState.SPECTATOR) {
+                players.add(p);
+            }
+        }
+
+        return players;
+    }
+
+    public Collection<Player> getAllCombatants() {
+        ArrayList<Player> players = new ArrayList<>();
+        for (Player p : playerMap.keySet()) {
+            if (playerMap.get(p).state != PlayerState.SPECTATOR) {
+                players.add(p);
+            }
+        }
+
+        return players;
+    }
+
+    public Collection<Player> getAllCombatantsOnTeam(int team) {
+        if (team <= 0 || team > numTeams) {
+            throw new IllegalArgumentException("Team must be positive and less than the team count.");
+        }
+
+        ArrayList<Player> players = new ArrayList<>();
+        for (Player p : playerMap.keySet()) {
+            Node n = playerMap.get(p);
+            if (n.state != PlayerState.SPECTATOR && n.team == team) {
+                players.add(p);
+            }
+        }
+
+        return players;
     }
 
     public boolean isTeamEliminated(int team) {
