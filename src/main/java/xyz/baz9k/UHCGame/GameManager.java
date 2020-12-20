@@ -1,11 +1,14 @@
 package xyz.baz9k.UHCGame;
 
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
 import java.time.*;
 import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
 
 public class GameManager {
     private UHCGame plugin;
@@ -20,11 +23,14 @@ public class GameManager {
     private Instant startTime = null;
     private Duration timeElapsed = null;
 
+    private World uhcWorld;
+
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
-        hudManager = new HUDManager(plugin);
+        hudManager = new HUDManager(plugin, this);
         plugin.getServer().getPluginManager().registerEvents(hudManager, plugin);
+        uhcWorld = plugin.getServer().getWorld("world"); //TODO MULTIVERSE
     }
 
 
@@ -81,6 +87,10 @@ public class GameManager {
         return hudManager;
     }
 
+    public World getUHCWorld() {
+        return uhcWorld;
+    }
+
     public boolean isUHCStarted() {
         return isUHCStarted;
     }
@@ -94,9 +104,8 @@ public class GameManager {
 
     public String getTimeElapsedString() {
         long s = timeElapsed.getSeconds();
-        long m = timeElapsed.toMillis() % 1000;
 
-        return String.format("%d:%02d:%02d.%02d", s / 3600, (s % 3600) / 60, (s % 60), m/10);
+        return String.format("%d:%02d:%02d", s / 3600, (s % 3600) / 60, (s % 60));
     }
 
 }

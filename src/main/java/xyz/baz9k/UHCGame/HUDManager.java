@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame;
 
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.World;
 import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
 import xyz.baz9k.UHCGame.util.TeamColors;
 
@@ -16,10 +17,15 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
+import java.awt.*;
+import java.util.logging.Level;
+
 public class HUDManager implements Listener {
     private UHCGame plugin;
-    HUDManager(UHCGame plugin){
+    private GameManager gameManager;
+    HUDManager(UHCGame plugin, GameManager gameManager){
         this.plugin = plugin;
+        this.gameManager = gameManager;
     }
 
     private static String createEmptyName(char c){
@@ -27,7 +33,7 @@ public class HUDManager implements Listener {
     }
 
     String formatState(Player p) {
-        TeamManager tm = plugin.getUHCManager().getTeamManager();
+        TeamManager tm = gameManager.getTeamManager();
 
         PlayerState state = tm.getPlayerState(p);
         int team = tm.getTeam(p);
@@ -111,17 +117,24 @@ public class HUDManager implements Listener {
     }
 
     public void updateElapsedTimeHUD(Player p){
-        String elapsed = plugin.getUHCManager().getTimeElapsedString();
+        String elapsed = gameManager.getTimeElapsedString();
         ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Elapsed Time: ",ChatColor.RED);
-        s.append(elapsed);
+        s.append("Game Time: ",ChatColor.RED);
+        s.append(elapsed + " ");
+        World world = gameManager.getUHCWorld();
+        long time = world.getTime();
+        boolean isDay = !(13188 <= time && time <= 22812);
+        Color dayCharacterColor = isDay ? new Color(255, 245, 123) : new Color(43, 47, 119);
+        String dayCharacterString = isDay ? "☀" : "☽";
+        s.append(dayCharacterString, dayCharacterColor);
+
         setHUDLine(p, "elapsedTime", s.toString());
 
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent join){
-        if(plugin.getUHCManager().isUHCStarted()){
+        if(gameManager.isUHCStarted()){
             setupPlayerHUD(join.getPlayer());
             updateMovementHUD(join.getPlayer());
         }
@@ -129,7 +142,7 @@ public class HUDManager implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent movement){
-        if(plugin.getUHCManager().isUHCStarted())
+        if(gameManager.isUHCStarted())
             updateMovementHUD(movement.getPlayer());
     }
 }
