@@ -30,15 +30,26 @@ public class GameManager implements Listener {
 
     private World uhcWorld;
 
-    private HashMap<Player, Integer> kills;
+    private class DelayedMessageSender extends BukkitRunnable {
+        private final String message;
+        public DelayedMessageSender(String message) {
+            this.message = message;
+        }
 
+        @Override
+        public void run() {
+            Bukkit.broadcastMessage(message);
+        }
+    }
+
+    private HashMap<Player, Integer> kills;
+    
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
         hudManager = new HUDManager(plugin, this);
         plugin.getServer().getPluginManager().registerEvents(hudManager, plugin);
         uhcWorld = plugin.getServer().getWorld("world"); //TODO MULTIVERSE
-        this.kills = new HashMap<>();
     }
 
 
@@ -46,6 +57,7 @@ public class GameManager implements Listener {
         if (isUHCStarted) throw new IllegalStateException("UHC has already started.");
         isUHCStarted = true;
         startTime = Instant.now();
+        this.kills = new HashMap<>();
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             //archive previous display name
             previousDisplayNames.put(p, p.getDisplayName());
@@ -62,6 +74,10 @@ public class GameManager implements Listener {
             
             if (teamManager.isPlayerSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
+            }
+
+            if (teamManager.getPlayerState(p) != PlayerState.SPECTATOR) {
+                kills.put(p, 0);
             }
 
         }
@@ -90,6 +106,7 @@ public class GameManager implements Listener {
 
         teamManager.resetAllPlayers();
         hudManager.cleanup();
+        kills.clear();
         tickManager.cancel();
     }
 
@@ -122,28 +139,18 @@ public class GameManager implements Listener {
         return String.format("%d:%02d:%02d", s / 3600, (s % 3600) / 60, (s % 60));
     }
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        plugin.getGameManager().getTeamManager().addPlayer(event.getPlayer());
+    public int getKills(Player p) {
+        return kills.get(p);
     }
 
-    private class DelayedMessageSender extends BukkitRunnable {
-        private final String message;
-        public DelayedMessageSender(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public void run() {
-            Bukkit.broadcastMessage(message);
-        }
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        teamManager.addPlayer(event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        GameManager gameManager = plugin.getGameManager();
-        if (gameManager.isUHCStarted()) {
-            TeamManager teamManager = gameManager.getTeamManager();
+        if (this.isUHCStarted()) {
             Player deadPlayer = event.getEntity();
             if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
                 teamManager.setCombatantAliveStatus(deadPlayer, false);
@@ -160,13 +167,20 @@ public class GameManager implements Listener {
                     (new DelayedMessageSender(winnerMessage)).runTaskLater(plugin, 1);
                 }
             }
+
+            Player killer = deadPlayer.getKiller();
+            if (killer != null) {
+                if (teamManager.getPlayerState(killer) != PlayerState.SPECTATOR) {
+                    int nKills = this.kills.get(killer);
+                    this.kills.put(killer, nKills + 1);
+                }
+            }
         }
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        GameManager gameManager = plugin.getGameManager();
-        if (gameManager.isUHCStarted()) {
+        if (this.isUHCStarted()) {
             event.getPlayer().setGameMode(GameMode.SPECTATOR);
         }
     }
