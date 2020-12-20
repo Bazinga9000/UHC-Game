@@ -28,7 +28,7 @@ public class HUDManager implements Listener {
     }
 
     private String formatState(Player p) {
-        TeamManager tm = plugin.getUHCManager().getTeamManager();
+        TeamManager tm = plugin.getGameManager().getTeamManager();
 
         PlayerState state = tm.getPlayerState(p);
         int team = tm.getTeam(p);
@@ -50,7 +50,7 @@ public class HUDManager implements Listener {
     }
 
     private String formatCombsAlive() {
-        TeamManager tm = plugin.getUHCManager().getTeamManager();
+        TeamManager tm = plugin.getGameManager().getTeamManager();
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Combatants: ", ChatColor.WHITE);
         s.append(tm.countLivingCombatants());
@@ -59,7 +59,7 @@ public class HUDManager implements Listener {
         return s.toString();
     }
     private String formatTeamsAlive() {
-        TeamManager tm = plugin.getUHCManager().getTeamManager();
+        TeamManager tm = plugin.getGameManager().getTeamManager();
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Teams: ", ChatColor.WHITE);
         s.append(tm.countLivingTeams());
@@ -136,7 +136,7 @@ public class HUDManager implements Listener {
     }
 
     public void updateElapsedTimeHUD(Player p){
-        String elapsed = plugin.getUHCManager().getTimeElapsedString();
+        String elapsed = plugin.getGameManager().getTimeElapsedString();
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Elapsed Time: ",ChatColor.RED);
         s.append(elapsed);
@@ -155,7 +155,7 @@ public class HUDManager implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent join){
-        if(plugin.getUHCManager().isUHCStarted()){
+        if(plugin.getGameManager().isUHCStarted()){
             setupPlayerHUD(join.getPlayer());
             updateMovementHUD(join.getPlayer());
         }
@@ -163,13 +163,13 @@ public class HUDManager implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent movement){
-        if(plugin.getUHCManager().isUHCStarted())
+        if(plugin.getGameManager().isUHCStarted())
             updateMovementHUD(movement.getPlayer());
     }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent death) {
-        if(plugin.getUHCManager().isUHCStarted()) {
+        if(plugin.getGameManager().isUHCStarted()) {
             for (Player p : plugin.getServer().getOnlinePlayers()) {
                 updateCombatantsAliveHUD(p);
                 updateTeamsAliveHUD(p);
