@@ -24,6 +24,7 @@ public class TeamManager {
     }
 
     public void addPlayer(Player player) {
+        if (playerMap.containsKey(player)) return;
         playerMap.put(player, new Node(0, PlayerState.SPECTATOR));
     }
 
