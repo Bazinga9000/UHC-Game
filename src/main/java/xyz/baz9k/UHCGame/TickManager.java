@@ -17,6 +17,7 @@ public class TickManager extends BukkitRunnable {
             manager.updateElapsedTime();
             for (Player p : plugin.getServer().getOnlinePlayers()) {
                 manager.getHUDManager().updateElapsedTimeHUD(p);
+                manager.getHUDManager().updateWBHUD(p);
             }
         }
     }
