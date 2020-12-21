@@ -2,6 +2,8 @@ package xyz.baz9k.UHCGame;
 
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import xyz.baz9k.UHCGame.util.ColorGradient;
 import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
 import xyz.baz9k.UHCGame.util.TeamColors;
 
@@ -47,14 +49,21 @@ public class HUDManager implements Listener {
         ColoredStringBuilder s = new ColoredStringBuilder();
         TeamManager tm = gameManager.getTeamManager();
 
+        double teammateHP = teammate.getHealth();
+        double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+        Color FULL_HP = new Color(204, 246, 200);
+        Color NO_HP = new Color(249, 192, 192);
+        Color gradient = ColorGradient.twoColorGradient(teammateHP/teammateMaxHP, FULL_HP, NO_HP);
+
         // username
         if (tm.isSpectator(you)) {
-            s.append(teammate.getDisplayName());
-        } else {
-            s.append(teammate.getName());
+            int team = tm.getTeam(teammate);
+            s.append("[" + team + "] ", TeamColors.getTeamChatColor(team), ChatColor.BOLD);
         }
+
+        s.append(teammate.getName(), gradient);
         // health
-        s.append(" ♥" + (int)Math.ceil(teammate.getHealth()) + " ", ChatColor.RED);
+        s.append((int)Math.ceil(teammate.getHealth()) + "♥ ", gradient);
 
         // direction
         Location youLoc = you.getLocation();
