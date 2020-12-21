@@ -42,7 +42,7 @@ public class HUDManager implements Listener {
 
         if (state == PlayerState.SPECTATOR) return ChatColor.AQUA.toString() + ChatColor.ITALIC + "Spectator";
         if (state == PlayerState.COMBATANT_UNASSIGNED) return ChatColor.ITALIC + "Unassigned";
-        return TeamColors.getTeamChatColor(team) + "Team " + team;
+        return TeamColors.getTeamChatColor(team) + ChatColor.BOLD.toString() + "Team " + team;
     }
 
     private String formatTeammate(Player you, Player teammate) {
