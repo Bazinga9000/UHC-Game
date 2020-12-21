@@ -46,7 +46,14 @@ public class HUDManager implements Listener {
 
     private String formatTeammate(Player you, Player teammate) {
         ColoredStringBuilder s = new ColoredStringBuilder();
+        TeamManager tm = gameManager.getTeamManager();
 
+        // username
+        if (tm.getPlayerState(you) == PlayerState.SPECTATOR) {
+            s.append(teammate.getDisplayName());
+        } else {
+            s.append(teammate.getName());
+        }
         // health
         s.append("♥ " + (int)Math.ceil(teammate.getHealth()) + " ", ChatColor.RED);
 
@@ -177,6 +184,7 @@ public class HUDManager implements Listener {
         List<Player> teammates;
         if (tm.getPlayerState(p) == PlayerState.SPECTATOR) teammates = tm.getAllCombatants();
         else teammates = tm.getAllCombatantsOnTeam(team);
+        teammates.remove(p);
         Collections.sort(teammates, (t1, t2) -> (int)Math.ceil(t1.getHealth()) - (int)Math.ceil(t2.getHealth()));
 
         int len = Math.min(5, teammates.size());
@@ -200,7 +208,7 @@ public class HUDManager implements Listener {
         s.append(loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ChatColor.GREEN);
         
         // rotation format
-        s.append("(", ChatColor.WHITE);
+        s.append(" (", ChatColor.WHITE);
         double yaw = ((loc.getYaw() % 360) + 360) % 360;
         String xf = yaw < 180 ? "+" : "-";
         String zf = yaw < 90 || yaw > 270 ? "+" : "-";
