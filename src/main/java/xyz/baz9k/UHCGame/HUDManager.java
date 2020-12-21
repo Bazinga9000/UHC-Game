@@ -252,7 +252,7 @@ public class HUDManager implements Listener {
         s.append(String.valueOf((int)r), ChatColor.AQUA);
 
         // distance format
-        double distance = r - Math.max(loc.getX(), loc.getZ());
+        double distance = r - Math.max(Math.abs(loc.getX()), Math.abs(loc.getZ()));
         s.append(" (");
         s.append((int)distance);
         s.append(" away)");
