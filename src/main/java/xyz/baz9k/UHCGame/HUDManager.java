@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -265,12 +264,6 @@ public class HUDManager implements Listener {
         s.append(gameManager.getKills(p));
         
         setHUDLine(p, "kills", s.toString());
-    }
-
-    @EventHandler
-    public void onJoin(PlayerJoinEvent join){
-        Player p = join.getPlayer();
-
     }
 
     @EventHandler
