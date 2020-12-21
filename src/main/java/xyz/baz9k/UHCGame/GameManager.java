@@ -64,6 +64,7 @@ public class GameManager implements Listener {
             throw new IllegalStateException("UHC has already started.");
         isUHCStarted = true;
         startTime = Instant.now();
+        updateElapsedTime();;
         this.kills = new HashMap<>();
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             // archive previous display name

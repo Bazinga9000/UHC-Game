@@ -66,7 +66,7 @@ public class HUDManager implements Listener {
         double angle = Math.toDegrees(Math.atan2(dz, dx)); // angle btwn you & teammate
         double yeYaw = youLoc.getYaw();
 
-        double relAngle = (((angle - yeYaw) % 360) + 360) % 360 - 180;
+        double relAngle = (((yeYaw - angle + 90) % 360) + 360) % 360 - 180;
         String arrow;
         if (112.5 < relAngle && relAngle < 157.5) arrow = "↙";
         else if (67.5 < relAngle && relAngle < 112.5) arrow = "←";
