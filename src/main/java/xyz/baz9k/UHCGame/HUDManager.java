@@ -232,6 +232,25 @@ public class HUDManager implements Listener {
         setHUDLine(p, "posrot", s.toString());
     }
 
+    public void updateWBHUD(Player p) {
+        Location loc = p.getLocation();
+
+        ColoredStringBuilder s = new ColoredStringBuilder();
+        
+        // world border radius format
+        double r = (p.getWorld().getWorldBorder().getSize() / 2);
+        s.append("Worldborder: ±", ChatColor.AQUA);
+        s.append(String.valueOf((int)r), ChatColor.AQUA);
+
+        // distance format
+        double distance = r - Math.max(loc.getX(), loc.getZ());
+        s.append(" (");
+        s.append((int)distance);
+        s.append(" away)");
+
+        setHUDLine(p, "wbpos", s.toString());
+    }
+
     public void updateElapsedTimeHUD(Player p){
         String elapsed = gameManager.getTimeElapsedString();
         ColoredStringBuilder s = new ColoredStringBuilder();
