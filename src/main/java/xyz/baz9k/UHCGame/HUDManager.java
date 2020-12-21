@@ -51,22 +51,25 @@ public class HUDManager implements Listener {
 
         double teammateHP = teammate.getHealth();
         double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-        Color FULL_HP = new Color(204, 246, 200);
-        Color NO_HP = new Color(249, 192, 192);
-        Color gradient = ColorGradient.twoColorGradient(teammateHP/teammateMaxHP, NO_HP, FULL_HP);
+        Color FULL_HP = new Color(87, 232, 107);
+        Color HALF_HP = new Color(254, 254, 105);
+        Color NO_HP = new Color(232, 85, 85);
+        Color gradient = ColorGradient.multiColorGradient(teammateHP/teammateMaxHP, NO_HP, HALF_HP, FULL_HP);
 
-        // username
+        // prefix if spectator
         if (tm.isSpectator(you)) {
             int team = tm.getTeam(teammate);
             s.append("[" + team + "] ", TeamColors.getTeamChatColor(team), ChatColor.BOLD);
         }
 
-        s.append(teammate.getName(), gradient);
-        // health
+        // name and health
         if (tm.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
-            s.append("0♥ ",ChatColor.GRAY, ChatColor.STRIKETHROUGH);
+            s.append(teammate.getName(), ChatColor.GRAY, ChatColor.STRIKETHROUGH);
+            s.append(" 0♥",ChatColor.GRAY, ChatColor.STRIKETHROUGH);
+            return s.toString();
         } else {
-            s.append((int) Math.ceil(teammate.getHealth()) + "♥ ", gradient);
+            s.append(teammate.getName(), gradient);
+            s.append(" " + (int) Math.ceil(teammate.getHealth()) + "♥ ", gradient);
         }
         // direction
         Location youLoc = you.getLocation();
