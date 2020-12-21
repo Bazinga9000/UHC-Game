@@ -75,7 +75,7 @@ public class HUDManager implements Listener {
             return s.toString();
         } else {
             s.append(teammate.getName(), gradient);
-            s.append(" " + (int) Math.ceil(teammate.getHealth()) + "♥ ", gradient);
+            s.append(" " + (int) Math.ceil(teammateHP) + "♥ ", gradient);
         }
         // direction
         Location youLoc = you.getLocation();
