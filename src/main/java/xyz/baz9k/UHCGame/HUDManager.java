@@ -49,7 +49,7 @@ public class HUDManager implements Listener {
         ColoredStringBuilder s = new ColoredStringBuilder();
         TeamManager tm = gameManager.getTeamManager();
 
-        double teammateHP = teammate.getHealth();
+        double teammateHP = teammate.getHealth() + teammate.getAbsorptionAmount();
         double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
         Color FULL_HP = new Color(87, 232, 107);
         Color HALF_HP = new Color(254, 254, 105);
