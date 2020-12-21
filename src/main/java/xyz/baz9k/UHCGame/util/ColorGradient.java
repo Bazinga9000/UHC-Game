@@ -13,4 +13,19 @@ public class ColorGradient {
         int newBlue = a.getBlue() + (int) Math.round(distance * (double) deltaBlue);
         return new Color(newRed, newGreen, newBlue);
     }
+
+    public static Color multiColorGradient(double distance, Color... color) {
+        int numColors = color.length;
+        int leftColorIndex = (int) Math.floor(distance * numColors);
+        if (leftColorIndex == numColors) {
+            //distance is exactly 1
+            return color[numColors - 1];
+        }
+
+        double lowerBound = (double) leftColorIndex / (double) numColors;
+        double upperBound = (double) (leftColorIndex + 1) / (double) numColors;
+
+        double newDistance = (distance - lowerBound) / (upperBound - lowerBound);
+        return twoColorGradient(newDistance, color[leftColorIndex], color[leftColorIndex + 1]);
+    }
 }
