@@ -196,8 +196,11 @@ public class HUDManager implements Listener {
 
         int team = tm.getTeam(p);
         List<Player> teammates;
-        if (tm.isAssignedCombatant(p)) teammates = tm.getAllCombatants();
-        else teammates = tm.getAllCombatantsOnTeam(team);
+        if (tm.isAssignedCombatant(p)) {
+            teammates = tm.getAllCombatantsOnTeam(team);
+        } else {
+            teammates = tm.getAllCombatants();
+        }
         teammates.remove(p);
         Collections.sort(teammates, (t1, t2) -> (int)Math.ceil(t1.getHealth()) - (int)Math.ceil(t2.getHealth()));
 
