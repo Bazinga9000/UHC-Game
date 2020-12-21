@@ -15,10 +15,12 @@ public class ColorGradient {
     }
 
     public static Color multiColorGradient(double distance, Color... color) {
+        if(distance < 0) distance = 0;
         int numColors = color.length;
         int leftColorIndex = (int) Math.floor(distance * numColors);
-        if (leftColorIndex == numColors) {
-            //distance is exactly 1
+        if (leftColorIndex >= numColors - 1) {
+            // distance is exactly 1
+            // check for overheal here ig
             return color[numColors - 1];
         }
 

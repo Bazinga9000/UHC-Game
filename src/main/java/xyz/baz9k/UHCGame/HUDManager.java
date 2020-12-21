@@ -54,7 +54,13 @@ public class HUDManager implements Listener {
         Color FULL_HP = new Color(87, 232, 107);
         Color HALF_HP = new Color(254, 254, 105);
         Color NO_HP = new Color(232, 85, 85);
-        Color gradient = ColorGradient.multiColorGradient(teammateHP/teammateMaxHP, NO_HP, HALF_HP, FULL_HP);
+        Color OVER_HEAL = new Color(171, 85, 232);
+        Color gradient;
+        if (teammateHP > teammateMaxHP) {
+            gradient = OVER_HEAL;
+        } else {
+            gradient = ColorGradient.multiColorGradient(teammateHP/teammateMaxHP, NO_HP, HALF_HP, FULL_HP);
+        }
 
         // prefix if spectator
         if (tm.isSpectator(you)) {
@@ -314,8 +320,10 @@ public class HUDManager implements Listener {
                 updateTeammateHUD(spec);
             }
             int team = tm.getTeam(p);
-            for (Player tmate : tm.getAllCombatantsOnTeam(team)) {
-                updateTeammateHUD(tmate);
+            if (team != 0) {
+                for (Player tmate : tm.getAllCombatantsOnTeam(team)) {
+                    updateTeammateHUD(tmate);
+                }
             }
     }
 
