@@ -12,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -57,7 +56,7 @@ public class HUDManager implements Listener {
         Color gradient = ColorGradient.twoColorGradient(teammateHP/teammateMaxHP, NO_HP, FULL_HP);
 
         // username
-        if (tm.getPlayerState(you) == PlayerState.SPECTATOR) {
+        if (tm.isSpectator(you)) {
             int team = tm.getTeam(teammate);
             s.append("[" + team + "] ", TeamColors.getTeamChatColor(team), ChatColor.BOLD);
         }
@@ -194,7 +193,7 @@ public class HUDManager implements Listener {
 
         int team = tm.getTeam(p);
         List<Player> teammates;
-        if (tm.getPlayerState(p) == PlayerState.SPECTATOR) teammates = tm.getAllCombatants();
+        if (tm.isAssignedCombatant(p)) teammates = tm.getAllCombatants();
         else teammates = tm.getAllCombatantsOnTeam(team);
         teammates.remove(p);
         Collections.sort(teammates, (t1, t2) -> (int)Math.ceil(t1.getHealth()) - (int)Math.ceil(t2.getHealth()));
@@ -271,18 +270,12 @@ public class HUDManager implements Listener {
 
     public void updateKillsHUD(Player p) {
         TeamManager tm = gameManager.getTeamManager();
-        if (tm.getPlayerState(p) == PlayerState.SPECTATOR) return;
+        if (tm.isSpectator(p)) return;
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Kills: ", ChatColor.WHITE);
         s.append(gameManager.getKills(p));
         
         setHUDLine(p, "kills", s.toString());
-    }
-
-    @EventHandler
-    public void onJoin(PlayerJoinEvent join){
-        Player p = join.getPlayer();
-
     }
 
     @EventHandler
