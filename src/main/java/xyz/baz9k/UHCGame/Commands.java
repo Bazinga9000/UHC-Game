@@ -69,7 +69,9 @@ public class Commands {
         .withArguments(arguments)
         .executes(
             (sender, args) -> {
-                plugin.getGameManager().getTeamManager().setSpectator((Player) args[0]);
+                Player p = (Player) args[0];
+                plugin.getGameManager().getTeamManager().setSpectator(p);
+                sender.sendMessage("Set " + p + " to state SPECTATOR.");
             }
         ).register();
     }
@@ -82,7 +84,9 @@ public class Commands {
         .withArguments(arguments)
         .executes(
             (sender, args) -> {
-                plugin.getGameManager().getTeamManager().setUnassignedCombatant((Player) args[0]);
+                Player p = (Player) args[0];
+                plugin.getGameManager().getTeamManager().setUnassignedCombatant(p);
+                sender.sendMessage("Set " + p + " to state COMBATANT_UNASSIGNED.");
             }
         ).register();
 }
@@ -97,7 +101,10 @@ public class Commands {
         .withArguments(arguments)
         .executes(
             (sender, args) -> {
-                plugin.getGameManager().getTeamManager().assignPlayerTeam((Player) args[0], (int) args[1]);
+                Player p = (Player) args[0];
+                int t = (int) args[1];
+                plugin.getGameManager().getTeamManager().assignPlayerTeam(p, t);
+                sender.sendMessage("Set " + p + " to team " + t);
             }
         ).register();
     }
