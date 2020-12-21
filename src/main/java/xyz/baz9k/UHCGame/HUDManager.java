@@ -53,7 +53,7 @@ public class HUDManager implements Listener {
         double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
         Color FULL_HP = new Color(204, 246, 200);
         Color NO_HP = new Color(249, 192, 192);
-        Color gradient = ColorGradient.twoColorGradient(teammateHP/teammateMaxHP, FULL_HP, NO_HP);
+        Color gradient = ColorGradient.twoColorGradient(teammateHP/teammateMaxHP, NO_HP, FULL_HP);
 
         // username
         if (tm.isSpectator(you)) {
@@ -63,8 +63,11 @@ public class HUDManager implements Listener {
 
         s.append(teammate.getName(), gradient);
         // health
-        s.append((int)Math.ceil(teammate.getHealth()) + "♥ ", gradient);
-
+        if (tm.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
+            s.append("0♥ ",ChatColor.GRAY, ChatColor.STRIKETHROUGH);
+        } else {
+            s.append((int) Math.ceil(teammate.getHealth()) + "♥ ", gradient);
+        }
         // direction
         Location youLoc = you.getLocation();
         Location teammateLoc = teammate.getLocation();
