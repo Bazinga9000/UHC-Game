@@ -67,11 +67,11 @@ public class TeamManager {
     }
 
     public void setCombatantAliveStatus(Player player, boolean aliveStatus) {
-        Node n = playerMap.get(player);
-        if (n.state == PlayerState.SPECTATOR || n.state == PlayerState.COMBATANT_UNASSIGNED) {
+        if (!isAssignedCombatant(player)) {
             throw new IllegalArgumentException("Player must be an assigned combatant.");
         }
-
+        
+        Node n = playerMap.get(player);
         n.state = aliveStatus ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
     }
 
@@ -160,8 +160,13 @@ public class TeamManager {
         return countLivingCombatantsInTeam(team) == 0;
     }
 
-    public boolean isPlayerSpectator(Player player) {
-        return playerMap.get(player).state == PlayerState.SPECTATOR;
+    public boolean isSpectator(Player p) {
+        return playerMap.get(p).state == PlayerState.SPECTATOR;
+    }
+
+    public boolean isAssignedCombatant(Player p) {
+        PlayerState state = playerMap.get(p).state;
+        return state == PlayerState.COMBATANT_ALIVE || state == PlayerState.COMBATANT_DEAD;
     }
 
     public int getNumTeams() {

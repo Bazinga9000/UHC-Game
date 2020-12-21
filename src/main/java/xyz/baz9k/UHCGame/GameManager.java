@@ -81,17 +81,17 @@ public class GameManager implements Listener {
                 p.removePotionEffect(effect.getType());
             }
 
-            if (teamManager.getPlayerState(p) != PlayerState.SPECTATOR) {
+            if (!teamManager.isSpectator(p)) {
                 kills.put(p, 0);
             }
 
-            if (teamManager.isPlayerSpectator(p)) {
+            if (teamManager.isSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
             }
 
             // set player display name
             ColoredStringBuilder cs = new ColoredStringBuilder();
-            if (teamManager.isPlayerSpectator(p)) {
+            if (teamManager.isSpectator(p)) {
                 cs.append("[S]", ChatColor.AQUA, ChatColor.ITALIC);
             } else {
                 int team = teamManager.getTeam(p);
@@ -196,7 +196,7 @@ public class GameManager implements Listener {
 
             Player killer = deadPlayer.getKiller();
             if (killer != null) {
-                if (teamManager.getPlayerState(killer) != PlayerState.SPECTATOR) {
+                if (!teamManager.isSpectator(killer)) {
                     int nKills = this.kills.get(killer);
                     this.kills.put(killer, nKills + 1);
                     hudManager.updateKillsHUD(killer);
