@@ -23,7 +23,11 @@ public class TeamColors {
     }
 
     public static Color getTeamColor(int teamIndex) {
-        if (teamIndex == 0) throw new IllegalArgumentException("Team index must be greater than 0.");
+        if (teamIndex < 0) throw new IllegalArgumentException("Team index must be positive.");
+        if (teamIndex > numTeamColors) throw new IllegalArgumentException("Team index must be less than number of predefined team colors (" + numTeamColors + ")");
+        if (teamIndex == 0) {
+            return new Color(85, 255, 255);
+        }
         return teamColors[teamIndex - 1];
     }
 
@@ -35,5 +39,19 @@ public class TeamColors {
         return numTeamColors;
     }
 
+    public static String getTeamPrefix(int teamIndex) {
+        ColoredStringBuilder cs = new ColoredStringBuilder();
+        if (teamIndex == 0) {
+            cs.append("[S]",ChatColor.AQUA,ChatColor.ITALIC);
+        } else {
+            cs.append("[" + teamIndex + "]",getTeamChatColor(teamIndex),ChatColor.BOLD);
+        }
+        return cs.toString();
+
+    }
+
+    public static String getTeamPrefixWithSpace(int teamIndex) {
+        return getTeamPrefix(teamIndex) + " " + ChatColor.RESET;
+    }
 
 }

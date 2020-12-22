@@ -16,18 +16,15 @@ public class ColorGradient {
 
     public static Color multiColorGradient(double distance, Color... color) {
         if(distance < 0) distance = 0;
-        int numColors = color.length;
-        int leftColorIndex = (int) Math.floor(distance * numColors);
-        if (leftColorIndex >= numColors - 1) {
-            // distance is exactly 1
-            // check for overheal here ig
-            return color[numColors - 1];
+        int numIntervals = color.length - 1;
+        double scaledDistance = distance * numIntervals;
+        int scaledDistanceFloor = (int) Math.floor(scaledDistance);
+        
+        if (scaledDistanceFloor >= numIntervals) {
+            return color[numIntervals];
         }
 
-        double lowerBound = (double) leftColorIndex / (double) numColors;
-        double upperBound = (double) (leftColorIndex + 1) / (double) numColors;
-
-        double newDistance = (distance - lowerBound) / (upperBound - lowerBound);
-        return twoColorGradient(newDistance, color[leftColorIndex], color[leftColorIndex + 1]);
+        double interDist = scaledDistance - scaledDistanceFloor;
+        return twoColorGradient(interDist, color[scaledDistanceFloor], color[scaledDistanceFloor + 1]);
     }
 }

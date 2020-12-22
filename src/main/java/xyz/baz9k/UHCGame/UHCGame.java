@@ -21,18 +21,6 @@ public class UHCGame extends JavaPlugin {
         Scoreboard scoreboard = sbm.getMainScoreboard();
         Commands commands = new Commands(this);
         commands.registerAll();
-
-        //register spectator team
-        Team t = scoreboard.getTeam("uhc_spectators");
-        if (t == null) {
-            t = scoreboard.registerNewTeam("uhc_spectators");
-        }
-
-        BaseComponent teamPrefix = new TextComponent("[S]");
-        teamPrefix.setBold(true);
-        teamPrefix.setColor(ChatColor.AQUA);
-        t.setPrefix(teamPrefix.toLegacyText());
-
     }
 
     public GameManager getGameManager() {

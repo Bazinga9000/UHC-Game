@@ -64,7 +64,7 @@ public class GameManager implements Listener {
             throw new IllegalStateException("UHC has already started.");
         isUHCStarted = true;
         startTime = Instant.now();
-        updateElapsedTime();;
+        updateElapsedTime();
         this.kills = new HashMap<>();
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             // archive previous display name
@@ -90,16 +90,7 @@ public class GameManager implements Listener {
             }
 
             // set player display name
-            ColoredStringBuilder cs = new ColoredStringBuilder();
-            if (teamManager.isSpectator(p)) {
-                cs.append("[S]", ChatColor.AQUA, ChatColor.ITALIC);
-            } else {
-                int team = teamManager.getTeam(p);
-                cs.append("[" + team + "]", TeamColors.getTeamChatColor(team), ChatColor.BOLD);
-            }
-
-            cs.append(" " + p.getName());
-            p.setDisplayName(cs.toString());
+            p.setDisplayName(TeamColors.getTeamPrefixWithSpace(teamManager.getTeam(p)) + p.getName());
 
             // activate hud things for all
             hudManager.initializePlayerHUD(p);

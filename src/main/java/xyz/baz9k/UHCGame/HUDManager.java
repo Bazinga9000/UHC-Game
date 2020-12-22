@@ -49,7 +49,7 @@ public class HUDManager implements Listener {
         ColoredStringBuilder s = new ColoredStringBuilder();
         TeamManager tm = gameManager.getTeamManager();
 
-        double teammateHP = teammate.getHealth();
+        double teammateHP = teammate.getHealth() + teammate.getAbsorptionAmount();
         double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
         Color FULL_HP = new Color(87, 232, 107);
         Color HALF_HP = new Color(254, 254, 105);
@@ -65,7 +65,7 @@ public class HUDManager implements Listener {
         // prefix if spectator
         if (tm.isSpectator(you)) {
             int team = tm.getTeam(teammate);
-            s.append("[" + team + "] ", TeamColors.getTeamChatColor(team), ChatColor.BOLD);
+            s.append(TeamColors.getTeamPrefixWithSpace(team));
         }
 
         // name and health
@@ -75,7 +75,7 @@ public class HUDManager implements Listener {
             return s.toString();
         } else {
             s.append(teammate.getName(), gradient);
-            s.append(" " + (int) Math.ceil(teammate.getHealth()) + "♥ ", gradient);
+            s.append(" " + (int) Math.ceil(teammateHP) + "♥ ", gradient);
         }
         // direction
         Location youLoc = you.getLocation();
@@ -106,10 +106,7 @@ public class HUDManager implements Listener {
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
             t = s.registerNewTeam(String.valueOf(team));
-            if(team != 0)
-                t.setPrefix(TeamColors.getTeamChatColor(team) + "" + ChatColor.BOLD + "["+team+"] ");
-            else
-                t.setPrefix(ChatColor.AQUA + "" + ChatColor.ITALIC + "Spectator ");
+            t.setPrefix(TeamColors.getTeamPrefixWithSpace(team));
         }
         t.addEntry(p.getName());
     }
