@@ -65,7 +65,7 @@ public class HUDManager implements Listener {
         // prefix if spectator
         if (tm.isSpectator(you)) {
             int team = tm.getTeam(teammate);
-            s.append("[" + team + "] ", TeamColors.getTeamChatColor(team), ChatColor.BOLD);
+            s.append(TeamColors.getTeamPrefixWithSpace(team));
         }
 
         // name and health
@@ -106,10 +106,7 @@ public class HUDManager implements Listener {
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
             t = s.registerNewTeam(String.valueOf(team));
-            if(team != 0)
-                t.setPrefix(TeamColors.getTeamChatColor(team) + "" + ChatColor.BOLD + "["+team+"] ");
-            else
-                t.setPrefix(ChatColor.AQUA + "" + ChatColor.ITALIC + "Spectator ");
+            t.setPrefix(TeamColors.getTeamPrefixWithSpace(team));
         }
         t.addEntry(p.getName());
     }
