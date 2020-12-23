@@ -5,7 +5,6 @@ import net.md_5.bungee.api.ChatColor;
 import java.awt.*;
 
 public class TeamColors {
-    private static final int numTeamColors = 64;
     private static final int[] teamColorCodes = {
         0xc04040, 0x4040c0, 0x40c040, 0xc0c040, 0xc06b40, 0x6b40c0, 0x40c0c0, 0x6bc040,
         0xc09640, 0x9640c0, 0x4096c0, 0x40c096, 0x96c040, 0xc040c0, 0x406bc0, 0x40c06b,
@@ -16,18 +15,21 @@ public class TeamColors {
         0xc09696, 0x404040, 0x966b6b, 0x96c0c0, 0xc0c096, 0x6b6b6b, 0x6b9696, 0xc096c0,
         0x96c096, 0x969696, 0x6b6b96, 0x6b966b, 0x9696c0, 0xc0c0c0, 0x966b96, 0x96966b
     };
-
-    private static Color[] teamColors = new Color[numTeamColors];
+    
+    private static final int NUM_TEAM_COLORS = teamColorCodes.length;
+    private static Color[] teamColors = new Color[NUM_TEAM_COLORS];
 
     static {
-        for (int i = 0; i < numTeamColors; i++) {
+        for (int i = 0; i < NUM_TEAM_COLORS; i++) {
             teamColors[i] = new Color(teamColorCodes[i]);
         }
     }
 
     public static Color getTeamColor(int teamIndex) {
-        if (teamIndex < 0) throw new IllegalArgumentException("Team index must be positive.");
-        if (teamIndex > numTeamColors) throw new IllegalArgumentException("Team index must be less than number of predefined team colors (" + numTeamColors + ")");
+        if (teamIndex < 0)
+            throw new IllegalArgumentException("Team index must be positive.");
+        if (teamIndex > NUM_TEAM_COLORS)
+            throw new IllegalArgumentException("Team index must be less than number of predefined team colors (" + NUM_TEAM_COLORS + ")");
         if (teamIndex == 0) {
             return new Color(85, 255, 255);
         }
@@ -39,7 +41,7 @@ public class TeamColors {
     }
 
     public static int getNumTeamColors() {
-        return numTeamColors;
+        return NUM_TEAM_COLORS;
     }
 
     public static String getTeamPrefix(int teamIndex) {
