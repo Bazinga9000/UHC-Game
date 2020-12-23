@@ -4,10 +4,9 @@ import java.time.Duration;
 import java.time.Instant;
 
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.KeyedBossBar;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
@@ -16,8 +15,7 @@ public class BossbarManager {
     private UHCGame plugin;
     private GameManager gameManager;
 
-    private NamespacedKey key;
-    private KeyedBossBar bossbar;
+    private BossBar bossbar;
     private class BossbarStage {
         public String title;
         public BarColor color;
@@ -38,12 +36,7 @@ public class BossbarManager {
     public BossbarManager(UHCGame plugin, GameManager gameManager) {
         this.plugin = plugin;
         this.gameManager = gameManager;
-
-        this.key = new NamespacedKey(plugin, "uhcbb");
-        this.bossbar = Bukkit.getBossBar(key);
-        if (bossbar == null) {
-            this.bossbar = Bukkit.createBossBar(key, null, BarColor.WHITE, BarStyle.SOLID);
-        }
+        this.bossbar = Bukkit.createBossBar(null, BarColor.WHITE, BarStyle.SOLID);
     }
     private String getTimeString(long s) {
         if (s < 3600) return String.format("%02d:%02d", s / 60, (s % 60));
