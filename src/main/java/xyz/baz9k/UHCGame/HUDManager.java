@@ -102,7 +102,6 @@ public class HUDManager implements Listener {
     }
 
     private void addPlayerToScoreboardTeam(Scoreboard s, Player p, int team){
-        String name = "team_" + team;
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
             t = s.registerNewTeam(String.valueOf(team));
