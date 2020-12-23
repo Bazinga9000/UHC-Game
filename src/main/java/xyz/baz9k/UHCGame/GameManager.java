@@ -1,6 +1,5 @@
 package xyz.baz9k.UHCGame;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -13,7 +12,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.scheduler.BukkitRunnable;
+
+import xyz.baz9k.UHCGame.util.DelayedMessageSender;
 import xyz.baz9k.UHCGame.util.TeamColors;
 
 import java.time.*;
@@ -33,21 +33,8 @@ public class GameManager implements Listener {
 
     private Instant startTime = null;
     private Duration timeElapsed = null;
-
+    
     private World uhcWorld;
-
-    private class DelayedMessageSender extends BukkitRunnable {
-        private final String message;
-
-        public DelayedMessageSender(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public void run() {
-            Bukkit.broadcastMessage(message);
-        }
-    }
 
     private HashMap<Player, Integer> kills;
 
