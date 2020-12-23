@@ -3,11 +3,8 @@ package xyz.baz9k.UHCGame;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.Argument;
-import dev.jorel.commandapi.arguments.IntegerArgument;
-import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -27,9 +24,11 @@ public class Commands {
     /combatant <player>
     /setteam <player> <team : int>
     /getteamdata <player>
+    /stage next
+    /stage set <n>
      */
 
-    private void startUHC() {
+    private void uhcStart() {
         new CommandAPICommand("uhc")
         .withPermission(CommandPermission.OP)
         .withArguments(new LiteralArgument("start"))
@@ -46,7 +45,7 @@ public class Commands {
         ).register();
     }
 
-    private void endUHC() {
+    private void uhcEnd() {
         new CommandAPICommand("uhc")
         .withPermission(CommandPermission.OP)
         .withArguments(new LiteralArgument("end"))
@@ -128,12 +127,44 @@ public class Commands {
         ).register();
     }
 
+    private void stageNext() {
+        ArrayList<Argument> arguments = new ArrayList<>();
+        arguments.add(new LiteralArgument("next"));
+
+        new CommandAPICommand("stage")
+        .withArguments(arguments)
+        .withPermission(CommandPermission.OP)
+        .executes(
+            (sender, args) -> {
+                GameManager gm = plugin.getGameManager();
+                gm.incrementStage();
+            }
+        ).register();
+    }
+    private void stageSet() {
+        ArrayList<Argument> arguments = new ArrayList<>();
+        arguments.add(new LiteralArgument("next"));
+        arguments.add(new IntegerArgument("stage"));
+
+        new CommandAPICommand("stage")
+        .withArguments(arguments)
+        .withPermission(CommandPermission.OP)
+        .executes(
+            (sender, args) -> {
+                GameManager gm = plugin.getGameManager();
+                gm.setStage((int)args[0]);
+            }
+        ).register();
+    }
+
     void registerAll() {
-        startUHC();
-        endUHC();
+        uhcStart();
+        uhcEnd();
         spectator();
         combatant();
         setTeam();
         getTeamData();
+        stageNext();
+        stageSet();
     }
 }
