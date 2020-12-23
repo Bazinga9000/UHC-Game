@@ -27,11 +27,12 @@ public class BossbarManager {
         }
     }
     private BossbarStage[] stages = {
-        new BossbarStage(ChatColor.RED + "World Border Begins Shrinking", BarColor.RED), // (Ticks to end of) Still border
-        new BossbarStage(ChatColor.BLUE + "World Border Stops Shrinking", BarColor.BLUE), // (Ticks to end of) Border 1
-        new BossbarStage(ChatColor.RED + "World Border Begins Shrinking... Again.", BarColor.RED), // (Ticks to end of) Border stops
-        new BossbarStage(ChatColor.WHITE + "The Battle at the Top of the World", BarColor.WHITE), // (Ticks to end of) Border 2
-        new BossbarStage(ChatColor.DARK_PURPLE + "Heat Death of the Universe", BarColor.PURPLE) // (Ticks to end of) Waiting until DM
+        new BossbarStage(ChatColor.RED + "Border Begins Shrinking", BarColor.RED), // Still border
+        new BossbarStage(ChatColor.BLUE + "Border Stops Shrinking", BarColor.BLUE), // Border 1
+        new BossbarStage(ChatColor.RED + "Border Begins Shrinking... Again.", BarColor.RED), // Border stops
+        new BossbarStage(ChatColor.BLUE + "Border Stops Shrinking... Again", BarColor.RED), // Border 2
+        new BossbarStage(ChatColor.WHITE + "The Battle at the Top of the World", BarColor.WHITE), // Waiting until DM
+        new BossbarStage(ChatColor.DARK_PURPLE + "Heat Death of the Universe", BarColor.PURPLE) // DEATHMATCH
     };
 
     public BossbarManager(UHCGame plugin, GameManager gameManager) {
@@ -53,6 +54,11 @@ public class BossbarManager {
         bossbar.setVisible(true);
     }
     public void tick() {
+        if (getBBStage() == stages[stages.length - 1]) {
+            bossbar.setProgress(1);
+            bossbar.setTitle(getBBStage().title);
+            return;
+        }
         // update progress bar
         Duration elapsedDur = Duration.between(gameManager.getLStageInstant(), Instant.now());
 

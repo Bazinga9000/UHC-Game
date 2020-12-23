@@ -17,6 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import xyz.baz9k.UHCGame.util.TeamColors;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 
 public class GameManager implements Listener {
@@ -57,7 +58,8 @@ public class GameManager implements Listener {
         Duration.ofMinutes(15), // Border 1
         Duration.ofMinutes(5), // Border stops
         Duration.ofMinutes(10), // Border 2
-        Duration.ofMinutes(5) // Waiting until DM
+        Duration.ofMinutes(5), // Waiting until DM
+        ChronoUnit.FOREVER.getDuration() // deathmatch
     };
 
     public GameManager(UHCGame plugin) {
