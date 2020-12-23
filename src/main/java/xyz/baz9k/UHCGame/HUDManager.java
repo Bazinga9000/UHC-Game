@@ -245,7 +245,7 @@ public class HUDManager implements Listener {
         
         // world border radius format
         double r = (p.getWorld().getWorldBorder().getSize() / 2);
-        s.append("Worldborder: ±", ChatColor.AQUA);
+        s.append("World Border: ±", ChatColor.AQUA);
         s.append(String.valueOf((int)r), ChatColor.AQUA);
 
         // distance format

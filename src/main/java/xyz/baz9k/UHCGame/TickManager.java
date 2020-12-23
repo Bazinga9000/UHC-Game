@@ -15,6 +15,9 @@ public class TickManager extends BukkitRunnable {
     public void run() {
         if (manager.isUHCStarted()) {
             manager.updateElapsedTime();
+            if (manager.isStageComplete()) manager.incrementStage();
+            manager.getBossbarManager().tick();
+            
             for (Player p : plugin.getServer().getOnlinePlayers()) {
                 manager.getHUDManager().updateElapsedTimeHUD(p);
                 manager.getHUDManager().updateWBHUD(p);

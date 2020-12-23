@@ -1,7 +1,6 @@
 package xyz.baz9k.UHCGame;
 
 import org.bukkit.Bukkit;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -15,7 +14,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
-import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
 import xyz.baz9k.UHCGame.util.TeamColors;
 
 import java.time.*;
@@ -26,10 +24,11 @@ public class GameManager implements Listener {
 
     private boolean isUHCStarted = false;
     private final HashMap<Player, String> previousDisplayNames;
-    private final TeamManager teamManager = new TeamManager();
-
-    private HUDManager hudManager;
-    private TickManager tickManager;
+    
+    private final TeamManager teamManager = new TeamManager(); // exists always
+    private HUDManager hudManager = new HUDManager(plugin, this); // exists always
+    private TickManager tickManager; // exists while game started
+    private BossbarManager bbManager = new BossbarManager(plugin, this); // exists always
 
     private Instant startTime = null;
     private Duration timeElapsed = null;
@@ -51,19 +50,27 @@ public class GameManager implements Listener {
 
     private HashMap<Player, Integer> kills;
 
+    private int stage = -1;
+    private Instant lastStageInstant = null;
+    private Duration[] stageDurations = {
+        Duration.ofMinutes(60), // Still border
+        Duration.ofMinutes(15), // Border 1
+        Duration.ofMinutes(5), // Border stops
+        Duration.ofMinutes(10), // Border 2
+        Duration.ofMinutes(5) // Waiting until DM
+    };
+
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
-        hudManager = new HUDManager(plugin, this);
         plugin.getServer().getPluginManager().registerEvents(hudManager, plugin);
         uhcWorld = plugin.getServer().getWorld("world"); // TODO MULTIVERSE
     }
 
     public void startUHC() {
-        if (isUHCStarted)
-            throw new IllegalStateException("UHC has already started.");
+        if (isUHCStarted) throw new IllegalStateException("UHC has already started.");
         isUHCStarted = true;
-        startTime = Instant.now();
+        startTime = lastStageInstant = Instant.now();
         updateElapsedTime();
         this.kills = new HashMap<>();
         for (Player p : plugin.getServer().getOnlinePlayers()) {
@@ -103,6 +110,9 @@ public class GameManager implements Listener {
         // begin uhc tick events
         tickManager = new TickManager(plugin);
         tickManager.runTaskTimer(plugin, 0L, 1L);
+
+        stage = 0;
+        bbManager.enable();
     }
 
     public void endUHC() {
@@ -120,6 +130,10 @@ public class GameManager implements Listener {
         hudManager.cleanup();
         kills.clear();
         tickManager.cancel();
+
+        stage = -1;
+        bbManager.disable();
+
     }
 
     public TeamManager getTeamManager() {
@@ -130,6 +144,35 @@ public class GameManager implements Listener {
         return hudManager;
     }
 
+    public BossbarManager getBossbarManager() {
+        return bbManager;
+    }
+
+    public int getStage() {
+        return stage;
+    }
+
+    public void incrementStage() {
+        stage++;
+        lastStageInstant = Instant.now();
+        bbManager.updateBossbarStage();
+    }
+    public void setStage(int stage) {
+        // probably just for debug purposes and not intended to be used in actual UHC
+        this.stage = stage;
+        lastStageInstant = Instant.now();
+        bbManager.updateBossbarStage();
+    }
+    public Instant getLStageInstant() {
+        return lastStageInstant;
+    }
+    public Duration getCurrentStageDuration() {
+        return stageDurations[stage];
+    }
+    public boolean isStageComplete() {
+        Instant end = lastStageInstant.plus(stageDurations[stage]);
+        return !end.isAfter(Instant.now());
+    }
     public World getUHCWorld() {
         return uhcWorld;
     }
