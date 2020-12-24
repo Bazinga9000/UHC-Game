@@ -10,6 +10,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
+import xyz.baz9k.UHCGame.util.Utils;
 
 public class BossbarManager {
     private UHCGame plugin;
@@ -40,11 +41,6 @@ public class BossbarManager {
         this.bossbar = Bukkit.createBossBar(null, BarColor.WHITE, BarStyle.SOLID);
     }
 
-    private String getTimeString(long s) {
-        if (s < 3600) return String.format("%02d:%02d", s / 60, (s % 60));
-        return String.format("%d:%02d:%02d", s / 3600, (s % 3600) / 60, (s % 60));
-    }
-
     public void enable() {
         for (Player p : plugin.getServer().getOnlinePlayers()) bossbar.addPlayer(p);
         bossbar.setVisible(true);
@@ -71,7 +67,7 @@ public class BossbarManager {
         // change display title
         String display = getBBStage().title;
         display += " | ";
-        display += getTimeString(remainingSecs);
+        display += Utils.getTimeString(remainingSecs);
         bossbar.setTitle(display);
     }
 

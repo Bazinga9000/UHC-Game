@@ -199,12 +199,6 @@ public class GameManager implements Listener {
         timeElapsed = Duration.between(startTime, Instant.now());
     }
 
-    public String getTimeElapsedString() {
-        long s = timeElapsed.getSeconds();
-
-        return String.format("%d:%02d:%02d", s / 3600, (s % 3600) / 60, (s % 60));
-    }
-
     public int getKills(Player p) {
         return kills.get(p);
     }
@@ -284,5 +278,9 @@ public class GameManager implements Listener {
             // update hud if dmg taken
             hudManager.updateTeammateHUD(p);
         }
+    }
+
+    public Duration getElapsedTime() {
+        return timeElapsed;
     }
 }

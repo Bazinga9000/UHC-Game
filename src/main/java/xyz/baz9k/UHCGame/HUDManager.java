@@ -17,6 +17,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import xyz.baz9k.UHCGame.util.Utils;
 
 import java.awt.*;
 import java.util.List;
@@ -257,7 +258,7 @@ public class HUDManager implements Listener {
     }
 
     public void updateElapsedTimeHUD(Player p){
-        String elapsed = gameManager.getTimeElapsedString();
+        String elapsed = Utils.getLongTimeString(gameManager.getElapsedTime());
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Game Time: ",ChatColor.RED);
         s.append(elapsed + " ");
