@@ -2,6 +2,8 @@ package xyz.baz9k.UHCGame;
 
 import org.bukkit.GameMode;
 import org.bukkit.World;
+import org.bukkit.WorldType;
+import org.bukkit.World.Environment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,6 +21,10 @@ import xyz.baz9k.UHCGame.util.TeamColors;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.Random;
+
+import com.onarandombox.MultiverseCore.api.MVWorldManager;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 
 public class GameManager implements Listener {
     private UHCGame plugin;
@@ -34,7 +40,9 @@ public class GameManager implements Listener {
     private Instant startTime = null;
     private Duration timeElapsed = null;
     
+    private MultiverseWorld[] mvUHCWorlds;
     private World uhcWorld;
+    private Random rand = new Random();
 
     private HashMap<Player, Integer> kills;
 
@@ -60,7 +68,13 @@ public class GameManager implements Listener {
         hudManager = new HUDManager(plugin, this); // exists always
         bbManager = new BossbarManager(plugin, this); // exists always
         plugin.getServer().getPluginManager().registerEvents(hudManager, plugin);
-        uhcWorld = plugin.getServer().getWorld("world"); // TODO MULTIVERSE
+
+        // get MV worlds or create if missing
+        mvUHCWorlds = new MultiverseWorld[2]; // overworld, nether
+        mvUHCWorlds[0] = getOrCreateMVWorld("game", Environment.NORMAL);
+        mvUHCWorlds[1] = getOrCreateMVWorld("game_nether", Environment.NETHER);
+
+        uhcWorld = mvUHCWorlds[0].getCBWorld(); // TODO MULTIVERSE
     }
 
     public void startUHC() {
@@ -225,6 +239,15 @@ public class GameManager implements Listener {
 
     public int getKills(Player p) {
         return kills.get(p);
+    }
+
+    public MultiverseWorld getOrCreateMVWorld(String world, Environment env) {
+        MVWorldManager wm = plugin.getMVWorldManager();
+        MultiverseWorld w = wm.getMVWorld(world);
+        if (w != null) return w;
+        
+        wm.addWorld(world, env, String.valueOf(rand.nextLong()), WorldType.NORMAL, true, null);
+        return wm.getMVWorld(world);
     }
 
     @EventHandler

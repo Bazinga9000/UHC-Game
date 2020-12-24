@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.api.MVWorldManager;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,5 +26,9 @@ public class UHCGame extends JavaPlugin {
 
         if (plugin instanceof MultiverseCore) return (MultiverseCore) plugin;
         throw new RuntimeException("Plugin Multiverse-Core is missing.");
+    }
+
+    public MVWorldManager getMVWorldManager() {
+        return getMVCore().getMVWorldManager();
     }
 }
