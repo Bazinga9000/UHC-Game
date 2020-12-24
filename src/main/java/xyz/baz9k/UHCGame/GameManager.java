@@ -106,15 +106,16 @@ public class GameManager implements Listener {
         // set time to 0 and delete rain
         uhcWorld.setTime(0);
         uhcWorld.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again.
-        uhcWorld.getWorldBorder().setSize(WORLDBORDER);
-        uhcWorld.getWorldBorder().setCenter(0.5, 0.5);
-
+        
         // begin uhc tick events
         tickManager = new TickManager(plugin);
         tickManager.runTaskTimer(plugin, 0L, 1L);
-
-        stage = 0;
+        
+        setStage(0);
         bbManager.enable();
+
+        // set wb center in case it was in the wrong position
+        uhcWorld.getWorldBorder().setCenter(0.5, 0.5);
     }
 
     public void endUHC() {
@@ -156,26 +157,37 @@ public class GameManager implements Listener {
 
     public void incrementStage() {
         stage++;
-        lastStageInstant = Instant.now();
-        bbManager.updateBossbarStage();
-        switch (stage) {
-            case 1: //worldborder starts moving the first time
-                uhcWorld.getWorldBorder().setSize(WB2, stageDurations[1].toSeconds());
-                break;
-            case 3: //worldborder starts moving the second time
-                uhcWorld.getWorldBorder().setSize(WB3, stageDurations[3].toSeconds());
-                break;
-            //TODO DEATHMATCH
-        }
-
+        updateStage();
     }
 
     public void setStage(int stage) {
-        // probably just for debug purposes and not intended to be used in actual UHC
         this.stage = stage;
         this.stage = getStage();
+        updateStage();
+    }
+
+    private void updateStage() {
         lastStageInstant = Instant.now();
         bbManager.updateBossbarStage();
+
+        //worldborder
+        switch (stage) {
+            case 0: // start of game (still border)
+                uhcWorld.getWorldBorder().setSize(WORLDBORDER);
+                break;
+            case 1: //worldborder starts moving the first time (border 1)
+                uhcWorld.getWorldBorder().setSize(WB2, stageDurations[1].toSeconds());
+                break;
+            case 2: // border stop
+                uhcWorld.getWorldBorder().setSize(WB2);
+            case 3: //worldborder starts moving the second time (border 2)
+                uhcWorld.getWorldBorder().setSize(WB3, stageDurations[3].toSeconds());
+                break;
+            case 4:
+                uhcWorld.getWorldBorder().setSize(WB3);
+                break;
+            //TODO DEATHMATCH
+        }
     }
 
     public Instant getLStageInstant() {
