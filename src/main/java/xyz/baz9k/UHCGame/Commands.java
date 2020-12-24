@@ -58,11 +58,12 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    Bukkit.broadcastMessage("UHC attempting start");
+                    Bukkit.broadcastMessage("[DEBUG] UHC attempting start");
                     plugin.getGameManager().startUHC();
-                    Bukkit.broadcastMessage("UHC started");
+                    Bukkit.broadcastMessage("[DEBUG] UHC started");
                 } catch (IllegalStateException e) {
-                    CommandAPI.fail("UHC has already started!");
+                    CommandAPI.fail(e.getMessage());
+                    throw e;
                 }
             }
         ).register();
@@ -77,11 +78,12 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    Bukkit.broadcastMessage("UHC attempting end");
+                    Bukkit.broadcastMessage("[DEBUG] UHC attempting end");
                     plugin.getGameManager().endUHC();
-                    Bukkit.broadcastMessage("UHC ended");
+                    Bukkit.broadcastMessage("[DEBUG] UHC ended");
                 } catch (IllegalStateException e) {
-                    CommandAPI.fail("UHC has not started!");
+                    CommandAPI.fail(e.getMessage());
+                    throw e;
                 }
             }
         ).register();
