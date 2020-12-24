@@ -6,9 +6,12 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 
+import java.util.Collection;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("unchecked")
 public class Commands {
     private final UHCGame plugin;
 
@@ -113,15 +116,16 @@ public class Commands {
     private void getTeamData() {
         new CommandAPICommand("getteamdata")
         .withArguments(
-            new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER)
+            new EntitySelectorArgument("player", EntitySelector.MANY_PLAYERS)
         )
         .executes(
             (sender, args) -> {
                 TeamManager tm = plugin.getGameManager().getTeamManager();
-                Player p = (Player) args[0];
-                int team = tm.getTeam(p);
-                PlayerState state = tm.getPlayerState(p);
-                sender.sendMessage(p.getName() + " is a " + state + " on team " + team);
+                for (Player p : (Collection<Player>) args[0]) {
+                    int team = tm.getTeam(p);
+                    PlayerState state = tm.getPlayerState(p);
+                    sender.sendMessage(p.getName() + " is a " + state + " on team " + team);
+                }
             }
         ).register();
     }
