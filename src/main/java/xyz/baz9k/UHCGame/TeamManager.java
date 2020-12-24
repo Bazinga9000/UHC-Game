@@ -34,6 +34,7 @@ public class TeamManager {
         UUID uuid = p.getUniqueId();
         if (playerMap.containsKey(uuid)) {
             playerMap.get(uuid).player = p;
+            return;
         };
         playerMap.put(uuid, new Node(0, PlayerState.SPECTATOR, p));
     }
