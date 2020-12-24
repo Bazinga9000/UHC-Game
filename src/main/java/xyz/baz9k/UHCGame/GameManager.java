@@ -38,6 +38,10 @@ public class GameManager implements Listener {
 
     private HashMap<Player, Integer> kills;
 
+    private final int WORLDBORDER = 1200;
+    private final int WB2 = 25;
+    private final int WB3 = 3;
+
     private int stage = -1;
     private Instant lastStageInstant = null;
     private Duration[] stageDurations = {
@@ -101,6 +105,8 @@ public class GameManager implements Listener {
         // set time to 0 and delete rain
         uhcWorld.setTime(0);
         uhcWorld.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again.
+        uhcWorld.getWorldBorder().setSize(WORLDBORDER);
+        uhcWorld.getWorldBorder().setCenter(0.5, 0.5);
 
         // begin uhc tick events
         tickManager = new TickManager(plugin);
@@ -159,21 +165,25 @@ public class GameManager implements Listener {
         lastStageInstant = Instant.now();
         bbManager.updateBossbarStage();
     }
+
     public Instant getLStageInstant() {
         return lastStageInstant;
     }
+
     public Duration getCurrentStageDuration() {
         return stageDurations[stage];
     }
+
     public boolean isDeathmatch() {
-        if (stage == stageDurations.length - 1) return true;
-        return false;
+        return stage == stageDurations.length - 1;
     }
+
     public boolean isStageComplete() {
         if (isDeathmatch()) return false;
         Instant end = lastStageInstant.plus(stageDurations[stage]);
         return !end.isAfter(Instant.now());
     }
+
     public World getUHCWorld() {
         return uhcWorld;
     }

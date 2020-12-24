@@ -24,6 +24,7 @@ public class BossbarManager {
             this.color = color;
         }
     }
+
     private BossbarStage[] stages = {
         new BossbarStage(ChatColor.RED + "Border Begins Shrinking", BarColor.RED), // Still border
         new BossbarStage(ChatColor.BLUE + "Border Stops Shrinking", BarColor.BLUE), // Border 1
@@ -38,18 +39,22 @@ public class BossbarManager {
         this.gameManager = gameManager;
         this.bossbar = Bukkit.createBossBar(null, BarColor.WHITE, BarStyle.SOLID);
     }
+
     private String getTimeString(long s) {
         if (s < 3600) return String.format("%02d:%02d", s / 60, (s % 60));
         return String.format("%d:%02d:%02d", s / 3600, (s % 3600) / 60, (s % 60));
     }
+
     public void enable() {
         for (Player p : plugin.getServer().getOnlinePlayers()) bossbar.addPlayer(p);
         bossbar.setVisible(true);
         updateBossbarStage();
     }
+
     public void enable(Player p) {
         bossbar.addPlayer(p);
     }
+
     public void tick() {
         if (gameManager.isDeathmatch()) {
             bossbar.setProgress(1);
@@ -69,13 +74,16 @@ public class BossbarManager {
         display += getTimeString(remainingSecs);
         bossbar.setTitle(display);
     }
+
     public void disable() {
         bossbar.setVisible(false);
     }
+
     public void updateBossbarStage() {
         bossbar.setColor(getBBStage().color);
         tick();
     }
+
     private BossbarStage getBBStage() {
         return stages[gameManager.getStage()];
     }
