@@ -38,6 +38,7 @@ public class GameManager implements Listener {
 
     private HashMap<Player, Integer> kills;
 
+    //TODO REMOVE THESE AND REPLACE WITH CONFIG MANAGER
     private final int WORLDBORDER = 1200;
     private final int WB2 = 25;
     private final int WB3 = 3;
@@ -157,7 +158,18 @@ public class GameManager implements Listener {
         stage++;
         lastStageInstant = Instant.now();
         bbManager.updateBossbarStage();
+        switch (stage) {
+            case 1: //worldborder starts moving the first time
+                uhcWorld.getWorldBorder().setSize(WB2, stageDurations[1].toSeconds());
+                break;
+            case 3: //worldborder starts moving the second time
+                uhcWorld.getWorldBorder().setSize(WB3, stageDurations[3].toSeconds());
+                break;
+            //TODO DEATHMATCH
+        }
+
     }
+
     public void setStage(int stage) {
         // probably just for debug purposes and not intended to be used in actual UHC
         this.stage = stage;
