@@ -5,6 +5,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import net.md_5.bungee.api.ChatColor;
 
 import java.util.List;
 import java.util.Collection;
@@ -12,6 +13,8 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("unchecked")
@@ -129,6 +132,74 @@ public class Commands {
         ).register();
     }
 
+    private void reseed() {
+        // TODO
+        // reseeds worlds
+    }
+    private void reseedSpecified() {
+        // TODO
+        // reseeds worlds
+    }
+
+    private void respawn() {
+        new CommandAPICommand("respawn")
+        .withArguments(
+            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
+        )
+        .executes(
+            (sender, args) -> {
+                GameManager gm = plugin.getGameManager();
+                TeamManager tm = gm.getTeamManager();
+
+                if (!plugin.getGameManager().isUHCStarted()) {
+                    CommandAPI.fail("Game has not started.");
+                    return;
+                }
+                for (Player p : (Collection<Player>) args[0]) {
+                    if (tm.isSpectator(p)) {
+                        sender.sendMessage(ChatColor.RED + "Cannot respawn spectator " + p.getName() + ".");
+                        continue;
+                    }
+
+                    Location respawn = p.getBedSpawnLocation();
+                    p.teleport(respawn);
+                    tm.setCombatantAliveStatus(p, true);
+                    p.setGameMode(GameMode.SURVIVAL);
+                }
+            }
+        ).register();
+    }
+
+    private void respawnLoc() {
+        new CommandAPICommand("respawn")
+        .withArguments(
+            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
+            new LocationArgument("location", LocationType.PRECISE_POSITION)
+        )
+        .executes(
+            (sender, args) -> {
+                GameManager gm = plugin.getGameManager();
+                TeamManager tm = gm.getTeamManager();
+
+                if (!plugin.getGameManager().isUHCStarted()) {
+                    CommandAPI.fail("Game has not started.");
+                    return;
+                }
+                for (Player p : (Collection<Player>) args[0]) {
+                    if (tm.isSpectator(p)) {
+                        sender.sendMessage(ChatColor.RED + "Cannot respawn spectator " + p.getName() + ".");
+                        continue;
+                    }
+
+                    Location respawn = (Location) args[1];
+                    p.teleport(respawn);
+                    tm.setCombatantAliveStatus(p, true);
+                    p.setGameMode(GameMode.SURVIVAL);
+                }
+            }
+        ).register();
+    }
+
     private void spectator() {
         new CommandAPICommand("spectator")
         .withArguments(
@@ -234,5 +305,7 @@ public class Commands {
         stageSet();
         randomizeTeamsLiteral();
         randomizeTeamsNTeams();
+        respawn();
+        respawnLoc();
     }
 }
