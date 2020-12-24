@@ -132,13 +132,14 @@ public class Commands {
     private void spectator() {
         new CommandAPICommand("spectator")
         .withArguments(
-            new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER)
+            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
         )
         .executes(
             (sender, args) -> {
-                Player p = (Player) args[0];
-                plugin.getGameManager().getTeamManager().setSpectator(p);
-                sender.sendMessage("Set " + p.getName() + " to state SPECTATOR.");
+                for (Player p : (Collection<Player>) args[0]) {
+                    plugin.getGameManager().getTeamManager().setSpectator(p);
+                    sender.sendMessage("Set " + p.getName() + " to state SPECTATOR.");
+                }
             }
         ).register();
     }
@@ -146,13 +147,14 @@ public class Commands {
     private void combatant() {
         new CommandAPICommand("combatant")
         .withArguments(
-            new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER)
+            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
         )
         .executes(
             (sender, args) -> {
-                Player p = (Player) args[0];
-                plugin.getGameManager().getTeamManager().setUnassignedCombatant(p);
-                sender.sendMessage("Set " + p.getName() + " to state COMBATANT_UNASSIGNED.");
+                for (Player p : (Collection<Player>) args[0]) {
+                    plugin.getGameManager().getTeamManager().setUnassignedCombatant(p);
+                    sender.sendMessage("Set " + p.getName() + " to state COMBATANT_UNASSIGNED.");
+                }
             }
         ).register();
 }
@@ -162,15 +164,16 @@ public class Commands {
 
         new CommandAPICommand("setteam")
         .withArguments(
-            new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER),
+            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
             new IntegerArgument("team", 1, numTeams)
         )
         .executes(
             (sender, args) -> {
-                Player p = (Player) args[0];
-                int t = (int) args[1];
-                plugin.getGameManager().getTeamManager().assignPlayerTeam(p, t);
-                sender.sendMessage("Set " + p.getName() + " to team " + t);
+                for (Player p : (Collection<Player>) args[0]) {
+                    int t = (int) args[1];
+                    plugin.getGameManager().getTeamManager().assignPlayerTeam(p, t);
+                    sender.sendMessage("Set " + p.getName() + " to team " + t);
+                }
             }
         ).register();
     }
@@ -178,7 +181,7 @@ public class Commands {
     private void getTeamData() {
         new CommandAPICommand("getteamdata")
         .withArguments(
-            new EntitySelectorArgument("player", EntitySelector.MANY_PLAYERS)
+            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
         )
         .executes(
             (sender, args) -> {
