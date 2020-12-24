@@ -27,9 +27,9 @@ public class GameManager implements Listener {
     private final HashMap<Player, String> previousDisplayNames;
     
     private final TeamManager teamManager = new TeamManager(); // exists always
-    private HUDManager hudManager = new HUDManager(plugin, this); // exists always
+    private HUDManager hudManager;
     private TickManager tickManager; // exists while game started
-    private BossbarManager bbManager = new BossbarManager(plugin, this); // exists always
+    private BossbarManager bbManager;
 
     private Instant startTime = null;
     private Duration timeElapsed = null;
@@ -52,6 +52,8 @@ public class GameManager implements Listener {
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
+        hudManager = new HUDManager(plugin, this); // exists always
+        bbManager = new BossbarManager(plugin, this); // exists always
         plugin.getServer().getPluginManager().registerEvents(hudManager, plugin);
         uhcWorld = plugin.getServer().getWorld("world"); // TODO MULTIVERSE
     }
