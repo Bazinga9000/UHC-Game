@@ -9,8 +9,6 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-
 public class Commands {
     private final UHCGame plugin;
 
@@ -31,7 +29,9 @@ public class Commands {
     private void uhcStart() {
         new CommandAPICommand("uhc")
         .withPermission(CommandPermission.OP)
-        .withArguments(new LiteralArgument("start"))
+        .withArguments(
+            new LiteralArgument("start")
+        )
         .executes(
             (sender, args) -> {
                 try {
@@ -48,7 +48,9 @@ public class Commands {
     private void uhcEnd() {
         new CommandAPICommand("uhc")
         .withPermission(CommandPermission.OP)
-        .withArguments(new LiteralArgument("end"))
+        .withArguments(
+            new LiteralArgument("end")
+        )
         .executes(
             (sender, args) -> {
                 try {
@@ -63,11 +65,10 @@ public class Commands {
 }
 
     private void spectator() {
-        ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
-
         new CommandAPICommand("spectator")
-        .withArguments(arguments)
+        .withArguments(
+            new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER)
+        )
         .executes(
             (sender, args) -> {
                 Player p = (Player) args[0];
@@ -78,11 +79,10 @@ public class Commands {
     }
 
     private void combatant() {
-        ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
-
         new CommandAPICommand("combatant")
-        .withArguments(arguments)
+        .withArguments(
+            new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER)
+        )
         .executes(
             (sender, args) -> {
                 Player p = (Player) args[0];
@@ -93,13 +93,13 @@ public class Commands {
 }
 
     private void setTeam() {
-        ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
         int numTeams = plugin.getGameManager().getTeamManager().getNumTeams();
-        arguments.add(new IntegerArgument("team",1,numTeams));
 
         new CommandAPICommand("setteam")
-        .withArguments(arguments)
+        .withArguments(
+            new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER),
+            new IntegerArgument("team", 1, numTeams)
+        )
         .executes(
             (sender, args) -> {
                 Player p = (Player) args[0];
@@ -111,11 +111,10 @@ public class Commands {
     }
 
     private void getTeamData() {
-        ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
-
         new CommandAPICommand("getteamdata")
-        .withArguments(arguments)
+        .withArguments(
+            new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER)
+        )
         .executes(
             (sender, args) -> {
                 TeamManager tm = plugin.getGameManager().getTeamManager();
@@ -128,11 +127,10 @@ public class Commands {
     }
 
     private void stageNext() {
-        ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new LiteralArgument("next"));
-
         new CommandAPICommand("stage")
-        .withArguments(arguments)
+        .withArguments(
+            new LiteralArgument("next")
+        )
         .withPermission(CommandPermission.OP)
         .executes(
             (sender, args) -> {
@@ -142,12 +140,11 @@ public class Commands {
         ).register();
     }
     private void stageSet() {
-        ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new LiteralArgument("set"));
-        arguments.add(new IntegerArgument("stage"));
-
         new CommandAPICommand("stage")
-        .withArguments(arguments)
+        .withArguments(
+            new LiteralArgument("set"),
+            new IntegerArgument("stage")
+        )
         .withPermission(CommandPermission.OP)
         .executes(
             (sender, args) -> {
