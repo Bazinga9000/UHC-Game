@@ -30,7 +30,7 @@ public class BossbarManager {
         new BossbarStage(ChatColor.RED + "Border Begins Shrinking... Again.", BarColor.RED), // Border stops
         new BossbarStage(ChatColor.BLUE + "Border Stops Shrinking... Again", BarColor.RED), // Border 2
         new BossbarStage(ChatColor.WHITE + "The Battle at the Top of the World", BarColor.WHITE), // Waiting until DM
-        new BossbarStage(ChatColor.DARK_PURPLE + "Heat Death of the Universe", BarColor.PURPLE) // DEATHMATCH
+        new BossbarStage(ChatColor.DARK_PURPLE + "∞", BarColor.PURPLE) // DEATHMATCH
     };
 
     public BossbarManager(UHCGame plugin, GameManager gameManager) {
