@@ -202,7 +202,7 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player p = event.getPlayer();
-        teamManager.addPlayer(event.getPlayer());
+        teamManager.addPlayer(p);
         if(isUHCStarted()) {
             bbManager.enable(p);
             hudManager.initializePlayerHUD(p);
