@@ -28,7 +28,7 @@ public class BossbarManager {
         new BossbarStage(ChatColor.RED + "Border Begins Shrinking", BarColor.RED), // Still border
         new BossbarStage(ChatColor.BLUE + "Border Stops Shrinking", BarColor.BLUE), // Border 1
         new BossbarStage(ChatColor.RED + "Border Begins Shrinking... Again.", BarColor.RED), // Border stops
-        new BossbarStage(ChatColor.BLUE + "Border Stops Shrinking... Again", BarColor.RED), // Border 2
+        new BossbarStage(ChatColor.BLUE + "Border Stops Shrinking... Again", BarColor.BLUE), // Border 2
         new BossbarStage(ChatColor.WHITE + "The Battle at the Top of the World", BarColor.WHITE), // Waiting until DM
         new BossbarStage(ChatColor.DARK_PURPLE + "∞", BarColor.PURPLE) // DEATHMATCH
     };
