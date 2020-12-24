@@ -47,6 +47,9 @@ public class BossbarManager {
         bossbar.setVisible(true);
         updateBossbarStage();
     }
+    public void enable(Player p) {
+        bossbar.addPlayer(p);
+    }
     public void tick() {
         if (gameManager.isDeathmatch()) {
             bossbar.setProgress(1);
@@ -69,7 +72,6 @@ public class BossbarManager {
     public void disable() {
         bossbar.setVisible(false);
     }
-
     public void updateBossbarStage() {
         bossbar.setColor(getBBStage().color);
         tick();

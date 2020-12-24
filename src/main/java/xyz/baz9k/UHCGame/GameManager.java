@@ -204,6 +204,7 @@ public class GameManager implements Listener {
         Player p = event.getPlayer();
         teamManager.addPlayer(event.getPlayer());
         if(isUHCStarted()) {
+            bbManager.enable(p);
             hudManager.initializePlayerHUD(p);
             hudManager.addPlayerToTeams(p);
         }
