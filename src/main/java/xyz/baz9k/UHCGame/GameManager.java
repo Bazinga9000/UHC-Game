@@ -42,7 +42,7 @@ public class GameManager implements Listener {
     
     private MultiverseWorld[] mvUHCWorlds;
     private World uhcWorld;
-    private Random rand = new Random();
+    private boolean worldsRegened = false;
 
     private HashMap<Player, Integer> kills;
 
@@ -78,12 +78,16 @@ public class GameManager implements Listener {
     }
 
     public void startUHC() {
+        // check if game is OK to start
         if (isUHCStarted) throw new IllegalStateException("UHC has already started.");
         for (Player p : plugin.getServer().getOnlinePlayers()) {
-            if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) throw new IllegalStateException("Teams not assigned.");
+            if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) throw new IllegalStateException("Teams have not been assigned.");
         }
+        if (!worldsRegened) throw new IllegalStateException("UHC worlds have not been regenerated. Run /reseed to regenerate.");
 
         isUHCStarted = true;
+        worldsRegened = false;
+
         startTime = lastStageInstant = Instant.now();
         updateElapsedTime();
         this.kills = new HashMap<>();
@@ -133,8 +137,8 @@ public class GameManager implements Listener {
     }
 
     public void endUHC() {
-        if (!isUHCStarted)
-            throw new IllegalStateException("UHC has not begun.");
+        // check if game is OK to end
+        if (!isUHCStarted) throw new IllegalStateException("UHC has not begun.");
         isUHCStarted = false;
 
         // update display names
@@ -246,10 +250,19 @@ public class GameManager implements Listener {
         MultiverseWorld w = wm.getMVWorld(world);
         if (w != null) return w;
         
-        wm.addWorld(world, env, String.valueOf(rand.nextLong()), WorldType.NORMAL, true, null);
+        Random temp = new Random();
+        wm.addWorld(world, env, String.valueOf(temp.nextLong()), WorldType.NORMAL, true, null);
         return wm.getMVWorld(world);
     }
 
+    public boolean haveWorldsRegened() {
+        return worldsRegened;
+    }
+
+    public void setWorldsRegenedStatus(boolean status) {
+        worldsRegened = status;
+    }
+    
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player p = event.getPlayer();
