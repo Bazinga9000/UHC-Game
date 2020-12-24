@@ -45,6 +45,7 @@ public class BossbarManager {
     public void enable() {
         for (Player p : plugin.getServer().getOnlinePlayers()) bossbar.addPlayer(p);
         bossbar.setVisible(true);
+        updateBossbarStage();
     }
     public void tick() {
         if (getBBStage() == stages[stages.length - 1]) {
