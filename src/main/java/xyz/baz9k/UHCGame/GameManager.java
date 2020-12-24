@@ -249,6 +249,10 @@ public class GameManager implements Listener {
         return !end.isAfter(Instant.now());
     }
 
+    public MultiverseWorld[] getMVUHCWorlds() {
+        return mvUHCWorlds;
+    }
+
     public World getUHCWorld(Environment env) {
         MultiverseWorld mvWorld;
         switch (env) {

@@ -8,6 +8,11 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.md_5.bungee.api.ChatColor;
 
 import java.util.List;
+import java.util.Random;
+
+import com.onarandombox.MultiverseCore.api.MVWorldManager;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -133,12 +138,36 @@ public class Commands {
     }
 
     private void reseed() {
-        // TODO
         // reseeds worlds
+        new CommandAPICommand("reseed")
+        .executes(
+            (sender, args) -> {
+                long seed = new Random().nextLong();
+                MVWorldManager wm = plugin.getMVWorldManager();
+                for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
+                    String name = mvWorld.getName();
+                    wm.regenWorld(name, true, false, String.valueOf(seed));
+                }
+                sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
+            }
+        ).register();
     }
     private void reseedSpecified() {
-        // TODO
         // reseeds worlds
+        new CommandAPICommand("reseed")
+        .withArguments(
+            new TextArgument("seed")
+        )
+        .executes(
+            (sender, args) -> {
+                MVWorldManager wm = plugin.getMVWorldManager();
+                for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
+                    String name = mvWorld.getName();
+                    wm.regenWorld(name, true, false, (String) args[0]);
+                    sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
+                }
+            }
+        ).register();
     }
 
     private void respawn() {
@@ -305,6 +334,8 @@ public class Commands {
         stageSet();
         randomizeTeamsLiteral();
         randomizeTeamsNTeams();
+        reseed();
+        reseedSpecified();
         respawn();
         respawnLoc();
     }
