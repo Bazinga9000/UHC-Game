@@ -4,4 +4,4 @@ version: 0.0
 author: Bazinga_9000 Nefarious Dealings LLC
 api-version: 1.16
 description: A plugin for UHC games
-depend: [CommandAPI]
+depend: [CommandAPI, Multiverse-Core]
