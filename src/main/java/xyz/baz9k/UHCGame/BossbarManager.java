@@ -53,15 +53,16 @@ public class BossbarManager {
             return;
         }
         // update progress bar
-        Duration elapsedDur = Duration.between(gameManager.getLStageInstant(), Instant.now());
+        Duration stageDuration = gameManager.getCurrentStageDuration();
+        Duration remainingDur = Duration.between(Instant.now(), gameManager.getLStageInstant().plus(stageDuration));
 
-        long elapsedSecs = elapsedDur.getSeconds();
-        long totalSecs = gameManager.getCurrentStageDuration().getSeconds();
-        bossbar.setProgress((double) elapsedSecs / totalSecs);
+        long remainingSecs = remainingDur.getSeconds();
+        long totalSecs = stageDuration.getSeconds();
+        bossbar.setProgress((double) remainingSecs / totalSecs);
         // change display title
         String display = getBBStage().title;
         display += " | ";
-        display += getTimeString(elapsedSecs);
+        display += getTimeString(remainingSecs);
         bossbar.setTitle(display);
     }
     public void disable() {

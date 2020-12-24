@@ -58,6 +58,10 @@ public class GameManager implements Listener {
 
     public void startUHC() {
         if (isUHCStarted) throw new IllegalStateException("UHC has already started.");
+        for (Player p : plugin.getServer().getOnlinePlayers()) {
+            if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) throw new IllegalStateException("Teams not assigned.");
+        }
+        
         isUHCStarted = true;
         startTime = lastStageInstant = Instant.now();
         updateElapsedTime();
