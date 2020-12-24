@@ -48,7 +48,7 @@ public class BossbarManager {
         updateBossbarStage();
     }
     public void tick() {
-        if (getBBStage() == stages[stages.length - 1]) {
+        if (gameManager.isDeathmatch()) {
             bossbar.setProgress(1);
             bossbar.setTitle(getBBStage().title);
             return;

@@ -165,7 +165,12 @@ public class GameManager implements Listener {
     public Duration getCurrentStageDuration() {
         return stageDurations[stage];
     }
+    public boolean isDeathmatch() {
+        if (stage == stageDurations.length - 1) return true;
+        return false;
+    }
     public boolean isStageComplete() {
+        if (isDeathmatch()) return false;
         Instant end = lastStageInstant.plus(stageDurations[stage]);
         return !end.isAfter(Instant.now());
     }
