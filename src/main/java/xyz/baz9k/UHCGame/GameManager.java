@@ -63,7 +63,7 @@ public class GameManager implements Listener {
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) throw new IllegalStateException("Teams not assigned.");
         }
-        
+
         isUHCStarted = true;
         startTime = lastStageInstant = Instant.now();
         updateElapsedTime();
@@ -144,7 +144,7 @@ public class GameManager implements Listener {
     }
 
     public int getStage() {
-        return stage;
+        return Math.max(0, Math.min(stage, stageDurations.length));
     }
 
     public void incrementStage() {
@@ -155,6 +155,7 @@ public class GameManager implements Listener {
     public void setStage(int stage) {
         // probably just for debug purposes and not intended to be used in actual UHC
         this.stage = stage;
+        this.stage = getStage();
         lastStageInstant = Instant.now();
         bbManager.updateBossbarStage();
     }
