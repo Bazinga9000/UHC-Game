@@ -143,7 +143,7 @@ public class Commands {
     }
     private void stageSet() {
         ArrayList<Argument> arguments = new ArrayList<>();
-        arguments.add(new LiteralArgument("next"));
+        arguments.add(new LiteralArgument("set"));
         arguments.add(new IntegerArgument("stage"));
 
         new CommandAPICommand("stage")
