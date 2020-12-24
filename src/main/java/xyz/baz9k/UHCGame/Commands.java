@@ -73,7 +73,7 @@ public class Commands {
             (sender, args) -> {
                 Player p = (Player) args[0];
                 plugin.getGameManager().getTeamManager().setSpectator(p);
-                sender.sendMessage("Set " + p + " to state SPECTATOR.");
+                sender.sendMessage("Set " + p.getName() + " to state SPECTATOR.");
             }
         ).register();
     }
@@ -87,7 +87,7 @@ public class Commands {
             (sender, args) -> {
                 Player p = (Player) args[0];
                 plugin.getGameManager().getTeamManager().setUnassignedCombatant(p);
-                sender.sendMessage("Set " + p + " to state COMBATANT_UNASSIGNED.");
+                sender.sendMessage("Set " + p.getName() + " to state COMBATANT_UNASSIGNED.");
             }
         ).register();
 }
@@ -105,7 +105,7 @@ public class Commands {
                 Player p = (Player) args[0];
                 int t = (int) args[1];
                 plugin.getGameManager().getTeamManager().assignPlayerTeam(p, t);
-                sender.sendMessage("Set " + p + " to team " + t);
+                sender.sendMessage("Set " + p.getName() + " to team " + t);
             }
         ).register();
     }
