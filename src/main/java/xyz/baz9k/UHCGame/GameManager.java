@@ -231,7 +231,7 @@ public class GameManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player p = event.getPlayer();
         teamManager.addPlayer(p);
-        if(isUHCStarted()) {
+        if(isUHCStarted) {
             bbManager.enable(p);
             hudManager.initializePlayerHUD(p);
             hudManager.addPlayerToTeams(p);
@@ -240,7 +240,7 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (this.isUHCStarted()) {
+        if (isUHCStarted) {
             Player deadPlayer = event.getEntity();
             if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
                 teamManager.setCombatantAliveStatus(deadPlayer, false);
@@ -276,7 +276,7 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        if (this.isUHCStarted()) {
+        if (isUHCStarted) {
             event.getPlayer().setGameMode(GameMode.SPECTATOR);
         }
     }
@@ -286,7 +286,7 @@ public class GameManager implements Listener {
         if (!(event.getEntity() instanceof Player)) return;
         Player p = (Player) event.getEntity();
 
-        if (this.isUHCStarted()) {
+        if (isUHCStarted) {
             // cancel friendlyFire
             if (event instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent entDmgEvent = (EntityDamageByEntityEvent) event;
