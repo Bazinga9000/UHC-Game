@@ -6,7 +6,10 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 
+import java.util.List;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,6 +17,15 @@ import org.bukkit.entity.Player;
 @SuppressWarnings("unchecked")
 public class Commands {
     private final UHCGame plugin;
+    private static HashMap<String, Integer> groupMap;
+    static {
+        groupMap = new HashMap<>();
+        groupMap.put("solos", 1);
+        groupMap.put("duos", 2);
+        groupMap.put("trios", 3);
+        groupMap.put("quartets", 4);
+        groupMap.put("quintets", 5);
+    }
 
     public Commands(UHCGame plugin) {
         this.plugin = plugin;
@@ -65,7 +77,57 @@ public class Commands {
                 }
             }
         ).register();
-}
+    }
+
+    private void randomizeTeamsLiteral() {
+        new CommandAPICommand("randomizeteams")
+        .withArguments(
+            new MultiLiteralArgument("solos", "duos", "trios", "quartets", "quintets")
+        )
+        .executes(
+            (sender, args) -> {
+                int pPerTeam = groupMap.get((String) args[0]);
+                TeamManager tm = plugin.getGameManager().getTeamManager();
+                List<Player> combatants = tm.getAllCombatants();
+
+                if (combatants.size() % pPerTeam != 0) {
+                    CommandAPI.fail("Cannot separate combatants into " + args[0] + ".");
+                    return;
+                }
+                int nTeams = combatants.size() / pPerTeam;
+                Collections.shuffle(combatants);
+                int i = 1;
+                for (Player p : combatants) {
+                    tm.assignPlayerTeam(p, i);
+                    i = (i + 1) % nTeams;
+                }
+                tm.setNumTeams(nTeams);
+
+            }
+        ).register();
+    }
+
+    private void randomizeTeamsNTeams() {
+        new CommandAPICommand("randomizeteams")
+        .withArguments(
+            new IntegerArgument("n", 1)
+        )
+        .executes(
+            (sender, args) -> {
+                TeamManager tm = plugin.getGameManager().getTeamManager();
+                List<Player> combatants = tm.getAllCombatants();
+
+                int nTeams = (int) args[0];
+                Collections.shuffle(combatants);
+                int i = 1;
+                for (Player p : combatants) {
+                    tm.assignPlayerTeam(p, i);
+                    i = (i + 1) % nTeams;
+                }
+                tm.setNumTeams(nTeams);
+            }
+        ).register();
+    }
 
     private void spectator() {
         new CommandAPICommand("spectator")
@@ -167,5 +229,7 @@ public class Commands {
         getTeamData();
         stageNext();
         stageSet();
+        randomizeTeamsLiteral();
+        randomizeTeamsNTeams();
     }
 }
