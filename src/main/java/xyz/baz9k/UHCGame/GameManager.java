@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.World.Environment;
@@ -20,11 +21,13 @@ import xyz.baz9k.UHCGame.util.TeamColors;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiverseCore.api.WorldPurger;
 
 public class GameManager implements Listener {
     private UHCGame plugin;
@@ -41,7 +44,6 @@ public class GameManager implements Listener {
     private Duration timeElapsed = null;
     
     private MultiverseWorld[] mvUHCWorlds;
-    private World uhcWorld;
     private boolean worldsRegened = false;
 
     private HashMap<Player, Integer> kills;
@@ -73,8 +75,6 @@ public class GameManager implements Listener {
         mvUHCWorlds = new MultiverseWorld[2]; // overworld, nether
         mvUHCWorlds[0] = getOrCreateMVWorld("game", Environment.NORMAL);
         mvUHCWorlds[1] = getOrCreateMVWorld("game_nether", Environment.NETHER);
-
-        uhcWorld = mvUHCWorlds[0].getCBWorld(); // TODO MULTIVERSE
     }
 
     public void startUHC() {
@@ -120,20 +120,40 @@ public class GameManager implements Listener {
             // activate hud things for all
             hudManager.initializePlayerHUD(p);
         }
-
-        // set time to 0 and delete rain
-        uhcWorld.setTime(0);
-        uhcWorld.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again.
         
+        WorldPurger purger = plugin.getMVWorldManager().getTheWorldPurger();
+        for (MultiverseWorld mvWorld : mvUHCWorlds) {
+            World w = mvWorld.getCBWorld();
+            // set time to 0 and delete rain
+            w.setTime(0);
+            w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
+            
+            w.getWorldBorder().setCenter(0.5, 0.5);
+            w.getWorldBorder().setWarningDistance(25);
+
+            Gamerules.set(w);
+            purger.purgeWorld(mvWorld, Arrays.asList("MONSTERS"), false, false); // multiverse is stupid (purges all monsters, hopefully)
+
+            // create beacon in worlds
+            w.getBlockAt(0, 1, 0).setType(Material.BEACON);
+            w.getBlockAt(0, 2, 0).setType(Material.BEDROCK);
+            for (int x = -1; x < 2; x++) {
+                for (int z = -1; z < 2; z++) {
+                    w.getBlockAt(x, 0, z).setType(Material.NETHERITE_BLOCK);
+                }
+            }
+            for (int y = 3; y < 255; y++) {
+                w.getBlockAt(0, y, 0).setType(Material.BARRIER);
+            }
+        }
+        // TODO teleport, spreadplayers
+
         // begin uhc tick events
         tickManager = new TickManager(plugin);
         tickManager.runTaskTimer(plugin, 0L, 1L);
         
         setStage(0);
         bbManager.enable();
-
-        // set wb center in case it was in the wrong position
-        uhcWorld.getWorldBorder().setCenter(0.5, 0.5);
     }
 
     public void endUHC() {
@@ -189,22 +209,25 @@ public class GameManager implements Listener {
         bbManager.updateBossbarStage();
 
         //worldborder
-        switch (stage) {
-            case 0: // start of game (still border)
-                uhcWorld.getWorldBorder().setSize(WORLDBORDER);
-                break;
-            case 1: //worldborder starts moving the first time (border 1)
-                uhcWorld.getWorldBorder().setSize(WB2, stageDurations[1].toSeconds());
-                break;
-            case 2: // border stop
-                uhcWorld.getWorldBorder().setSize(WB2);
-            case 3: //worldborder starts moving the second time (border 2)
-                uhcWorld.getWorldBorder().setSize(WB3, stageDurations[3].toSeconds());
-                break;
-            case 4:
-                uhcWorld.getWorldBorder().setSize(WB3);
-                break;
-            //TODO DEATHMATCH
+        for (MultiverseWorld mvWorld : mvUHCWorlds) {
+            World w = mvWorld.getCBWorld();
+            switch (stage) {
+                case 0: // start of game (still border)
+                    w.getWorldBorder().setSize(WORLDBORDER);
+                    break;
+                case 1: //worldborder starts moving the first time (border 1)
+                    w.getWorldBorder().setSize(WB2, stageDurations[1].toSeconds());
+                    break;
+                case 2: // border stop
+                    w.getWorldBorder().setSize(WB2);
+                case 3: //worldborder starts moving the second time (border 2)
+                    w.getWorldBorder().setSize(WB3, stageDurations[3].toSeconds());
+                    break;
+                case 4:
+                    w.getWorldBorder().setSize(WB3);
+                    break;
+                //TODO DEATHMATCH
+            }
         }
     }
 
@@ -226,8 +249,21 @@ public class GameManager implements Listener {
         return !end.isAfter(Instant.now());
     }
 
-    public World getUHCWorld() {
-        return uhcWorld;
+    public World getUHCWorld(Environment env) {
+        MultiverseWorld mvWorld;
+        switch (env) {
+            case NORMAL:
+                mvWorld = mvUHCWorlds[0];
+                break;
+            case NETHER:
+                mvWorld = mvUHCWorlds[1];
+                break;
+            case THE_END:
+            default:
+                mvWorld = null;
+                break;
+        }
+        return mvWorld == null ? null : mvWorld.getCBWorld();
     }
 
     public boolean isUHCStarted() {

@@ -2,6 +2,7 @@ package xyz.baz9k.UHCGame;
 
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import xyz.baz9k.UHCGame.util.ColorGradient;
 import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
@@ -262,7 +263,7 @@ public class HUDManager implements Listener {
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Game Time: ",ChatColor.RED);
         s.append(elapsed + " ");
-        World world = gameManager.getUHCWorld();
+        World world = gameManager.getUHCWorld(Environment.NORMAL);
         long time = world.getTime();
         boolean isDay = !(13188 <= time && time <= 22812);
         Color dayCharacterColor = isDay ? new Color(255, 245, 123) : new Color(43, 47, 119);
