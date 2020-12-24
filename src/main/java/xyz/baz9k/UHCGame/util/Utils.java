@@ -20,4 +20,12 @@ public class Utils {
         return getLongTimeString(d.toSeconds());
     }
 
+    public static int mod(int x, int y) {
+        return ((x % y) + y) % y;
+    }
+
+    public static double mod(double x, double y) {
+        return ((x % y) + y) % y;
+    }
+
 }

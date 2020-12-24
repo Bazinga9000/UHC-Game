@@ -87,7 +87,7 @@ public class HUDManager implements Listener {
         double angle = Math.toDegrees(Math.atan2(dz, dx)); // angle btwn you & teammate
         double yeYaw = youLoc.getYaw();
 
-        double relAngle = (((yeYaw - angle + 90) % 360) + 360) % 360 - 180;
+        double relAngle = Utils.mod(yeYaw - angle + 90, 360) - 180;
         String arrow;
         if (112.5 < relAngle && relAngle < 157.5) arrow = "↙";
         else if (67.5 < relAngle && relAngle < 112.5) arrow = "←";
@@ -229,7 +229,7 @@ public class HUDManager implements Listener {
         
         // rotation format
         s.append(" (", ChatColor.WHITE);
-        double yaw = ((loc.getYaw() % 360) + 360) % 360;
+        double yaw = Utils.mod(loc.getYaw(), 360);
         String xf = yaw < 180 ? "+" : "-";
         String zf = yaw < 90 || yaw > 270 ? "+" : "-";
         s.append(ChatColor.RED + xf + "X " + ChatColor.BLUE + zf + "Z");
