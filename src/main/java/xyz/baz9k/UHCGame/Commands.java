@@ -15,6 +15,7 @@ import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("unchecked")
@@ -84,8 +85,20 @@ public class Commands {
         ).register();
     }
 
-    private void randomizeTeamsLiteral() {
-        new CommandAPICommand("randomizeteams")
+    private void _assignTeams(int n) {
+        TeamManager tm = plugin.getGameManager().getTeamManager();
+        List<Player> combatants = tm.getAllCombatants();
+
+        Collections.shuffle(combatants);
+        int i = 1;
+        for (Player p : combatants) {
+            tm.assignPlayerTeam(p, i);
+            i = (i + 1) % n;
+        }
+        tm.setNumTeams(n);
+    }
+    private void assignTeamsLiteral() {
+        new CommandAPICommand("assignteams")
         .withArguments(
             new MultiLiteralArgument("solos", "duos", "trios", "quartets", "quintets")
         )
@@ -93,43 +106,26 @@ public class Commands {
             (sender, args) -> {
                 int pPerTeam = groupMap.get((String) args[0]);
                 TeamManager tm = plugin.getGameManager().getTeamManager();
-                List<Player> combatants = tm.getAllCombatants();
+                int combSize = tm.getAllCombatants().size();
 
-                if (combatants.size() % pPerTeam != 0) {
+                if (combSize % pPerTeam != 0) {
                     CommandAPI.fail("Cannot separate combatants into " + args[0] + ".");
                     return;
                 }
-                int nTeams = combatants.size() / pPerTeam;
-                Collections.shuffle(combatants);
-                int i = 1;
-                for (Player p : combatants) {
-                    tm.assignPlayerTeam(p, i);
-                    i = (i + 1) % nTeams;
-                }
-                tm.setNumTeams(nTeams);
+                _assignTeams(combSize / pPerTeam);
 
             }
         ).register();
     }
 
-    private void randomizeTeamsNTeams() {
-        new CommandAPICommand("randomizeteams")
+    private void assignTeamsNTeams() {
+        new CommandAPICommand("assignteams")
         .withArguments(
             new IntegerArgument("n", 1)
         )
         .executes(
             (sender, args) -> {
-                TeamManager tm = plugin.getGameManager().getTeamManager();
-                List<Player> combatants = tm.getAllCombatants();
-
-                int nTeams = (int) args[0];
-                Collections.shuffle(combatants);
-                int i = 1;
-                for (Player p : combatants) {
-                    tm.assignPlayerTeam(p, i);
-                    i = (i + 1) % nTeams;
-                }
-                tm.setNumTeams(nTeams);
+                _assignTeams((int) args[0]);
             }
         ).register();
     }
@@ -143,6 +139,17 @@ public class Commands {
         // reseeds worlds
     }
 
+    private void _respawn(CommandSender sender, Player p, Location loc) {
+        TeamManager tm = plugin.getGameManager().getTeamManager();
+        if (tm.isSpectator(p)) {
+            sender.sendMessage(ChatColor.RED + "Cannot respawn spectator " + p.getName() + ".");
+            return;
+        }
+
+        p.teleport(loc);
+        tm.setCombatantAliveStatus(p, true);
+        p.setGameMode(GameMode.SURVIVAL);
+    }
     private void respawn() {
         new CommandAPICommand("respawn")
         .withArguments(
@@ -150,23 +157,12 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                GameManager gm = plugin.getGameManager();
-                TeamManager tm = gm.getTeamManager();
-
                 if (!plugin.getGameManager().isUHCStarted()) {
                     CommandAPI.fail("Game has not started.");
                     return;
                 }
                 for (Player p : (Collection<Player>) args[0]) {
-                    if (tm.isSpectator(p)) {
-                        sender.sendMessage(ChatColor.RED + "Cannot respawn spectator " + p.getName() + ".");
-                        continue;
-                    }
-
-                    Location respawn = p.getBedSpawnLocation();
-                    p.teleport(respawn);
-                    tm.setCombatantAliveStatus(p, true);
-                    p.setGameMode(GameMode.SURVIVAL);
+                    _respawn(sender, p, p.getBedSpawnLocation());
                 }
             }
         ).register();
@@ -180,23 +176,12 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                GameManager gm = plugin.getGameManager();
-                TeamManager tm = gm.getTeamManager();
-
                 if (!plugin.getGameManager().isUHCStarted()) {
                     CommandAPI.fail("Game has not started.");
                     return;
                 }
                 for (Player p : (Collection<Player>) args[0]) {
-                    if (tm.isSpectator(p)) {
-                        sender.sendMessage(ChatColor.RED + "Cannot respawn spectator " + p.getName() + ".");
-                        continue;
-                    }
-
-                    Location respawn = (Location) args[1];
-                    p.teleport(respawn);
-                    tm.setCombatantAliveStatus(p, true);
-                    p.setGameMode(GameMode.SURVIVAL);
+                    _respawn(sender, p, (Location) args[1]);
                 }
             }
         ).register();
@@ -315,8 +300,8 @@ public class Commands {
         getTeamData();
         stageNext();
         stageSet();
-        randomizeTeamsLiteral();
-        randomizeTeamsNTeams();
+        assignTeamsLiteral();
+        assignTeamsNTeams();
         respawn();
         respawnLoc();
         config();
