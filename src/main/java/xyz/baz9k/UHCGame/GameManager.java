@@ -12,6 +12,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import xyz.baz9k.UHCGame.util.DelayedMessageSender;
 import xyz.baz9k.UHCGame.util.TeamColors;
@@ -79,20 +80,24 @@ public class GameManager implements Listener {
         startTime = lastStageInstant = Instant.now();
         updateElapsedTime();
         this.kills = new HashMap<>();
+        
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             // archive previous display name
             previousDisplayNames.put(p, p.getDisplayName());
-
+            
             // fully heal, adequately saturate, remove XP
             p.setHealth(20.0f);
             p.setFoodLevel(20);
             p.setSaturation(5.0f);
             p.setExp(0.0f);
-
+            
             // clear all potion effects
             for (PotionEffect effect : p.getActivePotionEffects()) {
                 p.removePotionEffect(effect.getType());
             }
+
+            // 60s grace period
+            PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
 
             if (!teamManager.isSpectator(p)) {
                 kills.put(p, 0);
