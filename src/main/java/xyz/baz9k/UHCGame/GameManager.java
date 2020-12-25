@@ -26,10 +26,11 @@ public class GameManager implements Listener {
     private boolean isUHCStarted = false;
     private final HashMap<Player, String> previousDisplayNames;
     
-    private final TeamManager teamManager = new TeamManager(); // exists always
+    private final TeamManager teamManager;
     private HUDManager hudManager;
-    private TickManager tickManager; // exists while game started
+    private TickManager tickManager;
     private BossbarManager bbManager;
+    private ConfigManager cfgManager;
 
     private Instant startTime = null;
     private Duration timeElapsed = null;
@@ -57,8 +58,13 @@ public class GameManager implements Listener {
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
-        hudManager = new HUDManager(plugin, this); // exists always
-        bbManager = new BossbarManager(plugin, this); // exists always
+
+        // init all managers (minus tick, b/c tick is created at uhc start)
+        teamManager = new TeamManager();
+        hudManager = new HUDManager(plugin, this);
+        bbManager = new BossbarManager(plugin, this);
+        cfgManager = new ConfigManager(plugin, this);
+
         plugin.getServer().getPluginManager().registerEvents(hudManager, plugin);
         uhcWorld = plugin.getServer().getWorld("world"); // TODO MULTIVERSE
     }
@@ -149,6 +155,10 @@ public class GameManager implements Listener {
 
     public BossbarManager getBossbarManager() {
         return bbManager;
+    }
+
+    public ConfigManager getConfigManager() {
+        return cfgManager;
     }
 
     public int getStage() {

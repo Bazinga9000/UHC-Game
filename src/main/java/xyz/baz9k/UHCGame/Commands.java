@@ -296,6 +296,16 @@ public class Commands {
         ).register();
     }
 
+    private void config() {
+        new CommandAPICommand("config")
+        .executesPlayer(
+            (sender, args) -> {
+                ConfigManager cfgManager = plugin.getGameManager().getConfigManager();
+                cfgManager.openMenu(sender);
+            }
+        ).register();
+    }
+
     void registerAll() {
         uhcStart();
         uhcEnd();
@@ -309,5 +319,6 @@ public class Commands {
         randomizeTeamsNTeams();
         respawn();
         respawnLoc();
+        config();
     }
 }
