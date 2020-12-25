@@ -3,10 +3,10 @@ package xyz.baz9k.UHCGame;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class TickManager extends BukkitRunnable {
+public class GameTick extends BukkitRunnable {
     private UHCGame plugin;
     private GameManager manager;
-    public TickManager(UHCGame plugin) {
+    public GameTick(UHCGame plugin) {
         this.plugin = plugin;
         manager = plugin.getGameManager();
     }

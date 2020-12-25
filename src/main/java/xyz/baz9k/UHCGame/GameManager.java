@@ -28,9 +28,9 @@ public class GameManager implements Listener {
     
     private final TeamManager teamManager;
     private HUDManager hudManager;
-    private TickManager tickManager;
     private BossbarManager bbManager;
     private ConfigManager cfgManager;
+    private GameTick tick;
 
     private Instant startTime = null;
     private Duration timeElapsed = null;
@@ -114,8 +114,8 @@ public class GameManager implements Listener {
         uhcWorld.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again.
         
         // begin uhc tick events
-        tickManager = new TickManager(plugin);
-        tickManager.runTaskTimer(plugin, 0L, 1L);
+        tick = new GameTick(plugin);
+        tick.runTaskTimer(plugin, 0L, 1L);
         
         setStage(0);
         bbManager.enable();
@@ -138,7 +138,7 @@ public class GameManager implements Listener {
         teamManager.resetAllPlayers();
         hudManager.cleanup();
         kills.clear();
-        tickManager.cancel();
+        tick.cancel();
 
         stage = -1;
         bbManager.disable();
