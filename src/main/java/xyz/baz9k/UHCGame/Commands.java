@@ -37,12 +37,14 @@ public class Commands {
     /*
     /uhc start
     /uhc end
-    /spectator <player>
-    /combatant <player>
-    /setteam <player> <team : int>
-    /getteamdata <player>
+    /assignteams <solos|duos|trios|quartets|quintets|n: int>
+    /reseed (seed: string)
+    /respawn (loc: location)
+    /state get <target: players>
+    /state set <target: players> <spectator|combatant>
+    /state set <target: players> combatant <team: int>
     /stage next
-    /stage set <n>
+    /stage set <n: int>
      */
 
     private void uhcStart() {
@@ -187,58 +189,10 @@ public class Commands {
         ).register();
     }
 
-    private void spectator() {
-        new CommandAPICommand("spectator")
+    private void stateGet() {
+        new CommandAPICommand("state")
         .withArguments(
-            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
-        )
-        .executes(
-            (sender, args) -> {
-                for (Player p : (Collection<Player>) args[0]) {
-                    plugin.getGameManager().getTeamManager().setSpectator(p);
-                    sender.sendMessage("Set " + p.getName() + " to state SPECTATOR.");
-                }
-            }
-        ).register();
-    }
-
-    private void combatant() {
-        new CommandAPICommand("combatant")
-        .withArguments(
-            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
-        )
-        .executes(
-            (sender, args) -> {
-                for (Player p : (Collection<Player>) args[0]) {
-                    plugin.getGameManager().getTeamManager().setUnassignedCombatant(p);
-                    sender.sendMessage("Set " + p.getName() + " to state COMBATANT_UNASSIGNED.");
-                }
-            }
-        ).register();
-}
-
-    private void setTeam() {
-        int numTeams = plugin.getGameManager().getTeamManager().getNumTeams();
-
-        new CommandAPICommand("setteam")
-        .withArguments(
-            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
-            new IntegerArgument("team", 1, numTeams)
-        )
-        .executes(
-            (sender, args) -> {
-                for (Player p : (Collection<Player>) args[0]) {
-                    int t = (int) args[1];
-                    plugin.getGameManager().getTeamManager().assignPlayerTeam(p, t);
-                    sender.sendMessage("Set " + p.getName() + " to team " + t);
-                }
-            }
-        ).register();
-    }
-
-    private void getTeamData() {
-        new CommandAPICommand("getteamdata")
-        .withArguments(
+            new LiteralArgument("get"),
             new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
         )
         .executes(
@@ -248,6 +202,56 @@ public class Commands {
                     int team = tm.getTeam(p);
                     PlayerState state = tm.getPlayerState(p);
                     sender.sendMessage(p.getName() + " is a " + state + " on team " + team);
+                }
+            }
+        ).register();
+    }
+
+    private void stateSet() {
+        new CommandAPICommand("state")
+        .withArguments(
+            new LiteralArgument("set"),
+            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
+            new MultiLiteralArgument("spectator", "combatant")
+        )
+        .executes(
+            (sender, args) -> {
+                TeamManager tm = plugin.getGameManager().getTeamManager();
+                for (Player p : (Collection<Player>) args[0]) {
+                    switch ((String) args[1]) {
+                        case "spectator":
+                            tm.setSpectator(p);
+                            break;
+                        case "combatant":
+                            tm.setUnassignedCombatant(p);
+                            break;
+                    }
+                    sender.sendMessage("Set " + p.getName() + " to state " + tm.getPlayerState(p) + ".");
+                }
+            }
+        ).register();
+    }
+
+    private void stateSetTeam() {
+        new CommandAPICommand("state")
+        .withArguments(
+            new LiteralArgument("set"),
+            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
+            new LiteralArgument("combatant"),
+            new IntegerArgument("team", 1)
+        )
+        .executes(
+            (sender, args) -> {
+                TeamManager tm = plugin.getGameManager().getTeamManager();
+                int max = tm.getNumTeams();
+                int t = (int) args[1];
+                if (t > max) {
+                    CommandAPI.fail("Team must not be greater than the number of teams.");
+                    return;
+                }
+                for (Player p : (Collection<Player>) args[0]) {
+                    plugin.getGameManager().getTeamManager().assignPlayerTeam(p, t);
+                    sender.sendMessage("Set " + p.getName() + " to team " + t);
                 }
             }
         ).register();
@@ -294,10 +298,9 @@ public class Commands {
     void registerAll() {
         uhcStart();
         uhcEnd();
-        spectator();
-        combatant();
-        setTeam();
-        getTeamData();
+        stateGet();
+        stateSet();
+        stateSetTeam();
         stageNext();
         stageSet();
         assignTeamsLiteral();
