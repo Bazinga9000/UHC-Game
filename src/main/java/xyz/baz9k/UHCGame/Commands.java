@@ -20,6 +20,7 @@ import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("unchecked")
@@ -139,18 +140,21 @@ public class Commands {
         ).register();
     }
 
+    private void _reseed(CommandSender sender, String seed) {
+        MVWorldManager wm = plugin.getMVWorldManager();
+        for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
+            wm.regenWorld(mvWorld.getName(), true, false, seed);
+        }
+        sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
+
+    }
     private void reseed() {
         // reseeds worlds
         new CommandAPICommand("reseed")
         .executes(
             (sender, args) -> {
                 long seed = new Random().nextLong();
-                MVWorldManager wm = plugin.getMVWorldManager();
-                for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
-                    String name = mvWorld.getName();
-                    wm.regenWorld(name, true, false, String.valueOf(seed));
-                }
-                sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
+                _reseed(sender, String.valueOf(seed));
             }
         ).register();
     }
@@ -162,12 +166,7 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                MVWorldManager wm = plugin.getMVWorldManager();
-                for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
-                    String name = mvWorld.getName();
-                    wm.regenWorld(name, true, false, (String) args[0]);
-                    sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
-                }
+                _reseed(sender, (String) args[0]);
             }
         ).register();
     }
