@@ -8,6 +8,11 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.md_5.bungee.api.ChatColor;
 
 import java.util.List;
+import java.util.Random;
+
+import com.onarandombox.MultiverseCore.api.MVWorldManager;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -121,13 +126,35 @@ public class Commands {
         ).register();
     }
 
+    private void _reseed(CommandSender sender, String seed) {
+        MVWorldManager wm = plugin.getMVWorldManager();
+        for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
+            wm.regenWorld(mvWorld.getName(), true, false, seed);
+        }
+        sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
+
+    }
     private void reseed() {
-        // TODO
         // reseeds worlds
+        new CommandAPICommand("reseed")
+        .executes(
+            (sender, args) -> {
+                long seed = new Random().nextLong();
+                _reseed(sender, String.valueOf(seed));
+            }
+        ).register();
     }
     private void reseedSpecified() {
-        // TODO
         // reseeds worlds
+        new CommandAPICommand("reseed")
+        .withArguments(
+            new TextArgument("seed")
+        )
+        .executes(
+            (sender, args) -> {
+                _reseed(sender, (String) args[0]);
+            }
+        ).register();
     }
 
     private void _respawn(CommandSender sender, Player p, Location loc) {
@@ -288,8 +315,8 @@ public class Commands {
         uhcStartEnd();
         assignTeamsLiteral();
         assignTeamsNTeams();
-        //reseed();
-        //reseedSpecified();
+        reseed();
+        reseedSpecified();
         respawn();
         respawnLoc();
         stateGet();

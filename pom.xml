@@ -21,6 +21,10 @@
             <id>commandapi</id>
             <url>https://raw.githubusercontent.com/JorelAli/CommandAPI/mvn-repo/</url>
         </repository>
+        <repository>
+            <id>Multiverse-Core</id>
+            <url>http://repo.onarandombox.com/content/repositories/multiverse/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -34,6 +38,12 @@
             <groupId>dev.jorel</groupId>
             <artifactId>commandapi-core</artifactId>
             <version>5.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.onarandombox.multiversecore</groupId>
+            <artifactId>Multiverse-Core</artifactId>
+            <version>4.2.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
