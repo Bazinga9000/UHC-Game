@@ -66,6 +66,7 @@ public class GameManager implements Listener {
         bbManager = new BossbarManager(plugin, this);
         cfgManager = new ConfigManager(plugin, this);
 
+        plugin.getServer().getPluginManager().registerEvents(cfgManager, plugin);
         plugin.getServer().getPluginManager().registerEvents(hudManager, plugin);
         uhcWorld = plugin.getServer().getWorld("world"); // TODO MULTIVERSE
     }
