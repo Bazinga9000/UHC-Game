@@ -6,6 +6,8 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.md_5.bungee.api.ChatColor;
+import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
+import xyz.baz9k.UHCGame.util.TeamColors;
 
 import java.util.List;
 import java.util.Random;
@@ -13,6 +15,7 @@ import java.util.Random;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -92,7 +95,43 @@ public class Commands {
             i = (i + 1) % n;
         }
         tm.setNumTeams(n);
+        _announceTeams();
     }
+
+    private void _announceTeams() {
+        TeamManager tm = plugin.getTeamManager();
+        for (int i = 1; i <= tm.getNumTeams(); i++) {
+            _announceTeamsLine(i);
+        }
+        _announceTeamsLine(0);
+
+    }
+
+    private void _announceTeamsLine(int t) {
+        TeamManager tm = plugin.getTeamManager();
+        List<Player> players;
+        if (t == 0) {
+            players = tm.getAllSpectators();
+        } else {
+            players = tm.getAllCombatantsOnTeam(t);
+        }
+        if (players.size() == 0) return;
+
+        ColoredStringBuilder s = new ColoredStringBuilder();
+        if (t == 0) {
+            s.append("Spectators", TeamColors.getTeamChatColor(0), ChatColor.ITALIC);
+        } else {
+            s.append("Team " + t, TeamColors.getTeamChatColor(t), ChatColor.BOLD);
+        }
+        s.append(": ");
+        List<String> plStrs = new ArrayList<>();
+        for (Player p : players) {
+            plStrs.add(p.toString());
+        }
+        s.append(String.join(", ", plStrs));
+        Bukkit.broadcastMessage(s.toString());
+    }
+
     private void assignTeamsLiteral() {
         new CommandAPICommand("assignteams")
         .withArguments(
