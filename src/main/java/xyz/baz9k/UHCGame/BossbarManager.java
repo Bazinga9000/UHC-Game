@@ -35,9 +35,9 @@ public class BossbarManager {
         new BossbarStage(ChatColor.DARK_PURPLE + "∞", BarColor.PURPLE) // DEATHMATCH
     };
 
-    public BossbarManager(UHCGame plugin, GameManager gameManager) {
+    public BossbarManager(UHCGame plugin) {
         this.plugin = plugin;
-        this.gameManager = gameManager;
+        this.gameManager = plugin.getGameManager();
         this.bossbar = Bukkit.createBossBar(null, BarColor.WHITE, BarStyle.SOLID);
     }
 

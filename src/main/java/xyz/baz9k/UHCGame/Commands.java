@@ -77,7 +77,7 @@ public class Commands {
     }
 
     private void _assignTeams(int n) {
-        TeamManager tm = plugin.getGameManager().getTeamManager();
+        TeamManager tm = plugin.getTeamManager();
         List<Player> combatants = tm.getAllCombatants();
 
         Collections.shuffle(combatants);
@@ -96,7 +96,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 int pPerTeam = groupMap.get((String) args[0]);
-                TeamManager tm = plugin.getGameManager().getTeamManager();
+                TeamManager tm = plugin.getTeamManager();
                 int combSize = tm.getAllCombatants().size();
 
                 if (combSize % pPerTeam != 0) {
@@ -131,7 +131,7 @@ public class Commands {
     }
 
     private void _respawn(CommandSender sender, Player p, Location loc) {
-        TeamManager tm = plugin.getGameManager().getTeamManager();
+        TeamManager tm = plugin.getTeamManager();
         if (tm.isSpectator(p)) {
             sender.sendMessage(ChatColor.RED + "Cannot respawn spectator " + p.getName() + ".");
             return;
@@ -186,7 +186,7 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                TeamManager tm = plugin.getGameManager().getTeamManager();
+                TeamManager tm = plugin.getTeamManager();
                 for (Player p : (Collection<Player>) args[0]) {
                     int team = tm.getTeam(p);
                     PlayerState state = tm.getPlayerState(p);
@@ -205,7 +205,7 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                TeamManager tm = plugin.getGameManager().getTeamManager();
+                TeamManager tm = plugin.getTeamManager();
                 for (Player p : (Collection<Player>) args[0]) {
                     switch ((String) args[1]) {
                         case "spectator":
@@ -231,7 +231,7 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                TeamManager tm = plugin.getGameManager().getTeamManager();
+                TeamManager tm = plugin.getTeamManager();
                 int max = tm.getNumTeams();
                 int t = (int) args[1];
                 if (t > max) {
@@ -239,7 +239,7 @@ public class Commands {
                     return;
                 }
                 for (Player p : (Collection<Player>) args[0]) {
-                    plugin.getGameManager().getTeamManager().assignPlayerTeam(p, t);
+                    plugin.getTeamManager().assignPlayerTeam(p, t);
                     sender.sendMessage("Set " + p.getName() + " to team " + t);
                 }
             }
@@ -278,7 +278,7 @@ public class Commands {
         new CommandAPICommand("config")
         .executesPlayer(
             (sender, args) -> {
-                ConfigManager cfgManager = plugin.getGameManager().getConfigManager();
+                ConfigManager cfgManager = plugin.getConfigManager();
                 cfgManager.openMenu(sender);
             }
         ).register();

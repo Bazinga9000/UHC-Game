@@ -10,14 +10,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class ConfigManager implements Listener {
-    private final UHCGame plugin;
-    private final GameManager gameManager;
     private Inventory menu;
 
-    public ConfigManager(UHCGame plugin, GameManager gameManager) {
-        this.plugin = plugin;
-        this.gameManager = gameManager;
-
+    public ConfigManager() {
         createMenu();
     }
     private void createMenu() {

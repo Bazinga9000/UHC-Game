@@ -26,9 +26,11 @@ import java.util.Collections;
 public class HUDManager implements Listener {
     private UHCGame plugin;
     private GameManager gameManager;
-    HUDManager(UHCGame plugin, GameManager gameManager) {
+    private TeamManager teamManager;
+    public HUDManager(UHCGame plugin) {
         this.plugin = plugin;
-        this.gameManager = gameManager;
+        this.gameManager = plugin.getGameManager();
+        this.teamManager = plugin.getTeamManager();
     }
 
     private static String createEmptyName(char c){
@@ -36,10 +38,9 @@ public class HUDManager implements Listener {
     }
 
     private String formatState(Player p) {
-        TeamManager tm = gameManager.getTeamManager();
 
-        PlayerState state = tm.getPlayerState(p);
-        int team = tm.getTeam(p);
+        PlayerState state = teamManager.getPlayerState(p);
+        int team = teamManager.getTeam(p);
 
         if (state == PlayerState.SPECTATOR) return ChatColor.AQUA.toString() + ChatColor.ITALIC + "Spectator";
         if (state == PlayerState.COMBATANT_UNASSIGNED) return ChatColor.ITALIC + "Unassigned";
@@ -48,7 +49,6 @@ public class HUDManager implements Listener {
 
     private String formatTeammate(Player you, Player teammate) {
         ColoredStringBuilder s = new ColoredStringBuilder();
-        TeamManager tm = gameManager.getTeamManager();
 
         double teammateHP = teammate.getHealth() + teammate.getAbsorptionAmount();
         double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
@@ -64,13 +64,13 @@ public class HUDManager implements Listener {
         }
 
         // prefix if spectator
-        if (tm.isSpectator(you)) {
-            int team = tm.getTeam(teammate);
+        if (teamManager.isSpectator(you)) {
+            int team = teamManager.getTeam(teammate);
             s.append(TeamColors.getTeamPrefixWithSpace(team));
         }
 
         // name and health
-        if (tm.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
+        if (teamManager.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
             s.append(teammate.getName(), ChatColor.GRAY, ChatColor.STRIKETHROUGH);
             s.append(" 0♥",ChatColor.GRAY, ChatColor.STRIKETHROUGH);
             return s.toString();
@@ -113,16 +113,14 @@ public class HUDManager implements Listener {
 
     private void setTeams(Player player){
         Scoreboard s = player.getScoreboard();
-        TeamManager tm = gameManager.getTeamManager();
         for(Player p : plugin.getServer().getOnlinePlayers()){
-            int team = tm.getTeam(p);
+            int team = teamManager.getTeam(p);
             addPlayerToScoreboardTeam(s, p, team);
         }
     }
 
     public void addPlayerToTeams(Player player){
-        TeamManager tm = gameManager.getTeamManager();
-        int team = tm.getTeam(player);
+        int team = teamManager.getTeam(player);
         for(Player p : plugin.getServer().getOnlinePlayers()){
             Scoreboard s = p.getScoreboard();
             addPlayerToScoreboardTeam(s, player, team);
@@ -195,14 +193,13 @@ public class HUDManager implements Listener {
 
     public void updateTeammateHUD(Player p) {
         Scoreboard b = p.getScoreboard();
-        TeamManager tm = gameManager.getTeamManager();
 
-        int team = tm.getTeam(p);
+        int team = teamManager.getTeam(p);
         List<Player> teammates;
-        if (tm.isAssignedCombatant(p)) {
-            teammates = tm.getAllCombatantsOnTeam(team);
+        if (teamManager.isAssignedCombatant(p)) {
+            teammates = teamManager.getAllCombatantsOnTeam(team);
         } else {
-            teammates = tm.getAllCombatants();
+            teammates = teamManager.getAllCombatants();
         }
         teammates.remove(p);
         Collections.sort(teammates, (t1, t2) -> (int)Math.ceil(t1.getHealth()) - (int)Math.ceil(t2.getHealth()));
@@ -274,31 +271,28 @@ public class HUDManager implements Listener {
     }
 
     public void updateCombatantsAliveHUD(Player p) {
-        TeamManager tm = gameManager.getTeamManager();
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Combatants: ", ChatColor.WHITE);
-        s.append(tm.countLivingCombatants());
+        s.append(teamManager.countLivingCombatants());
         s.append(" / ");
-        s.append(tm.countCombatants());
+        s.append(teamManager.countCombatants());
 
         setHUDLine(p, "combsalive", s.toString());
     }
 
     public void updateTeamsAliveHUD(Player p) {
-        TeamManager tm = gameManager.getTeamManager();
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Teams: ", ChatColor.WHITE);
-        s.append(tm.countLivingTeams());
+        s.append(teamManager.countLivingTeams());
         s.append(" / ");
-        s.append(tm.getNumTeams());
+        s.append(teamManager.getNumTeams());
 
         setHUDLine(p, "teamsalive", s.toString());
         
     }
 
     public void updateKillsHUD(Player p) {
-        TeamManager tm = gameManager.getTeamManager();
-        if (tm.isSpectator(p)) return;
+        if (teamManager.isSpectator(p)) return;
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Kills: ", ChatColor.WHITE);
         s.append(gameManager.getKills(p));
@@ -308,17 +302,16 @@ public class HUDManager implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent movement){
-        TeamManager tm = gameManager.getTeamManager();
         Player p = movement.getPlayer();
         if(gameManager.isUHCStarted())
             updateMovementHUD(p);
             // when someone moves, everyone who can see it (specs, ppl on team) should be able to see them move
-            for (Player spec : tm.getAllSpectators()) {
+            for (Player spec : teamManager.getAllSpectators()) {
                 updateTeammateHUD(spec);
             }
-            int team = tm.getTeam(p);
+            int team = teamManager.getTeam(p);
             if (team != 0) {
-                for (Player tmate : tm.getAllCombatantsOnTeam(team)) {
+                for (Player tmate : teamManager.getAllCombatantsOnTeam(team)) {
                     updateTeammateHUD(tmate);
                 }
             }

@@ -5,22 +5,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class GameTick extends BukkitRunnable {
     private UHCGame plugin;
-    private GameManager manager;
+    private GameManager gameManager;
     public GameTick(UHCGame plugin) {
         this.plugin = plugin;
-        manager = plugin.getGameManager();
+        gameManager = plugin.getGameManager();
     }
 
     @Override
     public void run() {
-        if (manager.isUHCStarted()) {
-            manager.updateElapsedTime();
-            if (manager.isStageComplete()) manager.incrementStage();
-            manager.getBossbarManager().tick();
+        if (gameManager.isUHCStarted()) {
+            gameManager.updateElapsedTime();
+            if (gameManager.isStageComplete()) gameManager.incrementStage();
+            plugin.getBossbarManager().tick();
             
             for (Player p : plugin.getServer().getOnlinePlayers()) {
-                manager.getHUDManager().updateElapsedTimeHUD(p);
-                manager.getHUDManager().updateWBHUD(p);
+                plugin.getHUDManager().updateElapsedTimeHUD(p);
+                plugin.getHUDManager().updateWBHUD(p);
             }
         }
     }
