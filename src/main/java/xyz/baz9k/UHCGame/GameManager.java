@@ -324,7 +324,11 @@ public class GameManager implements Listener {
                     (new DelayedMessageSender(teamEliminatedMessage)).runTaskLater(plugin, 1);
                 }
 
-                deadPlayer.setBedSpawnLocation(deadPlayer.getLocation(), true);
+                if (deadPlayer.getLocation().getY() < 0) {
+                    deadPlayer.setBedSpawnLocation(getUHCWorld(Environment.NORMAL).getSpawnLocation(), true);
+                } else {
+                    deadPlayer.setBedSpawnLocation(deadPlayer.getLocation(), true);
+                }
 
                 if (teamManager.countLivingTeams() == 1) {
                     String winnerMessage = "Only one team is left, this is when the game would end."; // TODO FANCY
