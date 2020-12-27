@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 
 public class TeamManager {
@@ -170,6 +171,11 @@ public class TeamManager {
         return players;
     }
 
+    private List<Player> onlyOnline(@NotNull List<Player> pList) {
+        return pList.stream()
+                    .filter(p -> p.isOnline())
+                    .collect(Collectors.toList());
+    }
     @NotNull
     public List<Player> getAllSpectators() {
         return getAllPlayersMatching(n -> n.state == PlayerState.SPECTATOR);
@@ -188,9 +194,23 @@ public class TeamManager {
 
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR && n.state != PlayerState.COMBATANT_UNASSIGNED && n.team == team);
     }
+    @NotNull
+    public List<Player> getAllOnlineSpectators() {
+        return onlyOnline(getAllSpectators());
+    }
 
-    public boolean isTeamEliminated(int team) {
-        return countLivingCombatantsInTeam(team) == 0;
+    @NotNull
+    public List<Player> getAllOnlineCombatants() {
+        return onlyOnline(getAllCombatants());
+    }
+
+    @NotNull
+    public List<Player> getAllOnlineCombatantsOnTeam(int t) {
+        return onlyOnline(getAllCombatantsOnTeam(t));
+    }
+
+    public boolean isTeamEliminated(int t) {
+        return countLivingCombatantsInTeam(t) == 0;
     }
 
     public boolean isSpectator(@NotNull Player p) {

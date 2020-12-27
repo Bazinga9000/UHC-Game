@@ -86,7 +86,7 @@ public class Commands {
 
     private void _assignTeams(int n) {
         TeamManager tm = plugin.getTeamManager();
-        List<Player> combatants = tm.getAllCombatants();
+        List<Player> combatants = tm.getAllOnlineCombatants();
 
         Collections.shuffle(combatants);
         int i = 1;
@@ -111,7 +111,7 @@ public class Commands {
         TeamManager tm = plugin.getTeamManager();
         List<Player> players;
         if (t == 0) {
-            players = tm.getAllSpectators();
+            players = tm.getAllOnlineSpectators();
         } else {
             players = tm.getAllCombatantsOnTeam(t);
         }
@@ -141,7 +141,7 @@ public class Commands {
             (sender, args) -> {
                 int pPerTeam = groupMap.get((String) args[0]);
                 TeamManager tm = plugin.getTeamManager();
-                int combSize = tm.getAllCombatants().size();
+                int combSize = tm.getAllOnlineCombatants().size();
 
                 if (combSize % pPerTeam != 0) {
                     CommandAPI.fail("Cannot separate combatants into " + args[0] + ".");
