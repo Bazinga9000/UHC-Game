@@ -15,8 +15,8 @@ public class UHCGame extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        teamManager = new TeamManager();
         cfgManager = new ConfigManager();
+        teamManager = new TeamManager(this);
         gameManager = new GameManager(this);
         hudManager = new HUDManager(this);
         bbManager = new BossbarManager(this);
