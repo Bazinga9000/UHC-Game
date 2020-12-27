@@ -27,6 +27,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.UUID;
 
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
@@ -50,7 +51,7 @@ public class GameManager implements Listener {
     private MultiverseWorld[] mvUHCWorlds;
     private boolean worldsRegened = false;
 
-    private HashMap<Player, Integer> kills;
+    private HashMap<UUID, Integer> kills;
 
     //TODO REMOVE THESE AND REPLACE WITH CONFIG MANAGER
     private final int WORLDBORDER = 1200;
@@ -118,12 +119,11 @@ public class GameManager implements Listener {
             // 60s grace period
             PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
 
-            if (!teamManager.isSpectator(p)) {
-                kills.put(p, 0);
-            }
-
             if (teamManager.isSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
+            } else {
+                p.setGameMode(GameMode.SURVIVAL);
+                kills.put(p.getUniqueId(), 0);
             }
 
             // set player display name
@@ -223,7 +223,7 @@ public class GameManager implements Listener {
                 case 3: //worldborder starts moving the second time (border 2)
                     w.getWorldBorder().setSize(WB3, stageDurations[3].toSeconds());
                     break;
-                case 4:
+                case 4: // waiting till DM
                     w.getWorldBorder().setSize(WB3);
                     break;
                 //TODO DEATHMATCH
@@ -289,7 +289,7 @@ public class GameManager implements Listener {
     }
 
     public int getKills(@NotNull Player p) {
-        return kills.get(p);
+        return kills.get(p.getUniqueId());
     }
 
     @NotNull
@@ -349,8 +349,8 @@ public class GameManager implements Listener {
             Player killer = deadPlayer.getKiller();
             if (killer != null) {
                 if (!teamManager.isSpectator(killer)) {
-                    int nKills = this.kills.get(killer);
-                    this.kills.put(killer, nKills + 1);
+                    int nKills = this.kills.get(killer.getUniqueId());
+                    this.kills.put(killer.getUniqueId(), nKills + 1);
                     hudManager.updateKillsHUD(killer);
                 }
             }
