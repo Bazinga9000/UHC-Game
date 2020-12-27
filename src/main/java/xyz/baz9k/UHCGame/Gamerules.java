@@ -3,7 +3,7 @@ package xyz.baz9k.UHCGame;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 
-public class Gamerules {
+public final class Gamerules {
     public static void set(World w) {
         w.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, true);
         w.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);

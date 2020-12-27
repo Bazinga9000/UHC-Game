@@ -140,7 +140,7 @@ public class HUDManager implements Listener {
 
     }
 
-    public void addHUDLine(Player p, String name, int position){
+    private void addHUDLine(Player p, String name, int position){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(name);
         if (team == null) team = b.registerNewTeam(name);
@@ -153,7 +153,7 @@ public class HUDManager implements Listener {
         hud.getScore(pname).setScore(position);
     }
 
-    public void setHUDLine(Player p, String field, String text){
+    private void setHUDLine(Player p, String field, String text){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(field);
         if(team == null) return;
