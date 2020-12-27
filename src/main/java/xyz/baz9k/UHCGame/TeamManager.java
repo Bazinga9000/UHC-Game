@@ -1,6 +1,9 @@
 package xyz.baz9k.UHCGame;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +23,16 @@ public class TeamManager {
         }
     }
 
-    int numTeams = 2;
+    private int numTeams = 2;
     private final HashMap<UUID, Node> playerMap;
+    private final UHCGame plugin;
+    private final NamespacedKey key;
 
-    public TeamManager() {
+    public TeamManager(UHCGame plugin) {
         playerMap = new HashMap<>();
+        this.plugin = plugin;
+        this.key = new NamespacedKey(plugin, "choseSpec"); // used to create a player tag storing user's chosen state (spec, combatant) across server reloads
+
     }
 
     public Node getPlayerNode(Player p) {
@@ -32,23 +40,41 @@ public class TeamManager {
     }
     public void addPlayer(Player p) {
         UUID uuid = p.getUniqueId();
+        // if player rejoins midgame, update node's player obj, but don't change state
         if (playerMap.containsKey(uuid)) {
             playerMap.get(uuid).player = p;
             return;
         };
-        playerMap.put(uuid, new Node(0, PlayerState.SPECTATOR, p));
+
+        // check player's stored choice. if p chose spec, set to spec. if p chose combatant, set to comb. if p didn't ever choose, set to comb.
+        // comb == 0
+        // spec == 1
+        PersistentDataContainer container = p.getPersistentDataContainer();
+        byte state = container.getOrDefault(key, PersistentDataType.BYTE, (byte) 0);
+        switch (state) {
+            case 0:
+                playerMap.put(uuid, new Node(0, PlayerState.COMBATANT_UNASSIGNED, p));
+                break;
+            case 1:
+                playerMap.put(uuid, new Node(0, PlayerState.SPECTATOR, p));
+                break;
+        }
     }
 
     public void setSpectator(Player p) {
         Node n = getPlayerNode(p);
+        PersistentDataContainer container = p.getPersistentDataContainer();
         n.team = 0;
         n.state = PlayerState.SPECTATOR;
+        container.set(key, PersistentDataType.BYTE, (byte) 1);
     }
 
     public void setUnassignedCombatant(Player p) {
         Node n = getPlayerNode(p);
+        PersistentDataContainer container = p.getPersistentDataContainer();
         n.team = 0;
         n.state = PlayerState.COMBATANT_UNASSIGNED;
+        container.set(key, PersistentDataType.BYTE, (byte) 1);
     }
 
     public void assignPlayerTeam(Player p, int team) {
@@ -56,6 +82,7 @@ public class TeamManager {
             throw new IllegalArgumentException("Team must be positive and less than the team count.");
         }
 
+        setUnassignedCombatant(p);
         Node n = getPlayerNode(p);
         n.state = PlayerState.COMBATANT_ALIVE;
         n.team = team;
