@@ -20,7 +20,9 @@ public class ConfigManager implements Listener {
     }
 
     private void clickSlot(int slot) {
-        if (slot < 0 || slot >= SLOTS) throw new IllegalArgumentException("Invalid slot (Slot must be positive and less than " + SLOTS + ".)");
+        if (slot < 0 || slot >= SLOTS) {
+            throw new IllegalArgumentException("Invalid slot (Slot must be positive and less than " + SLOTS + ".)");
+        }
     }
 
     public void openMenu(@NotNull Player p) {

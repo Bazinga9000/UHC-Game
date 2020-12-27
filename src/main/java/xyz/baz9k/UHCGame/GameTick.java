@@ -15,7 +15,9 @@ public class GameTick extends BukkitRunnable {
     public void run() {
         if (gameManager.isUHCStarted()) {
             gameManager.updateElapsedTime();
-            if (gameManager.isStageComplete()) gameManager.incrementStage();
+            if (gameManager.isStageComplete()) {
+                gameManager.incrementStage();
+            }
             plugin.getBossbarManager().tick();
             
             for (Player p : plugin.getServer().getOnlinePlayers()) {

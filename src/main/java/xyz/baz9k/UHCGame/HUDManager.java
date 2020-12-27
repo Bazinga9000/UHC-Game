@@ -45,8 +45,12 @@ public class HUDManager implements Listener {
         PlayerState state = teamManager.getPlayerState(p);
         int team = teamManager.getTeam(p);
 
-        if (state == PlayerState.SPECTATOR) return ChatColor.AQUA.toString() + ChatColor.ITALIC + "Spectator";
-        if (state == PlayerState.COMBATANT_UNASSIGNED) return ChatColor.ITALIC + "Unassigned";
+        if (state == PlayerState.SPECTATOR) {
+            return ChatColor.AQUA.toString() + ChatColor.ITALIC + "Spectator";
+        }
+        if (state == PlayerState.COMBATANT_UNASSIGNED) {
+            return ChatColor.ITALIC + "Unassigned";
+        }
         return TeamColors.getTeamChatColor(team) + ChatColor.BOLD.toString() + "Team " + team;
     }
 
@@ -149,8 +153,12 @@ public class HUDManager implements Listener {
     private void addHUDLine(@NotNull Player p, @NotNull String name, int position){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(name);
-        if (team == null) team = b.registerNewTeam(name);
-        if (position < 1 || position > 15) throw new IllegalArgumentException("Position needs to be between 1 and 15.");
+        if (team == null) {
+            team = b.registerNewTeam(name);
+        }
+        if (position < 1 || position > 15) {
+            throw new IllegalArgumentException("Position needs to be between 1 and 15.");
+        }
         String pname = createEmptyName(Integer.toString(position, 16).charAt(0));
         team.addEntry(pname);
 
