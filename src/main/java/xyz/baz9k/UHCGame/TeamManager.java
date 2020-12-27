@@ -79,7 +79,7 @@ public class TeamManager {
 
     public void assignPlayerTeam(Player p, int team) {
         if (team <= 0 || team > numTeams) {
-            throw new IllegalArgumentException("Team must be positive and less than the team count.");
+            throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
         }
 
         setUnassignedCombatant(p);
@@ -89,7 +89,7 @@ public class TeamManager {
 
     }
 
-    public void removePlayer(Player p) {
+    public void removePlayer(Player p) { // unused
         playerMap.remove(p.getUniqueId());
     }
 
@@ -145,7 +145,7 @@ public class TeamManager {
     }
     public int countLivingCombatantsInTeam(int team) {
         if (team <= 0 || team > numTeams) {
-            throw new IllegalArgumentException("Team must be positive and less than the team count.");
+            throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
         }
 
         int count = 0;
@@ -177,7 +177,7 @@ public class TeamManager {
 
     public List<Player> getAllCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
-            throw new IllegalArgumentException("Team must be positive and less than the team count.");
+            throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
         }
 
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR && n.state != PlayerState.COMBATANT_UNASSIGNED && n.team == team);
