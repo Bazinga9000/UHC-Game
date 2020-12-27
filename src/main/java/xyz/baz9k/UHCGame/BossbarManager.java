@@ -8,6 +8,8 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.md_5.bungee.api.ChatColor;
 import xyz.baz9k.UHCGame.util.Utils;
@@ -18,8 +20,8 @@ public class BossbarManager {
 
     private BossBar bossbar;
     private class BossbarStage {
-        public String title;
-        public BarColor color;
+        public @Nullable String title;
+        public @NotNull BarColor color;
         public BossbarStage(String title, BarColor color) {
             this.title = title;
             this.color = color;
@@ -47,7 +49,7 @@ public class BossbarManager {
         updateBossbarStage();
     }
 
-    public void enable(Player p) {
+    public void enable(@NotNull Player p) {
         bossbar.addPlayer(p);
     }
 
@@ -80,6 +82,7 @@ public class BossbarManager {
         tick();
     }
 
+    @NotNull
     private BossbarStage getBBStage() {
         return stages[gameManager.getStage()];
     }

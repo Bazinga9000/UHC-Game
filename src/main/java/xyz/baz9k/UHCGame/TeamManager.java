@@ -4,6 +4,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +34,12 @@ public class TeamManager {
 
     }
 
-    public Node getPlayerNode(Player p) {
+    @NotNull
+    private Node getPlayerNode(@NotNull Player p) {
         return playerMap.get(p.getUniqueId());
     }
-    public void addPlayer(Player p) {
+
+    public void addPlayer(@NotNull Player p) {
         UUID uuid = p.getUniqueId();
         // if player rejoins midgame, update node's player obj, but don't change state
         if (playerMap.containsKey(uuid)) {
@@ -59,7 +62,7 @@ public class TeamManager {
         }
     }
 
-    public void setSpectator(Player p) {
+    public void setSpectator(@NotNull Player p) {
         Node n = getPlayerNode(p);
         PersistentDataContainer container = p.getPersistentDataContainer();
         n.team = 0;
@@ -67,7 +70,7 @@ public class TeamManager {
         container.set(key, PersistentDataType.BYTE, (byte) 1);
     }
 
-    public void setUnassignedCombatant(Player p) {
+    public void setUnassignedCombatant(@NotNull Player p) {
         Node n = getPlayerNode(p);
         PersistentDataContainer container = p.getPersistentDataContainer();
         n.team = 0;
@@ -75,7 +78,7 @@ public class TeamManager {
         container.set(key, PersistentDataType.BYTE, (byte) 1);
     }
 
-    public void assignPlayerTeam(Player p, int team) {
+    public void assignPlayerTeam(@NotNull Player p, int team) {
         if (team <= 0 || team > numTeams) {
             throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
         }
@@ -87,23 +90,24 @@ public class TeamManager {
 
     }
 
-    public void removePlayer(Player p) { // unused
+    public void removePlayer(@NotNull Player p) { // unused
         playerMap.remove(p.getUniqueId());
     }
 
-    public int getTeam(Player p) {
+    public int getTeam(@NotNull Player p) {
         return getPlayerNode(p).team;
     }
 
-    public PlayerState getPlayerState(Player p) {
+    @NotNull
+    public PlayerState getPlayerState(@NotNull Player p) {
         return getPlayerNode(p).state;
     }
 
-    public boolean isPlayerAlive(Player p) {
+    public boolean isPlayerAlive(@NotNull Player p) {
         return getPlayerNode(p).state == PlayerState.COMBATANT_ALIVE;
     }
 
-    public void setCombatantAliveStatus(Player p, boolean aliveStatus) {
+    public void setCombatantAliveStatus(@NotNull Player p, boolean aliveStatus) {
         if (!isAssignedCombatant(p)) {
             throw new IllegalArgumentException("Player must be an assigned combatant.");
         }
@@ -165,14 +169,18 @@ public class TeamManager {
 
         return players;
     }
+
+    @NotNull
     public List<Player> getAllSpectators() {
         return getAllPlayersMatching(n -> n.state == PlayerState.SPECTATOR);
     }
 
+    @NotNull
     public List<Player> getAllCombatants() {
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR);
     }
 
+    @NotNull
     public List<Player> getAllCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
             throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
@@ -185,11 +193,11 @@ public class TeamManager {
         return countLivingCombatantsInTeam(team) == 0;
     }
 
-    public boolean isSpectator(Player p) {
+    public boolean isSpectator(@NotNull Player p) {
         return getPlayerNode(p).state == PlayerState.SPECTATOR;
     }
 
-    public boolean isAssignedCombatant(Player p) {
+    public boolean isAssignedCombatant(@NotNull Player p) {
         PlayerState state = getPlayerNode(p).state;
         return state == PlayerState.COMBATANT_ALIVE || state == PlayerState.COMBATANT_DEAD;
     }

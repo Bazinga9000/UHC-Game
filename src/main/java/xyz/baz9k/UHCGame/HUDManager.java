@@ -18,6 +18,8 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.NotNull;
+
 import xyz.baz9k.UHCGame.util.Utils;
 
 import java.awt.*;
@@ -38,7 +40,7 @@ public class HUDManager implements Listener {
         return ChatColor.translateAlternateColorCodes('&', "&"+c);
     }
 
-    private String formatState(Player p) {
+    private String formatState(@NotNull Player p) {
 
         PlayerState state = teamManager.getPlayerState(p);
         int team = teamManager.getTeam(p);
@@ -48,7 +50,7 @@ public class HUDManager implements Listener {
         return TeamColors.getTeamChatColor(team) + ChatColor.BOLD.toString() + "Team " + team;
     }
 
-    private String formatTeammate(Player you, Player teammate) {
+    private String formatTeammate(@NotNull Player you, @NotNull Player teammate) {
         ColoredStringBuilder s = new ColoredStringBuilder();
 
         double teammateHP = teammate.getHealth() + teammate.getAbsorptionAmount();
@@ -103,7 +105,7 @@ public class HUDManager implements Listener {
         return s.toString();
     }
 
-    private void addPlayerToScoreboardTeam(Scoreboard s, Player p, int team){
+    private void addPlayerToScoreboardTeam(@NotNull Scoreboard s, @NotNull Player p, int team){
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
             t = s.registerNewTeam(String.valueOf(team));
@@ -112,7 +114,7 @@ public class HUDManager implements Listener {
         t.addEntry(p.getName());
     }
 
-    private void setTeams(Player player){
+    private void setTeams(@NotNull Player player){
         Scoreboard s = player.getScoreboard();
         for(Player p : plugin.getServer().getOnlinePlayers()){
             int team = teamManager.getTeam(p);
@@ -120,7 +122,7 @@ public class HUDManager implements Listener {
         }
     }
 
-    public void addPlayerToTeams(Player player){
+    public void addPlayerToTeams(@NotNull Player player){
         int team = teamManager.getTeam(player);
         for(Player p : plugin.getServer().getOnlinePlayers()){
             Scoreboard s = p.getScoreboard();
@@ -128,7 +130,7 @@ public class HUDManager implements Listener {
         }
     }
 
-    public void createHUDScoreboard(Player p){
+    public void createHUDScoreboard(@NotNull Player p){
         // give player scoreboard & objective
         Scoreboard newBoard = Bukkit.getScoreboardManager().getNewScoreboard();
         p.setScoreboard(newBoard);
@@ -140,7 +142,7 @@ public class HUDManager implements Listener {
 
     }
 
-    private void addHUDLine(Player p, String name, int position){
+    private void addHUDLine(@NotNull Player p, @NotNull String name, int position){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(name);
         if (team == null) team = b.registerNewTeam(name);
@@ -153,14 +155,14 @@ public class HUDManager implements Listener {
         hud.getScore(pname).setScore(position);
     }
 
-    private void setHUDLine(Player p, String field, String text){
+    private void setHUDLine(@NotNull Player p, @NotNull String field, @NotNull String text){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(field);
         if(team == null) return;
         team.setPrefix(text);
     }
 
-    public void initializePlayerHUD(Player p) {
+    public void initializePlayerHUD(@NotNull Player p) {
         createHUDScoreboard(p);
 
         addHUDLine(p, "state",      15);
@@ -192,7 +194,7 @@ public class HUDManager implements Listener {
         }
     }
 
-    public void updateTeammateHUD(Player p) {
+    public void updateTeammateHUD(@NotNull Player p) {
         Scoreboard b = p.getScoreboard();
 
         int team = teamManager.getTeam(p);
@@ -218,7 +220,7 @@ public class HUDManager implements Listener {
             setHUDLine(p, rowName, formatTeammate(p, teammate));
         }
     }
-    public void updateMovementHUD(Player p){
+    public void updateMovementHUD(@NotNull Player p){
         Location loc = p.getLocation();
 
         ColoredStringBuilder s = new ColoredStringBuilder();
@@ -236,7 +238,7 @@ public class HUDManager implements Listener {
         setHUDLine(p, "posrot", s.toString());
     }
 
-    public void updateWBHUD(Player p) {
+    public void updateWBHUD(@NotNull Player p) {
         Location loc = p.getLocation();
 
         ColoredStringBuilder s = new ColoredStringBuilder();
@@ -255,7 +257,7 @@ public class HUDManager implements Listener {
         setHUDLine(p, "wbpos", s.toString());
     }
 
-    public void updateElapsedTimeHUD(Player p){
+    public void updateElapsedTimeHUD(@NotNull Player p){
         String elapsed = Utils.getLongTimeString(gameManager.getElapsedTime());
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Game Time: ",ChatColor.RED);
@@ -271,7 +273,7 @@ public class HUDManager implements Listener {
 
     }
 
-    public void updateCombatantsAliveHUD(Player p) {
+    public void updateCombatantsAliveHUD(@NotNull Player p) {
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Combatants: ", ChatColor.WHITE);
         s.append(teamManager.countLivingCombatants());
@@ -281,7 +283,7 @@ public class HUDManager implements Listener {
         setHUDLine(p, "combsalive", s.toString());
     }
 
-    public void updateTeamsAliveHUD(Player p) {
+    public void updateTeamsAliveHUD(@NotNull Player p) {
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Teams: ", ChatColor.WHITE);
         s.append(teamManager.countLivingTeams());
@@ -292,7 +294,7 @@ public class HUDManager implements Listener {
         
     }
 
-    public void updateKillsHUD(Player p) {
+    public void updateKillsHUD(@NotNull Player p) {
         if (teamManager.isSpectator(p)) return;
         ColoredStringBuilder s = new ColoredStringBuilder();
         s.append("Kills: ", ChatColor.WHITE);

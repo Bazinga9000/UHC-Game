@@ -1,29 +1,29 @@
 package xyz.baz9k.UHCGame;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class ConfigManager implements Listener {
     private Inventory menu;
+    private static int SLOTS = 54;
 
     public ConfigManager() {
         createMenu();
     }
     private void createMenu() {
-        menu = Bukkit.createInventory(null, 54, "Config");
+        menu = Bukkit.createInventory(null, SLOTS, "Config");
     }
 
     private void clickSlot(int slot) {
-        Bukkit.broadcastMessage(String.valueOf(slot));
+        if (slot < 0 || slot >= SLOTS) throw new IllegalArgumentException("Invalid slot (Slot must be positive and less than " + SLOTS + ".)");
     }
 
-    public void openMenu(Player p) {
+    public void openMenu(@NotNull Player p) {
         p.openInventory(menu);
     }
 

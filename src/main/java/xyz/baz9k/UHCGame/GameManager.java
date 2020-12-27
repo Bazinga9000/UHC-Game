@@ -16,6 +16,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import xyz.baz9k.UHCGame.util.DelayedMessageSender;
 import xyz.baz9k.UHCGame.util.TeamColors;
@@ -233,8 +235,9 @@ public class GameManager implements Listener {
         return lastStageInstant;
     }
 
+    @NotNull
     public Duration getCurrentStageDuration() {
-        return stageDurations[stage];
+        return stageDurations[getStage()];
     }
 
     public boolean isDeathmatch() {
@@ -247,11 +250,13 @@ public class GameManager implements Listener {
         return !end.isAfter(Instant.now());
     }
 
+    @NotNull
     public MultiverseWorld[] getMVUHCWorlds() {
         return mvUHCWorlds;
     }
 
-    public World getUHCWorld(Environment env) {
+    @Nullable
+    public World getUHCWorld(@NotNull Environment env) {
         MultiverseWorld mvWorld;
         switch (env) {
             case NORMAL:
@@ -279,11 +284,16 @@ public class GameManager implements Listener {
         timeElapsed = Duration.between(startTime, Instant.now());
     }
 
-    public int getKills(Player p) {
+    public Duration getElapsedTime() {
+        return timeElapsed;
+    }
+
+    public int getKills(@NotNull Player p) {
         return kills.get(p);
     }
 
-    public MultiverseWorld getOrCreateMVWorld(String world, Environment env) {
+    @NotNull
+    public MultiverseWorld getOrCreateMVWorld(@NotNull String world, @NotNull Environment env) {
         MVWorldManager wm = plugin.getMVWorldManager();
         MultiverseWorld w = wm.getMVWorld(world);
         if (w != null) return w;
@@ -380,9 +390,5 @@ public class GameManager implements Listener {
             // update hud if dmg taken
             hudManager.updateTeammateHUD(p);
         }
-    }
-
-    public Duration getElapsedTime() {
-        return timeElapsed;
     }
 }
