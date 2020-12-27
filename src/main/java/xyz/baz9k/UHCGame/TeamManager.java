@@ -25,12 +25,10 @@ public class TeamManager {
 
     private int numTeams = 2;
     private final HashMap<UUID, Node> playerMap;
-    private final UHCGame plugin;
     private final NamespacedKey key;
 
     public TeamManager(UHCGame plugin) {
         playerMap = new HashMap<>();
-        this.plugin = plugin;
         this.key = new NamespacedKey(plugin, "choseSpec"); // used to create a player tag storing user's chosen state (spec, combatant) across server reloads
 
     }
