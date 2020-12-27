@@ -26,10 +26,12 @@ public class TeamColors {
     }
 
     public static Color getTeamColor(int teamIndex) {
-        if (teamIndex < 0)
+        if (teamIndex < 0) {
             throw new IllegalArgumentException("Team index must be positive.");
-        if (teamIndex > NUM_TEAM_COLORS)
+        }
+        if (teamIndex > NUM_TEAM_COLORS) {
             throw new IllegalArgumentException("Team index must be less than number of predefined team colors (" + NUM_TEAM_COLORS + ")");
+        }
         if (teamIndex == 0) {
             return new Color(85, 255, 255);
         }
