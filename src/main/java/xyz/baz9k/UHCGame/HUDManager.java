@@ -84,23 +84,27 @@ public class HUDManager implements Listener {
         // direction
         Location youLoc = you.getLocation();
         Location teammateLoc = teammate.getLocation();
-        double dx = youLoc.getX() - teammateLoc.getX();
-        double dz = youLoc.getZ() - teammateLoc.getZ();
-
-        double angle = Math.toDegrees(Math.atan2(dz, dx)); // angle btwn you & teammate
-        double yeYaw = youLoc.getYaw();
-
-        double relAngle = Utils.mod(yeYaw - angle + 90, 360) - 180;
-        String arrow;
-        if (112.5 < relAngle && relAngle < 157.5) arrow = "↙";
-        else if (67.5 < relAngle && relAngle < 112.5) arrow = "←";
-        else if (22.5 < relAngle && relAngle < 67.5) arrow = "↖";
-        else if (-22.5 < relAngle && relAngle < 22.5) arrow = "↑";
-        else if (-67.5 < relAngle && relAngle < -22.5) arrow = "↗";
-        else if (-112.5 < relAngle && relAngle < -67.5) arrow = "→";
-        else if (-157.5 < relAngle && relAngle < -112.5) arrow = "↘";
-        else arrow = "↓";
-        s.append(arrow, ChatColor.GOLD);
+        if (youLoc.getWorld() == teammateLoc.getWorld()) {
+            double dx = youLoc.getX() - teammateLoc.getX();
+            double dz = youLoc.getZ() - teammateLoc.getZ();
+    
+            double angle = Math.toDegrees(Math.atan2(dz, dx)); // angle btwn you & teammate
+            double yeYaw = youLoc.getYaw();
+    
+            double relAngle = Utils.mod(yeYaw - angle + 90, 360) - 180;
+            String arrow;
+            if (112.5 < relAngle && relAngle < 157.5) arrow = "↙";
+            else if (67.5 < relAngle && relAngle < 112.5) arrow = "←";
+            else if (22.5 < relAngle && relAngle < 67.5) arrow = "↖";
+            else if (-22.5 < relAngle && relAngle < 22.5) arrow = "↑";
+            else if (-67.5 < relAngle && relAngle < -22.5) arrow = "↗";
+            else if (-112.5 < relAngle && relAngle < -67.5) arrow = "→";
+            else if (-157.5 < relAngle && relAngle < -112.5) arrow = "↘";
+            else arrow = "↓";
+            
+            ChatColor clr = teammate.isOnline() ? ChatColor.GOLD : ChatColor.DARK_GRAY;
+            s.append(arrow, clr);
+        }
 
         return s.toString();
     }
