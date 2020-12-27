@@ -1,5 +1,6 @@
 package xyz.baz9k.UHCGame;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -37,7 +38,7 @@ public class GameManager implements Listener {
     private UHCGame plugin;
 
     private boolean isUHCStarted = false;
-    private final HashMap<Player, String> previousDisplayNames;
+    private final HashMap<UUID, String> previousDisplayNames;
     
     private TeamManager teamManager;
     private HUDManager hudManager;
@@ -103,7 +104,7 @@ public class GameManager implements Listener {
         
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             // archive previous display name
-            previousDisplayNames.put(p, p.getDisplayName());
+            previousDisplayNames.put(p.getUniqueId(), p.getDisplayName());
             
             // fully heal, adequately saturate, remove XP
             p.setHealth(20.0f);
@@ -174,8 +175,10 @@ public class GameManager implements Listener {
         isUHCStarted = false;
 
         // update display names
-        for (Player p : previousDisplayNames.keySet()) {
-            p.setDisplayName(previousDisplayNames.get(p));
+        for (UUID uuid : previousDisplayNames.keySet()) {
+            Player p = Bukkit.getPlayer(uuid);
+            if (p == null) continue;
+            p.setDisplayName(previousDisplayNames.get(uuid));
             p.setGameMode(GameMode.SURVIVAL);
         }
 
