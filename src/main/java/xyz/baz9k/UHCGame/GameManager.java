@@ -270,6 +270,7 @@ public class GameManager implements Listener {
         if (stageDur.equals(ChronoUnit.FOREVER.getDuration())) return stageDur; // if deathmatch, just return ∞
         return Duration.between(Instant.now(), lastStageInstant.plus(stageDur));
     }
+    
     public boolean isDeathmatch() {
         return stage == stageDurations.length - 1;
     }
