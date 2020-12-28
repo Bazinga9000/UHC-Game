@@ -362,7 +362,7 @@ public class Commands {
         ).register();
     }
 
-    void registerAll() {
+    public void registerAll() {
         uhcStartEnd();
         assignTeamsLiteral();
         assignTeamsNTeams();
