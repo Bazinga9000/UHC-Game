@@ -46,6 +46,7 @@ public class Commands {
     /uhc start
     /uhc end
     /assignteams <solos|duos|trios|quartets|quintets|n: int>
+    /clearteams
     /reseed (seed: string)
     /respawn <target: players> (loc: location)
     /state get <target: players>
@@ -89,12 +90,13 @@ public class Commands {
         List<Player> combatants = tm.getAllOnlineCombatants();
 
         Collections.shuffle(combatants);
+        tm.setNumTeams(n);
+
         int i = 1;
         for (Player p : combatants) {
             tm.assignPlayerTeam(p, i);
             i = (i + 1) % n;
         }
-        tm.setNumTeams(n);
         _announceTeams();
     }
 
@@ -165,6 +167,16 @@ public class Commands {
         ).register();
     }
 
+    private void clearTeams() {
+        new CommandAPICommand("clearteams")
+        .executes(
+            (sender, args) -> {
+                TeamManager tm = plugin.getTeamManager();
+                tm.resetAllPlayers();
+                sender.sendMessage("All teams have been reset.");
+            }
+        )
+    }
     private void _reseed(CommandSender sender, String seed) {
         MVWorldManager wm = plugin.getMVWorldManager();
         for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
@@ -354,6 +366,7 @@ public class Commands {
         uhcStartEnd();
         assignTeamsLiteral();
         assignTeamsNTeams();
+        clearTeams();
         reseed();
         reseedSpecified();
         respawn();
