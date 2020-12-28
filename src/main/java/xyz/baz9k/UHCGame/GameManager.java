@@ -47,7 +47,6 @@ public class GameManager implements Listener {
     private GameTick tick;
 
     private Instant startTime = null;
-    private Duration timeElapsed = null;
     
     private MultiverseWorld[] mvUHCWorlds;
     private boolean worldsRegened = false;
@@ -105,7 +104,6 @@ public class GameManager implements Listener {
         worldsRegened = false;
 
         startTime = lastStageInstant = Instant.now();
-        updateElapsedTime();
         this.kills = new HashMap<>();
         
         for (Player p : plugin.getServer().getOnlinePlayers()) {
@@ -247,6 +245,15 @@ public class GameManager implements Listener {
     }
 
     @NotNull
+    public Duration getElapsedTime() {
+        if (!isUHCStarted) {
+            throw new IllegalStateException("UHC has not started.");
+        }
+
+        return Duration.between(startTime, Instant.now());
+    }
+
+    @NotNull
     public Duration getCurrentStageDuration() {
         return stageDurations[getStage()];
     }
@@ -286,17 +293,6 @@ public class GameManager implements Listener {
 
     public boolean isUHCStarted() {
         return isUHCStarted;
-    }
-
-    public void updateElapsedTime() {
-        if (!isUHCStarted) {
-            throw new IllegalStateException("UHC has not started.");
-        }
-        timeElapsed = Duration.between(startTime, Instant.now());
-    }
-
-    public Duration getElapsedTime() {
-        return timeElapsed;
     }
 
     public int getKills(@NotNull Player p) {
