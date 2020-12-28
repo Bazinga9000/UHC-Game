@@ -254,10 +254,22 @@ public class GameManager implements Listener {
     }
 
     @NotNull
-    public Duration getCurrentStageDuration() {
+    public Duration getStageDuration() {
+        if (!isUHCStarted) {
+            throw new IllegalStateException("UHC has not started.");
+        }
         return stageDurations[getStage()];
     }
 
+    @NotNull
+    public Duration getRemainingStageDuration() {
+        if (!isUHCStarted) {
+            throw new IllegalStateException("UHC has not started.");
+        }
+        Duration stageDur = getStageDuration();
+        if (stageDur.equals(ChronoUnit.FOREVER.getDuration())) return stageDur; // if deathmatch, just return ∞
+        return Duration.between(Instant.now(), lastStageInstant.plus(stageDur));
+    }
     public boolean isDeathmatch() {
         return stage == stageDurations.length - 1;
     }

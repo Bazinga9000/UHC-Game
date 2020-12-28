@@ -60,11 +60,9 @@ public class BossbarManager {
             return;
         }
         // update progress bar
-        Duration stageDuration = gameManager.getCurrentStageDuration();
-        Duration remainingDur = Duration.between(Instant.now(), gameManager.getLStageInstant().plus(stageDuration));
-
-        long remainingSecs = remainingDur.getSeconds();
-        long totalSecs = stageDuration.getSeconds();
+        long remainingSecs = gameManager.getRemainingStageDuration().getSeconds(),
+                 totalSecs = gameManager.getStageDuration().getSeconds();
+                 
         bossbar.setProgress((double) remainingSecs / totalSecs);
         // change display title
         String display = getBBStage().title;
