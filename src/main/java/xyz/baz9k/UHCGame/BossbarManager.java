@@ -1,8 +1,5 @@
 package xyz.baz9k.UHCGame;
 
-import java.time.Duration;
-import java.time.Instant;
-
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -62,7 +59,7 @@ public class BossbarManager {
         // update progress bar
         long remainingSecs = gameManager.getRemainingStageDuration().getSeconds(),
                  totalSecs = gameManager.getStageDuration().getSeconds();
-                 
+
         bossbar.setProgress((double) remainingSecs / totalSecs);
         // change display title
         String display = getBBStage().title;
