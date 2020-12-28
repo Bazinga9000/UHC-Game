@@ -175,7 +175,7 @@ public class Commands {
                 tm.resetAllPlayers();
                 sender.sendMessage("All teams have been reset.");
             }
-        )
+        ).register();
     }
     private void _reseed(CommandSender sender, String seed) {
         MVWorldManager wm = plugin.getMVWorldManager();
