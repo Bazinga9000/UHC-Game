@@ -2,6 +2,7 @@ package xyz.baz9k.UHCGame;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldType;
@@ -27,6 +28,7 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -54,13 +56,14 @@ public class GameManager implements Listener {
     private HashMap<UUID, Integer> kills;
 
     //TODO REMOVE THESE AND REPLACE WITH CONFIG MANAGER
-    private final int WORLDBORDER = 1200;
-    private final int WB2 = 25;
-    private final int WB3 = 3;
+    private static final int WB_INIT = 1200;
+    private static final int WB2 = 25;
+    private static final int WB3 = 3;
+    private static final int WB_DM = 20;
 
     private int stage = -1;
     private Instant lastStageInstant = null;
-    private Duration[] stageDurations = {
+    private static Duration[] stageDurations = {
         Duration.ofMinutes(60), // Still border
         Duration.ofMinutes(15), // Border 1
         Duration.ofMinutes(5), // Border stops
@@ -217,12 +220,13 @@ public class GameManager implements Listener {
         lastStageInstant = Instant.now();
         bbManager.updateBossbarStage();
 
+        // TODO messages when next stage starts
         //worldborder
         for (MultiverseWorld mvWorld : mvUHCWorlds) {
             World w = mvWorld.getCBWorld();
             switch (stage) {
                 case 0: // start of game (still border)
-                    w.getWorldBorder().setSize(WORLDBORDER);
+                    w.getWorldBorder().setSize(WB_INIT);
                     break;
                 case 1: //worldborder starts moving the first time (border 1)
                     w.getWorldBorder().setSize(WB2, stageDurations[1].toSeconds());
@@ -235,9 +239,32 @@ public class GameManager implements Listener {
                 case 4: // waiting till DM
                     w.getWorldBorder().setSize(WB3);
                     break;
-                //TODO DEATHMATCH
+                case 5: // DEATHMATCH
+                    w.getWorldBorder().setSize(WB_DM);
             }
         }
+
+        // deathmatch
+        if (isDeathmatch()) {
+            World w = getUHCWorld(Environment.NORMAL);
+            for (int x = -10; x < 11; x++) {
+                for (int z = -10; z < 11; z++) {
+                    w.getBlockAt(x, 254, z).setType(Material.BARRIER);
+                }
+            }
+            List<PotionEffect> effs = Arrays.asList(
+                PotionEffectType.DAMAGE_RESISTANCE.createEffect(10 * 20 /* ticks */, /* lvl */ 10),
+                PotionEffectType.SLOW.createEffect(10 * 20 /* ticks */, /* lvl */ 10),
+                PotionEffectType.JUMP.createEffect(10 * 20 /* ticks */, /* lvl */ 128),
+                PotionEffectType.BLINDNESS.createEffect(10 * 20 /* ticks */, /* lvl */ 10)
+            );
+            for (Player p : plugin.getServer().getOnlinePlayers()) p.teleport(new Location(w, 0.5, 255, 0.5));
+            for (Player p : teamManager.getAllCombatants()) {
+                // TODO spreadplayers
+                p.addPotionEffects(effs);
+            }
+        }
+
     }
 
     public Instant getLStageInstant() {
@@ -270,7 +297,7 @@ public class GameManager implements Listener {
         if (stageDur.equals(ChronoUnit.FOREVER.getDuration())) return stageDur; // if deathmatch, just return ∞
         return Duration.between(Instant.now(), lastStageInstant.plus(stageDur));
     }
-    
+
     public boolean isDeathmatch() {
         return stage == stageDurations.length - 1;
     }
