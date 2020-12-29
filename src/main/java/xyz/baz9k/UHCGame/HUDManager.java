@@ -30,6 +30,7 @@ public class HUDManager implements Listener {
     private UHCGame plugin;
     private GameManager gameManager;
     private TeamManager teamManager;
+
     public HUDManager(UHCGame plugin) {
         this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
@@ -241,10 +242,33 @@ public class HUDManager implements Listener {
         
         // rotation format
         s.append(" (", ChatColor.WHITE);
-        double yaw = Utils.mod(loc.getYaw(), 360);
-        String xf = yaw < 180 ? "+" : "-";
-        String zf = yaw < 90 || yaw > 270 ? "+" : "-";
-        s.append(ChatColor.RED + xf + "X " + ChatColor.BLUE + zf + "Z");
+        double yaw = Utils.mod(loc.getYaw() + 67.5, 360);
+        /*
+         * +Z =   0 -  67.5 - 135
+         * -X =  90 - 157.5 - 225
+         * -Z = 180 - 247.5 - 315
+         * +X = 270 - 337.5 -  45
+         * 
+         *   0 -  45: -X +Z
+         *  45 -  90: +Z
+         *  90 - 135: +X +Z
+         * 135 - 180: +X
+         * 180 - 225: +X -Z
+         * 225 - 270: -Z
+         * 270 - 315: -X -Z
+         * 315 - 360: -X
+         */
+
+        String xs = ChatColor.RED.toString();
+        String zs = ChatColor.BLUE.toString();
+
+        if ( 90 <= yaw && yaw < 225) xs += "-X";
+        if (270 <= yaw || yaw <  45) xs += "+X";
+
+        if (  0 <= yaw && yaw < 135) zs += "+Z";
+        if (180 <= yaw && yaw < 315) zs += "-Z";
+
+        s.append(xs + " " + zs);
         s.append(")", ChatColor.WHITE);
 
         setHUDLine(p, "posrot", s.toString());
