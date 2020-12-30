@@ -182,6 +182,7 @@ public class Commands {
         for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
             wm.regenWorld(mvWorld.getName(), true, false, seed);
         }
+        plugin.getGameManager().setWorldsRegenedStatus(true);
         sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
 
     }
@@ -207,7 +208,7 @@ public class Commands {
             }
         ).register();
     }
-
+    
     private void _respawn(CommandSender sender, Player p, Location loc) {
         TeamManager tm = plugin.getTeamManager();
         if (tm.isSpectator(p)) {
