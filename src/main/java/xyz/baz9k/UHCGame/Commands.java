@@ -45,6 +45,8 @@ public class Commands {
     /*
     /uhc start
     /uhc end
+    /uhc start force
+    /uhc end force
     /assignteams <solos|duos|trios|quartets|quintets|n: int>
     /clearteams
     /reseed (seed: string)
@@ -68,14 +70,47 @@ public class Commands {
                 try {
                     switch ((String) args[0]) {
                         case "start":
-                        Bukkit.broadcastMessage("[DEBUG] UHC attempting start");
-                        plugin.getGameManager().startUHC();
-                        Bukkit.broadcastMessage("[DEBUG] UHC started");
-                        break;
+                            Bukkit.broadcastMessage("[DEBUG] UHC attempting start");
+                            plugin.getGameManager().startUHC(false);
+                            Bukkit.broadcastMessage("[DEBUG] UHC started");
+                            break;
                         case "end":
-                        Bukkit.broadcastMessage("[DEBUG] UHC attempting end");
-                        plugin.getGameManager().endUHC();
-                        Bukkit.broadcastMessage("[DEBUG] UHC ended");
+                            Bukkit.broadcastMessage("[DEBUG] UHC attempting end");
+                            plugin.getGameManager().endUHC(false);
+                            Bukkit.broadcastMessage("[DEBUG] UHC ended");
+                            break;
+                    }
+                } catch (IllegalStateException e) {
+                    CommandAPI.fail(e.getMessage());
+                    throw e;
+                }
+            }
+        ).register();
+    }
+
+    private void uhcStartEndForce() {
+        new CommandAPICommand("uhc")
+        .withPermission(CommandPermission.OP)
+        .withArguments(
+            new MultiLiteralArgument("start", "end"),
+            new LiteralArgument("force")
+        )
+        .executes(
+            (sender, args) -> {
+                try {
+                    switch ((String) args[0]) {
+                        case "start":
+                            Bukkit.broadcastMessage("[DEBUG] UHC attempting start");
+                            Bukkit.broadcastMessage("[DEBUG] Skipping ALL error checks");
+                            plugin.getGameManager().startUHC(true);
+                            Bukkit.broadcastMessage("[DEBUG] UHC started");
+                            break;
+                        case "end":
+                            Bukkit.broadcastMessage("[DEBUG] UHC attempting end");
+                            Bukkit.broadcastMessage("[DEBUG] Skipping ALL error checks");
+                            plugin.getGameManager().endUHC(true);
+                            Bukkit.broadcastMessage("[DEBUG] UHC ended");
+                            break;
                     }
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
@@ -208,7 +243,7 @@ public class Commands {
             }
         ).register();
     }
-    
+
     private void _respawn(CommandSender sender, Player p, Location loc) {
         TeamManager tm = plugin.getTeamManager();
         if (tm.isSpectator(p)) {
@@ -365,6 +400,7 @@ public class Commands {
 
     public void registerAll() {
         uhcStartEnd();
+        uhcStartEndForce();
         assignTeamsLiteral();
         assignTeamsNTeams();
         clearTeams();

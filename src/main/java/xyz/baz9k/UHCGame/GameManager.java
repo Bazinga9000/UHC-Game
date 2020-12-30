@@ -89,18 +89,20 @@ public class GameManager implements Listener {
         cfgManager = plugin.getConfigManager();
     }
 
-    public void startUHC() {
-        // check if game is OK to start
-        if (isUHCStarted) {
-            throw new IllegalStateException("UHC has already started.");
-        }
-        for (Player p : plugin.getServer().getOnlinePlayers()) {
-            if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
-                throw new IllegalStateException("Teams have not been assigned.");
+    public void startUHC(boolean skipChecks) {
+        if (!skipChecks) {
+            // check if game is OK to start
+            if (isUHCStarted) {
+                throw new IllegalStateException("UHC has already started.");
             }
-        }
-        if (!worldsRegened) {
-            throw new IllegalStateException("UHC worlds have not been regenerated. Run /reseed to regenerate.");
+            for (Player p : plugin.getServer().getOnlinePlayers()) {
+                if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
+                    throw new IllegalStateException("Teams have not been assigned.");
+                }
+            }
+            if (!worldsRegened) {
+                throw new IllegalStateException("UHC worlds have not been regenerated. Run /reseed to regenerate.");
+            }
         }
 
         isUHCStarted = true;
@@ -176,11 +178,14 @@ public class GameManager implements Listener {
         bbManager.enable();
     }
 
-    public void endUHC() {
-        // check if game is OK to end
-        if (!isUHCStarted) {
-            throw new IllegalStateException("UHC has not begun.");
+    public void endUHC(boolean skipChecks) {
+        if (!skipChecks) {
+            // check if game is OK to end
+            if (!isUHCStarted) {
+                throw new IllegalStateException("UHC has not begun.");
+            }
         }
+        
         isUHCStarted = false;
 
         // update display names
