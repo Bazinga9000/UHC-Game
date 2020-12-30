@@ -6,13 +6,15 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BranchNode extends Node {
     private final int slotCount;
     private final Node[] children;
-    private final Inventory inventory;
+    private final @NotNull Inventory inventory;
 
-    public BranchNode(BranchNode parent, ItemStack itemStack, String guiName, int guiHeight) {
+    public BranchNode(@Nullable BranchNode parent, @Nullable ItemStack itemStack, @NotNull String guiName, int guiHeight) {
         super(parent, itemStack);
         slotCount = 9 * guiHeight;
         children = new Node[slotCount];
@@ -25,7 +27,7 @@ public class BranchNode extends Node {
         }
     }
 
-    public void addChild(int slot, Node node) {
+    public void addChild(int slot, @NotNull Node node) {
         if (0 > slot || slot > (slotCount - 1)) {
             throw new IllegalArgumentException("Invalid slot (Slot cannot be negative or the final slot.)");
         }
@@ -34,7 +36,7 @@ public class BranchNode extends Node {
         inventory.setItem(slot, node.getItemStack());
     }
 
-    public void onClick(Player p, int slot) {
+    public void onClick(@NotNull Player p, int slot) {
         if (0 > slot || slot >= slotCount) {
             throw new IllegalArgumentException("Invalid slot clicked (Slot cannot be negative or greater than" + slotCount + ".)");
         }
@@ -52,6 +54,7 @@ public class BranchNode extends Node {
         }
     }
 
+    @NotNull
     public Inventory getInventory() {
         return inventory;
     }

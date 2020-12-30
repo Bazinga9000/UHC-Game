@@ -32,14 +32,17 @@ public class Tree {
 
     }
 
+    @NotNull
     public List<Node> getTree() {
         return tree;
     }
 
+    @NotNull
     public Node getRoot() {
         return tree.get(0);
     }
 
+    @NotNull
     public List<Node> getNodes() {
         return tree;
     }
