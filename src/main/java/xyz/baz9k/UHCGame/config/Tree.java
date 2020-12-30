@@ -1,13 +1,18 @@
 package xyz.baz9k.UHCGame.config;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import xyz.baz9k.UHCGame.ConfigManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Tree {
-    private final ArrayList<Node> tree;
+    private final List<Node> tree;
     ConfigManager configManager;
     public Tree(ConfigManager manager) {
         configManager = manager;
@@ -27,7 +32,7 @@ public class Tree {
 
     }
 
-    public ArrayList<Node> getTree() {
+    public List<Node> getTree() {
         return tree;
     }
 
@@ -35,7 +40,17 @@ public class Tree {
         return tree.get(0);
     }
 
-    public ArrayList<Node> getNodes() {
+    public List<Node> getNodes() {
         return tree;
+    }
+
+    @Nullable
+    public BranchNode getCorrespondingNode(@NotNull Inventory inv) {
+        for (Node n : tree) {
+            if (!(n instanceof BranchNode)) continue;
+            BranchNode b = (BranchNode) n;
+            if (b.getInventory() == inv) return b;
+        }
+        return null;
     }
 }
