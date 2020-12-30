@@ -27,7 +27,7 @@ public class BranchNode extends Node {
 
     public void addChild(int slot, Node node) {
         if (0 > slot || slot > (slotCount - 1)) {
-            throw new IllegalArgumentException("Slot cannot be negative or the final slot.");
+            throw new IllegalArgumentException("Invalid slot (Slot cannot be negative or the final slot.)");
         }
 
         children[slot] = node;
@@ -36,7 +36,7 @@ public class BranchNode extends Node {
 
     public void onClick(Player p, int slot) {
         if (0 > slot || slot >= slotCount) {
-            throw new IllegalArgumentException("Invalid slot in onClick");
+            throw new IllegalArgumentException("Invalid slot clicked (Slot cannot be negative or greater than" + slotCount + ".)");
         }
 
         if (slot == slotCount - 1) {
