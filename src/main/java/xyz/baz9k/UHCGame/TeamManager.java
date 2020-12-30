@@ -22,7 +22,7 @@ public class TeamManager {
         }
     }
 
-    int numTeams = 2;
+    private int numTeams = 2;
     private final HashMap<UUID, Node> playerMap;
 
     public TeamManager() {
