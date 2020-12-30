@@ -7,15 +7,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class BranchConfigNode extends ConfigNode {
+public class BranchNode extends Node {
     private final int slotCount;
-    private final ConfigNode[] children;
+    private final Node[] children;
     private final Inventory inventory;
 
-    public BranchConfigNode(BranchConfigNode parent, ItemStack itemStack, String guiName, int guiHeight) {
+    public BranchNode(BranchNode parent, ItemStack itemStack, String guiName, int guiHeight) {
         super(parent, itemStack);
         slotCount = 9 * guiHeight;
-        children = new ConfigNode[slotCount];
+        children = new Node[slotCount];
         inventory = Bukkit.createInventory(null, slotCount, guiName);
 
         if (parent != null) {
@@ -25,7 +25,7 @@ public class BranchConfigNode extends ConfigNode {
         }
     }
 
-    public void addChild(int slot, ConfigNode node) {
+    public void addChild(int slot, Node node) {
         if (0 > slot || slot > (slotCount - 1)) {
             throw new IllegalArgumentException("Slot cannot be negative or the final slot.");
         }
@@ -44,10 +44,10 @@ public class BranchConfigNode extends ConfigNode {
             return;
         }
 
-        ConfigNode node = children[slot];
+        Node node = children[slot];
         if (node != null) {
-            if (node instanceof BranchConfigNode) {
-                p.openInventory(((BranchConfigNode) node).inventory);
+            if (node instanceof BranchNode) {
+                p.openInventory(((BranchNode) node).inventory);
             }
         }
     }

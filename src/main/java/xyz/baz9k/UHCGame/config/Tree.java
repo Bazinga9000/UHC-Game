@@ -6,20 +6,20 @@ import xyz.baz9k.UHCGame.ConfigManager;
 
 import java.util.ArrayList;
 
-public class ConfigTree {
-    private final ArrayList<ConfigNode> tree;
+public class Tree {
+    private final ArrayList<Node> tree;
     ConfigManager configManager;
-    public ConfigTree(ConfigManager manager) {
+    public Tree(ConfigManager manager) {
         configManager = manager;
         tree = new ArrayList<>();
 
         //ROOT
-        BranchConfigNode root = new BranchConfigNode(null, null, "Config", 1);
+        BranchNode root = new BranchNode(null, null, "Config", 1);
         tree.add(root);
 
-        BranchConfigNode current = root;
+        BranchNode current = root;
         for (int i = 0; i < 10; i++) {
-            BranchConfigNode node = new BranchConfigNode(current, new ItemStack(Material.DIAMOND), Integer.toString(i), 1);
+            BranchNode node = new BranchNode(current, new ItemStack(Material.DIAMOND), Integer.toString(i), 1);
             current.addChild(0, node);
             current = node;
             tree.add(node);
@@ -27,15 +27,15 @@ public class ConfigTree {
 
     }
 
-    public ArrayList<ConfigNode> getTree() {
+    public ArrayList<Node> getTree() {
         return tree;
     }
 
-    public ConfigNode getRoot() {
+    public Node getRoot() {
         return tree.get(0);
     }
 
-    public ArrayList<ConfigNode> getNodes() {
+    public ArrayList<Node> getNodes() {
         return tree;
     }
 }

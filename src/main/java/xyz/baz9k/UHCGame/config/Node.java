@@ -3,16 +3,16 @@ package xyz.baz9k.UHCGame.config;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class ConfigNode {
-    private final BranchConfigNode parent;
+public abstract class Node {
+    private final BranchNode parent;
     private final ItemStack itemStack;
 
-    public ConfigNode(BranchConfigNode parent, ItemStack itemStack) {
+    public Node(BranchNode parent, ItemStack itemStack) {
         this.parent = parent;
         this.itemStack = itemStack;
     }
 
-    public BranchConfigNode getParent() {
+    public BranchNode getParent() {
         return parent;
     }
 
