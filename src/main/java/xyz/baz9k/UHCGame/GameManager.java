@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.api.WorldPurger;
+
 import xyz.baz9k.UHCGame.util.Utils;
 
 public class GameManager implements Listener {
@@ -48,7 +49,6 @@ public class GameManager implements Listener {
 
     private Instant startTime = null;
     
-    private MultiverseWorld[] mvUHCWorlds;
     private boolean worldsRegened = false;
 
     private HashMap<UUID, Integer> kills;
@@ -74,10 +74,9 @@ public class GameManager implements Listener {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
 
-        // get MV worlds or create if missing
-        mvUHCWorlds = new MultiverseWorld[2]; // overworld, nether
-        mvUHCWorlds[0] = getOrCreateMVWorld("game", Environment.NORMAL);
-        mvUHCWorlds[1] = getOrCreateMVWorld("game_nether", Environment.NETHER);
+        // create MV worlds if missing
+        createMVWorld("game", Environment.NORMAL);
+        createMVWorld("game_nether", Environment.NETHER);
     }
 
     public void loadManagerRefs() {
@@ -142,7 +141,7 @@ public class GameManager implements Listener {
         }
         
         WorldPurger purger = plugin.getMVWorldManager().getTheWorldPurger();
-        for (MultiverseWorld mvWorld : mvUHCWorlds) {
+        for (MultiverseWorld mvWorld : getMVUHCWorlds()) {
             World w = mvWorld.getCBWorld();
             // set time to 0 and delete rain
             w.setTime(0);
@@ -226,7 +225,7 @@ public class GameManager implements Listener {
 
         // TODO messages when next stage starts
         //worldborder
-        for (MultiverseWorld mvWorld : mvUHCWorlds) {
+        for (MultiverseWorld mvWorld : getMVUHCWorlds()) {
             World w = mvWorld.getCBWorld();
             switch (stage) {
                 case 0: // start of game (still border)
@@ -317,17 +316,22 @@ public class GameManager implements Listener {
 
     @NotNull
     public MultiverseWorld[] getMVUHCWorlds() {
-        return mvUHCWorlds;
+        MVWorldManager wm = plugin.getMVWorldManager();
+        return new MultiverseWorld[]{
+            wm.getMVWorld("game"),
+            wm.getMVWorld("game_nether")
+        };
     }
 
     public World getUHCWorld(@NotNull Environment env) {
+        MultiverseWorld[] mvWorlds = getMVUHCWorlds();
         MultiverseWorld mvWorld;
         switch (env) {
             case NORMAL:
-                mvWorld = mvUHCWorlds[0];
+                mvWorld = mvWorlds[0];
                 break;
             case NETHER:
-                mvWorld = mvUHCWorlds[1];
+                mvWorld = mvWorlds[1];
                 break;
             case THE_END:
             default:
@@ -345,15 +349,13 @@ public class GameManager implements Listener {
         return kills.get(p.getUniqueId());
     }
 
-    @NotNull
-    public MultiverseWorld getOrCreateMVWorld(@NotNull String world, @NotNull Environment env) {
+    public void createMVWorld(@NotNull String world, @NotNull Environment env) {
         MVWorldManager wm = plugin.getMVWorldManager();
         MultiverseWorld w = wm.getMVWorld(world);
-        if (w != null) return w;
+        if (w != null) return;
         
         Random temp = new Random();
         wm.addWorld(world, env, String.valueOf(temp.nextLong()), WorldType.NORMAL, true, null);
-        return wm.getMVWorld(world);
     }
 
     public boolean haveWorldsRegened() {
