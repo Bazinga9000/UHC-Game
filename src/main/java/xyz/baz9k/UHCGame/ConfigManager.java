@@ -1,17 +1,21 @@
 package xyz.baz9k.UHCGame;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import xyz.baz9k.UHCGame.config.BranchNode;
-import xyz.baz9k.UHCGame.config.Tree;
+import xyz.baz9k.UHCGame.config.BranchConfigNode;
+import xyz.baz9k.UHCGame.config.ConfigNode;
+import xyz.baz9k.UHCGame.config.ConfigTree;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ConfigManager implements Listener {
-    private final Tree tree;
+    private final ConfigTree tree;
 
     private final HashMap<String, Boolean> booleanValues;
     private final HashMap<String, Integer> integerValues;
@@ -30,24 +34,28 @@ public class ConfigManager implements Listener {
     }
 
     public ConfigManager() {
-        tree = new Tree(this);
+        tree = new ConfigTree(this);
         booleanValues = new HashMap<>();
         integerValues = new HashMap<>();
         doubleValues = new HashMap<>();
     }
 
     public void openMenu(@NotNull Player p) {
-        p.openInventory(((BranchNode) tree.getRoot()).getInventory());
+        p.openInventory(((BranchConfigNode) tree.getRoot()).getInventory());
     }
 
     @EventHandler
     public void onInvClick(InventoryClickEvent e) {
-        BranchNode b = tree.getCorrespondingNode(e.getInventory());
-
-        if (b == null) return; // interacted view does not have a node inventory
-        if (e.getInventory() == e.getClickedInventory()) { // handle clicks IF the clicked inv is the top of the view
-            if (e.getCurrentItem() != null) b.onClick((Player) e.getWhoClicked(), e.getSlot());
+        for (ConfigNode node : tree.getNodes()) {
+            if (node instanceof BranchConfigNode) {
+                BranchConfigNode b = (BranchConfigNode) node;
+                if (b.getInventory() == e.getInventory()) {
+                    if (b.getInventory() == e.getClickedInventory()) {
+                        b.onClick((Player) e.getWhoClicked(), e.getSlot());
+                    }
+                    e.setCancelled(true);
+                }
+            }
         }
-
     }
 }
