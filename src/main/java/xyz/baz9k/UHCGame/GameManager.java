@@ -225,8 +225,7 @@ public class GameManager implements Listener {
 
         // TODO messages when next stage starts
         //worldborder
-        for (MultiverseWorld mvWorld : getMVUHCWorlds()) {
-            World w = mvWorld.getCBWorld();
+        for (World w : getUHCWorlds()) {
             switch (stage) {
                 case 0: // start of game (still border)
                     w.getWorldBorder().setSize(WB_INIT);
@@ -323,22 +322,33 @@ public class GameManager implements Listener {
         };
     }
 
-    public World getUHCWorld(@NotNull Environment env) {
+    @NotNull 
+    public World[] getUHCWorlds() {
         MultiverseWorld[] mvWorlds = getMVUHCWorlds();
-        MultiverseWorld mvWorld;
+        World[] worlds = new World[mvWorlds.length];
+        for (int i = 0; i < worlds.length; i++) {
+            worlds[i] = mvWorlds[i].getCBWorld();
+        }
+
+        return worlds;
+    }
+
+    public World getUHCWorld(@NotNull Environment env) {
+        World[] worlds = getUHCWorlds();
+        World world;
         switch (env) {
             case NORMAL:
-                mvWorld = mvWorlds[0];
+                world = worlds[0];
                 break;
             case NETHER:
-                mvWorld = mvWorlds[1];
+                world = worlds[1];
                 break;
             case THE_END:
             default:
-                mvWorld = null;
+                world = null;
                 break;
         }
-        return mvWorld == null ? null : mvWorld.getCBWorld();
+        return world;
     }
 
     public boolean isUHCStarted() {
