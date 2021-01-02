@@ -7,55 +7,36 @@ import org.jetbrains.annotations.NotNull;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import xyz.baz9k.UHCGame.config.BranchConfigNode;
-import xyz.baz9k.UHCGame.config.ConfigNode;
-import xyz.baz9k.UHCGame.config.ConfigTree;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ConfigManager implements Listener {
-    private final ConfigTree tree;
-
-    private final HashMap<String, Boolean> booleanValues;
-    private final HashMap<String, Integer> integerValues;
-    private final HashMap<String, Double> doubleValues;
-
-    public void setValue(String id, boolean value) {
-        booleanValues.put(id, value);
-    }
-
-    public void setValue(String id, int value) {
-        integerValues.put(id, value);
-    }
-
-    public void setValue(String id, double value) {
-        doubleValues.put(id, value);
-    }
+    private Inventory menu;
+    private static int SLOTS = 54;
 
     public ConfigManager() {
-        tree = new ConfigTree(this);
-        booleanValues = new HashMap<>();
-        integerValues = new HashMap<>();
-        doubleValues = new HashMap<>();
+        createMenu();
+    }
+    private void createMenu() {
+        menu = Bukkit.createInventory(null, SLOTS, "Config");
+    }
+
+    private void clickSlot(int slot) {
+        if (slot < 0 || slot >= SLOTS) {
+            throw new IllegalArgumentException("Invalid slot (Slot must be positive and less than " + SLOTS + ".)");
+        }
     }
 
     public void openMenu(@NotNull Player p) {
-        p.openInventory(((BranchConfigNode) tree.getRoot()).getInventory());
+        p.openInventory(menu);
     }
 
     @EventHandler
     public void onInvClick(InventoryClickEvent e) {
-        for (ConfigNode node : tree.getNodes()) {
-            if (node instanceof BranchConfigNode) {
-                BranchConfigNode b = (BranchConfigNode) node;
-                if (b.getInventory() == e.getInventory()) {
-                    if (b.getInventory() == e.getClickedInventory()) {
-                        b.onClick((Player) e.getWhoClicked(), e.getSlot());
-                    }
-                    e.setCancelled(true);
-                }
+        if (e.getInventory() == menu) { // check if inv view is menu
+            if (e.getClickedInventory() == menu) { // check if *clicked* inventory is menu
+                if (e.getCurrentItem() != null) clickSlot(e.getSlot());
             }
+            e.setCancelled(true);
         }
+        
     }
 }
