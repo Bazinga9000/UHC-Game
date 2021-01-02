@@ -87,6 +87,15 @@ public class GameManager implements Listener {
     }
 
     public void startUHC(boolean skipChecks) {
+        try {
+            _startUHC(skipChecks);
+        } catch (Exception e) {
+            Bukkit.broadcastMessage("[DEBUG] UHC cancelling start due to error");
+            isUHCStarted = false;
+            throw e;
+        }
+    }
+    private void _startUHC(boolean skipChecks) {
         if (!skipChecks) {
             // check if game is OK to start
             if (isUHCStarted) {
@@ -177,6 +186,16 @@ public class GameManager implements Listener {
     }
 
     public void endUHC(boolean skipChecks) {
+        try {
+            _endUHC(skipChecks);
+        } catch (Exception e) {
+            Bukkit.broadcastMessage("[DEBUG] UHC cancelling end due to error");
+            isUHCStarted = true;
+            throw e;
+        }
+    }
+
+    public void _endUHC(boolean skipChecks) {
         if (!skipChecks) {
             // check if game is OK to end
             if (!isUHCStarted) {
