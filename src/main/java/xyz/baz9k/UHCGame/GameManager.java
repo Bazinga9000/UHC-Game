@@ -26,15 +26,13 @@ import xyz.baz9k.UHCGame.util.TeamColors;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.api.WorldPurger;
+import xyz.baz9k.UHCGame.util.Utils;
 
 public class GameManager implements Listener {
     private UHCGame plugin;
@@ -164,11 +162,12 @@ public class GameManager implements Listener {
                     w.getBlockAt(x, 0, z).setType(Material.NETHERITE_BLOCK);
                 }
             }
-            for (int y = 3; y < 255; y++) {
+            for (int y = 3; y < w.getMaxHeight() - 1; y++) {
                 w.getBlockAt(0, y, 0).setType(Material.BARRIER);
             }
         }
-        // TODO teleport, spreadplayers
+
+        spreadPlayersByTeam(new Location(getUHCWorld(Environment.NORMAL), 0, 0, 0), WB_INIT/2.0, WB_INIT/8.0);
 
         // begin uhc tick events
         tick = new GameTick(plugin);
@@ -265,9 +264,12 @@ public class GameManager implements Listener {
             );
             for (Player p : plugin.getServer().getOnlinePlayers()) p.teleport(new Location(w, 0.5, 255, 0.5));
             for (Player p : teamManager.getAllCombatants()) {
-                // TODO spreadplayers
                 p.addPotionEffects(effs);
             }
+
+            //TODO FIX MAGIC NUMBERS
+            spreadPlayersByTeam(new Location(getUHCWorld(Environment.NORMAL), 0, 0, 0), 9, 5);
+
         }
 
     }
@@ -318,7 +320,6 @@ public class GameManager implements Listener {
         return mvUHCWorlds;
     }
 
-    @Nullable
     public World getUHCWorld(@NotNull Environment env) {
         MultiverseWorld mvWorld;
         switch (env) {
@@ -442,5 +443,75 @@ public class GameManager implements Listener {
             // update hud if dmg taken
             hudManager.updateTeammateHUD(p);
         }
+    }
+
+    private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minimumSeparation) {
+        ArrayList<Location> locations = new ArrayList<>();
+        Random r = new Random();
+
+        for (int i = 0; i < numLocations; i++) {
+            World w = getUHCWorld(Environment.NORMAL);
+            Location newLocation = null;
+            while (true) {
+                double x = center.getX() + (r.nextDouble() - 0.5) * maximumRange;
+                double z = center.getZ() + (r.nextDouble() - 0.5) * maximumRange;
+
+                if (!locations.isEmpty()) {
+                    List<Double> distances = locations.stream()
+                            .map((Location l) -> Utils.euclideanDistance(x, z, l.getX(), l.getZ()))
+                            .collect(Collectors.toList());
+                    double minimumDistance = Collections.min(distances);
+
+                    if (minimumDistance < minimumSeparation) {
+                        continue;
+                    }
+                }
+                newLocation = new Location(w, x, w.getHighestBlockYAt((int) x, (int) z), z);
+
+                Material blockType = w.getBlockAt(newLocation).getType();
+
+                if (blockType == Material.LAVA) {
+                    continue;
+                }
+
+                if (blockType == Material.WATER) {
+                    continue;
+                }
+
+                break;
+            }
+
+            locations.add(newLocation);
+        }
+        return locations;
+    }
+
+    public void spreadPlayersByTeam(Location center, double maximumRange, double minimumSeparation) {
+        ArrayList<Collection<Player>> groups = new ArrayList<>();
+        for (int i = 1; i <= teamManager.getNumTeams(); i++) {
+            groups.add(teamManager.getAllCombatantsOnTeam(i));
+        }
+
+        spreadPlayers(groups, center, maximumRange, minimumSeparation);
+    }
+
+    public void spreadPlayers(Collection<Player> players, Location center, double maximumRange, double minimumSeparation) {
+        List<Location> locations = getRandomLocations(center, players.size(), maximumRange, minimumSeparation);
+        int index = 0;
+        for (Player p : players) {
+            p.teleport(locations.get(index));
+            index++;
+        }
+
+    }
+
+    public void spreadPlayers(List<Collection<Player>> groups, Location center, double maximumRange, double minimumSeparation) {
+        List<Location> locations = getRandomLocations(center, groups.size(), maximumRange, minimumSeparation);
+        for (int i = 0; i < groups.size(); i++) {
+            for (Player p : groups.get(i)) {
+                p.teleport(locations.get(i));
+            }
+        }
+
     }
 }
