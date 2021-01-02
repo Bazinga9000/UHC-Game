@@ -130,7 +130,7 @@ public class Commands {
         int i = 1;
         for (Player p : combatants) {
             tm.assignPlayerTeam(p, i);
-            i = (i + 1) % n;
+            i = i % n + 1;
         }
         _announceTeams();
     }

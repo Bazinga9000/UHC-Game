@@ -1,5 +1,6 @@
 package xyz.baz9k.UHCGame;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -146,9 +147,15 @@ public class TeamManager {
         return players;
     }
 
+    private boolean isOnline(Player p) {
+        Player pl = Bukkit.getPlayer(p.getUniqueId());
+
+        return pl != null;
+    }
+
     private List<Player> onlyOnline(@NotNull List<Player> pList) {
         return pList.stream()
-                    .filter(p -> p.isOnline())
+                    .filter(p -> isOnline(p))
                     .collect(Collectors.toList());
     }
     @NotNull
