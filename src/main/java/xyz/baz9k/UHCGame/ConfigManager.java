@@ -15,6 +15,7 @@ public class ConfigManager implements Listener {
     public ConfigManager() {
         createMenu();
     }
+    
     private void createMenu() {
         menu = Bukkit.createInventory(null, SLOTS, "Config");
     }

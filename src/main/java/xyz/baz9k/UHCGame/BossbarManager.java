@@ -40,16 +40,33 @@ public class BossbarManager {
         this.bossbar = Bukkit.createBossBar(null, BarColor.WHITE, BarStyle.SOLID);
     }
 
+    /**
+     * On game start, this function runs to initialize the bossbar.
+     */
     public void enable() {
         for (Player p : plugin.getServer().getOnlinePlayers()) bossbar.addPlayer(p);
         bossbar.setVisible(true);
         updateBossbarStage();
     }
 
-    public void enable(@NotNull Player p) {
+    /**
+     * On game end, this function runs to deactivate the bossbar.
+     */
+    public void disable() {
+        bossbar.setVisible(false);
+    }
+
+    /**
+     * If a player joins midgame, this function runs to display the bossbar to the joining player.
+     * @param p
+     */
+    public void addPlayer(@NotNull Player p) {
         bossbar.addPlayer(p);
     }
 
+    /**
+     * This function runs every tick during the game.
+     */
     public void tick() {
         if (gameManager.isDeathmatch()) {
             bossbar.setProgress(1);
@@ -68,10 +85,9 @@ public class BossbarManager {
         bossbar.setTitle(display);
     }
 
-    public void disable() {
-        bossbar.setVisible(false);
-    }
-
+    /**
+     * This function updates the bossbar when the stage increments.
+     */
     public void updateBossbarStage() {
         bossbar.setColor(getBBStage().color);
         tick();

@@ -41,6 +41,7 @@ public class HUDManager implements Listener {
         return ChatColor.translateAlternateColorCodes('&', "&"+c);
     }
 
+    /* FORMATTING */
     private String formatState(@NotNull Player p) {
 
         PlayerState state = teamManager.getPlayerState(p);
@@ -114,6 +115,7 @@ public class HUDManager implements Listener {
         return s.toString();
     }
 
+    /* HANDLE SCOREBOARD PARITY */
     private void addPlayerToScoreboardTeam(@NotNull Scoreboard s, @NotNull Player p, int team){
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
@@ -139,7 +141,7 @@ public class HUDManager implements Listener {
         }
     }
 
-    public void createHUDScoreboard(@NotNull Player p){
+    private void createHUDScoreboard(@NotNull Player p){
         // give player scoreboard & objective
         Scoreboard newBoard = Bukkit.getScoreboardManager().getNewScoreboard();
         p.setScoreboard(newBoard);
@@ -151,6 +153,7 @@ public class HUDManager implements Listener {
 
     }
 
+    /* INITIALIZING HUD */
     private void addHUDLine(@NotNull Player p, @NotNull String name, int position){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(name);
@@ -175,6 +178,10 @@ public class HUDManager implements Listener {
         team.setPrefix(text);
     }
 
+    /**
+     * Setup a player's HUD on join.
+     * @param p
+     */
     public void initializePlayerHUD(@NotNull Player p) {
         createHUDScoreboard(p);
 
@@ -193,20 +200,24 @@ public class HUDManager implements Listener {
         setHUDLine(p, "state", formatState(p));
         updateTeammateHUD(p);
         updateMovementHUD(p);
-        // update WB POS hud //
+        updateWBHUD(p);
         updateCombatantsAliveHUD(p);
         updateTeamsAliveHUD(p);
         updateKillsHUD(p);
         updateElapsedTimeHUD(p);
     }
 
-    public void cleanup(){
+    /**
+     * Remove player HUD (for the main HUD)
+     */
+    public void cleanup() {
         Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
-        for(Player p : plugin.getServer().getOnlinePlayers()){
+        for (Player p : plugin.getServer().getOnlinePlayers()) {
             p.setScoreboard(main);
         }
     }
 
+    /* UPDATING SECTIONS OF HUD */
     public void updateTeammateHUD(@NotNull Player p) {
         Scoreboard b = p.getScoreboard();
 
@@ -339,6 +350,7 @@ public class HUDManager implements Listener {
         setHUDLine(p, "kills", s.toString());
     }
 
+    /* HANDLERS */
     @EventHandler
     public void onMove(PlayerMoveEvent movement){
         Player p = movement.getPlayer();

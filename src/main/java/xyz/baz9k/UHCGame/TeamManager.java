@@ -35,6 +35,10 @@ public class TeamManager {
         return playerMap.get(p.getUniqueId());
     }
 
+    /**
+     * Add a player to the TeamManager
+     * @param p
+     */
     public void addPlayer(@NotNull Player p) {
         UUID uuid = p.getUniqueId();
         if (playerMap.containsKey(uuid)) {
@@ -44,18 +48,31 @@ public class TeamManager {
         playerMap.put(uuid, new Node(0, PlayerState.SPECTATOR, p));
     }
 
+    /**
+     * Sets a player's state to {@link PlayerState#SPECTATOR}
+     * @param p
+     */
     public void setSpectator(@NotNull Player p) {
         Node n = getPlayerNode(p);
         n.team = 0;
         n.state = PlayerState.SPECTATOR;
     }
 
+    /**
+     * Sets a player's state to {@link PlayerState#COMBATANT_UNASSIGNED}
+     * @param p
+     */
     public void setUnassignedCombatant(@NotNull Player p) {
         Node n = getPlayerNode(p);
         n.team = 0;
         n.state = PlayerState.COMBATANT_UNASSIGNED;
     }
 
+    /**
+     * Assigns a player to a combatant team.
+     * @param p
+     * @param team
+     */
     public void assignPlayerTeam(@NotNull Player p, int team) {
         if (team <= 0 || team > numTeams) {
             throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
@@ -67,12 +84,12 @@ public class TeamManager {
 
     }
 
+    /**
+     * Removes a player from the TeamManager.
+     * @param p
+     */
     public void removePlayer(@NotNull Player p) { // unused
         playerMap.remove(p.getUniqueId());
-    }
-
-    public int getTeam(@NotNull Player p) {
-        return getPlayerNode(p).team;
     }
 
     @NotNull
@@ -80,10 +97,15 @@ public class TeamManager {
         return getPlayerNode(p).state;
     }
 
-    public boolean isPlayerAlive(@NotNull Player p) {
-        return getPlayerNode(p).state == PlayerState.COMBATANT_ALIVE;
+    public int getTeam(@NotNull Player p) {
+        return getPlayerNode(p).team;
     }
 
+    /**
+     * Sets player to alive or dead.
+     * @param p
+     * @param aliveStatus
+     */
     public void setCombatantAliveStatus(@NotNull Player p, boolean aliveStatus) {
         if (!isAssignedCombatant(p)) {
             throw new IllegalArgumentException("Player must be an assigned combatant.");
@@ -93,6 +115,11 @@ public class TeamManager {
         n.state = aliveStatus ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
     }
 
+    /* COUNTING */
+    
+    /**
+     * @return the number of combatants in the team manager.
+     */
     public int countCombatants() {
         int count = 0;
         for (Node v : playerMap.values()) {
@@ -103,6 +130,9 @@ public class TeamManager {
         return count;
     }
 
+    /**
+     * @return the number of living combatants in the team manager.
+     */
     public int countLivingCombatants() {
         int count = 0;
         for (Node v : playerMap.values()) {
@@ -113,6 +143,9 @@ public class TeamManager {
         return count;
     }
 
+    /**
+     * @return the number of living teams in the team manager.
+     */
     public int countLivingTeams() {
         int count = 0;
         for (int i = 1; i <= numTeams; i++) {
@@ -122,6 +155,11 @@ public class TeamManager {
         }
         return count;
     }
+
+    /**
+     * @param team
+     * @return the number of living combatants on the specified team.
+     */
     public int countLivingCombatantsInTeam(int team) {
         if (team <= 0 || team > numTeams) {
             throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
@@ -136,6 +174,8 @@ public class TeamManager {
         return count;
     }
 
+    /* LIST OF PLAYERS */
+    
     private List<Player> getAllPlayersMatching(Predicate<Node> predicate) {
         ArrayList<Player> players = new ArrayList<>();
         for (Node n : playerMap.values()) {
@@ -158,16 +198,27 @@ public class TeamManager {
                     .filter(p -> isOnline(p))
                     .collect(Collectors.toList());
     }
+
+    /**
+     * @return a {@link List} of all spectators
+     */
     @NotNull
     public List<Player> getAllSpectators() {
         return getAllPlayersMatching(n -> n.state == PlayerState.SPECTATOR);
     }
 
+    /**
+     * @return a {@link List} of all combatants
+     */
     @NotNull
     public List<Player> getAllCombatants() {
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR);
     }
 
+    /**
+     * @param team
+     * @return a {@link List} of all combatants on a specific team
+     */
     @NotNull
     public List<Player> getAllCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
@@ -176,29 +227,52 @@ public class TeamManager {
 
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR && n.state != PlayerState.COMBATANT_UNASSIGNED && n.team == team);
     }
+
+    /**
+     * @return a {@link List} of all online spectators
+     */
     @NotNull
     public List<Player> getAllOnlineSpectators() {
         return onlyOnline(getAllSpectators());
     }
 
+    /**
+     * @return a {@link List} of all online combatants
+     */
     @NotNull
     public List<Player> getAllOnlineCombatants() {
         return onlyOnline(getAllCombatants());
     }
 
+    /**
+     * @param t
+     * @return a {@link List} of all online combatants on a specific team
+     */
     @NotNull
     public List<Player> getAllOnlineCombatantsOnTeam(int t) {
         return onlyOnline(getAllCombatantsOnTeam(t));
     }
 
+    /**
+     * @param t
+     * @return if the specified team is eliminated
+     */
     public boolean isTeamEliminated(int t) {
         return countLivingCombatantsInTeam(t) == 0;
     }
 
+    /**
+     * @param p
+     * @return if the specified player is a {@link PlayerState#SPECTATOR}
+     */
     public boolean isSpectator(@NotNull Player p) {
         return getPlayerNode(p).state == PlayerState.SPECTATOR;
     }
 
+    /**
+     * @param p
+     * @return if the specified player is an assigned combatant.
+     */
     public boolean isAssignedCombatant(@NotNull Player p) {
         PlayerState state = getPlayerNode(p).state;
         return state == PlayerState.COMBATANT_ALIVE || state == PlayerState.COMBATANT_DEAD;
@@ -216,6 +290,9 @@ public class TeamManager {
         numTeams = n;
     }
 
+    /**
+     * Resets all players.
+     */
     public void resetAllPlayers() {
         for (Node v : playerMap.values()) {
             if (v.state != PlayerState.SPECTATOR) {

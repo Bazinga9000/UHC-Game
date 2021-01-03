@@ -79,6 +79,9 @@ public class GameManager implements Listener {
         createMVWorld("game_nether", Environment.NETHER);
     }
 
+    /**
+     * After all managers are initialized, this function is run to give gameManager references to all other managers.
+     */
     public void loadManagerRefs() {
         teamManager = plugin.getTeamManager();
         hudManager = plugin.getHUDManager();
@@ -86,6 +89,13 @@ public class GameManager implements Listener {
         cfgManager = plugin.getConfigManager();
     }
 
+    /**
+     * Starts UHC.
+     * Accessible through /uhc start or /uhc start force.
+     * /uhc start: Checks that teams are assigned, worlds have regenerated, and game has not started
+     * /uhc start force: Skips checks
+     * @param skipChecks If true, all checks are ignored.
+     */
     public void startUHC(boolean skipChecks) {
         try {
             _startUHC(skipChecks);
@@ -185,6 +195,13 @@ public class GameManager implements Listener {
         bbManager.enable();
     }
 
+    /**
+     * Ends UHC.
+     * Accessible through /uhc end or /uhc end force.
+     * /uhc end: Checks that the game has started
+     * /uhc end force: Forcibly starts game
+     * @param skipChecks If true, started game checks are ignored.
+     */
     public void endUHC(boolean skipChecks) {
         try {
             _endUHC(skipChecks);
@@ -195,7 +212,7 @@ public class GameManager implements Listener {
         }
     }
 
-    public void _endUHC(boolean skipChecks) {
+    private void _endUHC(boolean skipChecks) {
         if (!skipChecks) {
             // check if game is OK to end
             if (!isUHCStarted) {
@@ -223,7 +240,35 @@ public class GameManager implements Listener {
 
     }
 
+    public boolean isUHCStarted() {
+        return isUHCStarted;
+    }
+
+    public boolean haveWorldsRegened() {
+        return worldsRegened;
+    }
+
+    public void setWorldsRegenedStatus(boolean status) {
+        worldsRegened = status;
+    }
+
+    /**
+     * @return the {@link Duration} since the game has started.
+     */
+    @NotNull
+    public Duration getElapsedTime() {
+        if (!isUHCStarted) {
+            throw new IllegalStateException("UHC has not started.");
+        }
+
+        return Duration.between(startTime, Instant.now());
+    }
+
+    /**
+     * @return the current stage of the game. -1 if game has not started.
+     */
     public int getStage() {
+        if (!isUHCStarted) return -1;
         return Math.max(0, Math.min(stage, stageDurations.length));
     }
 
@@ -291,19 +336,19 @@ public class GameManager implements Listener {
 
     }
 
+    /**
+     * @return the {@link Instant} when the last stage change occurred.
+     */
     public Instant getLStageInstant() {
-        return lastStageInstant;
-    }
-
-    @NotNull
-    public Duration getElapsedTime() {
         if (!isUHCStarted) {
             throw new IllegalStateException("UHC has not started.");
         }
-
-        return Duration.between(startTime, Instant.now());
+        return lastStageInstant;
     }
 
+    /**
+     * @return the {@link Duration} that the current stage lasts.
+     */
     @NotNull
     public Duration getStageDuration() {
         if (!isUHCStarted) {
@@ -312,6 +357,9 @@ public class GameManager implements Listener {
         return stageDurations[getStage()];
     }
 
+    /**
+     * @return the {@link Duration} until the current stage ends.
+     */
     @NotNull
     public Duration getRemainingStageDuration() {
         if (!isUHCStarted) {
@@ -322,16 +370,34 @@ public class GameManager implements Listener {
         return Duration.between(Instant.now(), lastStageInstant.plus(stageDur));
     }
 
+    /**
+     * @return if deathmatch (last stage) has started.
+     */
     public boolean isDeathmatch() {
         return stage == stageDurations.length - 1;
     }
 
+    /**
+     * @return if the stage has completed and needs to be incremented.
+     */
     public boolean isStageComplete() {
         if (isDeathmatch()) return false;
         Instant end = lastStageInstant.plus(stageDurations[stage]);
         return !end.isAfter(Instant.now());
     }
 
+    private void createMVWorld(@NotNull String world, @NotNull Environment env) {
+        MVWorldManager wm = plugin.getMVWorldManager();
+        MultiverseWorld w = wm.getMVWorld(world);
+        if (w != null) return;
+        
+        Random temp = new Random();
+        wm.addWorld(world, env, String.valueOf(temp.nextLong()), WorldType.NORMAL, true, null);
+    }
+
+    /**
+     * @return an Array of {@link MultiverseWorld} which the UHC uses.
+     */
     @NotNull
     public MultiverseWorld[] getMVUHCWorlds() {
         MVWorldManager wm = plugin.getMVWorldManager();
@@ -341,7 +407,10 @@ public class GameManager implements Listener {
         };
     }
 
-    @NotNull 
+    /**
+     * @return an Array of {@link World} which the UHC uses.
+     */
+    @NotNull
     public World[] getUHCWorlds() {
         MultiverseWorld[] mvWorlds = getMVUHCWorlds();
         World[] worlds = new World[mvWorlds.length];
@@ -352,6 +421,11 @@ public class GameManager implements Listener {
         return worlds;
     }
 
+    /**
+     * Get a specific game world based on its environment.
+     * @param env NORMAL|NETHER
+     * @return the world. If there is no respective game world for the environment (e.g. THE_END) return null.
+     */
     public World getUHCWorld(@NotNull Environment env) {
         World[] worlds = getUHCWorlds();
         World world;
@@ -370,37 +444,111 @@ public class GameManager implements Listener {
         return world;
     }
 
-    public boolean isUHCStarted() {
-        return isUHCStarted;
-    }
-
+    /**
+     * Returns the number of kills that this combatant has dealt.
+     * @param p
+     * @return the number of kills
+     */
     public int getKills(@NotNull Player p) {
         return kills.get(p.getUniqueId());
     }
-
-    public void createMVWorld(@NotNull String world, @NotNull Environment env) {
-        MVWorldManager wm = plugin.getMVWorldManager();
-        MultiverseWorld w = wm.getMVWorld(world);
-        if (w != null) return;
-        
-        Random temp = new Random();
-        wm.addWorld(world, env, String.valueOf(temp.nextLong()), WorldType.NORMAL, true, null);
-    }
-
-    public boolean haveWorldsRegened() {
-        return worldsRegened;
-    }
-
-    public void setWorldsRegenedStatus(boolean status) {
-        worldsRegened = status;
-    }
     
+    private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minimumSeparation) {
+        ArrayList<Location> locations = new ArrayList<>();
+        Random r = new Random();
+
+        for (int i = 0; i < numLocations; i++) {
+            World w = getUHCWorld(Environment.NORMAL);
+            Location newLocation = null;
+            while (true) {
+                double x = center.getX() + (r.nextDouble() - 0.5) * maximumRange;
+                double z = center.getZ() + (r.nextDouble() - 0.5) * maximumRange;
+
+                if (!locations.isEmpty()) {
+                    List<Double> distances = locations.stream()
+                            .map((Location l) -> Utils.euclideanDistance(x, z, l.getX(), l.getZ()))
+                            .collect(Collectors.toList());
+                    double minimumDistance = Collections.min(distances);
+
+                    if (minimumDistance < minimumSeparation) {
+                        continue;
+                    }
+                }
+                newLocation = new Location(w, x, w.getHighestBlockYAt((int) x, (int) z), z);
+
+                Material blockType = w.getBlockAt(newLocation).getType();
+
+                if (blockType == Material.LAVA) {
+                    continue;
+                }
+
+                if (blockType == Material.WATER) {
+                    continue;
+                }
+
+                break;
+            }
+
+            locations.add(newLocation);
+        }
+        return locations;
+    }
+
+    /**
+     * Spreads players with respect to teams
+     * @param center
+     * @param maximumRange
+     * @param minimumSeparation
+     */
+    public void spreadPlayersByTeam(Location center, double maximumRange, double minimumSeparation) {
+        ArrayList<Collection<Player>> groups = new ArrayList<>();
+        for (int i = 1; i <= teamManager.getNumTeams(); i++) {
+            groups.add(teamManager.getAllCombatantsOnTeam(i));
+        }
+
+        spreadPlayers(groups, center, maximumRange, minimumSeparation);
+    }
+
+    /**
+     * Spreads players
+     * @param players
+     * @param center
+     * @param maximumRange
+     * @param minimumSeparation
+     */
+    public void spreadPlayers(Collection<Player> players, Location center, double maximumRange, double minimumSeparation) {
+        List<Location> locations = getRandomLocations(center, players.size(), maximumRange, minimumSeparation);
+        int index = 0;
+        for (Player p : players) {
+            p.teleport(locations.get(index));
+            index++;
+        }
+
+    }
+
+    /**
+     * Spreads players with respect to specified groups
+     * @param groups
+     * @param center
+     * @param maximumRange
+     * @param minimumSeparation
+     */
+    public void spreadPlayers(List<Collection<Player>> groups, Location center, double maximumRange, double minimumSeparation) {
+        List<Location> locations = getRandomLocations(center, groups.size(), maximumRange, minimumSeparation);
+        for (int i = 0; i < groups.size(); i++) {
+            for (Player p : groups.get(i)) {
+                p.teleport(locations.get(i));
+            }
+        }
+
+    }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player p = event.getPlayer();
         teamManager.addPlayer(p);
         if(isUHCStarted) {
-            bbManager.enable(p);
+            bbManager.addPlayer(p);
             hudManager.initializePlayerHUD(p);
             hudManager.addPlayerToTeams(p);
         }
@@ -474,75 +622,5 @@ public class GameManager implements Listener {
             // update hud if dmg taken
             hudManager.updateTeammateHUD(p);
         }
-    }
-
-    private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minimumSeparation) {
-        ArrayList<Location> locations = new ArrayList<>();
-        Random r = new Random();
-
-        for (int i = 0; i < numLocations; i++) {
-            World w = getUHCWorld(Environment.NORMAL);
-            Location newLocation = null;
-            while (true) {
-                double x = center.getX() + (r.nextDouble() - 0.5) * maximumRange;
-                double z = center.getZ() + (r.nextDouble() - 0.5) * maximumRange;
-
-                if (!locations.isEmpty()) {
-                    List<Double> distances = locations.stream()
-                            .map((Location l) -> Utils.euclideanDistance(x, z, l.getX(), l.getZ()))
-                            .collect(Collectors.toList());
-                    double minimumDistance = Collections.min(distances);
-
-                    if (minimumDistance < minimumSeparation) {
-                        continue;
-                    }
-                }
-                newLocation = new Location(w, x, w.getHighestBlockYAt((int) x, (int) z), z);
-
-                Material blockType = w.getBlockAt(newLocation).getType();
-
-                if (blockType == Material.LAVA) {
-                    continue;
-                }
-
-                if (blockType == Material.WATER) {
-                    continue;
-                }
-
-                break;
-            }
-
-            locations.add(newLocation);
-        }
-        return locations;
-    }
-
-    public void spreadPlayersByTeam(Location center, double maximumRange, double minimumSeparation) {
-        ArrayList<Collection<Player>> groups = new ArrayList<>();
-        for (int i = 1; i <= teamManager.getNumTeams(); i++) {
-            groups.add(teamManager.getAllCombatantsOnTeam(i));
-        }
-
-        spreadPlayers(groups, center, maximumRange, minimumSeparation);
-    }
-
-    public void spreadPlayers(Collection<Player> players, Location center, double maximumRange, double minimumSeparation) {
-        List<Location> locations = getRandomLocations(center, players.size(), maximumRange, minimumSeparation);
-        int index = 0;
-        for (Player p : players) {
-            p.teleport(locations.get(index));
-            index++;
-        }
-
-    }
-
-    public void spreadPlayers(List<Collection<Player>> groups, Location center, double maximumRange, double minimumSeparation) {
-        List<Location> locations = getRandomLocations(center, groups.size(), maximumRange, minimumSeparation);
-        for (int i = 0; i < groups.size(); i++) {
-            for (Player p : groups.get(i)) {
-                p.teleport(locations.get(i));
-            }
-        }
-
     }
 }
