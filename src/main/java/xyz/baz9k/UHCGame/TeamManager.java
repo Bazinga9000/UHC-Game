@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.HashMap;
 
 public class TeamManager {
@@ -117,74 +118,49 @@ public class TeamManager {
 
     /* COUNTING */
     
+    private int countPlayersMatching(Predicate<Node> predicate) {
+        return (int) playerMap.values().stream()
+                                       .filter(predicate)
+                                       .count();
+    }
     /**
      * @return the number of combatants in the team manager.
      */
     public int countCombatants() {
-        int count = 0;
-        for (Node v : playerMap.values()) {
-            if (v.state != PlayerState.SPECTATOR) {
-                count++;
-            }
-        }
-        return count;
+        return countPlayersMatching(n -> n.state != PlayerState.SPECTATOR);
     }
 
     /**
      * @return the number of living combatants in the team manager.
      */
     public int countLivingCombatants() {
-        int count = 0;
-        for (Node v : playerMap.values()) {
-            if (v.state == PlayerState.COMBATANT_ALIVE) {
-                count++;
-            }
-        }
-        return count;
+        return countPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE);
     }
 
     /**
      * @return the number of living teams in the team manager.
      */
     public int countLivingTeams() {
-        int count = 0;
-        for (int i = 1; i <= numTeams; i++) {
-            if (!isTeamEliminated(i)) {
-                count++;
-            }
-        }
-        return count;
+        return (int) IntStream.range(1, numTeams + 1)
+                              .filter(t -> !isTeamEliminated(t))
+                              .count();
     }
 
     /**
      * @param team
      * @return the number of living combatants on the specified team.
      */
-    public int countLivingCombatantsInTeam(int team) {
-        if (team <= 0 || team > numTeams) {
-            throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
-        }
-
-        int count = 0;
-        for (Node v : playerMap.values()) {
-            if (v.state == PlayerState.COMBATANT_ALIVE && v.team == team) {
-                count++;
-            }
-        }
-        return count;
+    public int countLivingCombatantsInTeam(int t) {
+        return countPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE && n.team == t);
     }
 
     /* LIST OF PLAYERS */
     
     private List<Player> getAllPlayersMatching(Predicate<Node> predicate) {
-        ArrayList<Player> players = new ArrayList<>();
-        for (Node n : playerMap.values()) {
-            if (predicate.test(n)) {
-                players.add(n.player);
-            }
-        }
-
-        return players;
+        return playerMap.values().stream()
+                                 .filter(predicate)
+                                 .map(n -> n.player)
+                                 .collect(Collectors.toList());
     }
 
     private boolean isOnline(Player p) {
@@ -193,7 +169,7 @@ public class TeamManager {
         return pl != null;
     }
 
-    private List<Player> onlyOnline(@NotNull List<Player> pList) {
+    private List<Player> filterOnline(@NotNull List<Player> pList) {
         return pList.stream()
                     .filter(p -> isOnline(p))
                     .collect(Collectors.toList());
@@ -233,7 +209,7 @@ public class TeamManager {
      */
     @NotNull
     public List<Player> getAllOnlineSpectators() {
-        return onlyOnline(getAllSpectators());
+        return filterOnline(getAllSpectators());
     }
 
     /**
@@ -241,7 +217,7 @@ public class TeamManager {
      */
     @NotNull
     public List<Player> getAllOnlineCombatants() {
-        return onlyOnline(getAllCombatants());
+        return filterOnline(getAllCombatants());
     }
 
     /**
@@ -250,7 +226,7 @@ public class TeamManager {
      */
     @NotNull
     public List<Player> getAllOnlineCombatantsOnTeam(int t) {
-        return onlyOnline(getAllCombatantsOnTeam(t));
+        return filterOnline(getAllCombatantsOnTeam(t));
     }
 
     /**
