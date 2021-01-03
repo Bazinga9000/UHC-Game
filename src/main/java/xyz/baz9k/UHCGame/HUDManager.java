@@ -24,6 +24,8 @@ import xyz.baz9k.UHCGame.util.Utils;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Set;
+import java.util.ArrayList;
 import java.util.Collections;
 
 public class HUDManager implements Listener {
@@ -222,12 +224,13 @@ public class HUDManager implements Listener {
         Scoreboard b = p.getScoreboard();
 
         int team = teamManager.getTeam(p);
-        List<Player> teammates;
+        Set<Player> teammateSet;
         if (teamManager.isAssignedCombatant(p)) {
-            teammates = teamManager.getAllCombatantsOnTeam(team);
+            teammateSet = teamManager.getAllCombatantsOnTeam(team);
         } else {
-            teammates = teamManager.getAllCombatants();
+            teammateSet = teamManager.getAllCombatants();
         }
+        List<Player> teammates = new ArrayList<>(teammateSet);
         teammates.remove(p);
         Collections.sort(teammates, (t1, t2) -> (int)Math.ceil(t1.getHealth()) - (int)Math.ceil(t2.getHealth()));
 

@@ -4,8 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -156,11 +155,11 @@ public class TeamManager {
 
     /* LIST OF PLAYERS */
     
-    private List<Player> getAllPlayersMatching(Predicate<Node> predicate) {
+    private Set<Player> getAllPlayersMatching(Predicate<Node> predicate) {
         return playerMap.values().stream()
                                  .filter(predicate)
                                  .map(n -> n.player)
-                                 .collect(Collectors.toList());
+                                 .collect(Collectors.toSet());
     }
 
     private boolean isOnline(Player p) {
@@ -169,34 +168,34 @@ public class TeamManager {
         return pl != null;
     }
 
-    private List<Player> filterOnline(@NotNull List<Player> pList) {
-        return pList.stream()
+    private Set<Player> filterOnline(@NotNull Set<Player> pSet) {
+        return pSet.stream()
                     .filter(p -> isOnline(p))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
     }
 
     /**
-     * @return a {@link List} of all spectators
+     * @return a {@link Set} of all spectators
      */
     @NotNull
-    public List<Player> getAllSpectators() {
+    public Set<Player> getAllSpectators() {
         return getAllPlayersMatching(n -> n.state == PlayerState.SPECTATOR);
     }
 
     /**
-     * @return a {@link List} of all combatants
+     * @return a {@link Set} of all combatants
      */
     @NotNull
-    public List<Player> getAllCombatants() {
+    public Set<Player> getAllCombatants() {
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR);
     }
 
     /**
      * @param team
-     * @return a {@link List} of all combatants on a specific team
+     * @return a {@link Set} of all combatants on a specific team
      */
     @NotNull
-    public List<Player> getAllCombatantsOnTeam(int team) {
+    public Set<Player> getAllCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
             throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
         }
@@ -205,27 +204,27 @@ public class TeamManager {
     }
 
     /**
-     * @return a {@link List} of all online spectators
+     * @return a {@link Set} of all online spectators
      */
     @NotNull
-    public List<Player> getAllOnlineSpectators() {
+    public Set<Player> getAllOnlineSpectators() {
         return filterOnline(getAllSpectators());
     }
 
     /**
-     * @return a {@link List} of all online combatants
+     * @return a {@link Set} of all online combatants
      */
     @NotNull
-    public List<Player> getAllOnlineCombatants() {
+    public Set<Player> getAllOnlineCombatants() {
         return filterOnline(getAllCombatants());
     }
 
     /**
      * @param t
-     * @return a {@link List} of all online combatants on a specific team
+     * @return a {@link Set} of all online combatants on a specific team
      */
     @NotNull
-    public List<Player> getAllOnlineCombatantsOnTeam(int t) {
+    public Set<Player> getAllOnlineCombatantsOnTeam(int t) {
         return filterOnline(getAllCombatantsOnTeam(t));
     }
 

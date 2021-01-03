@@ -11,6 +11,7 @@ import xyz.baz9k.UHCGame.util.TeamColors;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
@@ -122,7 +123,7 @@ public class Commands {
 
     private void _assignTeams(int n) {
         TeamManager tm = plugin.getTeamManager();
-        List<Player> combatants = tm.getAllOnlineCombatants();
+        List<Player> combatants = new ArrayList<>(tm.getAllOnlineCombatants());
 
         Collections.shuffle(combatants);
         tm.setNumTeams(n);
@@ -146,7 +147,7 @@ public class Commands {
 
     private void _announceTeamsLine(int t) {
         TeamManager tm = plugin.getTeamManager();
-        List<Player> players;
+        Set<Player> players;
         if (t == 0) {
             players = tm.getAllOnlineSpectators();
         } else {
@@ -163,7 +164,7 @@ public class Commands {
         s.append(": ");
         List<String> plStrs = new ArrayList<>();
         for (Player p : players) {
-            plStrs.add(p.toString());
+            plStrs.add(p.getName());
         }
         s.append(String.join(", ", plStrs));
         Bukkit.broadcastMessage(s.toString());
