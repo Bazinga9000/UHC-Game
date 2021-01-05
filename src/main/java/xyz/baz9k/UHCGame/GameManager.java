@@ -51,7 +51,7 @@ public class GameManager implements Listener {
     
     private boolean worldsRegened = false;
 
-    private HashMap<UUID, Integer> kills;
+    private HashMap<UUID, Integer> kills = new HashMap<>();
 
     //TODO REMOVE THESE AND REPLACE WITH CONFIG MANAGER
     private static final int WB_INIT = 1200;
@@ -125,7 +125,7 @@ public class GameManager implements Listener {
         worldsRegened = false;
 
         startTime = lastStageInstant = Instant.now();
-        this.kills = new HashMap<>();
+        kills.clear();
         
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             // archive previous display name
