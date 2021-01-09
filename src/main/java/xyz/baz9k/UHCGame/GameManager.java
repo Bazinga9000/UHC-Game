@@ -53,6 +53,8 @@ public class GameManager implements Listener {
 
     private HashMap<UUID, Integer> kills = new HashMap<>();
 
+    private final double[] center = {0.5, 0.5};
+
     //TODO REMOVE THESE AND REPLACE WITH CONFIG MANAGER
     private static final int WB_INIT = 1200;
     private static final int WB2 = 25;
@@ -166,7 +168,7 @@ public class GameManager implements Listener {
             w.setTime(0);
             w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
             
-            w.getWorldBorder().setCenter(0.5, 0.5);
+            w.getWorldBorder().setCenter(center[0], center[1]);
             w.getWorldBorder().setWarningDistance(25);
 
             Gamerules.set(w);
@@ -185,7 +187,7 @@ public class GameManager implements Listener {
             }
         }
 
-        spreadPlayersByTeam(new Location(getUHCWorld(Environment.NORMAL), 0, 0, 0), WB_INIT/2.0, WB_INIT/8.0);
+        spreadPlayersByTeam(getCenter(), WB_INIT/2.0, WB_INIT/8.0);
 
         // begin uhc tick events
         tick = new GameTick(plugin);
@@ -324,13 +326,12 @@ public class GameManager implements Listener {
                 PotionEffectType.JUMP.createEffect(10 * 20 /* ticks */, /* lvl */ 128),
                 PotionEffectType.BLINDNESS.createEffect(10 * 20 /* ticks */, /* lvl */ 10)
             );
-            for (Player p : plugin.getServer().getOnlinePlayers()) p.teleport(new Location(w, 0.5, 255, 0.5));
+            for (Player p : plugin.getServer().getOnlinePlayers()) p.teleport(getCenter(255));
             for (Player p : teamManager.getAllCombatants()) {
                 p.addPotionEffects(effs);
             }
 
-            //TODO FIX MAGIC NUMBERS
-            spreadPlayersByTeam(new Location(getUHCWorld(Environment.NORMAL), 0, 0, 0), 9, 5);
+            spreadPlayersByTeam(getCenter(), WB_DM / 2.0 - 1, WB_DM / 4.0);
 
         }
 
@@ -442,6 +443,18 @@ public class GameManager implements Listener {
                 break;
         }
         return world;
+    }
+
+    private Location getCenter() {
+        return new Location(getUHCWorld(Environment.NORMAL), center[0], 0, center[1]);
+    }
+    private Location getCenter(double y) {
+        return new Location(getUHCWorld(Environment.NORMAL), center[0], y, center[1]);
+    }
+
+    private void setCenter(double x, double z) {
+        center[0] = x;
+        center[1] = z;
     }
 
     /**
