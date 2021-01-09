@@ -26,8 +26,15 @@ import xyz.baz9k.UHCGame.util.DelayedMessage;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
@@ -54,22 +61,16 @@ public class GameManager implements Listener {
 
     private final double[] center = {0.5, 0.5};
 
-    //TODO REMOVE THESE AND REPLACE WITH CONFIG MANAGER
-    private static final int WB_INIT = 1200;
-    private static final int WB2 = 25;
-    private static final int WB3 = 3;
-    private static final int WB_DM = 20;
-
-    private int stage = -1;
+    private GameStage stage = GameStage.NOT_IN_GAME;
     private Instant lastStageInstant = null;
-    private static Duration[] stageDurations = {
-        Duration.ofMinutes(60), // Still border
-        Duration.ofMinutes(15), // Border 1
-        Duration.ofMinutes(5), // Border stops
-        Duration.ofMinutes(10), // Border 2
-        Duration.ofMinutes(5), // Waiting until DM
-        ChronoUnit.FOREVER.getDuration() // deathmatch
-    };
+    //private static Duration[] stageDurations = {
+    //    Duration.ofMinutes(60), // Still border
+    //    Duration.ofMinutes(15), // Border 1
+    //    Duration.ofMinutes(5), // Border stops
+    //    Duration.ofMinutes(10), // Border 2
+    //    Duration.ofMinutes(5), // Waiting until DM
+    //    ChronoUnit.FOREVER.getDuration() // deathmatch
+    //};
 
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
@@ -185,13 +186,13 @@ public class GameManager implements Listener {
             }
         }
 
-        spreadPlayersByTeam(getCenter(), WB_INIT/2.0, WB_INIT/8.0);
+        spreadPlayersByTeam(getCenter(), GameStage.WB_STILL.getWBSize() / 2.0, GameStage.WB_STILL.getWBSize() / 8.0);
 
         // begin uhc tick events
         tick = new GameTick(plugin);
         tick.runTaskTimer(plugin, 0L, 1L);
         
-        setStage(0);
+        setStage(GameStage.fromIndex(0));
         bbManager.enable();
     }
 
@@ -235,7 +236,7 @@ public class GameManager implements Listener {
         kills.clear();
         tick.cancel();
 
-        stage = -1;
+        setStage(GameStage.NOT_IN_GAME);
         bbManager.disable();
 
     }
@@ -265,50 +266,32 @@ public class GameManager implements Listener {
     }
 
     /**
-     * @return the current stage of the game. -1 if game has not started.
+     * @return the current stage of the game.
      */
-    public int getStage() {
-        if (!isUHCStarted) return -1;
-        return Math.max(0, Math.min(stage, stageDurations.length));
+    public GameStage getStage() {
+        return stage;
     }
 
     public void incrementStage() {
-        stage++;
+        stage = stage.next();
         updateStage();
     }
 
-    public void setStage(int stage) {
+    public void setStage(GameStage stage) {
         this.stage = stage;
-        this.stage = getStage();
         updateStage();
+    }
+    public void setStage(int s) {
+        stage = GameStage.fromIndex(s);
+        setStage(stage);
     }
 
     private void updateStage() {
         lastStageInstant = Instant.now();
         bbManager.updateBossbarStage();
 
-        // TODO messages when next stage starts
-        //worldborder
-        for (World w : getUHCWorlds()) {
-            switch (stage) {
-                case 0: // start of game (still border)
-                    w.getWorldBorder().setSize(WB_INIT);
-                    break;
-                case 1: //worldborder starts moving the first time (border 1)
-                    w.getWorldBorder().setSize(WB2, stageDurations[1].toSeconds());
-                    break;
-                case 2: // border stop
-                    w.getWorldBorder().setSize(WB2);
-                case 3: //worldborder starts moving the second time (border 2)
-                    w.getWorldBorder().setSize(WB3, stageDurations[3].toSeconds());
-                    break;
-                case 4: // waiting till DM
-                    w.getWorldBorder().setSize(WB3);
-                    break;
-                case 5: // DEATHMATCH
-                    w.getWorldBorder().setSize(WB_DM);
-            }
-        }
+        stage.sendMessage(); // TODO make messages for stage starts
+        stage.applyWBSize(getUHCWorlds());
 
         // deathmatch
         if (isDeathmatch()) {
@@ -324,12 +307,14 @@ public class GameManager implements Listener {
                 PotionEffectType.JUMP.createEffect(10 * 20 /* ticks */, /* lvl */ 128),
                 PotionEffectType.BLINDNESS.createEffect(10 * 20 /* ticks */, /* lvl */ 10)
             );
-            for (Player p : Bukkit.getOnlinePlayers()) p.teleport(getCenter(255));
+            for (Player p : plugin.getServer().getOnlinePlayers()) {
+                p.teleport(getCenterAtY(255));
+            }
             for (Player p : teamManager.getAllCombatants()) {
                 p.addPotionEffects(effs);
             }
 
-            spreadPlayersByTeam(getCenter(), WB_DM / 2.0 - 1, WB_DM / 4.0);
+            spreadPlayersByTeam(getCenter(), GameStage.DEATHMATCH.getWBSize() / 2.0 - 1, GameStage.DEATHMATCH.getWBSize() / 4.0);
 
         }
 
@@ -343,7 +328,7 @@ public class GameManager implements Listener {
         if (!isUHCStarted) {
             throw new IllegalStateException("UHC has not started.");
         }
-        return stageDurations[getStage()];
+        return stage.getDuration();
     }
 
     /**
@@ -355,7 +340,7 @@ public class GameManager implements Listener {
             throw new IllegalStateException("UHC has not started.");
         }
         Duration stageDur = getStageDuration();
-        if (stageDur.equals(ChronoUnit.FOREVER.getDuration())) return stageDur; // if deathmatch, just return ∞
+        if (isDeathmatch()) return stageDur; // if deathmatch, just return ∞
         return Duration.between(Instant.now(), lastStageInstant.plus(stageDur));
     }
 
@@ -363,7 +348,7 @@ public class GameManager implements Listener {
      * @return if deathmatch (last stage) has started.
      */
     public boolean isDeathmatch() {
-        return stage == stageDurations.length - 1;
+        return stage == GameStage.DEATHMATCH;
     }
 
     /**
@@ -371,7 +356,7 @@ public class GameManager implements Listener {
      */
     public boolean isStageComplete() {
         if (isDeathmatch()) return false;
-        Instant end = lastStageInstant.plus(stageDurations[stage]);
+        Instant end = lastStageInstant.plus(stage.getDuration());
         return !end.isAfter(Instant.now());
     }
 
@@ -436,7 +421,7 @@ public class GameManager implements Listener {
     private Location getCenter() {
         return new Location(getUHCWorld(Environment.NORMAL), center[0], 0, center[1]);
     }
-    private Location getCenter(double y) {
+    private Location getCenterAtY(double y) {
         return new Location(getUHCWorld(Environment.NORMAL), center[0], y, center[1]);
     }
 
@@ -446,7 +431,7 @@ public class GameManager implements Listener {
         center[1] = z;
     }
     */
-    
+
     /**
      * Returns the number of kills that this combatant has dealt.
      * @param p

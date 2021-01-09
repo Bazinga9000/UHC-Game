@@ -6,32 +6,12 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import net.md_5.bungee.api.ChatColor;
 import xyz.baz9k.UHCGame.util.Utils;
 
 public class BossbarManager {
     private GameManager gameManager;
-
     private BossBar bossbar;
-    private class BossbarStage {
-        public @Nullable String title;
-        public @NotNull BarColor color;
-        public BossbarStage(String title, BarColor color) {
-            this.title = title;
-            this.color = color;
-        }
-    }
-
-    private BossbarStage[] stages = {
-        new BossbarStage(ChatColor.RED + "Border Begins Shrinking", BarColor.RED), // Still border
-        new BossbarStage(ChatColor.BLUE + "Border Stops Shrinking", BarColor.BLUE), // Border 1
-        new BossbarStage(ChatColor.RED + "Border Begins Shrinking... Again.", BarColor.RED), // Border stops
-        new BossbarStage(ChatColor.BLUE + "Border Stops Shrinking... Again", BarColor.BLUE), // Border 2
-        new BossbarStage(ChatColor.WHITE + "The Battle at the Top of the World", BarColor.WHITE), // Waiting until DM
-        new BossbarStage(ChatColor.DARK_PURPLE + "∞", BarColor.PURPLE) // DEATHMATCH
-    };
 
     public BossbarManager(UHCGame plugin) {
         this.gameManager = plugin.getGameManager();
@@ -68,7 +48,7 @@ public class BossbarManager {
     public void tick() {
         if (gameManager.isDeathmatch()) {
             bossbar.setProgress(1);
-            bossbar.setTitle(getBBStage().title);
+            bossbar.setTitle(getBBTitle());
             return;
         }
         // update progress bar
@@ -77,7 +57,7 @@ public class BossbarManager {
 
         bossbar.setProgress((double) remainingSecs / totalSecs);
         // change display title
-        String display = getBBStage().title;
+        String display = getBBTitle();
         display += " | ";
         display += Utils.getTimeString(remainingSecs);
         bossbar.setTitle(display);
@@ -87,12 +67,17 @@ public class BossbarManager {
      * This function updates the bossbar when the stage increments.
      */
     public void updateBossbarStage() {
-        bossbar.setColor(getBBStage().color);
+        bossbar.setColor(getBBColor());
         tick();
     }
 
     @NotNull
-    private BossbarStage getBBStage() {
-        return stages[gameManager.getStage()];
+    private BarColor getBBColor() {
+        return gameManager.getStage().getBBColor();
+    }
+
+    @NotNull
+    private String getBBTitle() {
+        return gameManager.getStage().getBBTitle();
     }
 }
