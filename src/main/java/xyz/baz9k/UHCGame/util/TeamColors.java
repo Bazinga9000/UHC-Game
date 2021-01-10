@@ -3,6 +3,7 @@ package xyz.baz9k.UHCGame.util;
 import net.md_5.bungee.api.ChatColor;
 
 import java.awt.*;
+import java.util.Arrays;
 
 public class TeamColors {
     private static final int[] teamColorCodes = {
@@ -16,14 +17,11 @@ public class TeamColors {
         0x96c096, 0x969696, 0x6b6b96, 0x6b966b, 0x9696c0, 0xc0c0c0, 0x966b96, 0x96966b
     };
     
-    private static final int NUM_TEAM_COLORS = teamColorCodes.length;
-    private static Color[] teamColors = new Color[NUM_TEAM_COLORS];
-
-    static {
-        for (int i = 0; i < NUM_TEAM_COLORS; i++) {
-            teamColors[i] = new Color(teamColorCodes[i]);
-        }
-    }
+    private static final Color[] teamColors = Arrays.stream(teamColorCodes)
+                                                    .mapToObj(Color::new)
+                                                    .toArray(Color[]::new);
+    private static final Color SPEC_COLOR = ChatColor.AQUA.getColor();
+    private static final int NUM_TEAM_COLORS = teamColors.length;
 
     public static Color getTeamColor(int teamIndex) {
         if (teamIndex < 0) {
@@ -33,7 +31,7 @@ public class TeamColors {
             throw new IllegalArgumentException("Team index must be less than number of predefined team colors (" + NUM_TEAM_COLORS + ")");
         }
         if (teamIndex == 0) {
-            return new Color(85, 255, 255);
+            return SPEC_COLOR;
         }
         return teamColors[teamIndex - 1];
     }
@@ -49,7 +47,7 @@ public class TeamColors {
     public static String getTeamPrefix(int teamIndex) {
         ColoredStringBuilder cs = new ColoredStringBuilder();
         if (teamIndex == 0) {
-            cs.append("[S]",ChatColor.AQUA,ChatColor.ITALIC);
+            cs.append("[S]",ChatColor.AQUA, ChatColor.ITALIC);
         } else {
             cs.append("[" + teamIndex + "]",getTeamChatColor(teamIndex),ChatColor.BOLD);
         }
