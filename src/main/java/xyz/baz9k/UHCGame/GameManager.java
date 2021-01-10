@@ -338,16 +338,6 @@ public class GameManager implements Listener {
     }
 
     /**
-     * @return the {@link Instant} when the last stage change occurred.
-     */
-    public Instant getLStageInstant() {
-        if (!isUHCStarted) {
-            throw new IllegalStateException("UHC has not started.");
-        }
-        return lastStageInstant;
-    }
-
-    /**
      * @return the {@link Duration} that the current stage lasts.
      */
     @NotNull
