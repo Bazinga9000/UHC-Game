@@ -27,7 +27,6 @@ import xyz.baz9k.UHCGame.util.TeamColors;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
@@ -459,20 +458,19 @@ public class GameManager implements Listener {
     private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minimumSeparation) {
         ArrayList<Location> locations = new ArrayList<>();
         Random r = new Random();
+        World w = getUHCWorld(Environment.NORMAL);
 
         for (int i = 0; i < numLocations; i++) {
-            World w = getUHCWorld(Environment.NORMAL);
             Location newLocation = null;
             while (true) {
                 double x = center.getX() + (r.nextDouble() - 0.5) * maximumRange;
                 double z = center.getZ() + (r.nextDouble() - 0.5) * maximumRange;
 
                 if (!locations.isEmpty()) {
-                    List<Double> distances = locations.stream()
-                            .map((Location l) -> Utils.euclideanDistance(x, z, l.getX(), l.getZ()))
-                            .collect(Collectors.toList());
-                    double minimumDistance = Collections.min(distances);
-
+                    double minimumDistance = locations.stream()
+                                                      .map(l -> Utils.euclideanDistance(x, z, l.getX(), l.getZ()))
+                                                      .min(Double::compareTo)
+                                                      .orElseThrow();
                     if (minimumDistance < minimumSeparation) {
                         continue;
                     }
@@ -504,7 +502,7 @@ public class GameManager implements Listener {
      * @param minimumSeparation
      */
     public void spreadPlayersByTeam(Location center, double maximumRange, double minimumSeparation) {
-        ArrayList<Collection<Player>> groups = new ArrayList<>();
+        List<Collection<Player>> groups = new ArrayList<>();
         for (int i = 1; i <= teamManager.getNumTeams(); i++) {
             groups.add(teamManager.getAllCombatantsOnTeam(i));
         }
