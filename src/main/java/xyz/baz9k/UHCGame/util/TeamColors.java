@@ -47,9 +47,9 @@ public class TeamColors {
     public static String getTeamPrefix(int teamIndex) {
         ColoredStringBuilder cs = new ColoredStringBuilder();
         if (teamIndex == 0) {
-            cs.append("[S]",ChatColor.AQUA, ChatColor.ITALIC);
+            cs.append("[S]",ChatColor.AQUA).italic(true);
         } else {
-            cs.append("[" + teamIndex + "]",getTeamChatColor(teamIndex),ChatColor.BOLD);
+            cs.append("[" + teamIndex + "]",getTeamChatColor(teamIndex)).bold(true);
         }
         return cs.toString();
 

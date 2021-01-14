@@ -77,13 +77,13 @@ public class HUDManager implements Listener {
         // prefix if spectator
         if (teamManager.isSpectator(you)) {
             int team = teamManager.getTeam(teammate);
-            s.append(TeamColors.getTeamPrefixWithSpace(team));
+            s.appendColored(TeamColors.getTeamPrefixWithSpace(team));
         }
 
         // name and health
         if (teamManager.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
-            s.append(teammate.getName(), ChatColor.GRAY, ChatColor.STRIKETHROUGH);
-            s.append(" 0♥",ChatColor.GRAY, ChatColor.STRIKETHROUGH);
+            s.append(teammate.getName(), ChatColor.GRAY).strikethrough(true)
+             .append(" 0♥",ChatColor.GRAY).strikethrough(true);
             return s.toString();
         } else {
             s.append(teammate.getName(), gradient);
@@ -253,7 +253,7 @@ public class HUDManager implements Listener {
         ColoredStringBuilder s;
         s = new ColoredStringBuilder()
                 .append(loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ChatColor.GREEN) // position format
-                .append(" (", ChatColor.WHITE); // rotation format
+                .append(" ( ", ChatColor.WHITE); // rotation format
 
         double yaw = Utils.mod(loc.getYaw() + 67.5, 360);
         /*
@@ -272,16 +272,12 @@ public class HUDManager implements Listener {
          * 315 - 360: -X
          */
 
-        String xs = ChatColor.RED.toString();
-        String zs = ChatColor.BLUE.toString();
+        if ( 90 <= yaw && yaw < 225) s.append("-X ", ChatColor.RED);
+        if (270 <= yaw || yaw <  45) s.append("+X ", ChatColor.RED);
 
-        if ( 90 <= yaw && yaw < 225) xs += "-X";
-        if (270 <= yaw || yaw <  45) xs += "+X";
+        if (  0 <= yaw && yaw < 135) s.append("+Z ", ChatColor.BLUE);
+        if (180 <= yaw && yaw < 315) s.append("-Z ", ChatColor.BLUE);
 
-        if (  0 <= yaw && yaw < 135) zs += "+Z";
-        if (180 <= yaw && yaw < 315) zs += "-Z";
-
-        s.append(xs + " " + zs);
         s.append(")", ChatColor.WHITE);
 
         setHUDLine(p, "posrot", s.toString());
@@ -310,7 +306,7 @@ public class HUDManager implements Listener {
         String elapsed = Utils.getLongTimeString(gameManager.getElapsedTime());
         ColoredStringBuilder s;
         s = new ColoredStringBuilder()
-                .append("Game Time: ",ChatColor.RED)
+                .append("Game Time: ", ChatColor.RED)
                 .append(elapsed + " ");
         World world = gameManager.getUHCWorld(Environment.NORMAL);
         long time = world.getTime();
