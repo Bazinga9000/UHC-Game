@@ -250,12 +250,11 @@ public class HUDManager implements Listener {
     public void updateMovementHUD(@NotNull Player p){
         Location loc = p.getLocation();
 
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        // position format
-        s.append(loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ChatColor.GREEN);
-        
-        // rotation format
-        s.append(" (", ChatColor.WHITE);
+        ColoredStringBuilder s;
+        s = new ColoredStringBuilder()
+                .append(loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ChatColor.GREEN) // position format
+                .append(" (", ChatColor.WHITE); // rotation format
+
         double yaw = Utils.mod(loc.getYaw() + 67.5, 360);
         /*
          * +Z =   0 -  67.5 - 135
@@ -295,23 +294,24 @@ public class HUDManager implements Listener {
         
         // world border radius format
         double r = (p.getWorld().getWorldBorder().getSize() / 2);
-        s.append("World Border: ±", ChatColor.AQUA);
-        s.append(String.valueOf((int)r), ChatColor.AQUA);
+        s.append("World Border: ±", ChatColor.AQUA)
+         .append(String.valueOf((int)r), ChatColor.AQUA);
 
         // distance format
         double distance = r - Math.max(Math.abs(loc.getX()), Math.abs(loc.getZ()));
-        s.append(" (");
-        s.append((int)distance);
-        s.append(" away)");
+        s.append(" (")
+         .append((int)distance)
+         .append(" away)");
 
         setHUDLine(p, "wbpos", s.toString());
     }
 
     public void updateElapsedTimeHUD(@NotNull Player p){
         String elapsed = Utils.getLongTimeString(gameManager.getElapsedTime());
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Game Time: ",ChatColor.RED);
-        s.append(elapsed + " ");
+        ColoredStringBuilder s;
+        s = new ColoredStringBuilder()
+                .append("Game Time: ",ChatColor.RED)
+                .append(elapsed + " ");
         World world = gameManager.getUHCWorld(Environment.NORMAL);
         long time = world.getTime();
         boolean isDay = !(13188 <= time && time <= 22812);
@@ -324,21 +324,23 @@ public class HUDManager implements Listener {
     }
 
     public void updateCombatantsAliveHUD(@NotNull Player p) {
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Combatants: ", ChatColor.WHITE);
-        s.append(teamManager.countLivingCombatants());
-        s.append(" / ");
-        s.append(teamManager.countCombatants());
+        ColoredStringBuilder s;
+        s = new ColoredStringBuilder()
+                .append("Combatants: ", ChatColor.WHITE)
+                .append(teamManager.countLivingCombatants())
+                .append(" / ")
+                .append(teamManager.countCombatants());
 
         setHUDLine(p, "combsalive", s.toString());
     }
 
     public void updateTeamsAliveHUD(@NotNull Player p) {
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Teams: ", ChatColor.WHITE);
-        s.append(teamManager.countLivingTeams());
-        s.append(" / ");
-        s.append(teamManager.getNumTeams());
+        ColoredStringBuilder s;
+        s = new ColoredStringBuilder()
+                .append("Teams: ", ChatColor.WHITE)
+                .append(teamManager.countLivingTeams())
+                .append(" / ")
+                .append(teamManager.getNumTeams());
 
         setHUDLine(p, "teamsalive", s.toString());
         
@@ -346,9 +348,10 @@ public class HUDManager implements Listener {
 
     public void updateKillsHUD(@NotNull Player p) {
         if (teamManager.isSpectator(p)) return;
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Kills: ", ChatColor.WHITE);
-        s.append(gameManager.getKills(p));
+        ColoredStringBuilder s; 
+        s = new ColoredStringBuilder()
+                .append("Kills: ", ChatColor.WHITE)
+                .append(gameManager.getKills(p));
         
         setHUDLine(p, "kills", s.toString());
     }
