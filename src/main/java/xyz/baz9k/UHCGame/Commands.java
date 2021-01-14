@@ -6,12 +6,14 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.md_5.bungee.api.ChatColor;
-import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
 import xyz.baz9k.UHCGame.util.TeamColors;
 
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
@@ -155,19 +157,23 @@ public class Commands {
         }
         if (players.size() == 0) return;
 
-        ColoredStringBuilder s = new ColoredStringBuilder();
+        ComponentBuilder b = new ComponentBuilder();
         if (t == 0) {
-            s.append("Spectators", TeamColors.getTeamChatColor(0), ChatColor.ITALIC);
+            b.append("Spectators")
+             .color(TeamColors.getTeamChatColor(0))
+             .italic(true);
         } else {
-            s.append("Team " + t, TeamColors.getTeamChatColor(t), ChatColor.BOLD);
+            b.append("Team " + t)
+             .color(TeamColors.getTeamChatColor(t))
+             .bold(true);
         }
-        s.append(": ");
-        List<String> plStrs = new ArrayList<>();
-        for (Player p : players) {
-            plStrs.add(p.getName());
-        }
-        s.append(String.join(", ", plStrs));
-        Bukkit.broadcastMessage(s.toString());
+        b.append(": ", FormatRetention.NONE);
+
+        String str = players.stream()
+                            .map(p -> p.getName())
+                            .collect(Collectors.joining(", "));
+        b.append(str, FormatRetention.NONE);
+        Bukkit.broadcast(b.create());
     }
 
     private void assignTeamsLiteral() {
