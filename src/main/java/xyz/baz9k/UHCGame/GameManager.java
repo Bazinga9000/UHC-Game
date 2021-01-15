@@ -112,7 +112,7 @@ public class GameManager implements Listener {
             if (isUHCStarted) {
                 throw new IllegalStateException("UHC has already started.");
             }
-            for (Player p : plugin.getServer().getOnlinePlayers()) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
                 if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
                     throw new IllegalStateException("Teams have not been assigned.");
                 }
@@ -128,7 +128,7 @@ public class GameManager implements Listener {
         startTime = lastStageInstant = Instant.now();
         kills.clear();
         
-        for (Player p : plugin.getServer().getOnlinePlayers()) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             // archive previous display name
             previousDisplayNames.put(p.getUniqueId(), p.getDisplayName());
             
@@ -325,7 +325,7 @@ public class GameManager implements Listener {
                 PotionEffectType.JUMP.createEffect(10 * 20 /* ticks */, /* lvl */ 128),
                 PotionEffectType.BLINDNESS.createEffect(10 * 20 /* ticks */, /* lvl */ 10)
             );
-            for (Player p : plugin.getServer().getOnlinePlayers()) p.teleport(getCenter(255));
+            for (Player p : Bukkit.getOnlinePlayers()) p.teleport(getCenter(255));
             for (Player p : teamManager.getAllCombatants()) {
                 p.addPotionEffects(effs);
             }
@@ -588,7 +588,7 @@ public class GameManager implements Listener {
                 }
             }
 
-            for (Player p : plugin.getServer().getOnlinePlayers()) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
                 hudManager.updateCombatantsAliveHUD(p);
                 hudManager.updateTeamsAliveHUD(p);
             }

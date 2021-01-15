@@ -29,12 +29,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class HUDManager implements Listener {
-    private UHCGame plugin;
     private GameManager gameManager;
     private TeamManager teamManager;
 
     public HUDManager(UHCGame plugin) {
-        this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.teamManager = plugin.getTeamManager();
     }
@@ -129,7 +127,7 @@ public class HUDManager implements Listener {
 
     private void setTeams(@NotNull Player player){
         Scoreboard s = player.getScoreboard();
-        for(Player p : plugin.getServer().getOnlinePlayers()){
+        for(Player p : Bukkit.getOnlinePlayers()){
             int team = teamManager.getTeam(p);
             addPlayerToScoreboardTeam(s, p, team);
         }
@@ -137,7 +135,7 @@ public class HUDManager implements Listener {
 
     public void addPlayerToTeams(@NotNull Player player){
         int team = teamManager.getTeam(player);
-        for(Player p : plugin.getServer().getOnlinePlayers()){
+        for(Player p : Bukkit.getOnlinePlayers()){
             Scoreboard s = p.getScoreboard();
             addPlayerToScoreboardTeam(s, player, team);
         }
@@ -214,7 +212,7 @@ public class HUDManager implements Listener {
      */
     public void cleanup() {
         Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
-        for (Player p : plugin.getServer().getOnlinePlayers()) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             p.setScoreboard(main);
         }
     }

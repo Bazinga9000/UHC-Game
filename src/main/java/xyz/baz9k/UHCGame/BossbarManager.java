@@ -12,7 +12,6 @@ import net.md_5.bungee.api.ChatColor;
 import xyz.baz9k.UHCGame.util.Utils;
 
 public class BossbarManager {
-    private UHCGame plugin;
     private GameManager gameManager;
 
     private BossBar bossbar;
@@ -35,7 +34,6 @@ public class BossbarManager {
     };
 
     public BossbarManager(UHCGame plugin) {
-        this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.bossbar = Bukkit.createBossBar(null, BarColor.WHITE, BarStyle.SOLID);
     }
@@ -44,7 +42,7 @@ public class BossbarManager {
      * On game start, this function runs to initialize the bossbar.
      */
     public void enable() {
-        for (Player p : plugin.getServer().getOnlinePlayers()) bossbar.addPlayer(p);
+        for (Player p : Bukkit.getOnlinePlayers()) bossbar.addPlayer(p);
         bossbar.setVisible(true);
         updateBossbarStage();
     }
