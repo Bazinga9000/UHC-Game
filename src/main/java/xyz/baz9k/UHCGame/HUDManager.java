@@ -248,9 +248,12 @@ public class HUDManager implements Listener {
     public void updateMovementHUD(@NotNull Player p){
         Location loc = p.getLocation();
 
+        int x = loc.getBlockX(),
+            y = loc.getBlockY(),
+            z = loc.getBlockZ();
+
         ColoredStringBuilder s;
-        s = new ColoredStringBuilder()
-                .append(loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ChatColor.GREEN) // position format
+        s = ColoredStringBuilder.of(x + " " + y + " " + z, ChatColor.GREEN) // position format
                 .append(" ( ", ChatColor.WHITE); // rotation format
 
         double yaw = Utils.mod(loc.getYaw() + 67.5, 360);
@@ -301,8 +304,7 @@ public class HUDManager implements Listener {
     public void updateElapsedTimeHUD(@NotNull Player p){
         String elapsed = Utils.getLongTimeString(gameManager.getElapsedTime());
         ColoredStringBuilder s;
-        s = new ColoredStringBuilder()
-                .append("Game Time: ", ChatColor.RED)
+        s = ColoredStringBuilder.of("Game Time: ", ChatColor.RED)
                 .append(elapsed + " ");
         World world = gameManager.getUHCWorld(Environment.NORMAL);
         long time = world.getTime();
@@ -317,8 +319,7 @@ public class HUDManager implements Listener {
 
     public void updateCombatantsAliveHUD(@NotNull Player p) {
         ColoredStringBuilder s;
-        s = new ColoredStringBuilder()
-                .append("Combatants: ", ChatColor.WHITE)
+        s = ColoredStringBuilder.of("Combatants: ", ChatColor.WHITE)
                 .append(teamManager.countLivingCombatants())
                 .append(" / ")
                 .append(teamManager.countCombatants());
@@ -328,8 +329,7 @@ public class HUDManager implements Listener {
 
     public void updateTeamsAliveHUD(@NotNull Player p) {
         ColoredStringBuilder s;
-        s = new ColoredStringBuilder()
-                .append("Teams: ", ChatColor.WHITE)
+        s = ColoredStringBuilder.of("Teams: ", ChatColor.WHITE)
                 .append(teamManager.countLivingTeams())
                 .append(" / ")
                 .append(teamManager.getNumTeams());
@@ -341,8 +341,7 @@ public class HUDManager implements Listener {
     public void updateKillsHUD(@NotNull Player p) {
         if (teamManager.isSpectator(p)) return;
         ColoredStringBuilder s; 
-        s = new ColoredStringBuilder()
-                .append("Kills: ", ChatColor.WHITE)
+        s = ColoredStringBuilder.of("Kills: ", ChatColor.WHITE)
                 .append(gameManager.getKills(p));
         
         setHUDLine(p, "kills", s.toString());
