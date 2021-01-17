@@ -57,16 +57,19 @@ public class Commands {
         this.plugin = plugin;
     }
 
-    public void registerAll() throws IllegalAccessException, InvocationTargetException {
+    public void registerAll() {
         CommandAPICommand uhc = new CommandAPICommand("uhc")
                                     .withPermission(CommandPermission.OP);
         // register each @Command method
         Class<Command> annot = Command.class;
         Class<Commands> cls = Commands.class;
-
-        for (Method m : cls.getDeclaredMethods()) {
-            if (!m.isAnnotationPresent(annot)) continue;
-            uhc.withSubcommand((CommandAPICommand) m.invoke(this));
+        try {
+            for (Method m : cls.getDeclaredMethods()) {
+                if (!m.isAnnotationPresent(annot)) continue;
+                uhc.withSubcommand((CommandAPICommand) m.invoke(this));
+            }
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
 
         uhc.register();
@@ -86,7 +89,9 @@ public class Commands {
     /uhc state set <target: players> combatant <team: int>
     /uhc stage next
     /uhc stage set <n: int>
-    /uhc config - WIP
+    /uhc config
+    /uhc config get <id>
+    /uhc config set <type> <id> <value>
      */
 
     @Command
