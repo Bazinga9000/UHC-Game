@@ -27,7 +27,12 @@ public class UHCGame extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(cfgManager, this);
 
         Commands commands = new Commands(this);
-        commands.registerAll();
+        try {
+            commands.registerAll();
+        } catch (Exception e) {
+            System.out.println("An error occurred in registering commands");
+            e.printStackTrace();
+        }
 
         gameManager.loadManagerRefs();
     }
