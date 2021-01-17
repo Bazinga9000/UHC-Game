@@ -17,7 +17,10 @@ public class ColoredStringBuilder {
     public static ColoredStringBuilder of(String s, ChatColor c) {
         return new ColoredStringBuilder().append(s, c);
     }
-    
+    public static ColoredStringBuilder of(BaseComponent[] bc) {
+        return new ColoredStringBuilder().append(bc);
+    }
+
     /**
      * Coerce an object to string and append to builder.
      * @param o

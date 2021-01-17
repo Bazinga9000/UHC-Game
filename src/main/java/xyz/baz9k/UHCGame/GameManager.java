@@ -21,7 +21,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import xyz.baz9k.UHCGame.util.DelayedMessageSender;
+import net.md_5.bungee.api.chat.BaseComponent;
+import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
+import xyz.baz9k.UHCGame.util.DelayedMessage;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.time.*;
@@ -561,21 +563,28 @@ public class GameManager implements Listener {
             Player deadPlayer = event.getEntity();
             if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
                 teamManager.setCombatantAliveStatus(deadPlayer, false);
-                int team = teamManager.getTeam(deadPlayer);
-                if (teamManager.isTeamEliminated(team)) {
-                    String teamEliminatedMessage = "Team " + team + " has been eliminated!"; // TODO FANCY
-                    (new DelayedMessageSender(teamEliminatedMessage)).runTaskLater(plugin, 1);
+
+                int t = teamManager.getTeam(deadPlayer);
+                if (teamManager.isTeamEliminated(t)) {
+                    BaseComponent[] teamEliminatedMessage;
+                    teamEliminatedMessage = ColoredStringBuilder.of(TeamDisplay.getName(t))
+                                                                .append(" has been eliminated!")
+                                                                .toComponents();
+                    // this msg should be displayed after player death
+                    (new DelayedMessage(teamEliminatedMessage)).runTaskLater(plugin, 1);
                 }
 
-                if (deadPlayer.getLocation().getY() < 0) {
+                Location newSpawn = deadPlayer.getLocation();
+                if (newSpawn.getY() < 0) {
                     deadPlayer.setBedSpawnLocation(getUHCWorld(Environment.NORMAL).getSpawnLocation(), true);
                 } else {
-                    deadPlayer.setBedSpawnLocation(deadPlayer.getLocation(), true);
+                    deadPlayer.setBedSpawnLocation(newSpawn, true);
                 }
 
                 if (teamManager.countLivingTeams() == 1) {
                     String winnerMessage = "Only one team is left, this is when the game would end."; // TODO FANCY
-                    (new DelayedMessageSender(winnerMessage)).runTaskLater(plugin, 1);
+                    // this msg should be displayed after player death
+                    (new DelayedMessage(winnerMessage)).runTaskLater(plugin, 1);
                 }
             }
 

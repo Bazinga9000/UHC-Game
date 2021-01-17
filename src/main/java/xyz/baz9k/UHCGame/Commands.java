@@ -203,9 +203,9 @@ public class Commands {
         }
         if (players.size() == 0) return;
 
-        ColoredStringBuilder b = new ColoredStringBuilder();
-        b.append(TeamDisplay.getName(t))
-         .append(": ");
+        ColoredStringBuilder b;
+        b = ColoredStringBuilder.of(TeamDisplay.getName(t))
+            .append(": ");
 
         String str = players.stream()
                             .map(p -> p.getName())
