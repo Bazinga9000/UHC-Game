@@ -56,6 +56,22 @@ public class Commands {
     public Commands(UHCGame plugin) {
         this.plugin = plugin;
     }
+
+    public void registerAll() throws IllegalAccessException, InvocationTargetException {
+        CommandAPICommand uhc = new CommandAPICommand("uhc")
+                                    .withPermission(CommandPermission.OP);
+        // register each @Command method
+        Class<Command> annot = Command.class;
+        Class<Commands> cls = Commands.class;
+
+        for (Method m : cls.getDeclaredMethods()) {
+            if (!m.isAnnotationPresent(annot)) continue;
+            uhc.withSubcommand((CommandAPICommand) m.invoke(this));
+        }
+
+        uhc.register();
+    }
+
     /*
     /uhc start
     /uhc end
@@ -445,20 +461,5 @@ public class Commands {
                 cfgManager.openMenu(sender);
             }
         );
-    }
-
-    public void registerAll() throws IllegalAccessException, InvocationTargetException {
-        CommandAPICommand uhc = new CommandAPICommand("uhc")
-                                    .withPermission(CommandPermission.OP);
-        // register each @Command method
-        Class<Command> annot = Command.class;
-        Class<Commands> cls = Commands.class;
-
-        for (Method m : cls.getDeclaredMethods()) {
-            if (!m.isAnnotationPresent(annot)) continue;
-            uhc.withSubcommand((CommandAPICommand) m.invoke(this));
-        }
-
-        uhc.register();
     }
 }
