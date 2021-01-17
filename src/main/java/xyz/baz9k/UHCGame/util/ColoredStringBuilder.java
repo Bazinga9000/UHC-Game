@@ -13,6 +13,11 @@ public class ColoredStringBuilder {
 
     private final ComponentBuilder cb = new ComponentBuilder();
 
+
+    public static ColoredStringBuilder of(String s, ChatColor c) {
+        return new ColoredStringBuilder().append(s, c);
+    }
+    
     /**
      * Coerce an object to string and append to builder.
      * @param o

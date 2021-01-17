@@ -6,7 +6,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import xyz.baz9k.UHCGame.util.ColorGradient;
 import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
-import xyz.baz9k.UHCGame.util.TeamColors;
+import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -53,7 +53,7 @@ public class HUDManager implements Listener {
         if (state == PlayerState.COMBATANT_UNASSIGNED) {
             return ChatColor.ITALIC + "Unassigned";
         }
-        return TeamColors.getTeamChatColor(team) + ChatColor.BOLD.toString() + "Team " + team;
+        return TeamDisplay.getChatColor(team) + ChatColor.BOLD.toString() + "Team " + team;
     }
 
     private String formatTeammate(@NotNull Player you, @NotNull Player teammate) {
@@ -75,7 +75,7 @@ public class HUDManager implements Listener {
         // prefix if spectator
         if (teamManager.isSpectator(you)) {
             int team = teamManager.getTeam(teammate);
-            s.appendColored(TeamColors.getTeamPrefixWithSpace(team));
+            s.appendColored(TeamDisplay.getPrefixWithSpace(team));
         }
 
         // name and health
@@ -120,7 +120,7 @@ public class HUDManager implements Listener {
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
             t = s.registerNewTeam(String.valueOf(team));
-            t.setPrefix(TeamColors.getTeamPrefixWithSpace(team));
+            t.setPrefix(TeamDisplay.getPrefixWithSpace(team));
         }
         t.addEntry(p.getName());
     }
@@ -293,9 +293,7 @@ public class HUDManager implements Listener {
 
         // distance format
         double distance = r - Math.max(Math.abs(loc.getX()), Math.abs(loc.getZ()));
-        s.append(" (")
-         .append((int)distance)
-         .append(" away)");
+        s.append(" (" + (int) distance + ")");
 
         setHUDLine(p, "wbpos", s.toString());
     }

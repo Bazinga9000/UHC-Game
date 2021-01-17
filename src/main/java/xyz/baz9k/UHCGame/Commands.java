@@ -6,9 +6,8 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
-import xyz.baz9k.UHCGame.util.TeamColors;
+import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
+import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.util.List;
 import java.util.Random;
@@ -204,23 +203,15 @@ public class Commands {
         }
         if (players.size() == 0) return;
 
-        ComponentBuilder b = new ComponentBuilder();
-        if (t == 0) {
-            b.append("Spectators")
-             .color(TeamColors.getTeamChatColor(0))
-             .italic(true);
-        } else {
-            b.append("Team " + t)
-             .color(TeamColors.getTeamChatColor(t))
-             .bold(true);
-        }
-        b.append(": ", FormatRetention.NONE);
+        ColoredStringBuilder b = new ColoredStringBuilder();
+        b.append(TeamDisplay.getName(t))
+         .append(": ");
 
         String str = players.stream()
                             .map(p -> p.getName())
                             .collect(Collectors.joining(", "));
-        b.append(str, FormatRetention.NONE);
-        Bukkit.broadcast(b.create());
+        b.append(str);
+        Bukkit.broadcast(b.toComponents());
     }
 
     @Command

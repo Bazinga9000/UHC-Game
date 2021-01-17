@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import xyz.baz9k.UHCGame.util.DelayedMessageSender;
-import xyz.baz9k.UHCGame.util.TeamColors;
+import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -154,7 +154,7 @@ public class GameManager implements Listener {
             }
 
             // set player display name
-            p.setDisplayName(TeamColors.getTeamPrefixWithSpace(teamManager.getTeam(p)) + p.getName());
+            p.setDisplayName(TeamDisplay.prefixed(teamManager.getTeam(p),  p.getName()));
 
             // activate hud things for all
             hudManager.initializePlayerHUD(p);

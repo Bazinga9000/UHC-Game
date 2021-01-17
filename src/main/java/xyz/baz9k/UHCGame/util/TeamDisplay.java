@@ -1,12 +1,14 @@
 package xyz.baz9k.UHCGame.util;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 import java.awt.*;
 import java.util.Arrays;
 
-public class TeamColors {
+public class TeamDisplay {
     private static final int[] teamColorCodes = {
+        0x55FFFF, // spec color
         0xc04040, 0x4040c0, 0x40c040, 0xc0c040, 0xc06b40, 0x6b40c0, 0x40c0c0, 0x6bc040,
         0xc09640, 0x9640c0, 0x4096c0, 0x40c096, 0x96c040, 0xc040c0, 0x406bc0, 0x40c06b,
         0xc04096, 0xc06bc0, 0x6bc06b, 0xc0966b, 0xc0406b, 0xc06b96, 0x6b96c0, 0x96c06b,
@@ -20,42 +22,54 @@ public class TeamColors {
     private static final Color[] teamColors = Arrays.stream(teamColorCodes)
                                                     .mapToObj(Color::new)
                                                     .toArray(Color[]::new);
-    private static final Color SPEC_COLOR = ChatColor.AQUA.getColor();
-    private static final int NUM_TEAM_COLORS = teamColors.length;
+    private static final int NUM_TEAM_COLORS = teamColors.length - 1;
 
-    public static Color getTeamColor(int teamIndex) {
-        if (teamIndex < 0) {
+    public static Color getColor(int t) {
+        if (t < 0) {
             throw new IllegalArgumentException("Team index must be positive.");
         }
-        if (teamIndex > NUM_TEAM_COLORS) {
+        if (t > NUM_TEAM_COLORS) {
             throw new IllegalArgumentException("Team index must be less than number of predefined team colors (" + NUM_TEAM_COLORS + ")");
         }
-        if (teamIndex == 0) {
-            return SPEC_COLOR;
-        }
-        return teamColors[teamIndex - 1];
+        return teamColors[t];
     }
 
-    public static ChatColor getTeamChatColor(int teamIndex) {
-        return ChatColor.of(getTeamColor(teamIndex));
+    public static ChatColor getChatColor(int t) {
+        return ChatColor.of(getColor(t));
     }
 
     public static int getNumTeamColors() {
         return NUM_TEAM_COLORS;
     }
 
-    public static String getTeamPrefix(int teamIndex) {
-        ColoredStringBuilder cs = new ColoredStringBuilder();
-        if (teamIndex == 0) {
-            cs.append("[S]",ChatColor.AQUA).italic(true);
+    private static ColoredStringBuilder getPrefixBuilder(int t) {
+        if (t == 0) {
+            return ColoredStringBuilder.of("[S]", getChatColor(0)).italic(true);
         } else {
-            cs.append("[" + teamIndex + "]",getTeamChatColor(teamIndex)).bold(true);
+            return ColoredStringBuilder.of("[" + t + "]", getChatColor(t)).bold(true);
         }
-        return cs.toString();
-
+    }
+    public static String getPrefix(int t) {
+        if (t == 0) {
+            return getPrefixBuilder(t).toString();
+        } else {
+            return getPrefixBuilder(t).toString();
+        }
     }
 
-    public static String getTeamPrefixWithSpace(int teamIndex) {
-        return getTeamPrefix(teamIndex) + " " + ChatColor.RESET;
+    public static String getPrefixWithSpace(int t) {
+        return getPrefixBuilder(t).append(" ").toString();
+    }
+
+    public static String prefixed(int t, String name) {
+        return getPrefixBuilder(t).append(" ").append(name).toString();
+    }
+
+    public static BaseComponent[] getName(int t) {
+        if (t == 0) {
+            return ColoredStringBuilder.of("Spectators", getChatColor(0)).italic(true).toComponents();
+        } else {
+            return ColoredStringBuilder.of("Team " + t, getChatColor(t)).bold(true).toComponents();
+        }
     }
 }
