@@ -50,11 +50,7 @@ public class TeamDisplay {
         }
     }
     public static String getPrefix(int t) {
-        if (t == 0) {
-            return getPrefixBuilder(t).toString();
-        } else {
-            return getPrefixBuilder(t).toString();
-        }
+        return getPrefixBuilder(t).toString();
     }
 
     public static String getPrefixWithSpace(int t) {
