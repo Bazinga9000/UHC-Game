@@ -150,13 +150,6 @@ public class TeamManager {
     }
 
     /**
-     * @return the number of living teams in the team manager.
-     */
-    public int countLivingTeams() {
-        return aliveTeams.cardinality();
-    }
-
-    /**
      * @param team
      * @return the number of living combatants on the specified team.
      */
@@ -218,7 +211,7 @@ public class TeamManager {
      * @return a {@link Set} of all online spectators
      */
     @NotNull
-    public Set<Player> getAllOnlineSpectators() {
+    public Set<Player> getOnlineSpectators() {
         return filterOnline(getAllSpectators());
     }
 
@@ -226,7 +219,7 @@ public class TeamManager {
      * @return a {@link Set} of all online combatants
      */
     @NotNull
-    public Set<Player> getAllOnlineCombatants() {
+    public Set<Player> getOnlineCombatants() {
         return filterOnline(getAllCombatants());
     }
 
@@ -235,10 +228,18 @@ public class TeamManager {
      * @return a {@link Set} of all online combatants on a specific team
      */
     @NotNull
-    public Set<Player> getAllOnlineCombatantsOnTeam(int t) {
+    public Set<Player> getOnlineCombatantsOnTeam(int t) {
         return filterOnline(getAllCombatantsOnTeam(t));
     }
 
+
+    /**
+     * @return the number of living teams in the team manager.
+     */
+    public int countLivingTeams() {
+        return aliveTeams.cardinality();
+    }
+    
     /**
      * @return an array of the alive teams by int
      */

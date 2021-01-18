@@ -354,12 +354,12 @@ public class HUDManager implements Listener {
         if (gameManager.isUHCStarted()) {
             updateMovementHUD(p);
             // when someone moves, everyone who can see it (online specs, online comb on team) should be able to see them move
-            for (Player spec : teamManager.getAllOnlineSpectators()) {
+            for (Player spec : teamManager.getOnlineSpectators()) {
                 updateTeammateHUD(spec);
             }
             int team = teamManager.getTeam(p);
             if (team != 0) {
-                for (Player tmate : teamManager.getAllOnlineCombatantsOnTeam(team)) {
+                for (Player tmate : teamManager.getOnlineCombatantsOnTeam(team)) {
                     updateTeammateHUD(tmate);
                 }
             }
