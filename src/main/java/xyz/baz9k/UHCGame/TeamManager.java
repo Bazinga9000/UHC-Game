@@ -114,6 +114,12 @@ public class TeamManager {
         return getPlayerNode(p).team;
     }
 
+    private static boolean isOnline(Player p) {
+        Player pl = Bukkit.getPlayer(p.getUniqueId());
+
+        return pl != null;
+    }
+
     /**
      * Sets player to alive or dead.
      * @param p
@@ -167,15 +173,9 @@ public class TeamManager {
                                  .collect(Collectors.toSet());
     }
 
-    private boolean isOnline(Player p) {
-        Player pl = Bukkit.getPlayer(p.getUniqueId());
-
-        return pl != null;
-    }
-
     private Set<Player> filterOnline(@NotNull Set<Player> pSet) {
         return pSet.stream()
-                    .filter(p -> isOnline(p))
+                    .filter(TeamManager::isOnline)
                     .collect(Collectors.toSet());
     }
 
