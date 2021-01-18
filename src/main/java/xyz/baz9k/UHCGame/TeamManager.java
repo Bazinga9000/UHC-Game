@@ -237,8 +237,10 @@ public class TeamManager {
     }
 
     private IntStream aliveTeamsStream() {
-        return IntStream.range(0, numTeams)
-                        .filter(t -> isTeamEliminated(t));
+        return playerMap.values().stream()
+                                 .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
+                                 .mapToInt(n -> n.team)
+                                 .distinct();
     }
 
     /**
@@ -261,7 +263,8 @@ public class TeamManager {
      */
     public boolean isTeamEliminated(int t) {
         return playerMap.values().stream()
-                                 .map(n -> n.team)
+                                 .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
+                                 .mapToInt(n -> n.team)
                                  .noneMatch(i -> i == t);
     }
 
