@@ -195,7 +195,6 @@ public class GameManager implements Listener {
         tick.runTaskTimer(plugin, 0L, 1L);
         
         setStage(0);
-        teamManager.prepareAliveTeams();
         bbManager.enable();
     }
 
@@ -551,8 +550,8 @@ public class GameManager implements Listener {
         if (teamManager.countLivingTeams() > 1) return;
         int winner = teamManager.getAliveTeams()[0];
         String winnerMessage = "Only one team is left, this is when the game would end. Winner: " + winner; // TODO FANCY
-                    // this msg should be displayed after player death
-                    (new DelayedMessage(winnerMessage)).runTaskLater(plugin, 1);
+        // this msg should be displayed after player death
+        (new DelayedMessage(winnerMessage)).runTaskLater(plugin, 1);
     }
 
     @EventHandler
@@ -572,9 +571,8 @@ public class GameManager implements Listener {
             Player deadPlayer = event.getEntity();
             if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
                 teamManager.setCombatantAliveStatus(deadPlayer, false);
-                int t = teamManager.getTeam(deadPlayer);
-                teamManager.updateTeamAliveStatus(t);
 
+                int t = teamManager.getTeam(deadPlayer);
                 if (teamManager.isTeamEliminated(t)) {
                     BaseComponent[] teamEliminatedMessage;
                     teamEliminatedMessage = ColoredStringBuilder.of(TeamDisplay.getName(t))

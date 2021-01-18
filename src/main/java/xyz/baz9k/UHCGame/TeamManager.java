@@ -9,8 +9,8 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collections;
+import java.util.stream.IntStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class TeamManager {
 
     private int numTeams = 2;
     private final HashMap<UUID, Node> playerMap;
-    private final BitSet aliveTeams = new BitSet();
+
     public TeamManager() {
         playerMap = new HashMap<>();
     }
@@ -109,19 +109,6 @@ public class TeamManager {
         playerMap.remove(p.getUniqueId());
     }
 
-
-    /**
-     * Resets all players.
-     */
-    public void resetAllPlayers() {
-        for (Node v : playerMap.values()) {
-            if (v.state != PlayerState.SPECTATOR) {
-                v.state = PlayerState.COMBATANT_UNASSIGNED;
-                v.team = 0;
-            }
-        }
-    }
-
     @NotNull
     public PlayerState getPlayerState(@NotNull Player p) {
         return getPlayerNode(p).state;
@@ -149,7 +136,6 @@ public class TeamManager {
         
         Node n = getPlayerNode(p);
         n.state = aliveStatus ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
-        updateTeamAliveStatus(getTeam(p));
     }
 
     /* COUNTING */
@@ -250,34 +236,23 @@ public class TeamManager {
         return filterOnline(getAllCombatantsOnTeam(t));
     }
 
+    private IntStream aliveTeamsStream() {
+        return IntStream.range(0, numTeams)
+                        .filter(t -> isTeamEliminated(t));
+    }
 
     /**
      * @return the number of living teams in the team manager.
      */
     public int countLivingTeams() {
-        return aliveTeams.cardinality();
+        return (int) aliveTeamsStream().count();
     }
     
     /**
      * @return an array of the alive teams by int
      */
     public int[] getAliveTeams() {
-        return aliveTeams.stream().toArray();
-    }
-
-    /**
-     * On game start, this should be run to mark which teams are alive.
-     */
-    public void prepareAliveTeams() {
-        aliveTeams.clear();
-        aliveTeams.set(1, numTeams + 1);
-    }
-
-    /**
-     * This should be run whenever the # of players on a team updates.
-     */
-    public void updateTeamAliveStatus(int t) {
-        aliveTeams.set(t, countLivingCombatantsInTeam(t) == 0);
+        return aliveTeamsStream().toArray();
     }
 
     /**
@@ -285,7 +260,9 @@ public class TeamManager {
      * @return if the specified team is eliminated
      */
     public boolean isTeamEliminated(int t) {
-        return !aliveTeams.get(t);
+        return playerMap.values().stream()
+                                 .map(n -> n.team)
+                                 .noneMatch(i -> i == t);
     }
 
     /**
@@ -363,4 +340,15 @@ public class TeamManager {
         numTeams = n;
     }
 
+    /**
+     * Resets all players.
+     */
+    public void resetAllPlayers() {
+        for (Node v : playerMap.values()) {
+            if (v.state != PlayerState.SPECTATOR) {
+                v.state = PlayerState.COMBATANT_UNASSIGNED;
+                v.team = 0;
+            }
+        }
+    }
 }
