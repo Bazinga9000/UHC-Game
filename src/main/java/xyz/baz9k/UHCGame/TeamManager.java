@@ -126,6 +126,7 @@ public class TeamManager {
         
         Node n = getPlayerNode(p);
         n.state = aliveStatus ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
+        updateTeamAliveStatus(getTeam(p));
     }
 
     /* COUNTING */
@@ -256,13 +257,12 @@ public class TeamManager {
     }
 
     /**
-     * On player death, this should be run to mark that a team has died.
+     * This should be run whenever the # of players on a team updates.
      */
     public void updateTeamAliveStatus(int t) {
-        if (countLivingCombatantsInTeam(t) == 0) {
-            aliveTeams.set(t, false);
-        }
+        aliveTeams.set(t, countLivingCombatantsInTeam(t) == 0);
     }
+
     /**
      * @param t
      * @return if the specified team is eliminated
@@ -276,7 +276,7 @@ public class TeamManager {
      * @return if the specified player is a {@link PlayerState#SPECTATOR}
      */
     public boolean isSpectator(@NotNull Player p) {
-        return getPlayerNode(p).state == PlayerState.SPECTATOR;
+        return getPlayerState(p) == PlayerState.SPECTATOR;
     }
 
     /**
@@ -284,7 +284,7 @@ public class TeamManager {
      * @return if the specified player is an assigned combatant.
      */
     public boolean isAssignedCombatant(@NotNull Player p) {
-        PlayerState state = getPlayerNode(p).state;
+        PlayerState state = getPlayerState(p);
         return state == PlayerState.COMBATANT_ALIVE || state == PlayerState.COMBATANT_DEAD;
     }
 
