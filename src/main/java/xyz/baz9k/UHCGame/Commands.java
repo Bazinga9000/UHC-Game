@@ -9,7 +9,6 @@ import net.md_5.bungee.api.ChatColor;
 import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,9 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 
 
@@ -169,21 +166,6 @@ public class Commands {
         );
     }
 
-    private void _assignTeams(int n) {
-        TeamManager tm = plugin.getTeamManager();
-        List<Player> combatants = new ArrayList<>(tm.getOnlineCombatants());
-
-        Collections.shuffle(combatants);
-        tm.setNumTeams(n);
-
-        int i = 1;
-        for (Player p : combatants) {
-            tm.assignPlayerTeam(p, i);
-            i = i % n + 1;
-        }
-        _announceTeams();
-    }
-
     private void _announceTeams() {
         TeamManager tm = plugin.getTeamManager();
         for (int i = 1; i <= tm.getNumTeams(); i++) {
@@ -222,15 +204,12 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                int pPerTeam = groupMap.get((String) args[0]);
                 TeamManager tm = plugin.getTeamManager();
-                int combSize = tm.getOnlineCombatants().size();
+                String s = (String) args[0];
 
-                if (combSize % pPerTeam != 0) {
-                    CommandAPI.fail("Cannot separate combatants into " + args[0] + ".");
-                    return;
-                }
-                _assignTeams(combSize / pPerTeam);
+                tm.setTeamSize(s);
+                tm.assignTeams();
+                _announceTeams();
 
             }
         );
@@ -244,7 +223,12 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                _assignTeams((int) args[0]);
+                TeamManager tm = plugin.getTeamManager();
+                int n = (int) args[0];
+
+                tm.setNumTeams(n);
+                tm.assignTeams();
+                _announceTeams();
             }
         );
     }
@@ -412,7 +396,7 @@ public class Commands {
                     return;
                 }
                 for (Player p : (Collection<Player>) args[0]) {
-                    plugin.getTeamManager().assignPlayerTeam(p, t);
+                    plugin.getTeamManager().assignPlayerToTeam(p, t);
                     sender.sendMessage("Set " + p.getName() + " to team " + t);
                 }
             }

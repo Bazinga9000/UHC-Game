@@ -8,8 +8,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 public class TeamManager {
     private class Node {
@@ -73,7 +76,7 @@ public class TeamManager {
      * @param p
      * @param team
      */
-    public void assignPlayerTeam(@NotNull Player p, int team) {
+    public void assignPlayerToTeam(@NotNull Player p, int team) {
         if (team <= 0 || team > numTeams) {
             throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
         }
@@ -82,6 +85,20 @@ public class TeamManager {
         n.state = PlayerState.COMBATANT_ALIVE;
         n.team = team;
 
+    }
+
+    /**
+     * Assigns all registered players to a team.
+     */
+    public void assignTeams() {
+        List<Player> combatants = new ArrayList<>(getOnlineCombatants());
+        Collections.shuffle(combatants);
+
+        int i = 1;
+        for (Player p : combatants) {
+            assignPlayerToTeam(p, i);
+            i = i % numTeams + 1;
+        }
     }
 
     /**
@@ -290,6 +307,52 @@ public class TeamManager {
 
     public int getNumTeams() {
         return numTeams;
+    }
+
+    /**
+     * Sets the number of players per team
+     * @param s "solos", "duos", "trios", "quartets", "quintets", "sextets", "septets", "octets"
+     */
+    public void setTeamSize(String s) {
+        int tsize;
+        switch (s) {
+            case "solos":
+                tsize = 1;
+                break;
+            case "duos":
+                tsize = 2;
+                break;
+            case "trios":
+                tsize = 3;
+                break;
+            case "quartets":
+                tsize = 4;
+                break;
+            case "quintets":
+                tsize = 5;
+                break;
+            case "sextets":
+                tsize = 6;
+                break;
+            case "septets":
+                tsize = 7;
+                break;
+            case "octets":
+                tsize = 8;
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        setTeamSize(tsize);
+    }
+
+    /**
+     * Sets the number of players per team
+     * If the # of combatants is not easily divisible by the team size, try to even as much as possible
+     * @param n
+     */
+    public void setTeamSize(int n) {
+        setNumTeams((int) Math.round(countCombatants() / (double) n));
     }
 
     public void setNumTeams(int n) {
