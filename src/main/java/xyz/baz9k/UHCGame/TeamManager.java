@@ -3,6 +3,7 @@ package xyz.baz9k.UHCGame;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.UUID;
@@ -33,8 +34,8 @@ public class TeamManager {
         playerMap = new HashMap<>();
     }
 
-    @NotNull
-    private Node getPlayerNode(@NotNull Player p) {
+    @Nullable
+    private Node getNode(@NotNull Player p) {
         return playerMap.get(p.getUniqueId());
     }
 
@@ -48,7 +49,17 @@ public class TeamManager {
             playerMap.get(uuid).player = p;
             return;
         };
-        playerMap.put(uuid, new Node(0, PlayerState.SPECTATOR, p));
+        setNode(p, PlayerState.SPECTATOR, 0);
+    }
+
+    private void setNode(@NotNull Player p, @NotNull PlayerState s, int team) {
+        Node n = getNode(p);
+        if (n == null) {
+            n = playerMap.put(p.getUniqueId(), new Node(0, PlayerState.SPECTATOR, p));
+        }
+
+        n.state = s;
+        n.team = team;
     }
 
     /**
@@ -56,9 +67,7 @@ public class TeamManager {
      * @param p
      */
     public void setSpectator(@NotNull Player p) {
-        Node n = getPlayerNode(p);
-        n.team = 0;
-        n.state = PlayerState.SPECTATOR;
+        setNode(p, PlayerState.SPECTATOR, 0);
     }
 
     /**
@@ -66,9 +75,7 @@ public class TeamManager {
      * @param p
      */
     public void setUnassignedCombatant(@NotNull Player p) {
-        Node n = getPlayerNode(p);
-        n.team = 0;
-        n.state = PlayerState.COMBATANT_UNASSIGNED;
+        setNode(p, PlayerState.COMBATANT_UNASSIGNED, 0);
     }
 
     /**
@@ -76,15 +83,25 @@ public class TeamManager {
      * @param p
      * @param team
      */
-    public void assignPlayerToTeam(@NotNull Player p, int team) {
-        if (team <= 0 || team > numTeams) {
+    public void assignPlayerToTeam(@NotNull Player p, int t) {
+        if (t <= 0 || t > numTeams) {
             throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
         }
 
-        Node n = getPlayerNode(p);
-        n.state = PlayerState.COMBATANT_ALIVE;
-        n.team = team;
+        setNode(p, PlayerState.COMBATANT_ALIVE, t);
 
+    }
+
+    /**
+     * Resets all players.
+     */
+    public void resetAllPlayers() {
+        for (Node v : playerMap.values()) {
+            if (v.state != PlayerState.SPECTATOR) {
+                v.state = PlayerState.COMBATANT_UNASSIGNED;
+                v.team = 0;
+            }
+        }
     }
 
     /**
@@ -111,11 +128,11 @@ public class TeamManager {
 
     @NotNull
     public PlayerState getPlayerState(@NotNull Player p) {
-        return getPlayerNode(p).state;
+        return getNode(p).state;
     }
 
     public int getTeam(@NotNull Player p) {
-        return getPlayerNode(p).team;
+        return getNode(p).team;
     }
 
     private static boolean isOnline(Player p) {
@@ -134,7 +151,7 @@ public class TeamManager {
             throw new IllegalArgumentException("Player must be an assigned combatant.");
         }
         
-        Node n = getPlayerNode(p);
+        Node n = getNode(p);
         n.state = aliveStatus ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
     }
 
@@ -341,17 +358,5 @@ public class TeamManager {
         }
 
         numTeams = n;
-    }
-
-    /**
-     * Resets all players.
-     */
-    public void resetAllPlayers() {
-        for (Node v : playerMap.values()) {
-            if (v.state != PlayerState.SPECTATOR) {
-                v.state = PlayerState.COMBATANT_UNASSIGNED;
-                v.team = 0;
-            }
-        }
     }
 }
