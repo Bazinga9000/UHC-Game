@@ -23,7 +23,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.HashMap;
 
 
 import org.bukkit.Bukkit;
@@ -35,15 +34,6 @@ import org.bukkit.entity.Player;
 @SuppressWarnings("unchecked")
 public class Commands {
     private final UHCGame plugin;
-    private static HashMap<String, Integer> groupMap;
-    static {
-        groupMap = new HashMap<>();
-        groupMap.put("solos", 1);
-        groupMap.put("duos", 2);
-        groupMap.put("trios", 3);
-        groupMap.put("quartets", 4);
-        groupMap.put("quintets", 5);
-    }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
