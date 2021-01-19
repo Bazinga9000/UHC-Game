@@ -451,10 +451,12 @@ public class GameManager implements Listener {
     /**
      * Returns the number of kills that this combatant has dealt.
      * @param p
-     * @return the number of kills
+     * @return the number of kills in an OptionalInt. If the player is not registered in the kills map (i.e. they're a spec), return empty OptionalInt.
      */
-    public int getKills(@NotNull Player p) {
-        return kills.get(p.getUniqueId());
+    public OptionalInt getKills(@NotNull Player p) {
+        Integer k = kills.get(p.getUniqueId());
+        if (k == null) return OptionalInt.empty();
+        return OptionalInt.of(k);
     }
     
     private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minimumSeparation) {
@@ -572,6 +574,7 @@ public class GameManager implements Listener {
             if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
                 teamManager.setCombatantAliveStatus(deadPlayer, false);
 
+                // check team death
                 int t = teamManager.getTeam(deadPlayer);
                 if (teamManager.isTeamEliminated(t)) {
                     BaseComponent[] teamEliminatedMessage;
@@ -582,6 +585,7 @@ public class GameManager implements Listener {
                     (new DelayedMessage(teamEliminatedMessage)).runTaskLater(plugin, 1);
                 }
 
+                // set bed spawn
                 Location newSpawn = deadPlayer.getLocation();
                 if (newSpawn.getY() < 0) {
                     deadPlayer.setBedSpawnLocation(getUHCWorld(Environment.NORMAL).getSpawnLocation(), true);
@@ -589,6 +593,7 @@ public class GameManager implements Listener {
                     deadPlayer.setBedSpawnLocation(newSpawn, true);
                 }
 
+                // check win condition
                 if (teamManager.countLivingTeams() == 1) {
                     winMessage();
                 }
@@ -596,9 +601,9 @@ public class GameManager implements Listener {
 
             Player killer = deadPlayer.getKiller();
             if (killer != null) {
-                if (!teamManager.isSpectator(killer)) {
-                    int nKills = this.kills.get(killer.getUniqueId());
-                    this.kills.put(killer.getUniqueId(), nKills + 1);
+                OptionalInt k = getKills(killer);
+                if (k.isPresent()) {
+                    this.kills.put(killer.getUniqueId(), k.orElseThrow() + 1);
                     hudManager.updateKillsHUD(killer);
                 }
             }
@@ -623,6 +628,9 @@ public class GameManager implements Listener {
         Player p = (Player) event.getEntity();
 
         if (isUHCStarted) {
+            // update hud if dmg taken
+            hudManager.updateTeammateHUD(p);
+            
             // cancel friendlyFire
             if (event instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent entDmgEvent = (EntityDamageByEntityEvent) event;
@@ -635,8 +643,6 @@ public class GameManager implements Listener {
                     }
                 }
             }
-            // update hud if dmg taken
-            hudManager.updateTeammateHUD(p);
         }
     }
 }

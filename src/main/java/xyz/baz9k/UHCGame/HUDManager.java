@@ -24,6 +24,7 @@ import xyz.baz9k.UHCGame.util.Utils;
 
 import java.awt.*;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -336,12 +337,15 @@ public class HUDManager implements Listener {
     }
 
     public void updateKillsHUD(@NotNull Player p) {
-        if (teamManager.isSpectator(p)) return;
-        ColoredStringBuilder s; 
-        s = ColoredStringBuilder.of("Kills: ", ChatColor.WHITE)
-                .append(gameManager.getKills(p));
-        
-        setHUDLine(p, "kills", s.toString());
+        OptionalInt k = gameManager.getKills(p);
+
+        if (k.isPresent()) {
+            ColoredStringBuilder s; 
+            s = ColoredStringBuilder.of("Kills: ", ChatColor.WHITE)
+                    .append(k.orElseThrow());
+            
+            setHUDLine(p, "kills", s.toString());
+        }
     }
 
     /* HANDLERS */
