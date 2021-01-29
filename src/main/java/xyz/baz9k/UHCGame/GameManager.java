@@ -19,7 +19,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
@@ -441,11 +440,13 @@ public class GameManager implements Listener {
         return new Location(getUHCWorld(Environment.NORMAL), center[0], y, center[1]);
     }
 
+    /*
     private void setCenter(double x, double z) {
         center[0] = x;
         center[1] = z;
     }
-
+    */
+    
     /**
      * Returns the number of kills that this combatant has dealt.
      * @param p
