@@ -5,7 +5,7 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import xyz.baz9k.UHCGame.util.ColorGradient;
-import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
+import xyz.baz9k.UHCGame.util.ColoredText;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import org.bukkit.Bukkit;
@@ -55,7 +55,7 @@ public class HUDManager implements Listener {
     }
 
     private String formatTeammate(@NotNull Player you, @NotNull Player teammate) {
-        ColoredStringBuilder s = new ColoredStringBuilder();
+        ColoredText s = new ColoredText();
 
         double teammateHP = teammate.getHealth() + teammate.getAbsorptionAmount();
         double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
@@ -250,8 +250,7 @@ public class HUDManager implements Listener {
             y = loc.getBlockY(),
             z = loc.getBlockZ();
 
-        ColoredStringBuilder s;
-        s = ColoredStringBuilder.of(x + " " + y + " " + z, ChatColor.GREEN) // position format
+        var s = ColoredText.of(x + " " + y + " " + z, ChatColor.GREEN) // position format
                 .append(" ( ", ChatColor.WHITE); // rotation format
 
         double yaw = Utils.mod(loc.getYaw() + 67.5, 360);
@@ -285,7 +284,7 @@ public class HUDManager implements Listener {
     public void updateWBHUD(@NotNull Player p) {
         Location loc = p.getLocation();
 
-        ColoredStringBuilder s = new ColoredStringBuilder();
+        ColoredText s = new ColoredText();
         
         // world border radius format
         double r = (p.getWorld().getWorldBorder().getSize() / 2);
@@ -301,9 +300,9 @@ public class HUDManager implements Listener {
 
     public void updateElapsedTimeHUD(@NotNull Player p){
         String elapsed = Utils.getLongTimeString(gameManager.getElapsedTime());
-        ColoredStringBuilder s;
-        s = ColoredStringBuilder.of("Game Time: ", ChatColor.RED)
+        var s = ColoredText.of("Game Time: ", ChatColor.RED)
                 .append(elapsed + " ");
+
         World world = gameManager.getUHCWorld(Environment.NORMAL);
         long time = world.getTime();
         boolean isDay = !(13188 <= time && time <= 22812);
@@ -316,8 +315,7 @@ public class HUDManager implements Listener {
     }
 
     public void updateCombatantsAliveHUD(@NotNull Player p) {
-        ColoredStringBuilder s;
-        s = ColoredStringBuilder.of("Combatants: ", ChatColor.WHITE)
+        var s = ColoredText.of("Combatants: ", ChatColor.WHITE)
                 .append(teamManager.countLivingCombatants())
                 .append(" / ")
                 .append(teamManager.countCombatants());
@@ -326,8 +324,7 @@ public class HUDManager implements Listener {
     }
 
     public void updateTeamsAliveHUD(@NotNull Player p) {
-        ColoredStringBuilder s;
-        s = ColoredStringBuilder.of("Teams: ", ChatColor.WHITE)
+        var s = ColoredText.of("Teams: ", ChatColor.WHITE)
                 .append(teamManager.countLivingTeams())
                 .append(" / ")
                 .append(teamManager.getNumTeams());
@@ -340,8 +337,7 @@ public class HUDManager implements Listener {
         OptionalInt k = gameManager.getKills(p);
 
         if (k.isPresent()) {
-            ColoredStringBuilder s; 
-            s = ColoredStringBuilder.of("Kills: ", ChatColor.WHITE)
+            var s = ColoredText.of("Kills: ", ChatColor.WHITE)
                     .append(k.orElseThrow());
             
             setHUDLine(p, "kills", s.toString());

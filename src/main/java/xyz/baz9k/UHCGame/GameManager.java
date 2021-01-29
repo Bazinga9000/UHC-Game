@@ -21,7 +21,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 import net.md_5.bungee.api.chat.BaseComponent;
-import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
+import xyz.baz9k.UHCGame.util.ColoredText;
 import xyz.baz9k.UHCGame.util.DelayedMessage;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
@@ -562,9 +562,9 @@ public class GameManager implements Listener {
                 int t = teamManager.getTeam(deadPlayer);
                 if (teamManager.isTeamEliminated(t)) {
                     BaseComponent[] teamEliminatedMessage;
-                    teamEliminatedMessage = ColoredStringBuilder.of(TeamDisplay.getName(t))
-                                                                .append(" has been eliminated!")
-                                                                .toComponents();
+                    teamEliminatedMessage = ColoredText.of(TeamDisplay.getName(t))
+                                                       .append(" has been eliminated!")
+                                                       .toComponents();
                     // this msg should be displayed after player death
                     (new DelayedMessage(teamEliminatedMessage)).runTaskLater(plugin, 1);
                 }

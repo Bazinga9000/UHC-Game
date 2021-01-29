@@ -6,7 +6,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.md_5.bungee.api.ChatColor;
-import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
+import xyz.baz9k.UHCGame.util.ColoredText;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.util.Random;
@@ -175,9 +175,8 @@ public class Commands {
         }
         if (players.size() == 0) return;
 
-        ColoredStringBuilder b;
-        b = ColoredStringBuilder.of(TeamDisplay.getName(t))
-            .append(": ");
+        var b = ColoredText.of(TeamDisplay.getName(t))
+                .append(": ");
 
         String str = players.stream()
                             .map(p -> p.getName())

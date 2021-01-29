@@ -42,11 +42,11 @@ public class TeamDisplay {
         return NUM_TEAM_COLORS;
     }
 
-    private static ColoredStringBuilder getPrefixBuilder(int t) {
+    private static ColoredText getPrefixBuilder(int t) {
         if (t == 0) {
-            return ColoredStringBuilder.of("[S]", getChatColor(0)).italic(true);
+            return ColoredText.of("[S]", getChatColor(0)).italic(true);
         } else {
-            return ColoredStringBuilder.of("[" + t + "]", getChatColor(t)).bold(true);
+            return ColoredText.of("[" + t + "]", getChatColor(t)).bold(true);
         }
     }
     public static String getPrefix(int t) {
@@ -63,9 +63,9 @@ public class TeamDisplay {
 
     public static BaseComponent[] getName(int t) {
         if (t == 0) {
-            return ColoredStringBuilder.of("Spectators", getChatColor(0)).italic(true).toComponents();
+            return ColoredText.of("Spectators", getChatColor(0)).italic(true).toComponents();
         } else {
-            return ColoredStringBuilder.of("Team " + t, getChatColor(t)).bold(true).toComponents();
+            return ColoredText.of("Team " + t, getChatColor(t)).bold(true).toComponents();
         }
     }
 }

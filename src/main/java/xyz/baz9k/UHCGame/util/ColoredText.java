@@ -9,7 +9,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
 
 import java.awt.*;
 
-public class ColoredStringBuilder {
+public class ColoredText {
 
     private final ComponentBuilder cb = new ComponentBuilder();
     private final FormatRetention retention;
@@ -18,7 +18,7 @@ public class ColoredStringBuilder {
      * Create builder with retention {@link FormatRetention#NONE}
      * @see FormatRetention
      */
-    public ColoredStringBuilder() {
+    public ColoredText() {
         this(FormatRetention.NONE);
     }
     
@@ -26,14 +26,14 @@ public class ColoredStringBuilder {
      * Create builder with some retention
      * @see FormatRetention
      */
-    public ColoredStringBuilder(FormatRetention retention) {
+    public ColoredText(FormatRetention retention) {
         this.retention = retention;
     }
-    public static ColoredStringBuilder of(String s, ChatColor c) {
-        return new ColoredStringBuilder().append(s, c);
+    public static ColoredText of(String s, ChatColor c) {
+        return new ColoredText().append(s, c);
     }
-    public static ColoredStringBuilder of(BaseComponent[] bc) {
-        return new ColoredStringBuilder().append(bc);
+    public static ColoredText of(BaseComponent[] bc) {
+        return new ColoredText().append(bc);
     }
 
     /**
@@ -41,7 +41,7 @@ public class ColoredStringBuilder {
      * @param o
      * @return
      */
-    public ColoredStringBuilder append(Object o) {
+    public ColoredText append(Object o) {
         return append(String.valueOf(o));
     }
 
@@ -51,7 +51,7 @@ public class ColoredStringBuilder {
      * @return
      * @see #appendColored(String)
      */
-    public ColoredStringBuilder append(String s) {
+    public ColoredText append(String s) {
         cb.append(s, retention);
         return this;
     }
@@ -61,7 +61,7 @@ public class ColoredStringBuilder {
      * @param bc
      * @return
      */
-    public ColoredStringBuilder append(BaseComponent... bc) {
+    public ColoredText append(BaseComponent... bc) {
         cb.append(bc, retention);
         return this;
     }
@@ -72,7 +72,7 @@ public class ColoredStringBuilder {
      * @param c
      * @return
      */
-    public ColoredStringBuilder append(String s, Color c) {
+    public ColoredText append(String s, Color c) {
         ChatColor cc = ChatColor.of(c);
         append(s, cc);
         return this;
@@ -84,7 +84,7 @@ public class ColoredStringBuilder {
      * @param clr
      * @return
      */
-    public ColoredStringBuilder append(String s, ChatColor c) {
+    public ColoredText append(String s, ChatColor c) {
         if (c.getColor() == null) throw new IllegalArgumentException("Argument clr is not a color.");
 
         cb.append(s, retention)
@@ -97,7 +97,7 @@ public class ColoredStringBuilder {
      * @param s
      * @return
      */
-    public ColoredStringBuilder appendColored(String s) {
+    public ColoredText appendColored(String s) {
         cb.appendLegacy(s);
         return this;
     }
@@ -107,7 +107,7 @@ public class ColoredStringBuilder {
      * @param clr
      * @return
      */
-    public ColoredStringBuilder color(ChatColor clr) {
+    public ColoredText color(ChatColor clr) {
         if (clr.getColor() == null) throw new IllegalArgumentException("Argument clr is not a color.");
         cb.color(clr);
         return this;
@@ -118,7 +118,7 @@ public class ColoredStringBuilder {
      * @param bold
      * @return
      */
-    public ColoredStringBuilder bold(boolean bold) {
+    public ColoredText bold(boolean bold) {
         cb.bold(bold);
         return this;
     }
@@ -128,7 +128,7 @@ public class ColoredStringBuilder {
      * @param italic
      * @return
      */
-    public ColoredStringBuilder italic(boolean italic) {
+    public ColoredText italic(boolean italic) {
         cb.italic(italic);
         return this;
     }
@@ -138,7 +138,7 @@ public class ColoredStringBuilder {
      * @param underlined
      * @return
      */
-    public ColoredStringBuilder underlined(boolean underlined) {
+    public ColoredText underlined(boolean underlined) {
         cb.underlined(underlined);
         return this;
     }
@@ -148,7 +148,7 @@ public class ColoredStringBuilder {
      * @param strikethrough
      * @return
      */
-    public ColoredStringBuilder strikethrough(boolean strikethrough) {
+    public ColoredText strikethrough(boolean strikethrough) {
         cb.strikethrough(strikethrough);
         return this;
     }
@@ -158,7 +158,7 @@ public class ColoredStringBuilder {
      * @param obfuscated
      * @return
      */
-    public ColoredStringBuilder obfuscated(boolean obfuscated) {
+    public ColoredText obfuscated(boolean obfuscated) {
         cb.obfuscated(obfuscated);
         return this;
     }
@@ -168,7 +168,7 @@ public class ColoredStringBuilder {
      * @param event
      * @return
      */
-    public ColoredStringBuilder event(ClickEvent event) {
+    public ColoredText event(ClickEvent event) {
         cb.event(event);
         return this;
     }
@@ -178,7 +178,7 @@ public class ColoredStringBuilder {
      * @param event
      * @return
      */
-    public ColoredStringBuilder event(HoverEvent event) {
+    public ColoredText event(HoverEvent event) {
         cb.event(event);
         return this;
     }
