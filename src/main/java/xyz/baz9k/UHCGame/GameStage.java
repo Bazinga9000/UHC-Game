@@ -24,8 +24,6 @@ public enum GameStage {
     DM_WAIT    (BarColor.WHITE,  Duration.ofMinutes(5),  3,    true,  ChatColor.WHITE + "The Battle at the Top of the World", ""),
     DEATHMATCH (BarColor.PURPLE, FOREVER.getDuration(),  20,   true,  ChatColor.DARK_PURPLE + "∞",                            "");
 
-    private static UHCGame plugin;
-
     private final BarColor bbClr;
     private final Duration dur;
     private final double wbSize;
@@ -61,15 +59,6 @@ public enum GameStage {
         this.wbSize = wbDiameter;
         this.isWBInstant = isWBInstant;
         this.chatMessage = chatMessage;
-    }
-    
-    /**
-     * Sets the plugin. Can only be used once.
-     * @param p
-     */
-    public static void setPlugin(UHCGame p) {
-        if (plugin != null) return;
-        plugin = p;
     }
 
     @Nullable
