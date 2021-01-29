@@ -45,7 +45,6 @@ public class GameManager implements Listener {
     private TeamManager teamManager;
     private HUDManager hudManager;
     private BossbarManager bbManager;
-    private ConfigManager cfgManager;
     private GameTick tick;
 
     private Instant startTime = null;
@@ -89,7 +88,6 @@ public class GameManager implements Listener {
         teamManager = plugin.getTeamManager();
         hudManager = plugin.getHUDManager();
         bbManager = plugin.getBossbarManager();
-        cfgManager = plugin.getConfigManager();
     }
 
     /**

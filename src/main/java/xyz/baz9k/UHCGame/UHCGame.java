@@ -9,7 +9,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class UHCGame extends JavaPlugin {
     private TeamManager teamManager;
-    private ConfigManager cfgManager;
     private GameManager gameManager;
     private HUDManager hudManager;
     private BossbarManager bbManager;
@@ -17,14 +16,12 @@ public class UHCGame extends JavaPlugin {
     @Override
     public void onEnable() {
         teamManager = new TeamManager();
-        cfgManager = new ConfigManager();
         gameManager = new GameManager(this);
         hudManager = new HUDManager(this);
         bbManager = new BossbarManager(this);
 
         Bukkit.getPluginManager().registerEvents(gameManager, this);
         Bukkit.getPluginManager().registerEvents(hudManager, this);
-        Bukkit.getPluginManager().registerEvents(cfgManager, this);
 
         Commands commands = new Commands(this);
         commands.registerAll();
@@ -34,9 +31,6 @@ public class UHCGame extends JavaPlugin {
 
     public TeamManager getTeamManager() {
         return teamManager;
-    }
-    public ConfigManager getConfigManager() {
-        return cfgManager;
     }
     public GameManager getGameManager() {
         return gameManager;

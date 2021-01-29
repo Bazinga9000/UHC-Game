@@ -421,15 +421,4 @@ public class Commands {
             }
         );
     }
-
-    @Command
-    private CommandAPICommand config() {
-        return new CommandAPICommand("config")
-        .executesPlayer(
-            (sender, args) -> {
-                ConfigManager cfgManager = plugin.getConfigManager();
-                cfgManager.openMenu(sender);
-            }
-        );
-    }
 }
