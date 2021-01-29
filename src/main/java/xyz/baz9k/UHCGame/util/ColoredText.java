@@ -8,6 +8,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
 
 import java.awt.*;
+import static xyz.baz9k.UHCGame.util.Formats.*;
 import static java.util.Collections.unmodifiableMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,11 +33,11 @@ public class ColoredText {
 
     private static Map<ChatColor, Formatting> fmtActions = new HashMap<>();
     static {
-        fmtActions.put(ChatColor.BOLD,          ComponentBuilder::bold);
-        fmtActions.put(ChatColor.ITALIC,        ComponentBuilder::italic);
-        fmtActions.put(ChatColor.UNDERLINE,     ComponentBuilder::underlined);
-        fmtActions.put(ChatColor.STRIKETHROUGH, ComponentBuilder::strikethrough);
-        fmtActions.put(ChatColor.MAGIC,         ComponentBuilder::obfuscated);
+        fmtActions.put(BOLD,          ComponentBuilder::bold);
+        fmtActions.put(ITALIC,        ComponentBuilder::italic);
+        fmtActions.put(UNDERLINED,    ComponentBuilder::underlined);
+        fmtActions.put(STRIKETHROUGH, ComponentBuilder::strikethrough);
+        fmtActions.put(OBFUSCATED,    ComponentBuilder::obfuscated);
         fmtActions = unmodifiableMap(fmtActions);
     }
     /**

@@ -21,6 +21,7 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 import xyz.baz9k.UHCGame.util.Utils;
+import static xyz.baz9k.UHCGame.util.Formats.*;
 
 import java.awt.*;
 import java.util.List;
@@ -78,8 +79,8 @@ public class HUDManager implements Listener {
 
         // name and health
         if (teamManager.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
-            s.append(teammate.getName(), ChatColor.GRAY, ChatColor.STRIKETHROUGH)
-             .append(" 0♥",ChatColor.GRAY, ChatColor.STRIKETHROUGH);
+            s.append(teammate.getName(), ChatColor.GRAY, STRIKETHROUGH)
+             .append(" 0♥",ChatColor.GRAY, STRIKETHROUGH);
             return s.toString();
         } else {
             s.append(teammate.getName(), gradient);
