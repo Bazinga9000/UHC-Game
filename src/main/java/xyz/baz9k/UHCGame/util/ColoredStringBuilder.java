@@ -12,8 +12,23 @@ import java.awt.*;
 public class ColoredStringBuilder {
 
     private final ComponentBuilder cb = new ComponentBuilder();
+    private final FormatRetention retention;
 
-
+    /**
+     * Create builder with retention {@link FormatRetention#NONE}
+     * @see FormatRetention
+     */
+    public ColoredStringBuilder() {
+        this(FormatRetention.NONE);
+    }
+    
+    /**
+     * Create builder with some retention
+     * @see FormatRetention
+     */
+    public ColoredStringBuilder(FormatRetention retention) {
+        this.retention = retention;
+    }
     public static ColoredStringBuilder of(String s, ChatColor c) {
         return new ColoredStringBuilder().append(s, c);
     }
@@ -37,7 +52,7 @@ public class ColoredStringBuilder {
      * @see #appendColored(String)
      */
     public ColoredStringBuilder append(String s) {
-        cb.append(s, FormatRetention.NONE);
+        cb.append(s, retention);
         return this;
     }
 
@@ -47,7 +62,7 @@ public class ColoredStringBuilder {
      * @return
      */
     public ColoredStringBuilder append(BaseComponent... bc) {
-        cb.append(bc, FormatRetention.NONE);
+        cb.append(bc, retention);
         return this;
     }
 
@@ -72,7 +87,7 @@ public class ColoredStringBuilder {
     public ColoredStringBuilder append(String s, ChatColor c) {
         if (c.getColor() == null) throw new IllegalArgumentException("Argument clr is not a color.");
 
-        cb.append(s, FormatRetention.NONE)
+        cb.append(s, retention)
           .color(c);
         return this;
     }
