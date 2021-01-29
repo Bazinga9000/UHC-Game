@@ -44,9 +44,9 @@ public class TeamDisplay {
 
     private static ColoredText getPrefixBuilder(int t) {
         if (t == 0) {
-            return ColoredText.of("[S]", getChatColor(0)).italic(true);
+            return ColoredText.of("[S]", getChatColor(0), ChatColor.ITALIC);
         } else {
-            return ColoredText.of("[" + t + "]", getChatColor(t)).bold(true);
+            return ColoredText.of("[" + t + "]", getChatColor(t), ChatColor.BOLD);
         }
     }
     public static String getPrefix(int t) {
@@ -63,9 +63,9 @@ public class TeamDisplay {
 
     public static BaseComponent[] getName(int t) {
         if (t == 0) {
-            return ColoredText.of("Spectators", getChatColor(0)).italic(true).toComponents();
+            return ColoredText.of("Spectators", getChatColor(0), ChatColor.ITALIC).toComponents();
         } else {
-            return ColoredText.of("Team " + t, getChatColor(t)).bold(true).toComponents();
+            return ColoredText.of("Team " + t, getChatColor(t), ChatColor.BOLD).toComponents();
         }
     }
 }

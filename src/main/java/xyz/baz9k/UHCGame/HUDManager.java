@@ -78,8 +78,8 @@ public class HUDManager implements Listener {
 
         // name and health
         if (teamManager.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
-            s.append(teammate.getName(), ChatColor.GRAY).strikethrough(true)
-             .append(" 0♥",ChatColor.GRAY).strikethrough(true);
+            s.append(teammate.getName(), ChatColor.GRAY, ChatColor.STRIKETHROUGH)
+             .append(" 0♥",ChatColor.GRAY, ChatColor.STRIKETHROUGH);
             return s.toString();
         } else {
             s.append(teammate.getName(), gradient);
