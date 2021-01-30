@@ -114,11 +114,11 @@ public class ColoredText {
     public ColoredText append(String s, ChatColor c, ChatColor... fmt) {
         if (c.getColor() == null) throw new IllegalArgumentException("Argument clr is not a color.");
 
+        cb.append(s, retention)
+          .color(c);
         for (ChatColor f : fmt) {
             fmtActions.getOrDefault(f, Formatting.doNothing).format(cb);
         }
-        cb.append(s, retention)
-          .color(c);
         return this;
     }
 
