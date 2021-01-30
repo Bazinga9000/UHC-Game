@@ -24,11 +24,8 @@ import xyz.baz9k.UHCGame.util.Utils;
 import static xyz.baz9k.UHCGame.util.Formats.*;
 
 import java.awt.*;
-import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class HUDManager implements Listener {
     private GameManager gameManager;
@@ -227,21 +224,24 @@ public class HUDManager implements Listener {
         } else {
             teammateSet = teamManager.getAllCombatants();
         }
-        List<Player> teammates = new ArrayList<>(teammateSet);
-        teammates.remove(p);
-        Collections.sort(teammates, (t1, t2) -> (int)Math.ceil(t1.getHealth()) - (int)Math.ceil(t2.getHealth()));
 
-        int len = Math.min(5, teammates.size());
-        for (int i = 0; i < len; i++) {
+        Iterable<Player> tmates = teammateSet.stream()
+            .filter(e -> !e.equals(p))
+            .sorted((t1, t2) -> Double.compare(t1.getHealth(), t2.getHealth()))
+            .limit(5)
+            ::iterator;
+
+        int i = 0;
+        for (Player tmate : tmates) {
             String rowName = "tmate" + i;
-            Team row = b.getTeam(rowName);
-            Player teammate = teammates.get(i);
 
-            if (row == null)  { // if row has not been created before
+            Team row = b.getTeam(rowName);
+            if (row == null) {
                 addHUDLine(p, rowName, 14 - i);
-                row = b.getTeam(rowName);
             }
-            setHUDLine(p, rowName, formatTeammate(p, teammate));
+
+            setHUDLine(p, rowName, formatTeammate(p, tmate));
+            i++;
         }
     }
     public void updateMovementHUD(@NotNull Player p){
