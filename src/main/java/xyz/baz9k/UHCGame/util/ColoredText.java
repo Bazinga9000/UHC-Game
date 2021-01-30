@@ -16,7 +16,6 @@ import java.util.function.BiConsumer;
 
 public class ColoredText {
     private final ComponentBuilder cb = new ComponentBuilder();
-    private final FormatRetention retention;
 
     @FunctionalInterface
     private static interface Formatting extends BiConsumer<ComponentBuilder, Boolean> {
@@ -40,21 +39,7 @@ public class ColoredText {
         fmtActions.put(OBFUSCATED,    ComponentBuilder::obfuscated);
         fmtActions = unmodifiableMap(fmtActions);
     }
-    /**
-     * Create builder with retention {@link FormatRetention#NONE}
-     * @see FormatRetention
-     */
-    public ColoredText() {
-        this(FormatRetention.NONE);
-    }
     
-    /**
-     * Create builder with some retention
-     * @see FormatRetention
-     */
-    public ColoredText(FormatRetention retention) {
-        this.retention = retention;
-    }
     public static ColoredText of(String s, ChatColor c, ChatColor... fmt) {
         return new ColoredText().append(s, c, fmt);
     }
@@ -78,7 +63,7 @@ public class ColoredText {
      * @see #appendColored(String)
      */
     public ColoredText append(String s) {
-        cb.append(s, retention);
+        cb.append(s, FormatRetention.NONE);
         return this;
     }
 
@@ -88,7 +73,7 @@ public class ColoredText {
      * @return this instance
      */
     public ColoredText append(BaseComponent... bc) {
-        cb.append(bc, retention);
+        cb.append(bc, FormatRetention.NONE);
         return this;
     }
 
@@ -114,7 +99,7 @@ public class ColoredText {
     public ColoredText append(String s, ChatColor c, ChatColor... fmt) {
         if (c.getColor() == null) throw new IllegalArgumentException("Argument clr is not a color.");
 
-        cb.append(s, retention)
+        cb.append(s, FormatRetention.NONE)
           .color(c);
         for (ChatColor f : fmt) {
             fmtActions.getOrDefault(f, Formatting.doNothing).format(cb);

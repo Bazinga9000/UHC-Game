@@ -10,7 +10,6 @@ import org.bukkit.boss.BarColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
 import xyz.baz9k.UHCGame.util.ColoredText;
 
 import static java.time.temporal.ChronoUnit.FOREVER;
@@ -226,12 +225,12 @@ public enum GameStage {
             }
         }
         
-        var s = new ColoredText(FormatRetention.ALL)
+        var s = new ColoredText()
                 .appendColored(warnPrefix)
                 .append(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, dur.toMinutes()), clr, fmt);
 
         if (this == lastGradualStage()) {
-            s.append(dmWarn);
+            s.append(String.format(dmWarn, dur.toMinutes()), clr, fmt);
         }
         
         Bukkit.broadcast(s.toComponents());
