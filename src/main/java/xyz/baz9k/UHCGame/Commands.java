@@ -75,9 +75,6 @@ public class Commands {
     /uhc state set <target: players> combatant <team: int>
     /uhc stage next
     /uhc stage set <n: int>
-    /uhc config
-    /uhc config get <id>
-    /uhc config set <type> <id> <value>
     /uhc hasstarted ~ use w/ /execute store success
      */
 
