@@ -290,7 +290,7 @@ public class GameManager implements Listener {
         lastStageInstant = Instant.now();
         bbManager.updateBossbarStage();
 
-        stage.sendMessage(); // TODO make messages for stage starts
+        stage.sendMessage();
         stage.applyWBSize(getUHCWorlds());
 
         // deathmatch
