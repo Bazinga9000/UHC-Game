@@ -78,6 +78,7 @@ public class Commands {
     /uhc config
     /uhc config get <id>
     /uhc config set <type> <id> <value>
+    /uhc hasstarted ~ use w/ /execute store success
      */
 
     @Command
@@ -417,6 +418,22 @@ public class Commands {
             (sender, args) -> {
                 GameManager gm = plugin.getGameManager();
                 gm.setStage((int)args[0]);
+            }
+        );
+    }
+
+    @Command
+    private CommandAPICommand hasStarted() {
+        return new CommandAPICommand("hasstarted")
+        .executes(
+            (sender, args) -> {
+                boolean started = plugin.getGameManager().isUHCStarted();
+                if (started) {
+                    sender.sendMessage("UHC has started");
+                    return;
+                } else {
+                    CommandAPI.fail("UHC has not started");
+                }
             }
         );
     }
