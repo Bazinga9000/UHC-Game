@@ -268,8 +268,7 @@ public class GameManager implements Listener {
     }
 
     public void incrementStage() {
-        stage = stage.next();
-        updateStage();
+        setStage(stage.next());
     }
 
     public void setStage(GameStage stage) {
