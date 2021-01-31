@@ -167,7 +167,7 @@ public class GameManager implements Listener {
             }
         }
 
-        spreadPlayersByTeam(getCenter(), GameStage.WB_STILL.getWBRadius(), GameStage.WB_STILL.getWBRadius() / 4);
+        spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBRadius(), GameStage.WB_STILL.getWBRadius() / 4);
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
         startTick();
@@ -302,7 +302,6 @@ public class GameManager implements Listener {
      * Reseed worlds then mark worlds as reseeded.
      * <p>
      * Accessible through /uhc reseed
-     * @param seed
      */
     public void reseedWorlds() {
         long l = new Random().nextLong();
@@ -386,7 +385,7 @@ public class GameManager implements Listener {
                 p.teleport(getCenterAtY(255));
             }
 
-            spreadPlayersByTeam(getCenter(), GameStage.DEATHMATCH.getWBRadius() - 1, GameStage.DEATHMATCH.getWBRadius() / 2);
+            spreadPlayersRootsOfUnity(true, getCenter(), GameStage.DEATHMATCH.getWBRadius() - 1);
 
         }
 
@@ -500,7 +499,20 @@ public class GameManager implements Listener {
         if (k == null) return OptionalInt.empty();
         return OptionalInt.of(k);
     }
-    
+
+    private List<Location> getRootsOfUnityLocations(Location center, int numLocations, double distance) {
+        ArrayList<Location> locations = new ArrayList<Location>();
+        World w = getUHCWorld(Environment.NORMAL);
+        for (int i = 0; i < numLocations; i++) {
+            double X = center.getX() + (distance * Math.cos(i * 2 * Math.PI / numLocations));
+            double Z = center.getZ() + (distance * Math.sin(i * 2 * Math.PI / numLocations));
+            double Y = w.getHighestBlockYAt((int) X, (int) Z);
+            locations.add(new Location(w, X, Y, Z));
+        }
+        Collections.shuffle(locations);
+        return locations;
+    }
+
     private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minimumSeparation) {
         ArrayList<Location> locations = new ArrayList<>();
         Random r = new Random();
@@ -542,52 +554,63 @@ public class GameManager implements Listener {
     }
 
     /**
-     * Spreads players with respect to teams
+     * Spreads players randomly
+     * @param respectTeams
      * @param center
      * @param maximumRange
      * @param minimumSeparation
      */
-    public void spreadPlayersByTeam(Location center, double maximumRange, double minimumSeparation) {
-        List<Collection<Player>> groups = new ArrayList<>();
-        for (int i = 1; i <= teamManager.getNumTeams(); i++) {
-            groups.add(teamManager.getAllCombatantsOnTeam(i));
+    public void spreadPlayersRandom(boolean respectTeams, Location center, double maximumRange, double minimumSeparation) {
+        if (respectTeams) {
+            List<Collection<Player>> groups = new ArrayList<>();
+            for (int i : teamManager.getAliveTeams()) {
+                groups.add(teamManager.getAllCombatantsOnTeam(i));
+            }
+            List<Location> locations = getRandomLocations(center, groups.size(), maximumRange, minimumSeparation);
+            teleportPlayersToLocations(groups, locations);
+        } else {
+            Collection<Player> players = teamManager.getAllCombatants();
+            List<Location> locations = getRandomLocations(center, players.size(), maximumRange, minimumSeparation);
+            teleportPlayersToLocations(players, locations);
         }
-
-        spreadPlayers(groups, center, maximumRange, minimumSeparation);
     }
 
     /**
-     * Spreads players
-     * @param players
+     * Spreads players based on the roots of unity
+     * @param respectTeams
      * @param center
-     * @param maximumRange
-     * @param minimumSeparation
+     * @param distance
      */
-    public void spreadPlayers(Collection<Player> players, Location center, double maximumRange, double minimumSeparation) {
-        List<Location> locations = getRandomLocations(center, players.size(), maximumRange, minimumSeparation);
+    public void spreadPlayersRootsOfUnity(boolean respectTeams, Location center, double distance) {
+        List<Location> locations;
+        if (respectTeams) {
+            List<Collection<Player>> groups = new ArrayList<>();
+            for (int i : teamManager.getAliveTeams()) {
+                groups.add(teamManager.getAllCombatantsOnTeam(i));
+            }
+            locations = getRootsOfUnityLocations(center, groups.size(), distance);
+            teleportPlayersToLocations(groups, locations);
+        } else {
+            Collection<Player> players = teamManager.getAllCombatants();
+            locations = getRootsOfUnityLocations(center, players.size(), distance);
+            teleportPlayersToLocations(players, locations);
+        }
+    }
+
+    private void teleportPlayersToLocations(Collection<Player> players, List<Location> locations) {
         int index = 0;
         for (Player p : players) {
             p.teleport(locations.get(index));
             index++;
         }
-
     }
 
-    /**
-     * Spreads players with respect to specified groups
-     * @param groups
-     * @param center
-     * @param maximumRange
-     * @param minimumSeparation
-     */
-    public void spreadPlayers(List<Collection<Player>> groups, Location center, double maximumRange, double minimumSeparation) {
-        List<Location> locations = getRandomLocations(center, groups.size(), maximumRange, minimumSeparation);
+    private void teleportPlayersToLocations(List<Collection<Player>> groups, List<Location> locations) {
         for (int i = 0; i < groups.size(); i++) {
             for (Player p : groups.get(i)) {
                 p.teleport(locations.get(i));
             }
         }
-
     }
 
     private void winMessage() {
