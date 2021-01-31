@@ -288,7 +288,7 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                if (!plugin.getGameManager().isUHCStarted()) {
+                if (!plugin.getGameManager().hasUHCStarted()) {
                     CommandAPI.fail("Game has not started.");
                     return;
                 }
@@ -308,7 +308,7 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                if (!plugin.getGameManager().isUHCStarted()) {
+                if (!plugin.getGameManager().hasUHCStarted()) {
                     CommandAPI.fail("Game has not started.");
                     return;
                 }
@@ -424,7 +424,7 @@ public class Commands {
         return new CommandAPICommand("hasstarted")
         .executes(
             (sender, args) -> {
-                boolean started = plugin.getGameManager().isUHCStarted();
+                boolean started = plugin.getGameManager().hasUHCStarted();
                 if (started) {
                     sender.sendMessage("UHC has started");
                     return;

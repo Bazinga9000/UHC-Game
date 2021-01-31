@@ -45,7 +45,6 @@ import xyz.baz9k.UHCGame.util.Utils;
 public class GameManager implements Listener {
     private UHCGame plugin;
 
-    private boolean isUHCStarted = false;
     private final HashMap<UUID, String> previousDisplayNames;
     
     private TeamManager teamManager;
@@ -100,7 +99,7 @@ public class GameManager implements Listener {
     public void startUHC(boolean skipChecks) {
         if (!skipChecks) {
             // check if game is OK to start
-            if (isUHCStarted) {
+            if (hasUHCStarted()) {
                 throw new IllegalStateException("UHC has already started.");
             }
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -117,12 +116,10 @@ public class GameManager implements Listener {
             _startUHC();
         } catch (Exception e) {
             Bukkit.broadcastMessage("[DEBUG] UHC cancelling start due to error");
-            isUHCStarted = false;
             throw e;
         }
     }
     private void _startUHC() {
-        isUHCStarted = true;
         worldsRegened = false;
 
         startTime = lastStageInstant = Instant.now();
@@ -206,7 +203,7 @@ public class GameManager implements Listener {
     public void endUHC(boolean skipChecks) {
         if (!skipChecks) {
             // check if game is OK to end
-            if (!isUHCStarted) {
+            if (!hasUHCStarted()) {
                 throw new IllegalStateException("UHC has not begun.");
             }
         }
@@ -215,13 +212,11 @@ public class GameManager implements Listener {
             _endUHC();
         } catch (Exception e) {
             Bukkit.broadcastMessage("[DEBUG] UHC cancelling end due to error");
-            isUHCStarted = true;
             throw e;
         }
     }
 
     private void _endUHC() {
-        isUHCStarted = false;
 
         // update display names
         for (UUID uuid : previousDisplayNames.keySet()) {
@@ -241,8 +236,8 @@ public class GameManager implements Listener {
 
     }
 
-    public boolean isUHCStarted() {
-        return isUHCStarted;
+    public boolean hasUHCStarted() {
+        return stage != GameStage.NOT_IN_GAME;
     }
 
     public boolean haveWorldsRegened() {
@@ -258,7 +253,7 @@ public class GameManager implements Listener {
      */
     @NotNull
     public Duration getElapsedTime() {
-        if (!isUHCStarted) {
+        if (!hasUHCStarted()) {
             throw new IllegalStateException("UHC has not started.");
         }
 
@@ -325,7 +320,7 @@ public class GameManager implements Listener {
      */
     @NotNull
     public Duration getStageDuration() {
-        if (!isUHCStarted) {
+        if (!hasUHCStarted()) {
             throw new IllegalStateException("UHC has not started.");
         }
         return stage.getDuration();
@@ -336,7 +331,7 @@ public class GameManager implements Listener {
      */
     @NotNull
     public Duration getRemainingStageDuration() {
-        if (!isUHCStarted) {
+        if (!hasUHCStarted()) {
             throw new IllegalStateException("UHC has not started.");
         }
         Duration stageDur = getStageDuration();
@@ -544,7 +539,7 @@ public class GameManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player p = event.getPlayer();
         teamManager.addPlayer(p);
-        if(isUHCStarted) {
+        if(hasUHCStarted()) {
             bbManager.addPlayer(p);
             hudManager.initializePlayerHUD(p);
             hudManager.addPlayerToTeams(p);
@@ -553,7 +548,7 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (isUHCStarted) {
+        if (hasUHCStarted()) {
             Player deadPlayer = event.getEntity();
             if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
                 teamManager.setCombatantAliveStatus(deadPlayer, false);
@@ -601,7 +596,7 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        if (isUHCStarted) {
+        if (hasUHCStarted()) {
             event.getPlayer().setGameMode(GameMode.SPECTATOR);
         }
     }
@@ -611,7 +606,7 @@ public class GameManager implements Listener {
         if (!(event.getEntity() instanceof Player)) return;
         Player p = (Player) event.getEntity();
 
-        if (isUHCStarted) {
+        if (hasUHCStarted()) {
             // update hud if dmg taken
             hudManager.updateTeammateHUD(p);
             

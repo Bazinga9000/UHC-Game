@@ -14,7 +14,7 @@ public class GameTick extends BukkitRunnable {
 
     @Override
     public void run() {
-        if (gameManager.isUHCStarted()) {
+        if (gameManager.hasUHCStarted()) {
             if (gameManager.isStageComplete()) {
                 gameManager.incrementStage();
             }
