@@ -565,9 +565,10 @@ public class GameManager implements Listener {
                 int t = teamManager.getTeam(deadPlayer);
                 if (teamManager.isTeamEliminated(t)) {
                     BaseComponent[] teamEliminatedMessage;
-                    teamEliminatedMessage = ColoredText.of(TeamDisplay.getName(t))
-                                                       .append(" has been eliminated!")
-                                                       .toComponents();
+                    teamEliminatedMessage = new ColoredText()
+                                                .appendColored(TeamDisplay.getName(t))
+                                                .append(" has been eliminated!")
+                                                .toComponents();
                     // this msg should be displayed after player death
                     (new DelayedMessage(teamEliminatedMessage)).runTaskLater(plugin, 1);
                 }

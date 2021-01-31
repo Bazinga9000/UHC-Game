@@ -173,7 +173,8 @@ public class Commands {
         }
         if (players.size() == 0) return;
 
-        var b = ColoredText.of(TeamDisplay.getName(t))
+        var b = new ColoredText()
+                .appendColored(TeamDisplay.getName(t))
                 .append(": ");
 
         String str = players.stream()

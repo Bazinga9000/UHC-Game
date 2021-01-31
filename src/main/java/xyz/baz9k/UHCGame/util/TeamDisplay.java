@@ -2,7 +2,6 @@ package xyz.baz9k.UHCGame.util;
 
 import net.md_5.bungee.api.ChatColor;
 import static xyz.baz9k.UHCGame.util.Formats.*;
-import net.md_5.bungee.api.chat.BaseComponent;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -64,11 +63,11 @@ public final class TeamDisplay {
         return getPrefixBuilder(t).append(" ").append(name).toString();
     }
 
-    public static BaseComponent[] getName(int t) {
+    public static String getName(int t) {
         if (t == 0) {
-            return ColoredText.of("Spectators", getChatColor(0), ITALIC).toComponents();
+            return ColoredText.of("Spectators", getChatColor(0), ITALIC).toString();
         } else {
-            return ColoredText.of("Team " + t, getChatColor(t), BOLD).toComponents();
+            return ColoredText.of("Team " + t, getChatColor(t), BOLD).toString();
         }
     }
 }
