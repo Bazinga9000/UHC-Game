@@ -12,6 +12,7 @@ public class UHCGame extends JavaPlugin {
     private GameManager gameManager;
     private HUDManager hudManager;
     private BossbarManager bbManager;
+    private Recipes recipes;
 
     @Override
     public void onEnable() {
@@ -19,12 +20,14 @@ public class UHCGame extends JavaPlugin {
         gameManager = new GameManager(this);
         hudManager = new HUDManager(this);
         bbManager = new BossbarManager(this);
+        recipes = new Recipes(this);
 
         Bukkit.getPluginManager().registerEvents(gameManager, this);
         Bukkit.getPluginManager().registerEvents(hudManager, this);
 
         Commands commands = new Commands(this);
         commands.registerAll();
+        recipes.registerAll();
 
         gameManager.loadManagerRefs();
     }
@@ -40,6 +43,9 @@ public class UHCGame extends JavaPlugin {
     }
     public BossbarManager getBossbarManager() {
         return bbManager;
+    }
+    public Recipes getRecipes() {
+        return recipes;
     }
 
     public MultiverseCore getMVCore() {
