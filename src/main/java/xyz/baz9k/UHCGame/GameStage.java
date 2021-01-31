@@ -24,12 +24,12 @@ import static java.time.temporal.ChronoUnit.FOREVER;
  */
 public enum GameStage {
     NOT_IN_GAME,
-    WB_STILL   (BarColor.RED,    Duration.ofMinutes(60), 1200, true,  ChatColor.RED + "Border Begins Shrinking",              "Let the games begin! Our players have been shuffled across the world! ", ChatColor.GREEN, BOLD, ITALIC, UNDERLINED),
-    WB_1       (BarColor.BLUE,   Duration.ofMinutes(15), 25,   false, ChatColor.BLUE + "Border Stops Shrinking",              "The World Border has begun to shrink! ", ChatColor.RED, BOLD, ITALIC, UNDERLINED),
-    WB_STOP    (BarColor.RED,    Duration.ofMinutes(5),  25,   true,  ChatColor.RED + "Border Begins Shrinking... Again.",    "The World Border has ground to a halt. ", ChatColor.AQUA, ITALIC),
-    WB_2       (BarColor.BLUE,   Duration.ofMinutes(10), 3,    false, ChatColor.BLUE + "Border Stops Shrinking... Again",     "The World Border has resumed once more! ", ChatColor.RED, ITALIC),
-    DM_WAIT    (BarColor.WHITE,  Duration.ofMinutes(5),  3,    true,  ChatColor.WHITE + "The Battle at the Top of the World", "The World Border has ground to a halt once again! ", ChatColor.DARK_AQUA, ITALIC),
-    DEATHMATCH (BarColor.PURPLE, FOREVER.getDuration(),  20,   true,  ChatColor.DARK_PURPLE + "∞",                            "It is time. Let the Battle At The Top Of The World commence! ", ChatColor.BLUE, BOLD, ITALIC, UNDERLINED);
+    WB_STILL   (BarColor.RED,    Duration.ofMinutes(60), 1200, true,  ChatColor.RED + "Border Begins Shrinking",              "Let the games begin! Our players have been shuffled across the world! ", ChatColor.GREEN, BOLD),
+    WB_1       (BarColor.BLUE,   Duration.ofMinutes(15), 25,   false, ChatColor.BLUE + "Border Stops Shrinking",              "The World Border has begun to shrink! ", ChatColor.RED, BOLD),
+    WB_STOP    (BarColor.RED,    Duration.ofMinutes(5),  25,   true,  ChatColor.RED + "Border Begins Shrinking... Again.",    "The World Border has ground to a halt. ", ChatColor.AQUA),
+    WB_2       (BarColor.BLUE,   Duration.ofMinutes(10), 3,    false, ChatColor.BLUE + "Border Stops Shrinking... Again",     "The World Border has resumed once more! ", ChatColor.RED),
+    DM_WAIT    (BarColor.WHITE,  Duration.ofMinutes(5),  3,    true,  ChatColor.WHITE + "The Battle at the Top of the World", "The World Border has ground to a halt once again! ", ChatColor.DARK_AQUA),
+    DEATHMATCH (BarColor.PURPLE, FOREVER.getDuration(),  20,   true,  ChatColor.DARK_PURPLE + "∞",                            "It is time. Let the Battle At The Top Of The World commence! ", ChatColor.BLUE, BOLD);
     
     private final BarColor bbClr;
     private final Duration dur;
