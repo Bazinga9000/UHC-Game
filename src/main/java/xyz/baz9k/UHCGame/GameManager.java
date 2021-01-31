@@ -89,6 +89,7 @@ public class GameManager implements Listener {
      * @param skipChecks If true, all checks are ignored.
      */
     public void startUHC(boolean skipChecks) {
+        Debug.broadcastDebug("UHC attempting start");
         if (!skipChecks) {
             // check if game is OK to start
             if (hasUHCStarted()) {
@@ -102,6 +103,8 @@ public class GameManager implements Listener {
             if (!worldsRegened) {
                 throw new IllegalStateException("UHC worlds have not been regenerated. Run /reseed to regenerate.");
             }
+        } else {
+            Debug.broadcastDebug("Skipping starting requirements");
         }
 
         try {
@@ -110,6 +113,7 @@ public class GameManager implements Listener {
             Debug.broadcastDebug("UHC cancelling start due to error");
             Debug.printError(e);
         }
+        Debug.broadcastDebug("UHC started");
     }
     private void _startUHC() {
         setStage(GameStage.fromIndex(0));
@@ -183,11 +187,14 @@ public class GameManager implements Listener {
      * @param skipChecks If true, started game checks are ignored.
      */
     public void endUHC(boolean skipChecks) {
+        Debug.broadcastDebug("UHC attempting end");
         if (!skipChecks) {
             // check if game is OK to end
             if (!hasUHCStarted()) {
                 throw new IllegalStateException("UHC has not begun.");
             }
+        } else {
+            Debug.broadcastDebug("Skipping ending requirements");
         }
         
         try {
@@ -196,6 +203,7 @@ public class GameManager implements Listener {
             Debug.broadcastDebug("UHC cancelling end due to error");
             Debug.printError(e);
         }
+        Debug.broadcastDebug("UHC ended");
     }
 
     private void _endUHC() {

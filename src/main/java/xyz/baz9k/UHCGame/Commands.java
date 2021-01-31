@@ -84,9 +84,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    Debug.broadcastDebug("UHC attempting start");
                     plugin.getGameManager().startUHC(false);
-                    Debug.broadcastDebug("UHC started");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
                     e.printStackTrace();
@@ -101,9 +99,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    Debug.broadcastDebug("UHC attempting end");
                     plugin.getGameManager().endUHC(false);
-                    Debug.broadcastDebug("UHC ended");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
                     Debug.printError(sender, e);
@@ -121,10 +117,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    Debug.broadcastDebug("UHC attempting start");
-                    Debug.broadcastDebug("Skipping starting requirements");
                     plugin.getGameManager().startUHC(true);
-                    Debug.broadcastDebug("UHC started");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
                     Debug.printError(sender, e);
@@ -142,10 +135,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    Debug.broadcastDebug("UHC attempting end");
-                    Debug.broadcastDebug("Skipping ending requirements");
                     plugin.getGameManager().endUHC(true);
-                    Debug.broadcastDebug("UHC ended");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
                     Debug.printError(sender, e);
