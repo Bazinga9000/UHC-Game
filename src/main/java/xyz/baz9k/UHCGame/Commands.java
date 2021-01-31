@@ -448,10 +448,7 @@ public class Commands {
         return new CommandAPICommand("escape")
         .executes(
             (sender, args) -> {
-                GameManager gm = plugin.getGameManager();
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.teleport(new Location(gm.getLobbyWorld(), 0, 10, 0));
-                }
+                plugin.getGameManager().escapeAll();
             }
         );
     }

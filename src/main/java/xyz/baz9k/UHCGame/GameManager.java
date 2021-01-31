@@ -134,17 +134,7 @@ public class GameManager implements Listener {
         for (Player p : Bukkit.getOnlinePlayers()) {
             // archive previous display name
             previousDisplayNames.put(p.getUniqueId(), p.getDisplayName());
-            
-            // fully heal, adequately saturate, remove XP
-            p.setHealth(20.0f);
-            p.setFoodLevel(20);
-            p.setSaturation(5.0f);
-            p.setExp(0.0f);
-            
-            // clear all potion effects
-            for (PotionEffect effect : p.getActivePotionEffects()) {
-                p.removePotionEffect(effect.getType());
-            }
+            resetStatuses(p);
 
             // 60s grace period
             PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
@@ -236,6 +226,8 @@ public class GameManager implements Listener {
             p.setGameMode(GameMode.SURVIVAL);
         }
 
+        for (Player p : Bukkit.getOnlinePlayers()) resetStatuses(p);
+        escapeAll();
         teamManager.resetAllPlayers();
         hudManager.cleanup();
         kills.clear();
@@ -243,6 +235,40 @@ public class GameManager implements Listener {
 
         bbManager.disable();
 
+    }
+
+    /**
+     * Resets a player's statuses (health, food, sat, xp, etc.)
+     * @param p
+     */
+    public void resetStatuses(@NotNull Player p) {
+        // fully heal, adequately saturate, remove XP
+        p.setHealth(20.0f);
+        p.setFoodLevel(20);
+        p.setSaturation(5.0f);
+        p.setExp(0.0f);
+        
+        // clear all potion effects
+        for (PotionEffect effect : p.getActivePotionEffects()) {
+            p.removePotionEffect(effect.getType());
+        }
+    }
+
+    /**
+     * Sends all players back to the lobby world.
+     * <p>
+     * Accessible through /uhc escape
+     */
+    public void escapeAll() {
+        World lobby = getLobbyWorld();
+        Location spawn = new Location(lobby, 0, 10, 0);
+        Material mat = spawn.getBlock().getType();
+
+        // check if 0 10 0 is valid spawn place, else teleport to highest 0,0
+        if (mat != Material.AIR && mat != Material.CAKE) {
+            spawn = lobby.getBlockAt(0, lobby.getHighestBlockYAt(0, 0), 0).getLocation();
+        }
+        for (Player p : Bukkit.getOnlinePlayers()) p.teleport(spawn);
     }
 
     public boolean hasUHCStarted() {
