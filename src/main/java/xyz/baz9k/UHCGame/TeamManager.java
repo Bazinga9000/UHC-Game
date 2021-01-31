@@ -3,7 +3,6 @@ package xyz.baz9k.UHCGame;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.UUID;
@@ -34,32 +33,27 @@ public class TeamManager {
         playerMap = new HashMap<>();
     }
 
-    @Nullable
-    private Node getNode(@NotNull Player p) {
-        return playerMap.get(p.getUniqueId());
-    }
-
     /**
-     * Add a player to the TeamManager
+     * Gets the stored node of the player in the player map.
+     * <p>
+     * If the player is not found in the map, a new Node of state {@link PlayerState#COMBATANT_UNASSIGNED} is created.
      * @param p
+     * @return the node
      */
-    public void addPlayer(@NotNull Player p) {
-        UUID uuid = p.getUniqueId();
-        if (playerMap.containsKey(uuid)) {
-            playerMap.get(uuid).player = p;
-            return;
-        };
-        setNode(p, PlayerState.COMBATANT_UNASSIGNED, 0);
+    @NotNull
+    private Node getNode(@NotNull Player p) {
+        return playerMap.compute(p.getUniqueId(), (k, v) -> {
+            if (v == null) {
+                return new Node(PlayerState.COMBATANT_UNASSIGNED, 0, p);
+            } else {
+                v.player = p;
+                return v;
+            }
+        });
     }
 
     private void setNode(@NotNull Player p, @NotNull PlayerState s, int team) {
         Node n = getNode(p);
-        if (n == null) {
-            n = new Node(s, team, p);
-            playerMap.put(p.getUniqueId(), n);
-            return;
-        }
-
         n.state = s;
         n.team = team;
     }
