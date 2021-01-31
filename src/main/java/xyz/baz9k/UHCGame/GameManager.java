@@ -125,6 +125,7 @@ public class GameManager implements Listener {
         }
     }
     private void _startUHC() {
+        setStage(GameStage.fromIndex(0));
         worldsRegened = false;
 
         startTime = lastStageInstant = Instant.now();
@@ -194,7 +195,6 @@ public class GameManager implements Listener {
         tick = new GameTick(plugin);
         tick.runTaskTimer(plugin, 0L, 1L);
         
-        setStage(GameStage.fromIndex(0));
         bbManager.enable();
     }
 
@@ -227,7 +227,7 @@ public class GameManager implements Listener {
     }
 
     private void _endUHC() {
-
+        setStage(GameStage.NOT_IN_GAME);
         // update display names
         for (UUID uuid : previousDisplayNames.keySet()) {
             Player p = Bukkit.getPlayer(uuid);
@@ -241,7 +241,6 @@ public class GameManager implements Listener {
         kills.clear();
         tick.cancel();
 
-        setStage(GameStage.NOT_IN_GAME);
         bbManager.disable();
 
     }
@@ -263,10 +262,6 @@ public class GameManager implements Listener {
      */
     @NotNull
     public Duration getElapsedTime() {
-        if (!hasUHCStarted()) {
-            throw new IllegalStateException("UHC has not started.");
-        }
-
         return Duration.between(startTime, Instant.now());
     }
 
