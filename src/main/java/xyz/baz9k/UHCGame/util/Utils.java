@@ -3,7 +3,7 @@ package xyz.baz9k.UHCGame.util;
 import java.time.Duration;
 import java.util.ArrayList;
 
-public class Utils {
+public final class Utils {
     private Utils() {}
 
     /**

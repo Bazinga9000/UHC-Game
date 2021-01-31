@@ -2,7 +2,9 @@ package xyz.baz9k.UHCGame.util;
 
 import java.awt.*;
 
-public class ColorGradient {
+public final class ColorGradient {
+    private ColorGradient() {}
+
     public static Color twoColorGradient(double distance, Color a, Color b) {
         int deltaRed = b.getRed() - a.getRed();
         int deltaGreen = b.getGreen() - a.getGreen();

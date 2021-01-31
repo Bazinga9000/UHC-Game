@@ -7,7 +7,9 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import java.awt.*;
 import java.util.Arrays;
 
-public class TeamDisplay {
+public final class TeamDisplay {
+    private TeamDisplay() {}
+
     private static final int[] teamColorCodes = {
         0x55FFFF, // spec color
         0xc04040, 0x4040c0, 0x40c040, 0xc0c040, 0xc06b40, 0x6b40c0, 0x40c0c0, 0x6bc040,
