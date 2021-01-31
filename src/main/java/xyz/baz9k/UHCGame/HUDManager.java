@@ -24,6 +24,7 @@ import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.Formats.*;
 
 import java.awt.*;
+import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -49,7 +50,7 @@ public class HUDManager implements Listener {
         if (state == PlayerState.COMBATANT_UNASSIGNED) {
             return ChatColor.ITALIC + "Unassigned";
         }
-        return TeamDisplay.getName(team).toString();
+        return TeamDisplay.getName(team);
     }
 
     private String formatTeammate(@NotNull Player you, @NotNull Player teammate) {
@@ -214,7 +215,7 @@ public class HUDManager implements Listener {
     }
 
     /* UPDATING SECTIONS OF HUD */
-    public void updateTeammateHUD(@NotNull Player p) {
+    private void updateTeammateHUD(@NotNull Player p) {
         Scoreboard b = p.getScoreboard();
 
         int team = teamManager.getTeam(p);
@@ -345,22 +346,27 @@ public class HUDManager implements Listener {
         }
     }
 
+    /**
+     * Updates the teammate hud for everyone who could see this player's health / position
+     * @param p
+     */
+    public void updateTeammateHUDForViewers(@NotNull Player p) {
+        Set<Player> viewers = new HashSet<>();
+
+        int t = teamManager.getTeam(p);
+        viewers.addAll(teamManager.getOnlineSpectators());
+        if (t != 0) viewers.addAll(teamManager.getOnlineCombatantsOnTeam(t));
+
+        for (Player viewer : viewers) {
+            updateTeammateHUD(viewer);
+        }
+    }
     /* HANDLERS */
     @EventHandler
     public void onMove(PlayerMoveEvent movement){
         Player p = movement.getPlayer();
         if (gameManager.hasUHCStarted()) {
-            updateMovementHUD(p);
-            // when someone moves, everyone who can see it (online specs, online comb on team) should be able to see them move
-            for (Player spec : teamManager.getOnlineSpectators()) {
-                updateTeammateHUD(spec);
-            }
-            int team = teamManager.getTeam(p);
-            if (team != 0) {
-                for (Player tmate : teamManager.getOnlineCombatantsOnTeam(team)) {
-                    updateTeammateHUD(tmate);
-                }
-            }
+            updateTeammateHUDForViewers(p);
         }
     }
 

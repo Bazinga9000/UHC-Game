@@ -78,6 +78,8 @@ public class Commands {
     /uhc stage set <n: int>
     /uhc hasstarted ~ use w/ /execute store success
     /uhc escape
+    /uhc debug
+    /uhc debug <on|off>
      */
 
     @Command

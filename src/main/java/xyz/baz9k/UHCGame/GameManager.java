@@ -644,7 +644,7 @@ public class GameManager implements Listener {
 
         if (hasUHCStarted()) {
             // update hud if dmg taken
-            hudManager.updateTeammateHUD(p);
+            hudManager.updateTeammateHUDForViewers(p);
             
             // cancel friendlyFire
             if (event instanceof EntityDamageByEntityEvent) {

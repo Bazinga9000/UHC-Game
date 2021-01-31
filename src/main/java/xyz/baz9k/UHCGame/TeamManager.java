@@ -20,7 +20,7 @@ public class TeamManager {
         public int team;
         public PlayerState state;
         public Player player;
-        public Node(int team, PlayerState state, Player player) {
+        public Node(PlayerState state, int team, Player player) {
             this.team = team;
             this.state = state;
             this.player = player;
@@ -55,8 +55,9 @@ public class TeamManager {
     private void setNode(@NotNull Player p, @NotNull PlayerState s, int team) {
         Node n = getNode(p);
         if (n == null) {
-            n = new Node(0, PlayerState.COMBATANT_UNASSIGNED, p);
+            n = new Node(s, team, p);
             playerMap.put(p.getUniqueId(), n);
+            return;
         }
 
         n.state = s;

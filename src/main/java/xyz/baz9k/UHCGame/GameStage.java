@@ -197,7 +197,7 @@ public enum GameStage {
     public void sendMessage() {
         if (this == NOT_IN_GAME) return;
         if (this == DEATHMATCH) {
-            Bukkit.broadcast(ColoredText.of(baseChatMsg, clr, fmt).toComponents());
+            Bukkit.broadcast(getMessageBuilder().append(baseChatMsg, clr, fmt).toComponents());
         }
         /**
          * 
