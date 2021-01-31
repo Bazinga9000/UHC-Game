@@ -27,11 +27,7 @@ public class TeamManager {
     }
 
     private int numTeams = 2;
-    private final HashMap<UUID, Node> playerMap;
-
-    public TeamManager() {
-        playerMap = new HashMap<>();
-    }
+    private final HashMap<UUID, Node> playerMap = new HashMap<>();
 
     /**
      * Gets the stored node of the player in the player map.
