@@ -1,5 +1,6 @@
 package xyz.baz9k.UHCGame;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -13,14 +14,13 @@ public class GameTick extends BukkitRunnable {
 
     @Override
     public void run() {
-        if (gameManager.isUHCStarted()) {
-            gameManager.updateElapsedTime();
+        if (gameManager.hasUHCStarted()) {
             if (gameManager.isStageComplete()) {
                 gameManager.incrementStage();
             }
             plugin.getBossbarManager().tick();
             
-            for (Player p : plugin.getServer().getOnlinePlayers()) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
                 plugin.getHUDManager().updateElapsedTimeHUD(p);
                 plugin.getHUDManager().updateWBHUD(p);
             }

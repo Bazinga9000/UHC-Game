@@ -6,19 +6,24 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.md_5.bungee.api.ChatColor;
-import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
-import xyz.baz9k.UHCGame.util.TeamColors;
+import xyz.baz9k.UHCGame.util.ColoredText;
+import xyz.baz9k.UHCGame.util.TeamDisplay;
 
-import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 
-import java.util.ArrayList;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -29,73 +34,124 @@ import org.bukkit.entity.Player;
 @SuppressWarnings("unchecked")
 public class Commands {
     private final UHCGame plugin;
-    private static HashMap<String, Integer> groupMap;
-    static {
-        groupMap = new HashMap<>();
-        groupMap.put("solos", 1);
-        groupMap.put("duos", 2);
-        groupMap.put("trios", 3);
-        groupMap.put("quartets", 4);
-        groupMap.put("quintets", 5);
-    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    private static @interface Command { }
 
     public Commands(UHCGame plugin) {
         this.plugin = plugin;
     }
+
+    public void registerAll() {
+        CommandAPICommand uhc = new CommandAPICommand("uhc")
+                                    .withPermission(CommandPermission.OP);
+        // register each @Command method
+        Class<Command> annot = Command.class;
+        Class<Commands> cls = Commands.class;
+        try {
+            for (Method m : cls.getDeclaredMethods()) {
+                if (!m.isAnnotationPresent(annot)) continue;
+                uhc.withSubcommand((CommandAPICommand) m.invoke(this));
+            }
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+
+        uhc.register();
+    }
+
     /*
     /uhc start
     /uhc end
-    /assignteams <solos|duos|trios|quartets|quintets|n: int>
-    /reseed (seed: string)
-    /respawn <target: players> (loc: location)
-    /state get <target: players>
-    /state set <target: players> <spectator|combatant>
-    /state set <target: players> combatant <team: int>
-    /stage next
-    /stage set <n: int>
-    /config - WIP
+    /uhc start force
+    /uhc end force
+    /uhc assignteams <solos|duos|trios|quartets|quintets|n: int>
+    /uhc clearteams
+    /uhc reseed (seed: string)
+    /uhc respawn <target: players> (loc: location)
+    /uhc state get <target: players>
+    /uhc state set <target: players> <spectator|combatant>
+    /uhc state set <target: players> combatant <team: int>
+    /uhc stage next
+    /uhc stage set <n: int>
+    /uhc hasstarted ~ use w/ /execute store success
      */
 
-    private void uhcStartEnd() {
-        new CommandAPICommand("uhc")
-        .withPermission(CommandPermission.OP)
-        .withArguments(
-            new MultiLiteralArgument("start", "end")
-        )
+    @Command
+    private CommandAPICommand start() {
+        return new CommandAPICommand("start")
         .executes(
             (sender, args) -> {
                 try {
-                    switch ((String) args[0]) {
-                        case "start":
-                        Bukkit.broadcastMessage("[DEBUG] UHC attempting start");
-                        plugin.getGameManager().startUHC();
-                        Bukkit.broadcastMessage("[DEBUG] UHC started");
-                        break;
-                        case "end":
-                        Bukkit.broadcastMessage("[DEBUG] UHC attempting end");
-                        plugin.getGameManager().endUHC();
-                        Bukkit.broadcastMessage("[DEBUG] UHC ended");
-                    }
+                    Bukkit.broadcastMessage("[DEBUG] UHC attempting start");
+                    plugin.getGameManager().startUHC(false);
+                    Bukkit.broadcastMessage("[DEBUG] UHC started");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
                     throw e;
                 }
             }
-        ).register();
+        );
     }
 
-    private void _assignTeams(int n) {
-        TeamManager tm = plugin.getTeamManager();
-        List<Player> combatants = tm.getAllOnlineCombatants();
+    @Command
+    private CommandAPICommand end() {
+        return new CommandAPICommand("end")
+        .executes(
+            (sender, args) -> {
+                try {
+                    Bukkit.broadcastMessage("[DEBUG] UHC attempting end");
+                    plugin.getGameManager().endUHC(false);
+                    Bukkit.broadcastMessage("[DEBUG] UHC ended");
+                } catch (IllegalStateException e) {
+                    CommandAPI.fail(e.getMessage());
+                    throw e;
+                }
+            }
+        );
+    }
 
-        Collections.shuffle(combatants);
-        int i = 1;
-        for (Player p : combatants) {
-            tm.assignPlayerTeam(p, i);
-            i = (i + 1) % n;
-        }
-        tm.setNumTeams(n);
-        _announceTeams();
+    @Command
+    private CommandAPICommand startForce() {
+        return new CommandAPICommand("start")
+        .withArguments(
+            new LiteralArgument("force")
+        )
+        .executes(
+            (sender, args) -> {
+                try {
+                    Bukkit.broadcastMessage("[DEBUG] UHC attempting start");
+                    Bukkit.broadcastMessage("[DEBUG] Skipping starting requirements");
+                    plugin.getGameManager().startUHC(true);
+                    Bukkit.broadcastMessage("[DEBUG] UHC started");
+                } catch (IllegalStateException e) {
+                    CommandAPI.fail(e.getMessage());
+                    throw e;
+                }
+            }
+        );
+    }
+
+    @Command
+    private CommandAPICommand endForce() {
+        return new CommandAPICommand("end")
+        .withArguments(
+            new LiteralArgument("force")
+        )
+        .executes(
+            (sender, args) -> {
+                try {
+                    Bukkit.broadcastMessage("[DEBUG] UHC attempting end");
+                    Bukkit.broadcastMessage("[DEBUG] Skipping ending requirements");
+                    plugin.getGameManager().endUHC(true);
+                    Bukkit.broadcastMessage("[DEBUG] UHC ended");
+                } catch (IllegalStateException e) {
+                    CommandAPI.fail(e.getMessage());
+                    throw e;
+                }
+            }
+        );
     }
 
     private void _announceTeams() {
@@ -109,60 +165,71 @@ public class Commands {
 
     private void _announceTeamsLine(int t) {
         TeamManager tm = plugin.getTeamManager();
-        List<Player> players;
+        Set<Player> players;
         if (t == 0) {
-            players = tm.getAllOnlineSpectators();
+            players = tm.getOnlineSpectators();
         } else {
             players = tm.getAllCombatantsOnTeam(t);
         }
         if (players.size() == 0) return;
 
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        if (t == 0) {
-            s.append("Spectators", TeamColors.getTeamChatColor(0), ChatColor.ITALIC);
-        } else {
-            s.append("Team " + t, TeamColors.getTeamChatColor(t), ChatColor.BOLD);
-        }
-        s.append(": ");
-        List<String> plStrs = new ArrayList<>();
-        for (Player p : players) {
-            plStrs.add(p.toString());
-        }
-        s.append(String.join(", ", plStrs));
-        Bukkit.broadcastMessage(s.toString());
+        var b = ColoredText.of(TeamDisplay.getName(t))
+                .append(": ");
+
+        String str = players.stream()
+                            .map(p -> p.getName())
+                            .collect(Collectors.joining(", "));
+        b.append(str);
+        Bukkit.broadcast(b.toComponents());
     }
 
-    private void assignTeamsLiteral() {
-        new CommandAPICommand("assignteams")
+    @Command
+    private CommandAPICommand assignTeamsLiteral() {
+        return new CommandAPICommand("assignteams")
         .withArguments(
             new MultiLiteralArgument("solos", "duos", "trios", "quartets", "quintets")
         )
         .executes(
             (sender, args) -> {
-                int pPerTeam = groupMap.get((String) args[0]);
                 TeamManager tm = plugin.getTeamManager();
-                int combSize = tm.getAllOnlineCombatants().size();
+                String s = (String) args[0];
 
-                if (combSize % pPerTeam != 0) {
-                    CommandAPI.fail("Cannot separate combatants into " + args[0] + ".");
-                    return;
-                }
-                _assignTeams(combSize / pPerTeam);
+                tm.setTeamSize(s);
+                tm.assignTeams();
+                _announceTeams();
 
             }
-        ).register();
+        );
     }
 
-    private void assignTeamsNTeams() {
-        new CommandAPICommand("assignteams")
+    @Command
+    private CommandAPICommand assignTeamsNTeams() {
+        return new CommandAPICommand("assignteams")
         .withArguments(
             new IntegerArgument("n", 1)
         )
         .executes(
             (sender, args) -> {
-                _assignTeams((int) args[0]);
+                TeamManager tm = plugin.getTeamManager();
+                int n = (int) args[0];
+
+                tm.setNumTeams(n);
+                tm.assignTeams();
+                _announceTeams();
             }
-        ).register();
+        );
+    }
+
+    @Command
+    private CommandAPICommand clearTeams() {
+        return new CommandAPICommand("clearteams")
+        .executes(
+            (sender, args) -> {
+                TeamManager tm = plugin.getTeamManager();
+                tm.resetAllPlayers();
+                sender.sendMessage("All teams have been reset.");
+            }
+        );
     }
 
     private void _reseed(CommandSender sender, String seed) {
@@ -170,22 +237,27 @@ public class Commands {
         for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
             wm.regenWorld(mvWorld.getName(), true, false, seed);
         }
+        plugin.getGameManager().setWorldsRegenedStatus(true);
         sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
 
     }
-    private void reseed() {
+
+    @Command
+    private CommandAPICommand reseed() {
         // reseeds worlds
-        new CommandAPICommand("reseed")
+        return new CommandAPICommand("reseed")
         .executes(
             (sender, args) -> {
                 long seed = new Random().nextLong();
                 _reseed(sender, String.valueOf(seed));
             }
-        ).register();
+        );
     }
-    private void reseedSpecified() {
+
+    @Command
+    private CommandAPICommand reseedSpecified() {
         // reseeds worlds
-        new CommandAPICommand("reseed")
+        return new CommandAPICommand("reseed")
         .withArguments(
             new TextArgument("seed")
         )
@@ -193,7 +265,7 @@ public class Commands {
             (sender, args) -> {
                 _reseed(sender, (String) args[0]);
             }
-        ).register();
+        );
     }
 
     private void _respawn(CommandSender sender, Player p, Location loc) {
@@ -207,14 +279,16 @@ public class Commands {
         tm.setCombatantAliveStatus(p, true);
         p.setGameMode(GameMode.SURVIVAL);
     }
-    private void respawn() {
-        new CommandAPICommand("respawn")
+
+    @Command
+    private CommandAPICommand respawn() {
+        return new CommandAPICommand("respawn")
         .withArguments(
             new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
         )
         .executes(
             (sender, args) -> {
-                if (!plugin.getGameManager().isUHCStarted()) {
+                if (!plugin.getGameManager().hasUHCStarted()) {
                     CommandAPI.fail("Game has not started.");
                     return;
                 }
@@ -222,18 +296,19 @@ public class Commands {
                     _respawn(sender, p, p.getBedSpawnLocation());
                 }
             }
-        ).register();
+        );
     }
 
-    private void respawnLoc() {
-        new CommandAPICommand("respawn")
+    @Command
+    private CommandAPICommand respawnLoc() {
+        return new CommandAPICommand("respawn")
         .withArguments(
             new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
             new LocationArgument("location", LocationType.PRECISE_POSITION)
         )
         .executes(
             (sender, args) -> {
-                if (!plugin.getGameManager().isUHCStarted()) {
+                if (!plugin.getGameManager().hasUHCStarted()) {
                     CommandAPI.fail("Game has not started.");
                     return;
                 }
@@ -241,11 +316,12 @@ public class Commands {
                     _respawn(sender, p, (Location) args[1]);
                 }
             }
-        ).register();
+        );
     }
 
-    private void stateGet() {
-        new CommandAPICommand("state")
+    @Command
+    private CommandAPICommand stateGet() {
+        return new CommandAPICommand("state")
         .withArguments(
             new LiteralArgument("get"),
             new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
@@ -259,11 +335,12 @@ public class Commands {
                     sender.sendMessage(p.getName() + " is a " + state + " on team " + team);
                 }
             }
-        ).register();
+        );
     }
 
-    private void stateSet() {
-        new CommandAPICommand("state")
+    @Command
+    private CommandAPICommand stateSet() {
+        return new CommandAPICommand("state")
         .withArguments(
             new LiteralArgument("set"),
             new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
@@ -284,11 +361,12 @@ public class Commands {
                     sender.sendMessage("Set " + p.getName() + " to state " + tm.getPlayerState(p) + ".");
                 }
             }
-        ).register();
+        );
     }
 
-    private void stateSetTeam() {
-        new CommandAPICommand("state")
+    @Command
+    private CommandAPICommand stateSetTeam() {
+        return new CommandAPICommand("state")
         .withArguments(
             new LiteralArgument("set"),
             new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
@@ -305,64 +383,55 @@ public class Commands {
                     return;
                 }
                 for (Player p : (Collection<Player>) args[0]) {
-                    plugin.getTeamManager().assignPlayerTeam(p, t);
+                    plugin.getTeamManager().assignPlayerToTeam(p, t);
                     sender.sendMessage("Set " + p.getName() + " to team " + t);
                 }
             }
-        ).register();
+        );
     }
 
-    private void stageNext() {
-        new CommandAPICommand("stage")
+    @Command
+    private CommandAPICommand stageNext() {
+        return new CommandAPICommand("stage")
         .withArguments(
             new LiteralArgument("next")
         )
-        .withPermission(CommandPermission.OP)
         .executes(
             (sender, args) -> {
                 GameManager gm = plugin.getGameManager();
                 gm.incrementStage();
             }
-        ).register();
+        );
     }
-    private void stageSet() {
-        new CommandAPICommand("stage")
+
+    @Command
+    private CommandAPICommand stageSet() {
+        return new CommandAPICommand("stage")
         .withArguments(
             new LiteralArgument("set"),
             new IntegerArgument("stage")
         )
-        .withPermission(CommandPermission.OP)
         .executes(
             (sender, args) -> {
                 GameManager gm = plugin.getGameManager();
                 gm.setStage((int)args[0]);
             }
-        ).register();
+        );
     }
 
-    private void config() {
-        new CommandAPICommand("config")
-        .executesPlayer(
+    @Command
+    private CommandAPICommand hasStarted() {
+        return new CommandAPICommand("hasstarted")
+        .executes(
             (sender, args) -> {
-                ConfigManager cfgManager = plugin.getConfigManager();
-                cfgManager.openMenu(sender);
+                boolean started = plugin.getGameManager().hasUHCStarted();
+                if (started) {
+                    sender.sendMessage("UHC has started");
+                    return;
+                } else {
+                    CommandAPI.fail("UHC has not started");
+                }
             }
-        ).register();
-    }
-
-    void registerAll() {
-        uhcStartEnd();
-        assignTeamsLiteral();
-        assignTeamsNTeams();
-        reseed();
-        reseedSpecified();
-        respawn();
-        respawnLoc();
-        stateGet();
-        stateSet();
-        stateSetTeam();
-        stageNext();
-        stageSet();
-        config();
+        );
     }
 }

@@ -5,8 +5,8 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import xyz.baz9k.UHCGame.util.ColorGradient;
-import xyz.baz9k.UHCGame.util.ColoredStringBuilder;
-import xyz.baz9k.UHCGame.util.TeamColors;
+import xyz.baz9k.UHCGame.util.ColoredText;
+import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,17 +21,17 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 import xyz.baz9k.UHCGame.util.Utils;
+import static xyz.baz9k.UHCGame.util.Formats.*;
 
 import java.awt.*;
-import java.util.List;
-import java.util.Collections;
+import java.util.OptionalInt;
+import java.util.Set;
 
 public class HUDManager implements Listener {
-    private UHCGame plugin;
     private GameManager gameManager;
     private TeamManager teamManager;
+
     public HUDManager(UHCGame plugin) {
-        this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.teamManager = plugin.getTeamManager();
     }
@@ -40,22 +40,20 @@ public class HUDManager implements Listener {
         return ChatColor.translateAlternateColorCodes('&', "&"+c);
     }
 
+    /* FORMATTING */
     private String formatState(@NotNull Player p) {
 
         PlayerState state = teamManager.getPlayerState(p);
         int team = teamManager.getTeam(p);
 
-        if (state == PlayerState.SPECTATOR) {
-            return ChatColor.AQUA.toString() + ChatColor.ITALIC + "Spectator";
-        }
         if (state == PlayerState.COMBATANT_UNASSIGNED) {
             return ChatColor.ITALIC + "Unassigned";
         }
-        return TeamColors.getTeamChatColor(team) + ChatColor.BOLD.toString() + "Team " + team;
+        return TeamDisplay.getName(team).toString();
     }
 
     private String formatTeammate(@NotNull Player you, @NotNull Player teammate) {
-        ColoredStringBuilder s = new ColoredStringBuilder();
+        ColoredText s = new ColoredText();
 
         double teammateHP = teammate.getHealth() + teammate.getAbsorptionAmount();
         double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
@@ -73,13 +71,13 @@ public class HUDManager implements Listener {
         // prefix if spectator
         if (teamManager.isSpectator(you)) {
             int team = teamManager.getTeam(teammate);
-            s.append(TeamColors.getTeamPrefixWithSpace(team));
+            s.appendColored(TeamDisplay.getPrefixWithSpace(team));
         }
 
         // name and health
         if (teamManager.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
-            s.append(teammate.getName(), ChatColor.GRAY, ChatColor.STRIKETHROUGH);
-            s.append(" 0♥",ChatColor.GRAY, ChatColor.STRIKETHROUGH);
+            s.append(teammate.getName(), ChatColor.GRAY, STRIKETHROUGH)
+             .append(" 0♥",ChatColor.GRAY, STRIKETHROUGH);
             return s.toString();
         } else {
             s.append(teammate.getName(), gradient);
@@ -113,18 +111,19 @@ public class HUDManager implements Listener {
         return s.toString();
     }
 
+    /* HANDLE SCOREBOARD PARITY */
     private void addPlayerToScoreboardTeam(@NotNull Scoreboard s, @NotNull Player p, int team){
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
             t = s.registerNewTeam(String.valueOf(team));
-            t.setPrefix(TeamColors.getTeamPrefixWithSpace(team));
+            t.setPrefix(TeamDisplay.getPrefixWithSpace(team));
         }
         t.addEntry(p.getName());
     }
 
     private void setTeams(@NotNull Player player){
         Scoreboard s = player.getScoreboard();
-        for(Player p : plugin.getServer().getOnlinePlayers()){
+        for(Player p : Bukkit.getOnlinePlayers()){
             int team = teamManager.getTeam(p);
             addPlayerToScoreboardTeam(s, p, team);
         }
@@ -132,13 +131,13 @@ public class HUDManager implements Listener {
 
     public void addPlayerToTeams(@NotNull Player player){
         int team = teamManager.getTeam(player);
-        for(Player p : plugin.getServer().getOnlinePlayers()){
+        for(Player p : Bukkit.getOnlinePlayers()){
             Scoreboard s = p.getScoreboard();
             addPlayerToScoreboardTeam(s, player, team);
         }
     }
 
-    public void createHUDScoreboard(@NotNull Player p){
+    private void createHUDScoreboard(@NotNull Player p){
         // give player scoreboard & objective
         Scoreboard newBoard = Bukkit.getScoreboardManager().getNewScoreboard();
         p.setScoreboard(newBoard);
@@ -150,6 +149,7 @@ public class HUDManager implements Listener {
 
     }
 
+    /* INITIALIZING HUD */
     private void addHUDLine(@NotNull Player p, @NotNull String name, int position){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(name);
@@ -174,6 +174,10 @@ public class HUDManager implements Listener {
         team.setPrefix(text);
     }
 
+    /**
+     * Setup a player's HUD on join.
+     * @param p
+     */
     public void initializePlayerHUD(@NotNull Player p) {
         createHUDScoreboard(p);
 
@@ -192,59 +196,87 @@ public class HUDManager implements Listener {
         setHUDLine(p, "state", formatState(p));
         updateTeammateHUD(p);
         updateMovementHUD(p);
-        // update WB POS hud //
+        updateWBHUD(p);
         updateCombatantsAliveHUD(p);
         updateTeamsAliveHUD(p);
         updateKillsHUD(p);
         updateElapsedTimeHUD(p);
     }
 
-    public void cleanup(){
+    /**
+     * Remove player HUD (for the main HUD)
+     */
+    public void cleanup() {
         Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
-        for(Player p : plugin.getServer().getOnlinePlayers()){
+        for (Player p : Bukkit.getOnlinePlayers()) {
             p.setScoreboard(main);
         }
     }
 
+    /* UPDATING SECTIONS OF HUD */
     public void updateTeammateHUD(@NotNull Player p) {
         Scoreboard b = p.getScoreboard();
 
         int team = teamManager.getTeam(p);
-        List<Player> teammates;
+        Set<Player> teammateSet;
         if (teamManager.isAssignedCombatant(p)) {
-            teammates = teamManager.getAllCombatantsOnTeam(team);
+            teammateSet = teamManager.getAllCombatantsOnTeam(team);
         } else {
-            teammates = teamManager.getAllCombatants();
+            teammateSet = teamManager.getAllCombatants();
         }
-        teammates.remove(p);
-        Collections.sort(teammates, (t1, t2) -> (int)Math.ceil(t1.getHealth()) - (int)Math.ceil(t2.getHealth()));
 
-        int len = Math.min(5, teammates.size());
-        for (int i = 0; i < len; i++) {
+        Iterable<Player> tmates = teammateSet.stream()
+            .filter(e -> !e.equals(p))
+            .sorted((t1, t2) -> Double.compare(t1.getHealth(), t2.getHealth()))
+            .limit(5)
+            ::iterator;
+
+        int i = 0;
+        for (Player tmate : tmates) {
             String rowName = "tmate" + i;
-            Team row = b.getTeam(rowName);
-            Player teammate = teammates.get(i);
 
-            if (row == null)  { // if row has not been created before
+            Team row = b.getTeam(rowName);
+            if (row == null) {
                 addHUDLine(p, rowName, 14 - i);
-                row = b.getTeam(rowName);
             }
-            setHUDLine(p, rowName, formatTeammate(p, teammate));
+
+            setHUDLine(p, rowName, formatTeammate(p, tmate));
+            i++;
         }
     }
     public void updateMovementHUD(@NotNull Player p){
         Location loc = p.getLocation();
 
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        // position format
-        s.append(loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ(), ChatColor.GREEN);
-        
-        // rotation format
-        s.append(" (", ChatColor.WHITE);
-        double yaw = Utils.mod(loc.getYaw(), 360);
-        String xf = yaw < 180 ? "+" : "-";
-        String zf = yaw < 90 || yaw > 270 ? "+" : "-";
-        s.append(ChatColor.RED + xf + "X " + ChatColor.BLUE + zf + "Z");
+        int x = loc.getBlockX(),
+            y = loc.getBlockY(),
+            z = loc.getBlockZ();
+
+        var s = ColoredText.of(x + " " + y + " " + z, ChatColor.GREEN) // position format
+                .append(" ( ", ChatColor.WHITE); // rotation format
+
+        double yaw = Utils.mod(loc.getYaw() + 67.5, 360);
+        /*
+         * +Z =   0 -  67.5 - 135
+         * -X =  90 - 157.5 - 225
+         * -Z = 180 - 247.5 - 315
+         * +X = 270 - 337.5 -  45
+         * 
+         *   0 -  45: -X +Z
+         *  45 -  90: +Z
+         *  90 - 135: +X +Z
+         * 135 - 180: +X
+         * 180 - 225: +X -Z
+         * 225 - 270: -Z
+         * 270 - 315: -X -Z
+         * 315 - 360: -X
+         */
+
+        if ( 90 <= yaw && yaw < 225) s.append("-X ", ChatColor.RED);
+        if (270 <= yaw || yaw <  45) s.append("+X ", ChatColor.RED);
+
+        if (  0 <= yaw && yaw < 135) s.append("+Z ", ChatColor.BLUE);
+        if (180 <= yaw && yaw < 315) s.append("-Z ", ChatColor.BLUE);
+
         s.append(")", ChatColor.WHITE);
 
         setHUDLine(p, "posrot", s.toString());
@@ -253,27 +285,25 @@ public class HUDManager implements Listener {
     public void updateWBHUD(@NotNull Player p) {
         Location loc = p.getLocation();
 
-        ColoredStringBuilder s = new ColoredStringBuilder();
+        ColoredText s = new ColoredText();
         
         // world border radius format
         double r = (p.getWorld().getWorldBorder().getSize() / 2);
-        s.append("World Border: ±", ChatColor.AQUA);
-        s.append(String.valueOf((int)r), ChatColor.AQUA);
+        s.append("World Border: ±", ChatColor.AQUA)
+         .append(String.valueOf((int)r), ChatColor.AQUA);
 
         // distance format
         double distance = r - Math.max(Math.abs(loc.getX()), Math.abs(loc.getZ()));
-        s.append(" (");
-        s.append((int)distance);
-        s.append(" away)");
+        s.append(" (" + (int) distance + ")");
 
         setHUDLine(p, "wbpos", s.toString());
     }
 
     public void updateElapsedTimeHUD(@NotNull Player p){
         String elapsed = Utils.getLongTimeString(gameManager.getElapsedTime());
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Game Time: ",ChatColor.RED);
-        s.append(elapsed + " ");
+        var s = ColoredText.of("Game Time: ", ChatColor.RED)
+                .append(elapsed + " ");
+
         World world = gameManager.getUHCWorld(Environment.NORMAL);
         long time = world.getTime();
         boolean isDay = !(13188 <= time && time <= 22812);
@@ -286,47 +316,48 @@ public class HUDManager implements Listener {
     }
 
     public void updateCombatantsAliveHUD(@NotNull Player p) {
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Combatants: ", ChatColor.WHITE);
-        s.append(teamManager.countLivingCombatants());
-        s.append(" / ");
-        s.append(teamManager.countCombatants());
+        var s = ColoredText.of("Combatants: ", ChatColor.WHITE)
+                .append(teamManager.countLivingCombatants())
+                .append(" / ")
+                .append(teamManager.countCombatants());
 
         setHUDLine(p, "combsalive", s.toString());
     }
 
     public void updateTeamsAliveHUD(@NotNull Player p) {
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Teams: ", ChatColor.WHITE);
-        s.append(teamManager.countLivingTeams());
-        s.append(" / ");
-        s.append(teamManager.getNumTeams());
+        var s = ColoredText.of("Teams: ", ChatColor.WHITE)
+                .append(teamManager.countLivingTeams())
+                .append(" / ")
+                .append(teamManager.getNumTeams());
 
         setHUDLine(p, "teamsalive", s.toString());
         
     }
 
     public void updateKillsHUD(@NotNull Player p) {
-        if (teamManager.isSpectator(p)) return;
-        ColoredStringBuilder s = new ColoredStringBuilder();
-        s.append("Kills: ", ChatColor.WHITE);
-        s.append(gameManager.getKills(p));
-        
-        setHUDLine(p, "kills", s.toString());
+        OptionalInt k = gameManager.getKills(p);
+
+        if (k.isPresent()) {
+            var s = ColoredText.of("Kills: ", ChatColor.WHITE)
+                    .append(k.orElseThrow());
+            
+            setHUDLine(p, "kills", s.toString());
+        }
     }
 
+    /* HANDLERS */
     @EventHandler
     public void onMove(PlayerMoveEvent movement){
         Player p = movement.getPlayer();
-        if (gameManager.isUHCStarted()) {
+        if (gameManager.hasUHCStarted()) {
             updateMovementHUD(p);
             // when someone moves, everyone who can see it (online specs, online comb on team) should be able to see them move
-            for (Player spec : teamManager.getAllOnlineSpectators()) {
+            for (Player spec : teamManager.getOnlineSpectators()) {
                 updateTeammateHUD(spec);
             }
             int team = teamManager.getTeam(p);
             if (team != 0) {
-                for (Player tmate : teamManager.getAllOnlineCombatantsOnTeam(team)) {
+                for (Player tmate : teamManager.getOnlineCombatantsOnTeam(team)) {
                     updateTeammateHUD(tmate);
                 }
             }
