@@ -655,19 +655,18 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent e) {
-        if (hasUHCStarted()) {
-            e.getPlayer().setGameMode(GameMode.SPECTATOR);
-        }
+        if (!hasUHCStarted()) return;
+        e.getPlayer().setGameMode(GameMode.SPECTATOR);
     }
 
 
     @EventHandler
     public void onPlayerFight(EntityDamageByEntityEvent e) {
-        // friendly fire
-        if (hasUHCStarted()) return;
+        if (!hasUHCStarted()) return;
         if (!(e.getEntity() instanceof Player)) return;
         if (!(e.getDamager() instanceof Player)) return;
-
+        
+        // friendly fire
         Player target = (Player) e.getEntity();
         Player damager = (Player) e.getDamager();
         if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {

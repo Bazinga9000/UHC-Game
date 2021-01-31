@@ -271,10 +271,8 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                if (!plugin.getGameManager().hasUHCStarted()) {
-                    CommandAPI.fail("Game has not started.");
-                    return;
-                }
+                plugin.getGameManager().requireStarted();
+                
                 for (Player p : (Collection<Player>) args[0]) {
                     _respawn(sender, p, p.getBedSpawnLocation());
                 }
@@ -291,10 +289,8 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                if (!plugin.getGameManager().hasUHCStarted()) {
-                    CommandAPI.fail("Game has not started.");
-                    return;
-                }
+                plugin.getGameManager().requireStarted();
+                
                 for (Player p : (Collection<Player>) args[0]) {
                     _respawn(sender, p, (Location) args[1]);
                 }
@@ -412,13 +408,11 @@ public class Commands {
         return new CommandAPICommand("hasstarted")
         .executes(
             (sender, args) -> {
-                boolean started = plugin.getGameManager().hasUHCStarted();
-                if (started) {
+                if (plugin.getGameManager().hasUHCStarted()) {
                     sender.sendMessage("UHC has started");
                     return;
-                } else {
-                    CommandAPI.fail("UHC has not started");
                 }
+                CommandAPI.fail("UHC has not started");
             }
         );
     }
