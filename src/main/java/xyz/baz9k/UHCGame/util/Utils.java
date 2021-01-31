@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame.util;
 
 import java.time.Duration;
+import java.util.ArrayList;
 
 public class Utils {
     private Utils() {}
@@ -34,7 +35,7 @@ public class Utils {
      * Get a long time string of the provided number of seconds.
      * Hours, minutes, and seconds are all provided in the string.
      * @param s
-     * @return
+     * @return the time string
      */
     public static String getLongTimeString(long s) {
         return String.format("%d:%02d:%02d", s / 3600, (s % 3600) / 60, (s % 60));
@@ -44,10 +45,46 @@ public class Utils {
      * Get a long time string of the provided {@link Duration}'s duration.
      * Hours, minutes, and seconds are all provided in the string.
      * @param d
-     * @return
+     * @return the time string
      */
     public static String getLongTimeString(Duration d) {
         return getLongTimeString(d.toSeconds());
+    }
+
+    /**
+     * Get a string of format "X hours, X minutes, and X seconds" from a number of seconds.
+     * @param s
+     * @return the time string
+     */
+    public static String getWordTimeString(long s) {
+        if (s == 0) return "";
+
+        long[] segs = {s / 3600, (s % 3600) / 60, (s % 60)};
+        String[] unit = {"hour", "minute", "second"};
+        ArrayList<String> segStrs = new ArrayList<>();
+
+        for (int i = 0; i < 3; i++) {
+            long seg = segs[i];
+            if (seg == 0) continue;
+            if (seg == 1) {
+                segStrs.add(String.format("%s %s", seg, unit[i]));
+                continue;
+            }
+            segStrs.add(String.format("%s %ss", seg, unit[i]));
+        }
+    
+        int size = segStrs.size();
+        if (size == 1) return segStrs.get(0);
+        return String.format("%s, and %s", String.join(", ", segStrs.subList(0, size - 1)), segStrs.get(size - 1));
+    }
+
+    /**
+     * Get a string of format "X hours, X minutes, and X seconds" from the provided {@link Duration}'s duration.
+     * @param s
+     * @return the time string
+     */
+    public static String getWordTimeString(Duration d) {
+        return getWordTimeString(d.toSeconds());
     }
 
     /**
