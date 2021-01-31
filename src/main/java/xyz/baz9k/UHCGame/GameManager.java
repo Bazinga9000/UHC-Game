@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import net.md_5.bungee.api.chat.BaseComponent;
 import xyz.baz9k.UHCGame.util.ColoredText;
 import xyz.baz9k.UHCGame.util.Debug;
-import xyz.baz9k.UHCGame.util.DelayedMessage;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.time.*;
@@ -59,14 +58,6 @@ public class GameManager implements Listener {
 
     private GameStage stage = GameStage.NOT_IN_GAME;
     private Instant lastStageInstant = null;
-    //private static Duration[] stageDurations = {
-    //    Duration.ofMinutes(60), // Still border
-    //    Duration.ofMinutes(15), // Border 1
-    //    Duration.ofMinutes(5), // Border stops
-    //    Duration.ofMinutes(10), // Border 2
-    //    Duration.ofMinutes(5), // Waiting until DM
-    //    ChronoUnit.FOREVER.getDuration() // deathmatch
-    //};
 
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
@@ -589,7 +580,7 @@ public class GameManager implements Listener {
         int winner = teamManager.getAliveTeams()[0];
         String winnerMessage = "Only one team is left, this is when the game would end. Winner: " + winner; // TODO FANCY
         // this msg should be displayed after player death
-        (new DelayedMessage(winnerMessage)).runTaskLater(plugin, 1);
+        delayedMessage(winnerMessage, plugin, 1);
     }
 
     @EventHandler
@@ -618,7 +609,7 @@ public class GameManager implements Listener {
                                             .append(" has been eliminated!")
                                             .toComponents();
                 // this msg should be displayed after player death
-                (new DelayedMessage(teamEliminatedMessage)).runTaskLater(plugin, 1);
+                delayedMessage(teamEliminatedMessage, plugin, 1);
             }
 
             // set bed spawn

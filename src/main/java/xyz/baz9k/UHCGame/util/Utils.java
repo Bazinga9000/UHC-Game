@@ -3,6 +3,12 @@ package xyz.baz9k.UHCGame.util;
 import java.time.Duration;
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import net.md_5.bungee.api.chat.BaseComponent;
+import xyz.baz9k.UHCGame.UHCGame;
+
 public final class Utils {
     private Utils() {}
 
@@ -129,5 +135,33 @@ public final class Utils {
      */
     public static double euclideanDistance(double x1, double x2, double y1, double y2) {
         return Math.hypot(x1 - x2, y1 - y2);
+    }
+
+    /**
+     * Send a message after some delay.
+     * @param m
+     * @param plugin
+     * @param delay
+     */
+    public static void delayedMessage(String m, UHCGame plugin, long delay) {
+        new BukkitRunnable() {
+            public void run() {
+                Bukkit.broadcastMessage(m);
+            }
+        }.runTaskLater(plugin, delay);
+    }
+    
+    /**
+     * Send a message after some delay.
+     * @param m
+     * @param plugin
+     * @param delay
+     */
+    public static void delayedMessage(BaseComponent[] m, UHCGame plugin, long delay) {
+        new BukkitRunnable() {
+            public void run() {
+                Bukkit.broadcast(m);
+            }
+        }.runTaskLater(plugin, delay);
     }
 }
