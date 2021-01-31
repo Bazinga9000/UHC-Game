@@ -12,6 +12,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
@@ -35,13 +36,20 @@ public final class Recipes {
             throw new RuntimeException(e);
         }
     }
-    public void unregister() {
+    public void unregisterAll() {
         for (NamespacedKey key : registered) {
             Bukkit.removeRecipe(key);
         }
         registered.clear();
     }
 
+    /**
+     * Discover all registered recipes for a player
+     * @param p
+     */
+    public void discoverFor(@NotNull Player p) {
+        p.discoverRecipes(registered);
+    }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)

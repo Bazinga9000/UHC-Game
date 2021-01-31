@@ -51,6 +51,7 @@ public class GameManager implements Listener {
     private TeamManager teamManager;
     private HUDManager hudManager;
     private BossbarManager bbManager;
+    private Recipes recipes;
     private GameTick tick;
 
     private Instant startTime = null;
@@ -88,6 +89,7 @@ public class GameManager implements Listener {
         teamManager = plugin.getTeamManager();
         hudManager = plugin.getHUDManager();
         bbManager = plugin.getBossbarManager();
+        recipes = plugin.getRecipes();
     }
 
     /**
@@ -134,6 +136,7 @@ public class GameManager implements Listener {
             // archive previous display name
             previousDisplayNames.put(p.getUniqueId(), p.getDisplayName());
             resetStatuses(p);
+            recipes.discoverFor(p);
 
             // 60s grace period
             PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
