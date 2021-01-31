@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -46,7 +47,7 @@ public class GameManager implements Listener {
     private HUDManager hudManager;
     private BossbarManager bbManager;
     private Recipes recipes;
-    private GameTick tick;
+    private BukkitRunnable tick;
 
     private Instant startTime = null;
     
@@ -176,10 +177,7 @@ public class GameManager implements Listener {
         spreadPlayersByTeam(getCenter(), GameStage.WB_STILL.getWBRadius(), GameStage.WB_STILL.getWBRadius() / 4);
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
-        // begin uhc tick events
-        tick = new GameTick(plugin);
-        tick.runTaskTimer(plugin, 0L, 1L);
-        
+        startTick();
         bbManager.enable();
     }
 
@@ -229,6 +227,27 @@ public class GameManager implements Listener {
 
         bbManager.disable();
 
+    }
+
+    private void startTick() {
+        tick = new BukkitRunnable() {
+            public void run() {
+                if (!hasUHCStarted()) return;
+
+                bbManager.tick();
+                
+                if (isStageComplete()) {
+                    incrementStage();
+                }
+                
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    hudManager.updateElapsedTimeHUD(p);
+                    hudManager.updateWBHUD(p);
+                }
+            }
+        };
+
+        tick.runTaskTimer(plugin, 0L, 1L);
     }
 
     /**
