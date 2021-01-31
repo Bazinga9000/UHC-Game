@@ -76,6 +76,7 @@ public class Commands {
     /uhc stage next
     /uhc stage set <n: int>
     /uhc hasstarted ~ use w/ /execute store success
+    /uhc escape
      */
 
     @Command
@@ -437,6 +438,19 @@ public class Commands {
                     return;
                 } else {
                     CommandAPI.fail("UHC has not started");
+                }
+            }
+        );
+    }
+
+    @Command
+    private CommandAPICommand escape() {
+        return new CommandAPICommand("escape")
+        .executes(
+            (sender, args) -> {
+                GameManager gm = plugin.getGameManager();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.teleport(new Location(gm.getLobbyWorld(), 0, 10, 0));
                 }
             }
         );

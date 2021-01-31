@@ -414,6 +414,12 @@ public class GameManager implements Listener {
         return world;
     }
 
+    public World getLobbyWorld() {
+        World lobby = Bukkit.getWorld("lobby");
+        if (lobby != null) return lobby;
+        return Bukkit.getWorld("world");
+    }
+
     private Location getCenter() {
         return new Location(getUHCWorld(Environment.NORMAL), center[0], 0, center[1]);
     }
