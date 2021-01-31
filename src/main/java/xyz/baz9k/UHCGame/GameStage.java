@@ -103,17 +103,22 @@ public enum GameStage {
     }
 
     /* PROPERTIES */
+
+    @Nullable
     public BarColor getBBColor() {
         return bbClr;
     }
 
+    @Nullable
     public String getBBTitle() {
         return bbTitle;
     }
 
+    @Nullable
     public Duration getDuration() {
         return dur;
     }
+    
     public boolean isInstant() {
         return dur.isZero();
     }
@@ -144,6 +149,7 @@ public enum GameStage {
     /**
      * @return the next stage that has a non-zero duration; returns null if executed on {@link #NOT_IN_GAME} or {@link #DEATHMATCH}
      */
+    @Nullable
     private GameStage nextGradualStage() {
         if (this == NOT_IN_GAME) return null;
 
@@ -157,6 +163,7 @@ public enum GameStage {
     /**
      * Last stage before DM that has a non-zero duration; returns null if every stage has a 0 duration (Should not be possible normally).
      */
+    @Nullable
     private static GameStage lastGradualStage() {
         GameStage[] values = values();
 
