@@ -17,8 +17,9 @@ import static java.time.temporal.ChronoUnit.FOREVER;
 
 /**
  * {@link Enum} with properties for each stage of the game.
- * 
+ * <p>
  * {@link #NOT_IN_GAME} should always be the first game stage
+ * <p>
  * {@link #DEATHMATCH} should always be the last game stage
  */
 public enum GameStage {
@@ -170,7 +171,8 @@ public enum GameStage {
 
     /**
      * [warn prefix] [message]
-     * <!> World border is shrinking in ---
+     * <p>
+     * {@literal <!> World border is shrinking in ---}
      */
     private static final String warnPrefix = ChatColor.BLUE + "<!> ";
 

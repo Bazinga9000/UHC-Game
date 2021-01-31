@@ -93,6 +93,7 @@ public class ColoredText {
      * Append a string with a color and some formatting to builder.
      * @param s
      * @param clr ChatColor color
+     * @param c
      * @param fmt Array of ChatColor formatting types (BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, MAGIC)
      * @return this instance
      */

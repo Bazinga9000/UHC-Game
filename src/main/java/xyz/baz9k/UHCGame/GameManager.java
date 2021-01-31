@@ -91,8 +91,11 @@ public class GameManager implements Listener {
 
     /**
      * Starts UHC.
+     * <p>
      * Accessible through /uhc start or /uhc start force.
+     * <p>
      * /uhc start: Checks that teams are assigned, worlds have regenerated, and game has not started
+     * <p>
      * /uhc start force: Skips checks
      * @param skipChecks If true, all checks are ignored.
      */
@@ -195,8 +198,11 @@ public class GameManager implements Listener {
 
     /**
      * Ends UHC.
+     * <p>
      * Accessible through /uhc end or /uhc end force.
+     * <p>
      * /uhc end: Checks that the game has started
+     * <p>
      * /uhc end force: Forcibly starts game
      * @param skipChecks If true, started game checks are ignored.
      */
@@ -426,7 +432,9 @@ public class GameManager implements Listener {
     /**
      * Returns the number of kills that this combatant has dealt.
      * @param p
-     * @return the number of kills in an OptionalInt. If the player is not registered in the kills map (i.e. they're a spec), return empty OptionalInt.
+     * @return the number of kills in an OptionalInt. 
+     * <p>
+     * If the player is not registered in the kills map (i.e. they're a spec), return empty OptionalInt.
      */
     public OptionalInt getKills(@NotNull Player p) {
         Integer k = kills.get(p.getUniqueId());

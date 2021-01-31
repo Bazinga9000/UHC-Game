@@ -8,6 +8,7 @@ public final class Utils {
 
     /**
      * Get a time string of the provided number of seconds.
+     * <p>
      * Minutes and seconds are provided by default, and hours are provided if the amount of time provided exceeds an hour.
      * @param s
      * @return the time string
@@ -21,6 +22,7 @@ public final class Utils {
 
     /**
      * Get a time string of the provided {@link Duration}'s duration.
+     * <p>
      * Minutes and seconds are provided by default, and hours are provided if the amount of time provided exceeds an hour.
      * @param d
      * @return the time string
@@ -33,6 +35,7 @@ public final class Utils {
 
     /**
      * Get a long time string of the provided number of seconds.
+     * <p>
      * Hours, minutes, and seconds are all provided in the string.
      * @param s
      * @return the time string
@@ -43,6 +46,7 @@ public final class Utils {
 
     /**
      * Get a long time string of the provided {@link Duration}'s duration.
+     * <p>
      * Hours, minutes, and seconds are all provided in the string.
      * @param d
      * @return the time string
@@ -53,6 +57,8 @@ public final class Utils {
 
     /**
      * Get a string of format "X hours, X minutes, and X seconds" from a number of seconds.
+     * <p>
+     * A clause can be comitted if there is zero of the unit of that clause.
      * @param s
      * @return the time string
      */
@@ -80,6 +86,8 @@ public final class Utils {
 
     /**
      * Get a string of format "X hours, X minutes, and X seconds" from the provided {@link Duration}'s duration.
+     * <p>
+     * A clause can be comitted if there is zero of the unit of that clause.
      * @param s
      * @return the time string
      */
@@ -89,6 +97,7 @@ public final class Utils {
 
     /**
      * Take the modulo where 0 <= x < y.
+     * <p>
      * Java's operation % takes the remainder and is negative if x is negative.
      * @param x
      * @param y
@@ -100,6 +109,7 @@ public final class Utils {
 
     /**
      * Take the modulo where 0 <= x < y.
+     * <p>
      * Java's operation % takes the remainder and is negative if x is negative.
      * @param x
      * @param y
