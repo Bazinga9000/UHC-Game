@@ -640,21 +640,19 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerDamaged(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
-        Player p = (Player) event.getEntity();
 
         if (hasUHCStarted()) {
+            Player p = (Player) event.getEntity();
             // update hud if dmg taken
             hudManager.updateTeammateHUDForViewers(p);
             
             // cancel friendlyFire
             if (event instanceof EntityDamageByEntityEvent) {
-                EntityDamageByEntityEvent entDmgEvent = (EntityDamageByEntityEvent) event;
-                Entity damager = entDmgEvent.getDamager(); 
-                if (damager instanceof Player) {
-                    Player playerDamager = (Player) damager;
-                    if (teamManager.getTeam(p) == teamManager.getTeam(playerDamager)) {
+                var entd = ((EntityDamageByEntityEvent) event).getDamager(); 
+                if (entd instanceof Player) {
+                    Player damager = (Player) entd;
+                    if (teamManager.getTeam(p) == teamManager.getTeam(damager)) {
                         event.setCancelled(true);
-                        return;
                     }
                 }
             }
