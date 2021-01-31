@@ -174,7 +174,11 @@ public enum GameStage {
      * <p>
      * {@literal <!> World border is shrinking in ---}
      */
-    private static final String warnPrefix = ChatColor.BLUE + "<!> ";
+    private static ColoredText getMessageBuilder() {
+        return ColoredText.of("<", ChatColor.of("#CFCFFF"), BOLD)
+                          .append("The Boxless One", ChatColor.of("#A679FE"), BOLD)
+                          .append("> ", ChatColor.of("#CFCFFF"), BOLD);
+    }
 
     // String.format(-, base, subject, radius, duration)
     // subject = "It" or "The World Border"
@@ -231,8 +235,7 @@ public enum GameStage {
             }
         }
         
-        var s = new ColoredText()
-                .appendColored(warnPrefix)
+        var s = getMessageBuilder()
                 .append(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, getWordTimeString(dur)), clr, fmt);
 
         if (this == lastGradualStage()) {
