@@ -92,9 +92,7 @@ public class GameManager implements Listener {
         Debug.broadcastDebug("UHC attempting start");
         if (!skipChecks) {
             // check if game is OK to start
-            if (hasUHCStarted()) {
-                throw new IllegalStateException("UHC has already started.");
-            }
+            requireNotStarted();
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
                     throw new IllegalStateException("Teams have not been assigned.");
@@ -190,9 +188,7 @@ public class GameManager implements Listener {
         Debug.broadcastDebug("UHC attempting end");
         if (!skipChecks) {
             // check if game is OK to end
-            if (!hasUHCStarted()) {
-                throw new IllegalStateException("UHC has not begun.");
-            }
+            requireStarted();
         } else {
             Debug.broadcastDebug("Skipping ending requirements");
         }
@@ -226,6 +222,18 @@ public class GameManager implements Listener {
 
         bbManager.disable();
 
+    }
+
+    public void requireStarted() {
+        if (!hasUHCStarted()) {
+            throw new IllegalStateException("UHC has not started");
+        }
+    }
+
+    public void requireNotStarted() {
+        if (hasUHCStarted()) {
+            throw new IllegalStateException("UHC has already started");
+        }
     }
 
     private void startTick() {
@@ -386,9 +394,7 @@ public class GameManager implements Listener {
      */
     @NotNull
     public Duration getStageDuration() {
-        if (!hasUHCStarted()) {
-            throw new IllegalStateException("UHC has not started.");
-        }
+        requireStarted();
         return stage.getDuration();
     }
 
@@ -397,9 +403,7 @@ public class GameManager implements Listener {
      */
     @NotNull
     public Duration getRemainingStageDuration() {
-        if (!hasUHCStarted()) {
-            throw new IllegalStateException("UHC has not started.");
-        }
+        requireStarted();
         Duration stageDur = getStageDuration();
         if (isDeathmatch()) return stageDur; // if deathmatch, just return ∞
         return Duration.between(Instant.now(), lastStageInstant.plus(stageDur));
