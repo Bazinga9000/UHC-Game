@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import xyz.baz9k.UHCGame.util.ColoredText;
+import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.DelayedMessage;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
@@ -118,10 +119,8 @@ public class GameManager implements Listener {
         try {
             _startUHC();
         } catch (Exception e) {
-            Bukkit.broadcastMessage("[DEBUG] UHC cancelling start due to error");
-            Bukkit.broadcastMessage(e.getMessage());
-            Bukkit.broadcastMessage(Arrays.toString(e.getStackTrace()));
-            e.printStackTrace();
+            Debug.broadcastDebug("UHC cancelling start due to error");
+            Debug.printError(e);
         }
     }
     private void _startUHC() {
@@ -209,10 +208,8 @@ public class GameManager implements Listener {
         try {
             _endUHC();
         } catch (Exception e) {
-            Bukkit.broadcastMessage("[DEBUG] UHC cancelling end due to error");
-            Bukkit.broadcastMessage(e.getMessage());
-            Bukkit.broadcastMessage(Arrays.toString(e.getStackTrace()));
-            e.printStackTrace();
+            Debug.broadcastDebug("UHC cancelling end due to error");
+            Debug.printError(e);
         }
     }
 

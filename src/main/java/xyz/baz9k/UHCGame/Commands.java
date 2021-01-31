@@ -7,6 +7,7 @@ import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.md_5.bungee.api.ChatColor;
 import xyz.baz9k.UHCGame.util.ColoredText;
+import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.util.Random;
@@ -85,9 +86,9 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    Bukkit.broadcastMessage("[DEBUG] UHC attempting start");
+                    Debug.broadcastDebug("UHC attempting start");
                     plugin.getGameManager().startUHC(false);
-                    Bukkit.broadcastMessage("[DEBUG] UHC started");
+                    Debug.broadcastDebug("UHC started");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
                     e.printStackTrace();
@@ -102,12 +103,12 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    Bukkit.broadcastMessage("[DEBUG] UHC attempting end");
+                    Debug.broadcastDebug("UHC attempting end");
                     plugin.getGameManager().endUHC(false);
-                    Bukkit.broadcastMessage("[DEBUG] UHC ended");
+                    Debug.broadcastDebug("UHC ended");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    e.printStackTrace();
+                    Debug.printError(sender, e);
                 }
             }
         );
@@ -122,13 +123,13 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    Bukkit.broadcastMessage("[DEBUG] UHC attempting start");
-                    Bukkit.broadcastMessage("[DEBUG] Skipping starting requirements");
+                    Debug.broadcastDebug("UHC attempting start");
+                    Debug.broadcastDebug("Skipping starting requirements");
                     plugin.getGameManager().startUHC(true);
-                    Bukkit.broadcastMessage("[DEBUG] UHC started");
+                    Debug.broadcastDebug("UHC started");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    e.printStackTrace();
+                    Debug.printError(sender, e);
                 }
             }
         );
@@ -143,13 +144,13 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 try {
-                    Bukkit.broadcastMessage("[DEBUG] UHC attempting end");
-                    Bukkit.broadcastMessage("[DEBUG] Skipping ending requirements");
+                    Debug.broadcastDebug("UHC attempting end");
+                    Debug.broadcastDebug("Skipping ending requirements");
                     plugin.getGameManager().endUHC(true);
-                    Bukkit.broadcastMessage("[DEBUG] UHC ended");
+                    Debug.broadcastDebug("UHC ended");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    e.printStackTrace();
+                    Debug.printError(sender, e);
                 }
             }
         );
@@ -452,4 +453,42 @@ public class Commands {
             }
         );
     }
+
+    @Command
+    private CommandAPICommand debug() {
+        return new CommandAPICommand("debug")
+        .withAliases("verbose")
+        .executes(
+            (sender, args) -> {
+                Debug.setDebug(!Debug.getDebug());
+                boolean d = Debug.getDebug();
+
+                if (d) {
+                    sender.sendMessage("Verbose messages on");
+                } else {
+                    sender.sendMessage("Verbose messages off");
+                }
+            }
+        );
+    }
+
+    @Command
+    private CommandAPICommand debugOnOff() {
+        return new CommandAPICommand("debug")
+        .withAliases("verbose")
+        .withArguments(new BooleanArgument("status"))
+        .executes(
+            (sender, args) -> {
+                boolean d = (boolean) args[0];
+                Debug.setDebug(d);
+
+                if (d) {
+                    sender.sendMessage("Verbose messages on");
+                } else {
+                    sender.sendMessage("Verbose messages off");
+                }
+            }
+        );
+    }
+
 }
