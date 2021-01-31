@@ -3,7 +3,7 @@ package xyz.baz9k.UHCGame.util;
 import net.md_5.bungee.api.ChatColor;
 import static xyz.baz9k.UHCGame.util.Formats.*;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Arrays;
 
 public final class TeamDisplay {
@@ -34,6 +34,10 @@ public final class TeamDisplay {
             throw new IllegalArgumentException("Team index must be less than number of predefined team colors (" + NUM_TEAM_COLORS + ")");
         }
         return teamColors[t];
+    }
+
+    public static org.bukkit.Color getBukkitColor(int t) {
+        return org.bukkit.Color.fromRGB(getColor(t).getRGB());
     }
 
     public static ChatColor getChatColor(int t) {

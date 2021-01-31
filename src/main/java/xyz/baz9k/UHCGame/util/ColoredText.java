@@ -7,7 +7,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
 
-import java.awt.*;
+import java.awt.Color;
 import static xyz.baz9k.UHCGame.util.Formats.*;
 import static java.util.Collections.unmodifiableMap;
 import java.util.HashMap;

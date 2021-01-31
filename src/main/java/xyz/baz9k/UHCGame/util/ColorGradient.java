@@ -1,6 +1,6 @@
 package xyz.baz9k.UHCGame.util;
 
-import java.awt.*;
+import java.awt.Color;
 
 public final class ColorGradient {
     private ColorGradient() {}

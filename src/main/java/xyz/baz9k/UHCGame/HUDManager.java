@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.Formats.*;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
