@@ -71,6 +71,7 @@ public class BossbarManager {
         if (getBBColor() == null) {
             // should only occur on NOT_IN_GAME
             bossbar.setColor(BarColor.WHITE);
+            return;
         }
         bossbar.setColor(getBBColor());
         tick();
