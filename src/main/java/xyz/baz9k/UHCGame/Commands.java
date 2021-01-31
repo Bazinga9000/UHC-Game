@@ -10,12 +10,8 @@ import xyz.baz9k.UHCGame.util.ColoredText;
 import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.onarandombox.MultiverseCore.api.MVWorldManager;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -237,24 +233,14 @@ public class Commands {
         );
     }
 
-    private void _reseed(CommandSender sender, String seed) {
-        MVWorldManager wm = plugin.getMVWorldManager();
-        for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
-            wm.regenWorld(mvWorld.getName(), true, false, seed);
-        }
-        plugin.getGameManager().setWorldsRegenedStatus(true);
-        sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
-
-    }
-
     @Command
     private CommandAPICommand reseed() {
         // reseeds worlds
         return new CommandAPICommand("reseed")
         .executes(
             (sender, args) -> {
-                long seed = new Random().nextLong();
-                _reseed(sender, String.valueOf(seed));
+                plugin.getGameManager().reseedWorlds();
+                sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
             }
         );
     }
@@ -268,7 +254,8 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                _reseed(sender, (String) args[0]);
+                plugin.getGameManager().reseedWorlds((String) args[0]);
+                sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
             }
         );
     }

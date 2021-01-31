@@ -273,12 +273,21 @@ public class GameManager implements Listener {
         return stage != GameStage.NOT_IN_GAME;
     }
 
-    public boolean haveWorldsRegened() {
-        return worldsRegened;
+    public void reseedWorlds() {
+        long l = new Random().nextLong();
+        reseedWorlds(String.valueOf(l));
     }
 
-    public void setWorldsRegenedStatus(boolean status) {
-        worldsRegened = status;
+    /**
+     * Reseed worlds then mark worlds as reseeded.
+     * @param seed
+     */
+    public void reseedWorlds(String seed) {
+        MVWorldManager wm = plugin.getMVWorldManager();
+        for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
+            wm.regenWorld(mvWorld.getName(), true, false, seed);
+        }
+        worldsRegened = true;
     }
 
     /**
