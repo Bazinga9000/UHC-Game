@@ -27,9 +27,9 @@ public class UHCGame extends JavaPlugin {
 
         Commands commands = new Commands(this);
         commands.registerAll();
+        recipes.registerAll();
 
         gameManager.loadManagerRefs();
-        recipes.register();
     }
 
     public TeamManager getTeamManager() {
