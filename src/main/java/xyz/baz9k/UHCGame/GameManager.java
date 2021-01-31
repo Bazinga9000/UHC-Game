@@ -625,7 +625,7 @@ public class GameManager implements Listener {
         Player p = e.getPlayer();
         teamManager.addPlayer(p);
         if(!hasUHCStarted()) return; 
-        teamManager.setSpectator(p);
+        if (!teamManager.isAssignedCombatant(p)) teamManager.setSpectator(p);
         bbManager.addPlayer(p);
         hudManager.initializePlayerHUD(p);
         hudManager.addPlayerToTeams(p);
