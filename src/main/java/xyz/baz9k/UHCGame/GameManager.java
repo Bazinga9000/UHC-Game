@@ -173,7 +173,7 @@ public class GameManager implements Listener {
             }
         }
 
-        spreadPlayersByTeam(getCenter(), GameStage.WB_STILL.getWBSize() / 2.0, GameStage.WB_STILL.getWBSize() / 8.0);
+        spreadPlayersByTeam(getCenter(), GameStage.WB_STILL.getWBRadius(), GameStage.WB_STILL.getWBRadius() / 4);
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
         // begin uhc tick events
@@ -260,7 +260,7 @@ public class GameManager implements Listener {
 
         // check if 0 10 0 is valid spawn place, else teleport to highest 0,0
         if (mat != Material.AIR && mat != Material.CAKE) {
-            spawn = lobby.getBlockAt(0, lobby.getHighestBlockYAt(0, 0), 0).getLocation();
+            spawn = lobby.getHighestBlockAt(0, 0).getLocation();
         }
         for (Player p : Bukkit.getOnlinePlayers()) p.teleport(spawn);
     }
@@ -338,25 +338,26 @@ public class GameManager implements Listener {
         // deathmatch
         if (isDeathmatch()) {
             World w = getUHCWorld(Environment.NORMAL);
-            for (int x = -10; x < 11; x++) {
-                for (int z = -10; z < 11; z++) {
-                    w.getBlockAt(x, 254, z).setType(Material.BARRIER);
+
+            int radius = (int) GameStage.DEATHMATCH.getWBRadius();
+            for (int x = radius; x <= radius; x++) {
+                for (int z = radius; z <= radius; z++) {
+                    w.getBlockAt(x, w.getMaxHeight() - 2, z).setType(Material.BARRIER);
                 }
             }
-            List<PotionEffect> effs = Arrays.asList(
-                PotionEffectType.DAMAGE_RESISTANCE.createEffect(10 * 20 /* ticks */, /* lvl */ 10),
-                PotionEffectType.SLOW.createEffect(10 * 20 /* ticks */, /* lvl */ 10),
-                PotionEffectType.JUMP.createEffect(10 * 20 /* ticks */, /* lvl */ 128),
-                PotionEffectType.BLINDNESS.createEffect(10 * 20 /* ticks */, /* lvl */ 10)
-            );
+            for (Player p : teamManager.getAllCombatants()) {
+                p.addPotionEffects(Arrays.asList(
+                    PotionEffectType.DAMAGE_RESISTANCE.createEffect(10 * 20, 10),
+                    PotionEffectType.SLOW.createEffect(10 * 20, 10),
+                    PotionEffectType.JUMP.createEffect(10 * 20, 128),
+                    PotionEffectType.BLINDNESS.createEffect(10 * 20, 10)
+                ));
+            }
             for (Player p : plugin.getServer().getOnlinePlayers()) {
                 p.teleport(getCenterAtY(255));
             }
-            for (Player p : teamManager.getAllCombatants()) {
-                p.addPotionEffects(effs);
-            }
 
-            spreadPlayersByTeam(getCenter(), GameStage.DEATHMATCH.getWBSize() / 2.0 - 1, GameStage.DEATHMATCH.getWBSize() / 4.0);
+            spreadPlayersByTeam(getCenter(), GameStage.DEATHMATCH.getWBRadius() - 1, GameStage.DEATHMATCH.getWBRadius() / 2);
 
         }
 
@@ -449,7 +450,7 @@ public class GameManager implements Listener {
     }
 
     private Location getCenter() {
-        return new Location(getUHCWorld(Environment.NORMAL), center[0], 0, center[1]);
+        return getCenterAtY(0);
     }
     private Location getCenterAtY(double y) {
         return new Location(getUHCWorld(Environment.NORMAL), center[0], y, center[1]);

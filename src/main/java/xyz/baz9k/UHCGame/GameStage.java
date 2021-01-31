@@ -117,11 +117,13 @@ public enum GameStage {
     public boolean isInstant() {
         return dur.isZero();
     }
-    /**
-     * @return the worldborder diameter of this stage
-     */
-    public double getWBSize() {
+
+    public double getWBDiameter() {
         return wbSize;
+    }
+
+    public double getWBRadius() {
+        return getWBDiameter() / 2;
     }
     
     /**
