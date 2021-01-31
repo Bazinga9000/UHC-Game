@@ -207,6 +207,7 @@ public enum GameStage {
         if (this == NOT_IN_GAME) return;
         if (this == DEATHMATCH) {
             Bukkit.broadcast(getMessageBuilder().append(baseChatMsg, clr, fmt).toComponents());
+            return;
         }
         /**
          * 
