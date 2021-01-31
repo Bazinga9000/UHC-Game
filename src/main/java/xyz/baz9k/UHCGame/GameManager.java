@@ -35,10 +35,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import com.onarandombox.MultiverseCore.api.MVWorldManager;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiverseCore.api.WorldPurger;
-
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 public class GameManager implements Listener {
@@ -153,9 +149,7 @@ public class GameManager implements Listener {
             hudManager.initializePlayerHUD(p);
         }
         
-        WorldPurger purger = plugin.getMVWorldManager().getTheWorldPurger();
-        for (MultiverseWorld mvWorld : getMVUHCWorlds()) {
-            World w = mvWorld.getCBWorld();
+        for (World w : getUHCWorlds()) {
             // set time to 0 and delete rain
             w.setTime(0);
             w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
@@ -164,7 +158,7 @@ public class GameManager implements Listener {
             w.getWorldBorder().setWarningDistance(25);
 
             Gamerules.set(w);
-            purger.purgeWorld(mvWorld, Arrays.asList("MONSTERS"), false, false); // multiverse is stupid (purges all monsters, hopefully)
+            purgeWorld(w);
 
             // create beacon in worlds
             w.getBlockAt(0, 1, 0).setType(Material.BEACON);
@@ -217,6 +211,9 @@ public class GameManager implements Listener {
     private void _endUHC() {
         setStage(GameStage.NOT_IN_GAME);
         // update display names
+        escapeAll();
+        for (Player p : Bukkit.getOnlinePlayers()) resetStatuses(p);
+
         for (UUID uuid : previousDisplayNames.keySet()) {
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
@@ -224,8 +221,6 @@ public class GameManager implements Listener {
             p.setGameMode(GameMode.SURVIVAL);
         }
 
-        for (Player p : Bukkit.getOnlinePlayers()) resetStatuses(p);
-        escapeAll();
         teamManager.resetAllPlayers();
         hudManager.cleanup();
         kills.clear();
@@ -273,6 +268,12 @@ public class GameManager implements Listener {
         return stage != GameStage.NOT_IN_GAME;
     }
 
+    /**
+     * Reseed worlds then mark worlds as reseeded.
+     * <p>
+     * Accessible through /uhc reseed
+     * @param seed
+     */
     public void reseedWorlds() {
         long l = new Random().nextLong();
         reseedWorlds(String.valueOf(l));
@@ -280,14 +281,24 @@ public class GameManager implements Listener {
 
     /**
      * Reseed worlds then mark worlds as reseeded.
+     * <p>
+     * Accessible through /uhc reseed <seed>
      * @param seed
      */
     public void reseedWorlds(String seed) {
-        MVWorldManager wm = plugin.getMVWorldManager();
-        for (MultiverseWorld mvWorld : plugin.getGameManager().getMVUHCWorlds()) {
-            wm.regenWorld(mvWorld.getName(), true, false, seed);
+        var wm = plugin.getMVWorldManager();
+        for (World w : getUHCWorlds()) {
+            wm.regenWorld(w.getName(), true, false, seed);
         }
         worldsRegened = true;
+    }
+
+    private void purgeWorld(World w) {
+        var wm = plugin.getMVWorldManager();
+        var purger = wm.getTheWorldPurger();
+        var mvWorld = wm.getMVWorld(w);
+
+        purger.purgeWorld(mvWorld, Arrays.asList("MONSTERS"), false, false); // multiverse is stupid (purges all monsters, hopefully)
     }
 
     /**
@@ -390,24 +401,9 @@ public class GameManager implements Listener {
     }
 
     private void createMVWorld(@NotNull String world, @NotNull Environment env) {
-        MVWorldManager wm = plugin.getMVWorldManager();
-        MultiverseWorld w = wm.getMVWorld(world);
-        if (w != null) return;
-        
-        Random temp = new Random();
-        wm.addWorld(world, env, String.valueOf(temp.nextLong()), WorldType.NORMAL, true, null);
-    }
-
-    /**
-     * @return an Array of {@link MultiverseWorld} which the UHC uses.
-     */
-    @NotNull
-    public MultiverseWorld[] getMVUHCWorlds() {
-        MVWorldManager wm = plugin.getMVWorldManager();
-        return new MultiverseWorld[]{
-            wm.getMVWorld("game"),
-            wm.getMVWorld("game_nether")
-        };
+        var wm = plugin.getMVWorldManager();
+        if (wm.isMVWorld(world)) return;
+        wm.addWorld(world, env, String.valueOf(new Random().nextLong()), WorldType.NORMAL, true, null);
     }
 
     /**
@@ -415,13 +411,10 @@ public class GameManager implements Listener {
      */
     @NotNull
     public World[] getUHCWorlds() {
-        MultiverseWorld[] mvWorlds = getMVUHCWorlds();
-        World[] worlds = new World[mvWorlds.length];
-        for (int i = 0; i < worlds.length; i++) {
-            worlds[i] = mvWorlds[i].getCBWorld();
-        }
-
-        return worlds;
+        return new World[] {
+            Bukkit.getWorld("game"),
+            Bukkit.getWorld("game_nether")
+        };
     }
 
     /**
