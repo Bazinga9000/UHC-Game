@@ -274,13 +274,14 @@ public class Commands {
     private void _respawn(CommandSender sender, Player p, Location loc) {
         TeamManager tm = plugin.getTeamManager();
         if (tm.isSpectator(p)) {
-            sender.sendMessage(ChatColor.RED + "Cannot respawn spectator " + p.getName() + ".");
+            sender.sendMessage(String.format("%sCannot respawn spectator %s.", ChatColor.RED, p.getName()));
             return;
         }
 
         p.teleport(loc);
         tm.setCombatantAliveStatus(p, true);
         p.setGameMode(GameMode.SURVIVAL);
+        sender.sendMessage(String.format("Respawned %s!", p.getName()));
     }
 
     @Command
@@ -335,7 +336,7 @@ public class Commands {
                 for (Player p : (Collection<Player>) args[0]) {
                     int team = tm.getTeam(p);
                     PlayerState state = tm.getPlayerState(p);
-                    sender.sendMessage(p.getName() + " is a " + state + " on team " + team);
+                    sender.sendMessage(String.format("%s is a %s on team %s.", p.getName(), state, team));
                 }
             }
         );
@@ -361,7 +362,7 @@ public class Commands {
                             tm.setUnassignedCombatant(p);
                             break;
                     }
-                    sender.sendMessage("Set " + p.getName() + " to state " + tm.getPlayerState(p) + ".");
+                    sender.sendMessage(String.format("Set %s to team %s.", p.getName(), tm.getPlayerState(p)));
                 }
             }
         );
@@ -387,7 +388,7 @@ public class Commands {
                 }
                 for (Player p : (Collection<Player>) args[0]) {
                     plugin.getTeamManager().assignPlayerToTeam(p, t);
-                    sender.sendMessage("Set " + p.getName() + " to team " + t);
+                    sender.sendMessage(String.format("Set %s to team %s.", p.getName(), tm.getPlayerState(p)));
                 }
             }
         );
@@ -402,7 +403,9 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 GameManager gm = plugin.getGameManager();
+
                 gm.incrementStage();
+                sender.sendMessage("Set stage to " + gm.getStage());
             }
         );
     }
@@ -419,11 +422,8 @@ public class Commands {
                 GameManager gm = plugin.getGameManager();
                 GameStage s = GameStage.fromIndex((int) args[0]);
 
-                if (s != null) {
-                    gm.setStage(s);
-                } else {
-                    CommandAPI.fail("Invalid stage");
-                }
+                gm.setStage(s);
+                sender.sendMessage("Set stage to " + s);
             }
         );
     }
