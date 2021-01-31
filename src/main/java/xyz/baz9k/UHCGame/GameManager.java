@@ -372,7 +372,7 @@ public class GameManager implements Listener {
                     PotionEffectType.BLINDNESS.createEffect(10 * 20, 10)
                 ));
             }
-            for (Player p : plugin.getServer().getOnlinePlayers()) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
                 p.teleport(getCenterAtY(255));
             }
 
