@@ -48,6 +48,10 @@ public class TeamManager {
         });
     }
 
+    public void addPlayer(@NotNull Player p) {
+        getNode(p);
+    }
+
     private void setNode(@NotNull Player p, @NotNull PlayerState s, int team) {
         Node n = getNode(p);
         n.state = s;
