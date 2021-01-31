@@ -288,7 +288,10 @@ public class GameManager implements Listener {
         if (mat != Material.AIR && mat != Material.CAKE) {
             spawn = lobby.getHighestBlockAt(0, 0).getLocation();
         }
-        for (Player p : Bukkit.getOnlinePlayers()) p.teleport(spawn);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.setBedSpawnLocation(spawn);
+            p.teleport(spawn);
+        };
     }
 
     public boolean hasUHCStarted() {
