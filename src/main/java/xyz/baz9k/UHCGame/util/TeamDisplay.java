@@ -26,6 +26,11 @@ public final class TeamDisplay {
                                                     .toArray(Color[]::new);
     private static final int NUM_TEAM_COLORS = teamColors.length - 1;
 
+    /**
+     * Returns color of type {@link java.awt.Color}.
+     * @param t
+     * @return
+     */
     public static Color getColor(int t) {
         if (t < 0) {
             throw new IllegalArgumentException("Team index must be positive.");
@@ -36,10 +41,21 @@ public final class TeamDisplay {
         return teamColors[t];
     }
 
+    /**
+     * Returns color of type {@link org.bukkit.Color}. Please refrain from using this.
+     * @see #getColor
+     * @param t
+     * @return Bukkit color
+     */
     public static org.bukkit.Color getBukkitColor(int t) {
         return org.bukkit.Color.fromRGB(getColor(t).getRGB());
     }
 
+    /**
+     * Returns color of type {@link ChatColor}.
+     * @param t
+     * @return
+     */
     public static ChatColor getChatColor(int t) {
         return ChatColor.of(getColor(t));
     }
