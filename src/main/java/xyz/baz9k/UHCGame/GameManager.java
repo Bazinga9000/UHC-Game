@@ -1,18 +1,21 @@
 package xyz.baz9k.UHCGame;
 
 import org.bukkit.Bukkit;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.World.Environment;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -615,9 +618,27 @@ public class GameManager implements Listener {
     private void winMessage() {
         if (teamManager.countLivingTeams() > 1) return;
         int winner = teamManager.getAliveTeams()[0];
-        String winnerMessage = "Only one team is left, this is when the game would end. Winner: " + winner; // TODO FANCY
+        BaseComponent[] winMsg = new ColoredText()
+            .append(TeamDisplay.getName(winner))
+            .append(" has won!")
+            .toComponents();
+
         // this msg should be displayed after player death
-        delayedMessage(winnerMessage, plugin, 1);
+        delayedMessage(winMsg, plugin, 1);
+        
+        var fwe = FireworkEffect.builder()
+                                .withColor(TeamDisplay.getBukkitColor(winner), org.bukkit.Color.WHITE)
+                                .with(FireworkEffect.Type.BURST)
+                                .withFlicker()
+                                .withTrail()
+                                .build();
+        for (Player p : teamManager.getAllCombatantsOnTeam(winner)) {
+            Firework fw = p.getWorld().spawn(p.getLocation(), Firework.class);
+            FireworkMeta meta = fw.getFireworkMeta();
+            meta.addEffect(fwe);
+            meta.setPower(1);
+            fw.setFireworkMeta(meta);
+        }
     }
 
     @EventHandler
