@@ -272,12 +272,9 @@ public class GameManager implements Listener {
     }
 
     public void setStage(GameStage stage) {
+        if (stage == null) return;
         this.stage = stage;
         updateStage();
-    }
-    public void setStage(int s) {
-        stage = GameStage.fromIndex(s);
-        setStage(stage);
     }
 
     private void updateStage() {

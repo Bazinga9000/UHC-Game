@@ -414,7 +414,13 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 GameManager gm = plugin.getGameManager();
-                gm.setStage((int)args[0]);
+                GameStage s = GameStage.fromIndex((int) args[0]);
+
+                if (s != null) {
+                    gm.setStage(s);
+                } else {
+                    CommandAPI.fail("Invalid stage");
+                }
             }
         );
     }

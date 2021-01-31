@@ -84,7 +84,7 @@ public enum GameStage {
     /**
      * 0 = First in game stage
      * @param i
-     * @return GameStage connected to index
+     * @return GameStage connected to index. Null if not valid
      */
     @Nullable
     public static GameStage fromIndex(int i) {
