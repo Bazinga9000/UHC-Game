@@ -55,7 +55,8 @@ public class TeamManager {
     private void setNode(@NotNull Player p, @NotNull PlayerState s, int team) {
         Node n = getNode(p);
         if (n == null) {
-            n = playerMap.put(p.getUniqueId(), new Node(0, PlayerState.SPECTATOR, p));
+            n = new Node(0, PlayerState.SPECTATOR, p);
+            playerMap.put(p.getUniqueId(), n);
         }
 
         n.state = s;
