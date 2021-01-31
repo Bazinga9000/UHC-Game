@@ -119,7 +119,9 @@ public class GameManager implements Listener {
             _startUHC();
         } catch (Exception e) {
             Bukkit.broadcastMessage("[DEBUG] UHC cancelling start due to error");
-            throw e;
+            Bukkit.broadcastMessage(e.getMessage());
+            Bukkit.broadcastMessage(Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
         }
     }
     private void _startUHC() {
@@ -218,7 +220,9 @@ public class GameManager implements Listener {
             _endUHC();
         } catch (Exception e) {
             Bukkit.broadcastMessage("[DEBUG] UHC cancelling end due to error");
-            throw e;
+            Bukkit.broadcastMessage(e.getMessage());
+            Bukkit.broadcastMessage(Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
         }
     }
 

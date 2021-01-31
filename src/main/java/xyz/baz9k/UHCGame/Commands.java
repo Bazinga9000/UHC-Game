@@ -89,7 +89,7 @@ public class Commands {
                     Bukkit.broadcastMessage("[DEBUG] UHC started");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    throw e;
+                    e.printStackTrace();
                 }
             }
         );
@@ -106,7 +106,7 @@ public class Commands {
                     Bukkit.broadcastMessage("[DEBUG] UHC ended");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    throw e;
+                    e.printStackTrace();
                 }
             }
         );
@@ -127,7 +127,7 @@ public class Commands {
                     Bukkit.broadcastMessage("[DEBUG] UHC started");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    throw e;
+                    e.printStackTrace();
                 }
             }
         );
@@ -148,7 +148,7 @@ public class Commands {
                     Bukkit.broadcastMessage("[DEBUG] UHC ended");
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    throw e;
+                    e.printStackTrace();
                 }
             }
         );
