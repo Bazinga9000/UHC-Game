@@ -20,7 +20,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
-import xyz.baz9k.UHCGame.util.Utils;
+import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.Formats.*;
 
 import java.awt.*;
@@ -93,7 +93,7 @@ public class HUDManager implements Listener {
             double angle = Math.toDegrees(Math.atan2(dz, dx)); // angle btwn you & teammate
             double yeYaw = youLoc.getYaw();
     
-            double relAngle = Utils.mod(yeYaw - angle + 90, 360) - 180;
+            double relAngle = mod(yeYaw - angle + 90, 360) - 180;
             String arrow;
             if (112.5 < relAngle && relAngle < 157.5) arrow = "↙";
             else if (67.5 < relAngle && relAngle < 112.5) arrow = "←";
@@ -254,7 +254,7 @@ public class HUDManager implements Listener {
         var s = ColoredText.of(x + " " + y + " " + z, ChatColor.GREEN) // position format
                 .append(" ( ", ChatColor.WHITE); // rotation format
 
-        double yaw = Utils.mod(loc.getYaw() + 67.5, 360);
+        double yaw = mod(loc.getYaw() + 67.5, 360);
         /*
          * +Z =   0 -  67.5 - 135
          * -X =  90 - 157.5 - 225
@@ -300,7 +300,7 @@ public class HUDManager implements Listener {
     }
 
     public void updateElapsedTimeHUD(@NotNull Player p){
-        String elapsed = Utils.getLongTimeString(gameManager.getElapsedTime());
+        String elapsed = getLongTimeString(gameManager.getElapsedTime());
         var s = ColoredText.of("Game Time: ", ChatColor.RED)
                 .append(elapsed + " ");
 

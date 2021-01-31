@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import xyz.baz9k.UHCGame.util.Utils;
+import static xyz.baz9k.UHCGame.util.Utils.*;
 
 public class BossbarManager {
     private GameManager gameManager;
@@ -60,7 +60,7 @@ public class BossbarManager {
         // change display title
         String display = getBBTitle();
         display += " | ";
-        display += Utils.getTimeString(remainingSecs);
+        display += getTimeString(remainingSecs);
         bossbar.setTitle(display);
     }
 

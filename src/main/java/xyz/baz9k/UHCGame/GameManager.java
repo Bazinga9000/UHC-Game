@@ -40,7 +40,7 @@ import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.api.WorldPurger;
 
-import xyz.baz9k.UHCGame.util.Utils;
+import static xyz.baz9k.UHCGame.util.Utils.*;
 
 public class GameManager implements Listener {
     private UHCGame plugin;
@@ -486,7 +486,7 @@ public class GameManager implements Listener {
 
                 if (!locations.isEmpty()) {
                     double minimumDistance = locations.stream()
-                                                      .map(l -> Utils.euclideanDistance(x, z, l.getX(), l.getZ()))
+                                                      .map(l -> euclideanDistance(x, z, l.getX(), l.getZ()))
                                                       .min(Double::compareTo)
                                                       .orElseThrow();
                     if (minimumDistance < minimumSeparation) {
