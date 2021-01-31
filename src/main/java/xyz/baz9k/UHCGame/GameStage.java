@@ -3,6 +3,7 @@ package xyz.baz9k.UHCGame;
 import java.time.Duration;
 import java.util.Arrays;
 import static xyz.baz9k.UHCGame.util.Formats.*;
+import static xyz.baz9k.UHCGame.util.Utils.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -173,15 +174,16 @@ public enum GameStage {
      */
     private static final String warnPrefix = ChatColor.BLUE + "<!> ";
 
-    // String.format(-, base, subject, radius, minutes)
+    // String.format(-, base, subject, radius, duration)
     // subject = "It" or "The World Border"
-    private static final String wbWillShrinkInstant = "%s%s will immediately shrink to ±%s in %s minutes! Watch out!";
-    private static final String wbWillShrink = "%s%s will begin shrinking to ±%s in %s minutes!";
+    private static final String wbWillShrinkInstant = "%s%s will immediately shrink to ±%s in %s! Watch out!";
+    private static final String wbWillShrink = "%s%s will begin shrinking to ±%s in %s!";
 
     private static final String wbJustShrinkInstant = "%2$s has immediately shrank to ±%3$s!";
-    private static final String wbJustShrink = "%s%s will stop at ±%s in %s minutes.";
+    private static final String wbJustShrink = "%s%s will stop at ±%s in %s.";
 
-    private static final String dmWarn = "If the game does not end within %s minutes, I shall end it myself!";
+    // String.format(-, duration)
+    private static final String dmWarn = "If the game does not end within %s, I shall end it myself!";
 
     /**
      * Sends the linked message in chat.
@@ -227,10 +229,10 @@ public enum GameStage {
         
         var s = new ColoredText()
                 .appendColored(warnPrefix)
-                .append(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, dur.toMinutes()), clr, fmt);
+                .append(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, getWordTimeString(dur)), clr, fmt);
 
         if (this == lastGradualStage()) {
-            s.append(String.format(dmWarn, dur.toMinutes()), clr, fmt);
+            s.append(String.format(dmWarn, getWordTimeString(dur)), clr, fmt);
         }
         
         Bukkit.broadcast(s.toComponents());
