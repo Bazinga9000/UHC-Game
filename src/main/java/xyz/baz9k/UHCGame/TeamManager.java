@@ -49,13 +49,13 @@ public class TeamManager {
             playerMap.get(uuid).player = p;
             return;
         };
-        setNode(p, PlayerState.SPECTATOR, 0);
+        setNode(p, PlayerState.COMBATANT_UNASSIGNED, 0);
     }
 
     private void setNode(@NotNull Player p, @NotNull PlayerState s, int team) {
         Node n = getNode(p);
         if (n == null) {
-            n = new Node(0, PlayerState.SPECTATOR, p);
+            n = new Node(0, PlayerState.COMBATANT_UNASSIGNED, p);
             playerMap.put(p.getUniqueId(), n);
         }
 
