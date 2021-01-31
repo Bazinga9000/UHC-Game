@@ -506,7 +506,7 @@ public class GameManager implements Listener {
         for (int i = 0; i < numLocations; i++) {
             double X = center.getX() + (distance * Math.cos(i * 2 * Math.PI / numLocations));
             double Z = center.getZ() + (distance * Math.sin(i * 2 * Math.PI / numLocations));
-            double Y = w.getHighestBlockYAt((int) X, (int) Z);
+            double Y = 2 + w.getHighestBlockYAt((int) X, (int) Z);
             locations.add(new Location(w, X, Y, Z));
         }
         Collections.shuffle(locations);
@@ -533,7 +533,7 @@ public class GameManager implements Listener {
                         continue;
                     }
                 }
-                newLocation = new Location(w, x, w.getHighestBlockYAt((int) x, (int) z), z);
+                newLocation = new Location(w, x, 2 + w.getHighestBlockYAt((int) x, (int) z), z);
 
                 Material blockType = w.getBlockAt(newLocation).getType();
 
