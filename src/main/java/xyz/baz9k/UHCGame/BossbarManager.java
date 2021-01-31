@@ -6,6 +6,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import xyz.baz9k.UHCGame.util.Utils;
 
@@ -67,16 +68,20 @@ public class BossbarManager {
      * This function updates the bossbar when the stage increments.
      */
     public void updateBossbarStage() {
+        if (getBBColor() == null) {
+            // should only occur on NOT_IN_GAME
+            bossbar.setColor(BarColor.WHITE);
+        }
         bossbar.setColor(getBBColor());
         tick();
     }
 
-    @NotNull
+    @Nullable
     private BarColor getBBColor() {
         return gameManager.getStage().getBBColor();
     }
 
-    @NotNull
+    @Nullable
     private String getBBTitle() {
         return gameManager.getStage().getBBTitle();
     }
