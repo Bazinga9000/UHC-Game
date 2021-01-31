@@ -13,7 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -368,8 +367,8 @@ public class GameManager implements Listener {
             World w = getUHCWorld(Environment.NORMAL);
 
             int radius = (int) GameStage.DEATHMATCH.getWBRadius();
-            for (int x = radius; x <= radius; x++) {
-                for (int z = radius; z <= radius; z++) {
+            for (int x = -radius; x <= radius; x++) {
+                for (int z = -radius; z <= radius; z++) {
                     w.getBlockAt(x, w.getMaxHeight() - 2, z).setType(Material.BARRIER);
                 }
             }
