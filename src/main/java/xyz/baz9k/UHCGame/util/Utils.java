@@ -2,8 +2,12 @@ package xyz.baz9k.UHCGame.util;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -94,7 +98,7 @@ public final class Utils {
      * Get a string of format "X hours, X minutes, and X seconds" from the provided {@link Duration}'s duration.
      * <p>
      * A clause can be comitted if there is zero of the unit of that clause.
-     * @param s
+     * @param d
      * @return the time string
      */
     public static String getWordTimeString(Duration d) {
@@ -163,5 +167,71 @@ public final class Utils {
                 Bukkit.broadcast(m);
             }
         }.runTaskLater(plugin, delay);
+    }
+
+
+    //random location generation
+
+    public static Location getMaxYLocation(World w, double X, double Z) {
+        return w.getHighestBlockAt((int) X, (int) Z).getLocation().add(0, 1, 0);
+    }
+
+    public static double randomDoubleInRange(Random r, double min, double max) {
+        return min + ((max - min) * r.nextDouble());
+    }
+
+    public static boolean isLocationSpawnable(Location l) {
+        Location blockLocation = l.add(0, -1, 0);
+        Material b = blockLocation.getBlock().getType();
+        return (b != Material.LAVA && b != Material.WATER);
+    }
+
+    public static boolean isLocationInSquare(Location l, Location center, double squareEdgeLength) {
+        double minX = center.getX() - (squareEdgeLength/2);
+        double maxX = center.getX() + (squareEdgeLength/2);
+        double minZ = center.getZ() - (squareEdgeLength/2);
+        double maxZ = center.getZ() + (squareEdgeLength/2);
+        return isLocationInSquare(l, minX, maxX, minZ, maxZ);
+    }
+    public static boolean isLocationInSquare(Location l, double minX, double maxX, double minZ, double maxZ) {
+        return (minX < l.getX() && l.getX() < maxX && minZ < l.getZ() && l.getZ() < maxZ);
+    }
+
+    public static Location uniformRandomLocation(World w, double minX, double maxX, double minZ, double maxZ) {
+        Random r = new Random();
+        double X = randomDoubleInRange(r, minX, maxX);
+        double Z = randomDoubleInRange(r, minZ, maxZ);
+        return getMaxYLocation(w, X, Z);
+    }
+
+    public static Location uniformRandomSpawnableLocation(World w, double minX, double maxX, double minZ, double maxZ) {
+        Location l = uniformRandomLocation(w, minX, maxX, minZ, maxZ);
+        for (int i = 0; i < 30; i++) {
+            l = uniformRandomLocation(w, minX, maxX, minZ, maxZ);
+            if (isLocationSpawnable(l)) {
+                break;
+            }
+        }
+        return l;
+    }
+
+    public static Location ringRandomLocation(World w, double centerX, double centerZ, double minRadius, double maxRadius) {
+        Random r = new Random();
+        double theta = randomDoubleInRange(r, 0, 2 * Math.PI);
+        double radius = randomDoubleInRange(r, minRadius, maxRadius);
+        double X = centerX + radius * Math.cos(theta);
+        double Z = centerZ + radius * Math.sin(theta);
+        return getMaxYLocation(w, X, Z);
+    }
+
+    public static Location ringRandomSpawnableLocation(World w, double centerX, double centerZ, double minRadius, double maxRadius) {
+        Location l = ringRandomLocation(w, centerX, centerZ, minRadius, maxRadius);
+        for (int i = 0; i < 30; i++) {
+            l = ringRandomLocation(w, centerX, centerZ, minRadius, maxRadius);
+            if (isLocationSpawnable(l)) {
+                break;
+            }
+        }
+        return l;
     }
 }

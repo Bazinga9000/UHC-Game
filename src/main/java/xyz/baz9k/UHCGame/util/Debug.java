@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 
 public final class Debug {
     private Debug() { }
-    private static boolean debug = false;
+    private static boolean debug = true;
 
     public static boolean getDebug() {
         return debug;
