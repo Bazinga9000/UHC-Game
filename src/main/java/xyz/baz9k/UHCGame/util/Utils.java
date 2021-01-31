@@ -3,6 +3,8 @@ package xyz.baz9k.UHCGame.util;
 import java.time.Duration;
 
 public class Utils {
+    private Utils() {}
+
     /**
      * Get a time string of the provided number of seconds.
      * Minutes and seconds are provided by default, and hours are provided if the amount of time provided exceeds an hour.
