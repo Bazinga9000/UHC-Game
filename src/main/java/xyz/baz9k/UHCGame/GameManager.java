@@ -612,12 +612,14 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         if (!hasUHCStarted()) return;
-        Player deadPlayer = e.getEntity();
-        if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
-            teamManager.setCombatantAliveStatus(deadPlayer, false);
+        Player dead = e.getEntity();
+        
+        dead.setGameMode(GameMode.SPECTATOR);
+        if (teamManager.getPlayerState(dead) == PlayerState.COMBATANT_ALIVE) {
+            teamManager.setCombatantAliveStatus(dead, false);
 
             // check team death
-            int t = teamManager.getTeam(deadPlayer);
+            int t = teamManager.getTeam(dead);
             if (teamManager.isTeamEliminated(t)) {
                 BaseComponent[] teamEliminatedMessage;
                 teamEliminatedMessage = new ColoredText()
@@ -629,11 +631,11 @@ public class GameManager implements Listener {
             }
 
             // set bed spawn
-            Location newSpawn = deadPlayer.getLocation();
+            Location newSpawn = dead.getLocation();
             if (newSpawn.getY() < 0) {
-                deadPlayer.setBedSpawnLocation(getUHCWorld(Environment.NORMAL).getSpawnLocation(), true);
+                dead.setBedSpawnLocation(getUHCWorld(Environment.NORMAL).getSpawnLocation(), true);
             } else {
-                deadPlayer.setBedSpawnLocation(newSpawn, true);
+                dead.setBedSpawnLocation(newSpawn, true);
             }
 
             // check win condition
@@ -642,7 +644,7 @@ public class GameManager implements Listener {
             }
         }
 
-        Player killer = deadPlayer.getKiller();
+        Player killer = dead.getKiller();
         if (killer != null) {
             OptionalInt k = getKills(killer);
             if (k.isPresent()) {
@@ -656,13 +658,6 @@ public class GameManager implements Listener {
             hudManager.updateTeamsAliveHUD(p);
         }
     }
-
-    @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent e) {
-        if (!hasUHCStarted()) return;
-        e.getPlayer().setGameMode(GameMode.SPECTATOR);
-    }
-
 
     @EventHandler
     public void onPlayerFight(EntityDamageByEntityEvent e) {
