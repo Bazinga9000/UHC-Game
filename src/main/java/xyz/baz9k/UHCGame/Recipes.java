@@ -57,7 +57,7 @@ public final class Recipes {
     /* RECIPES */
     @DeclaredRecipe
     private Recipe godApple() {
-        ShapedRecipe recipe = new ShapedRecipe(key("recipeGodApple"), new ItemStack(Material.ENCHANTED_GOLDEN_APPLE));
+        ShapedRecipe recipe = new ShapedRecipe(key("godapple"), new ItemStack(Material.ENCHANTED_GOLDEN_APPLE));
 
         recipe.shape(
             "GGG",
