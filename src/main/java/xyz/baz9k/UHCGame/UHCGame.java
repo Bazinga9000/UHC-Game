@@ -4,7 +4,6 @@ import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class UHCGame extends JavaPlugin {
@@ -49,10 +48,7 @@ public class UHCGame extends JavaPlugin {
     }
 
     public MultiverseCore getMVCore() {
-        Plugin plugin = Bukkit.getPluginManager().getPlugin("Multiverse-Core");
-
-        if (plugin instanceof MultiverseCore) return (MultiverseCore) plugin;
-        throw new RuntimeException("Plugin Multiverse-Core is missing.");
+        return getPlugin(MultiverseCore.class);
     }
 
     public MVWorldManager getMVWorldManager() {
