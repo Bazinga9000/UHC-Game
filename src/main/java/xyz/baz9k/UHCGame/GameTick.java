@@ -14,16 +14,17 @@ public class GameTick extends BukkitRunnable {
 
     @Override
     public void run() {
-        if (gameManager.hasUHCStarted()) {
-            if (gameManager.isStageComplete()) {
-                gameManager.incrementStage();
-            }
-            plugin.getBossbarManager().tick();
-            
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                plugin.getHUDManager().updateElapsedTimeHUD(p);
-                plugin.getHUDManager().updateWBHUD(p);
-            }
+        if (!gameManager.hasUHCStarted()) return;
+
+        plugin.getBossbarManager().tick();
+        
+        if (gameManager.isStageComplete()) {
+            gameManager.incrementStage();
+        }
+        
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            plugin.getHUDManager().updateElapsedTimeHUD(p);
+            plugin.getHUDManager().updateWBHUD(p);
         }
     }
 }

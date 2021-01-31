@@ -7,12 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.World.Environment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -571,8 +569,8 @@ public class GameManager implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player p = event.getPlayer();
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        Player p = e.getPlayer();
         teamManager.addPlayer(p);
         if(hasUHCStarted()) {
             bbManager.addPlayer(p);
@@ -582,80 +580,72 @@ public class GameManager implements Listener {
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        if (hasUHCStarted()) {
-            Player deadPlayer = event.getEntity();
-            if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
-                teamManager.setCombatantAliveStatus(deadPlayer, false);
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        if (!hasUHCStarted()) return;
+        Player deadPlayer = e.getEntity();
+        if (teamManager.getPlayerState(deadPlayer) == PlayerState.COMBATANT_ALIVE) {
+            teamManager.setCombatantAliveStatus(deadPlayer, false);
 
-                // check team death
-                int t = teamManager.getTeam(deadPlayer);
-                if (teamManager.isTeamEliminated(t)) {
-                    BaseComponent[] teamEliminatedMessage;
-                    teamEliminatedMessage = new ColoredText()
-                                                .appendColored(TeamDisplay.getName(t))
-                                                .append(" has been eliminated!")
-                                                .toComponents();
-                    // this msg should be displayed after player death
-                    (new DelayedMessage(teamEliminatedMessage)).runTaskLater(plugin, 1);
-                }
-
-                // set bed spawn
-                Location newSpawn = deadPlayer.getLocation();
-                if (newSpawn.getY() < 0) {
-                    deadPlayer.setBedSpawnLocation(getUHCWorld(Environment.NORMAL).getSpawnLocation(), true);
-                } else {
-                    deadPlayer.setBedSpawnLocation(newSpawn, true);
-                }
-
-                // check win condition
-                if (teamManager.countLivingTeams() == 1) {
-                    winMessage();
-                }
+            // check team death
+            int t = teamManager.getTeam(deadPlayer);
+            if (teamManager.isTeamEliminated(t)) {
+                BaseComponent[] teamEliminatedMessage;
+                teamEliminatedMessage = new ColoredText()
+                                            .appendColored(TeamDisplay.getName(t))
+                                            .append(" has been eliminated!")
+                                            .toComponents();
+                // this msg should be displayed after player death
+                (new DelayedMessage(teamEliminatedMessage)).runTaskLater(plugin, 1);
             }
 
-            Player killer = deadPlayer.getKiller();
-            if (killer != null) {
-                OptionalInt k = getKills(killer);
-                if (k.isPresent()) {
-                    this.kills.put(killer.getUniqueId(), k.orElseThrow() + 1);
-                    hudManager.updateKillsHUD(killer);
-                }
+            // set bed spawn
+            Location newSpawn = deadPlayer.getLocation();
+            if (newSpawn.getY() < 0) {
+                deadPlayer.setBedSpawnLocation(getUHCWorld(Environment.NORMAL).getSpawnLocation(), true);
+            } else {
+                deadPlayer.setBedSpawnLocation(newSpawn, true);
             }
 
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                hudManager.updateCombatantsAliveHUD(p);
-                hudManager.updateTeamsAliveHUD(p);
+            // check win condition
+            if (teamManager.countLivingTeams() == 1) {
+                winMessage();
             }
+        }
+
+        Player killer = deadPlayer.getKiller();
+        if (killer != null) {
+            OptionalInt k = getKills(killer);
+            if (k.isPresent()) {
+                this.kills.put(killer.getUniqueId(), k.orElseThrow() + 1);
+                hudManager.updateKillsHUD(killer);
+            }
+        }
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            hudManager.updateCombatantsAliveHUD(p);
+            hudManager.updateTeamsAliveHUD(p);
         }
     }
 
     @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
+    public void onPlayerRespawn(PlayerRespawnEvent e) {
         if (hasUHCStarted()) {
-            event.getPlayer().setGameMode(GameMode.SPECTATOR);
+            e.getPlayer().setGameMode(GameMode.SPECTATOR);
         }
     }
 
-    @EventHandler
-    public void onPlayerDamaged(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
 
-        if (hasUHCStarted()) {
-            Player p = (Player) event.getEntity();
-            // update hud if dmg taken
-            hudManager.updateTeammateHUDForViewers(p);
-            
-            // cancel friendlyFire
-            if (event instanceof EntityDamageByEntityEvent) {
-                var entd = ((EntityDamageByEntityEvent) event).getDamager(); 
-                if (entd instanceof Player) {
-                    Player damager = (Player) entd;
-                    if (teamManager.getTeam(p) == teamManager.getTeam(damager)) {
-                        event.setCancelled(true);
-                    }
-                }
-            }
+    @EventHandler
+    public void onPlayerFight(EntityDamageByEntityEvent e) {
+        // friendly fire
+        if (hasUHCStarted()) return;
+        if (!(e.getEntity() instanceof Player)) return;
+        if (!(e.getDamager() instanceof Player)) return;
+
+        Player target = (Player) e.getEntity();
+        Player damager = (Player) e.getDamager();
+        if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
+            e.setCancelled(true);
         }
     }
 }

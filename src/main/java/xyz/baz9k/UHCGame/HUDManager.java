@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -363,11 +364,18 @@ public class HUDManager implements Listener {
     }
     /* HANDLERS */
     @EventHandler
-    public void onMove(PlayerMoveEvent movement){
-        Player p = movement.getPlayer();
-        if (gameManager.hasUHCStarted()) {
-            updateTeammateHUDForViewers(p);
-        }
+    public void onMove(PlayerMoveEvent e){
+        if (!gameManager.hasUHCStarted()) return;
+        updateTeammateHUDForViewers(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerDamaged(EntityDamageEvent e) {
+        if (!gameManager.hasUHCStarted()) return;
+        if (!(e.getEntity() instanceof Player)) return;
+
+        // update hud if dmg taken
+        updateTeammateHUDForViewers((Player) e.getEntity());
     }
 
 }
