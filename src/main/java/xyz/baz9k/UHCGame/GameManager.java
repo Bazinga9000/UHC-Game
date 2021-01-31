@@ -174,6 +174,7 @@ public class GameManager implements Listener {
         }
 
         spreadPlayersByTeam(getCenter(), GameStage.WB_STILL.getWBSize() / 2.0, GameStage.WB_STILL.getWBSize() / 8.0);
+        Bukkit.unloadWorld(getLobbyWorld(), true);
 
         // begin uhc tick events
         tick = new GameTick(plugin);
@@ -327,6 +328,7 @@ public class GameManager implements Listener {
     }
 
     private void updateStage() {
+        if (!hasUHCStarted()) return;
         lastStageInstant = Instant.now();
         bbManager.updateBossbarStage();
 
@@ -575,6 +577,7 @@ public class GameManager implements Listener {
         Player p = e.getPlayer();
         teamManager.addPlayer(p);
         if(hasUHCStarted()) {
+            teamManager.setSpectator(p);
             bbManager.addPlayer(p);
             hudManager.initializePlayerHUD(p);
             hudManager.addPlayerToTeams(p);
