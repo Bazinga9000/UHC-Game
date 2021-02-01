@@ -191,7 +191,7 @@ public final class Utils {
         return getHighestLoc(w, p.x(), p.z());
     }
 
-    public static double randomDoubleInRange(double min, double max) {
+    public static double rand(double min, double max) {
         return min + ((max - min) * Math.random());
     }
 
@@ -224,8 +224,8 @@ public final class Utils {
     }
 
     public static Point2D uniformRandomPoint(double minX, double maxX, double minZ, double maxZ) {
-        double X = randomDoubleInRange(minX, maxX);
-        double Z = randomDoubleInRange(minZ, maxZ);
+        double X = rand(minX, maxX);
+        double Z = rand(minZ, maxZ);
         return new Point2D(X, Z);
     }
 
@@ -239,8 +239,8 @@ public final class Utils {
 
 
     public static Point2D ringRandomPoint(Point2D center, double minRadius, double maxRadius) {
-        double theta = randomDoubleInRange(0, 2 * Math.PI);
-        double radius = randomDoubleInRange(minRadius, maxRadius);
+        double theta = rand(0, 2 * Math.PI);
+        double radius = rand(minRadius, maxRadius);
         return center.add(radius * Math.cos(theta), radius * Math.sin(theta));
     }
 }
