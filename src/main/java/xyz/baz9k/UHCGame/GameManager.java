@@ -111,6 +111,7 @@ public class GameManager implements Listener {
             _startUHC();
             Debug.broadcastDebug("UHC started");
         } catch (Exception e) {
+            setStage(GameStage.NOT_IN_GAME);
             Debug.broadcastDebug("UHC cancelling start due to error");
             Debug.printError(e);
         }
@@ -201,6 +202,7 @@ public class GameManager implements Listener {
             _endUHC();
             Debug.broadcastDebug("UHC ended");
         } catch (Exception e) {
+            setStage(GameStage.WB_STILL);
             Debug.broadcastDebug("UHC cancelling end due to error");
             Debug.printError(e);
         }
