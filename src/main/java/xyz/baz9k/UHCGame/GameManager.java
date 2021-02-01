@@ -511,7 +511,7 @@ public class GameManager implements Listener {
             locations.add(getHighestLoc(w, X, Z));
         }
         Collections.shuffle(locations);
-        return locations;
+        return Collections.unmodifiableList(locations);
     }
 
     //poisson disk sampling
@@ -588,7 +588,7 @@ public class GameManager implements Listener {
         }
 
         Collections.shuffle(spawnableLocations);
-        return spawnableLocations.subList(0, numLocations);
+        return Collections.unmodifiableList(spawnableLocations.subList(0, numLocations));
 
     }
 

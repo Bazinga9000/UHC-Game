@@ -2,6 +2,7 @@ package xyz.baz9k.UHCGame.util;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -76,7 +77,7 @@ public final class Utils {
 
         long[] segs = {s / 3600, (s % 3600) / 60, (s % 60)};
         String[] unit = {"hour", "minute", "second"};
-        ArrayList<String> segStrs = new ArrayList<>();
+        List<String> segStrs = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
             long seg = segs[i];
