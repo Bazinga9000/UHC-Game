@@ -207,38 +207,4 @@ public final class Utils {
         Location blockLocation = l.add(0,-1,0);
         return (blockLocation.getBlock().getType() == Material.WATER);
     }
-
-
-    //point util functions
-    public static boolean isPointInSquare(Point2D l, Point2D center, double squareEdgeLength) {
-        double minX = center.x() - (squareEdgeLength/2);
-        double maxX = center.x() + (squareEdgeLength/2);
-        double minZ = center.z() - (squareEdgeLength/2);
-        double maxZ = center.z() + (squareEdgeLength/2);
-        return isPointInSquare(l, minX, maxX, minZ, maxZ);
-    }
-    public static boolean isPointInSquare(Point2D l, double minX, double maxX, double minZ, double maxZ) {
-        return (minX < l.x() && l.x() < maxX && minZ < l.z() && l.z() < maxZ);
-    }
-
-    public static Point2D uniformRandomPoint(double minX, double maxX, double minZ, double maxZ) {
-        double X = rand(minX, maxX);
-        double Z = rand(minZ, maxZ);
-        return new Point2D(X, Z);
-    }
-
-    public static Point2D uniformRandomPoint(Point2D center, double squareEdgeLength) {
-        double minX = center.x() - (squareEdgeLength/2);
-        double maxX = center.x() + (squareEdgeLength/2);
-        double minZ = center.z() - (squareEdgeLength/2);
-        double maxZ = center.z() + (squareEdgeLength/2);
-        return uniformRandomPoint(minX, maxX, minZ, maxZ);
-    }
-
-
-    public static Point2D ringRandomPoint(Point2D center, double minRadius, double maxRadius) {
-        double theta = rand(0, 2 * Math.PI);
-        double radius = rand(minRadius, maxRadius);
-        return center.add(radius * Math.cos(theta), radius * Math.sin(theta));
-    }
 }

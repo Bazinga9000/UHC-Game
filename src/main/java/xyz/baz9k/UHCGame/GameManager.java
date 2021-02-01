@@ -520,7 +520,7 @@ public class GameManager implements Listener {
         Random r = new Random();
         final int numPointsPerIteration = 30;
         World w = getUHCWorld(Environment.NORMAL);
-        Point2D firstLocation = uniformRandomPoint(center, squareEdgeLength);
+        Point2D firstLocation = Point2D.uniformRand(center, squareEdgeLength);
         activeList.add(firstLocation);
         samples.add(firstLocation);
 
@@ -529,9 +529,10 @@ public class GameManager implements Listener {
             Point2D search = activeList.get(index);
             Point2D toCheck = new Point2D(0,0);
             boolean success = false;
+
             for (int i = 0; i < numPointsPerIteration; i++) {
-                toCheck = ringRandomPoint(search, minimumSeparation, 2 * minimumSeparation);
-                if (!isPointInSquare(toCheck, center, squareEdgeLength)) {
+                toCheck = Point2D.ringRand(search, minimumSeparation, 2 * minimumSeparation);
+                if (!toCheck.inSquare(center, squareEdgeLength)) {
                     continue;
                 }
 
