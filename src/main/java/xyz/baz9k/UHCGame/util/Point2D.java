@@ -13,6 +13,11 @@ public class Point2D {
         this.z = z;
     }
 
+    public Point2D(Location l) {
+        this.x = l.getX();
+        this.z = l.getZ();
+    }
+
     public double x() { return x; }
     public double z() { return z; }
 
@@ -63,6 +68,10 @@ public class Point2D {
      */
     public Point2D add(double X, double Z) {
         return new Point2D(x + X, z + Z);
+    }
+
+    public Point2D addPolar(double r, double theta) {
+        return add(fromPolar(r, theta));
     }
 
     /**
@@ -150,6 +159,6 @@ public class Point2D {
     public static Point2D ringRand(Point2D center, double minRadius, double maxRadius) {
         double theta = rand(0, 2 * Math.PI);
         double radius = rand(minRadius, maxRadius);
-        return center.add(fromPolar(radius, theta));
+        return center.addPolar(radius, theta);
     }
 }
