@@ -502,8 +502,9 @@ public class GameManager implements Listener {
     }
 
     private List<Location> getRootsOfUnityLocations(Location center, int numLocations, double distance) {
-        ArrayList<Location> locations = new ArrayList<Location>();
+        List<Location> locations = new ArrayList<>();
         World w = getUHCWorld(Environment.NORMAL);
+        
         for (int i = 0; i < numLocations; i++) {
             double X = center.getX() + (distance * Math.cos(i * 2 * Math.PI / numLocations));
             double Z = center.getZ() + (distance * Math.sin(i * 2 * Math.PI / numLocations));
@@ -514,13 +515,15 @@ public class GameManager implements Listener {
     }
 
     //poisson disk sampling
-    private List<Location> getRandomLocations(Point2D center, int numLocations, double squareEdgeLength, double minimumSeparation) {
-        ArrayList<Point2D> samples = new ArrayList<>();
-        ArrayList<Point2D> activeList = new ArrayList<>();
+    private List<Location> getRandomLocations(Point2D center, int numLocations, double sideLength, double minSeparation) {
+        List<Point2D> samples = new ArrayList<>();
+        List<Point2D> activeList = new ArrayList<>();
         Random r = new Random();
-        final int numPointsPerIteration = 30;
         World w = getUHCWorld(Environment.NORMAL);
-        Point2D firstLocation = Point2D.uniformRand(center, squareEdgeLength);
+
+        final int POINTS_PER_ITER = 30;
+        
+        Point2D firstLocation = Point2D.uniformRand(center, sideLength);
         activeList.add(firstLocation);
         samples.add(firstLocation);
 
@@ -530,21 +533,21 @@ public class GameManager implements Listener {
             Point2D toCheck = new Point2D(0,0);
             boolean success = false;
 
-            for (int i = 0; i < numPointsPerIteration; i++) {
-                toCheck = Point2D.ringRand(search, minimumSeparation, 2 * minimumSeparation);
-                if (!toCheck.inSquare(center, squareEdgeLength)) {
+            for (int i = 0; i < POINTS_PER_ITER; i++) {
+                toCheck = Point2D.ringRand(search, minSeparation, 2 * minSeparation);
+                if (!toCheck.inSquare(center, sideLength)) {
                     continue;
                 }
 
-                double minimumDistance = Double.MAX_VALUE;
+                double minDist = Double.MAX_VALUE;
                 for (Point2D point : samples) {
                     double d = toCheck.dist(point);
-                    if (d < minimumDistance) {
-                        minimumDistance = d;
+                    if (d < minDist) {
+                        minDist = d;
                     }
                 }
 
-                if (minimumDistance < minimumSeparation) {
+                if (minDist < minSeparation) {
                     continue;
                 }
 
@@ -563,8 +566,8 @@ public class GameManager implements Listener {
 
         Debug.broadcastDebug(samples.size() + " points generated.");
 
-        ArrayList<Location> spawnableLocations = new ArrayList<>();
-        ArrayList<Location> overWaterLocations = new ArrayList<>();
+        List<Location> spawnableLocations = new ArrayList<>();
+        List<Location> overWaterLocations = new ArrayList<>();
         for (Point2D samplePoint : samples) {
             Location sample = getHighestLoc(w, samplePoint);
             if (isLocationSpawnable(sample)) {
@@ -590,7 +593,7 @@ public class GameManager implements Listener {
     }
 
     /*
-    private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minimumSeparation) {
+    private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minSeparation) {
         ArrayList<Location> locations = new ArrayList<>();
         Random r = new Random();
         World w = getUHCWorld(Environment.NORMAL);
@@ -602,11 +605,11 @@ public class GameManager implements Listener {
                 double z = center.getZ() + (r.nextDouble() - 0.5) * maximumRange;
 
                 if (!locations.isEmpty()) {
-                    double minimumDistance = locations.stream()
+                    double minDist = locations.stream()
                                                       .map(l -> euclideanDistance(x, z, l.getX(), l.getZ()))
                                                       .min(Double::compareTo)
                                                       .orElseThrow();
-                    if (minimumDistance < minimumSeparation) {
+                    if (minDist < minSeparation) {
                         continue;
                     }
                 }
@@ -659,10 +662,10 @@ public class GameManager implements Listener {
      * @param respectTeams
      * @param center
      * @param maximumRange
-     * @param minimumSeparation
+     * @param minSeparation
      */
-    public void spreadPlayersRandom(boolean respectTeams, Point2D center, double maximumRange, double minimumSeparation) {
-        spreadPlayers(respectTeams, n -> getRandomLocations(center, n, maximumRange, minimumSeparation));
+    public void spreadPlayersRandom(boolean respectTeams, Point2D center, double maximumRange, double minSeparation) {
+        spreadPlayers(respectTeams, n -> getRandomLocations(center, n, maximumRange, minSeparation));
     }
 
     /**
