@@ -366,6 +366,7 @@ public class HUDManager implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e){
         if (!gameManager.hasUHCStarted()) return;
+        updateMovementHUD(e.getPlayer());
         updateTeammateHUDForViewers(e.getPlayer());
     }
 
