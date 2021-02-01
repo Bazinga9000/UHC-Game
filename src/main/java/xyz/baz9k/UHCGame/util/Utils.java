@@ -2,7 +2,6 @@ package xyz.baz9k.UHCGame.util;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -169,16 +168,16 @@ public final class Utils {
         }.runTaskLater(plugin, delay);
     }
 
+    public static Location getHighestStandingLoc(World w, double X, double Z) {
+        return new Location(w, X, 0, Z).toHighestLocation().add(0, 1, 0);
+    }
+
+    public static double randDoubleInRange(double min, double max) {
+        return min + ((max - min) * Math.random());
+    }
 
     //random location generation
 
-    public static Location getMaxYLocation(World w, double X, double Z) {
-        return w.getHighestBlockAt((int) X, (int) Z).getLocation().add(0, 1, 0);
-    }
-
-    public static double randomDoubleInRange(Random r, double min, double max) {
-        return min + ((max - min) * r.nextDouble());
-    }
 
     public static boolean isLocationSpawnable(Location l) {
         Location blockLocation = l.add(0, -1, 0);
@@ -198,10 +197,9 @@ public final class Utils {
     }
 
     public static Location uniformRandomLocation(World w, double minX, double maxX, double minZ, double maxZ) {
-        Random r = new Random();
-        double X = randomDoubleInRange(r, minX, maxX);
-        double Z = randomDoubleInRange(r, minZ, maxZ);
-        return getMaxYLocation(w, X, Z);
+        double X = randDoubleInRange(minX, maxX);
+        double Z = randDoubleInRange(minZ, maxZ);
+        return getHighestStandingLoc(w, X, Z);
     }
 
     public static Location uniformRandomSpawnableLocation(World w, double minX, double maxX, double minZ, double maxZ) {
@@ -216,12 +214,11 @@ public final class Utils {
     }
 
     public static Location ringRandomLocation(World w, double centerX, double centerZ, double minRadius, double maxRadius) {
-        Random r = new Random();
-        double theta = randomDoubleInRange(r, 0, 2 * Math.PI);
-        double radius = randomDoubleInRange(r, minRadius, maxRadius);
+        double theta = randDoubleInRange(0, 2 * Math.PI);
+        double radius = randDoubleInRange(minRadius, maxRadius);
         double X = centerX + radius * Math.cos(theta);
         double Z = centerZ + radius * Math.sin(theta);
-        return getMaxYLocation(w, X, Z);
+        return getHighestStandingLoc(w, X, Z);
     }
 
     public static Location ringRandomSpawnableLocation(World w, double centerX, double centerZ, double minRadius, double maxRadius) {
