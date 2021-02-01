@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.IntFunction;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
@@ -629,6 +630,29 @@ public class GameManager implements Listener {
     }
     */
 
+    // TODO: spreadPlayers groups, for groups not aligning with teams
+    /**
+     * Spreads players to a list of locations by the given generator
+     * @param respectTeams Should teams be separated together?
+     * @param locGenerator Takes in int n, returns a list of locations of size n
+     */
+    private void spreadPlayers(boolean respectTeams, IntFunction<List<Location>> locGenerator) {
+        if (respectTeams) {
+            List<Collection<Player>> groups = new ArrayList<>();
+            for (int i : teamManager.getAliveTeams()) {
+                groups.add(teamManager.getAllCombatantsOnTeam(i));
+            }
+            
+            List<Location> loc = locGenerator.apply(groups.size());
+            teleportPlayersToLocations(groups, loc);
+        } else {
+            Collection<Player> players = teamManager.getAllCombatants();
+
+            List<Location> loc = locGenerator.apply(players.size());
+            teleportPlayersToLocations(players, loc);
+        }
+    }
+
     /**
      * Spreads players randomly
      * @param respectTeams
@@ -637,18 +661,7 @@ public class GameManager implements Listener {
      * @param minimumSeparation
      */
     public void spreadPlayersRandom(boolean respectTeams, Point2D center, double maximumRange, double minimumSeparation) {
-        if (respectTeams) {
-            List<Collection<Player>> groups = new ArrayList<>();
-            for (int i : teamManager.getAliveTeams()) {
-                groups.add(teamManager.getAllCombatantsOnTeam(i));
-            }
-            List<Location> locations = getRandomLocations(center, groups.size(), maximumRange, minimumSeparation);
-            teleportPlayersToLocations(groups, locations);
-        } else {
-            Collection<Player> players = teamManager.getAllCombatants();
-            List<Location> locations = getRandomLocations(center, players.size(), maximumRange, minimumSeparation);
-            teleportPlayersToLocations(players, locations);
-        }
+        spreadPlayers(respectTeams, n -> getRandomLocations(center, n, maximumRange, minimumSeparation));
     }
 
     /**
@@ -658,19 +671,7 @@ public class GameManager implements Listener {
      * @param distance
      */
     public void spreadPlayersRootsOfUnity(boolean respectTeams, Location center, double distance) {
-        List<Location> locations;
-        if (respectTeams) {
-            List<Collection<Player>> groups = new ArrayList<>();
-            for (int i : teamManager.getAliveTeams()) {
-                groups.add(teamManager.getAllCombatantsOnTeam(i));
-            }
-            locations = getRootsOfUnityLocations(center, groups.size(), distance);
-            teleportPlayersToLocations(groups, locations);
-        } else {
-            Collection<Player> players = teamManager.getAllCombatants();
-            locations = getRootsOfUnityLocations(center, players.size(), distance);
-            teleportPlayersToLocations(players, locations);
-        }
+        spreadPlayers(respectTeams, n -> getRootsOfUnityLocations(center, n, distance));
     }
 
     private void teleportPlayersToLocations(Collection<Player> players, List<Location> locations) {
