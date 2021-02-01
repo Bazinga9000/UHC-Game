@@ -170,7 +170,7 @@ public class GameManager implements Listener {
         }
 
         Debug.broadcastDebug("Generating Spawn Locations");
-        spreadPlayersRandom(true, new Point2D(0,0), GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
+        spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
         Debug.broadcastDebug("Done!");
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
@@ -502,28 +502,29 @@ public class GameManager implements Listener {
     }
 
     private List<Location> getRootsOfUnityLocations(Location center, int numLocations, double distance) {
+        Point2D center2 = new Point2D(center);
         List<Location> locations = new ArrayList<>();
-        World w = getUHCWorld(Environment.NORMAL);
-        
+        World w = center.getWorld();
+
         for (int i = 0; i < numLocations; i++) {
-            double X = center.getX() + (distance * Math.cos(i * 2 * Math.PI / numLocations));
-            double Z = center.getZ() + (distance * Math.sin(i * 2 * Math.PI / numLocations));
-            locations.add(getHighestLoc(w, X, Z));
+            double theta = i * 2 * Math.PI / numLocations;
+            center2.addPolar(distance, theta);
+            locations.add(getHighestLoc(w, center2));
         }
         Collections.shuffle(locations);
         return Collections.unmodifiableList(locations);
     }
 
     //poisson disk sampling
-    private List<Location> getRandomLocations(Point2D center, int numLocations, double sideLength, double minSeparation) {
+    private List<Location> getRandomLocations(Location center, int numLocations, double sideLength, double minSeparation) {
+        Point2D center2 = new Point2D(center);
         List<Point2D> samples = new ArrayList<>();
         List<Point2D> activeList = new ArrayList<>();
         Random r = new Random();
-        World w = getUHCWorld(Environment.NORMAL);
 
         final int POINTS_PER_ITER = 30;
         
-        Point2D firstLocation = Point2D.uniformRand(center, sideLength);
+        Point2D firstLocation = Point2D.uniformRand(center2, sideLength);
         activeList.add(firstLocation);
         samples.add(firstLocation);
 
@@ -535,7 +536,7 @@ public class GameManager implements Listener {
 
             for (int i = 0; i < POINTS_PER_ITER; i++) {
                 toCheck = Point2D.ringRand(search, minSeparation, 2 * minSeparation);
-                if (!toCheck.inSquare(center, sideLength)) {
+                if (!toCheck.inSquare(center2, sideLength)) {
                     continue;
                 }
 
@@ -568,6 +569,7 @@ public class GameManager implements Listener {
 
         List<Location> spawnableLocations = new ArrayList<>();
         List<Location> overWaterLocations = new ArrayList<>();
+        World w = center.getWorld();
         for (Point2D samplePoint : samples) {
             Location sample = getHighestLoc(w, samplePoint);
             if (isLocationSpawnable(sample)) {
@@ -664,7 +666,7 @@ public class GameManager implements Listener {
      * @param maximumRange
      * @param minSeparation
      */
-    public void spreadPlayersRandom(boolean respectTeams, Point2D center, double maximumRange, double minSeparation) {
+    public void spreadPlayersRandom(boolean respectTeams, Location center, double maximumRange, double minSeparation) {
         spreadPlayers(respectTeams, n -> getRandomLocations(center, n, maximumRange, minSeparation));
     }
 
