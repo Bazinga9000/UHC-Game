@@ -171,7 +171,7 @@ public class GameManager implements Listener {
         }
 
         Debug.broadcastDebug("Generating Spawn Locations");
-        spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBRadius(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
+        spreadPlayersRandom(true, new double[]{0,0}, GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
         Debug.broadcastDebug("Done!");
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
@@ -520,43 +520,44 @@ public class GameManager implements Listener {
     }
 
     //poisson disk sampling
-    private List<Location> getRandomLocations(Location center, int numLocations, double squareEdgeLength, double minimumSeparation) {
-        ArrayList<Location> samples = new ArrayList<>();
-        ArrayList<Location> activeList = new ArrayList<>();
+    private List<Location> getRandomLocations(double[] center, int numLocations, double squareEdgeLength, double minimumSeparation) {
+        ArrayList<double[]> samples = new ArrayList<>();
+        ArrayList<double[]> activeList = new ArrayList<>();
         Random r = new Random();
-
-        double minX = center.getX() - (squareEdgeLength/2);
-        double maxX = center.getX() + (squareEdgeLength/2);
-        double minZ = center.getZ() - (squareEdgeLength/2);
-        double maxZ = center.getZ() + (squareEdgeLength/2);
-
+        Debug.broadcastDebug("Center: (" + center[0] + "," + center[1] + ")");
+        Debug.broadcastDebug("Numer of Loactions: " + numLocations);
+        Debug.broadcastDebug("Square Edge Length: " + squareEdgeLength);
+        Debug.broadcastDebug("Minimum Sepraration Distance: " + minimumSeparation);
         final int numPointsPerIteration = 30;
         World w = getUHCWorld(Environment.NORMAL);
-        Location firstLocation = uniformRandomSpawnableLocation(w, minX, maxX, minZ, maxZ);
+        double[] firstLocation = uniformRandomPoint(center, squareEdgeLength);
         activeList.add(firstLocation);
         samples.add(firstLocation);
 
         int count = 0;
         while (!activeList.isEmpty()) {
             count++;
-            if (count % 5 == 0) {
-                Debug.broadcastDebug(samples.size() + " Samples, " + activeList.size() + " Active");
+            if (count % 100 == 0) {
+                Debug.broadcastDebug(count + " Iterations, " + samples.size() + " Samples, " + activeList.size() + " Active.");
             }
             int index = r.nextInt(activeList.size());
-            Location search = activeList.get(index);
-            Location toCheck = ringRandomSpawnableLocation(w, search.getX(), search.getZ(), minimumSeparation, 2 * minimumSeparation);
+            double[] search = activeList.get(index);
+            double[] toCheck = {0,0};
             boolean success = false;
             for (int i = 0; i < numPointsPerIteration; i++) {
-                toCheck = ringRandomSpawnableLocation(w, search.getX(), search.getZ(), minimumSeparation, 2 * minimumSeparation);
-                if (!isLocationInSquare(toCheck, center, squareEdgeLength)) {
+                toCheck = ringRandomPoint(search[0], search[1], minimumSeparation, 2 * minimumSeparation);
+                if (!isPointInSquare(toCheck, center, squareEdgeLength)) {
                     continue;
                 }
-                double x = toCheck.getX();
-                double z = toCheck.getZ();
-                double minimumDistance = samples.stream()
-                        .map(l -> euclideanDistance(x, z, l.getX(), l.getZ()))
-                        .min(Double::compareTo)
-                        .orElseThrow();
+                double x = toCheck[0];
+                double z = toCheck[1];
+                double minimumDistance = Double.MAX_VALUE;
+                for (double[] point : samples) {
+                    double d = euclideanDistance(x, z, point[0], point[1]);
+                    if (d < minimumDistance) {
+                        minimumDistance = d;
+                    }
+                }
 
                 if (minimumDistance < minimumSeparation) {
                     continue;
@@ -575,8 +576,31 @@ public class GameManager implements Listener {
             }
         }
 
-        Collections.shuffle(samples);
-        return samples.subList(0, numLocations);
+        Debug.broadcastDebug(samples.size() + " points generated.");
+
+        ArrayList<Location> spawnableLocations = new ArrayList<>();
+        ArrayList<Location> overWaterLocations = new ArrayList<>();
+        for (double[] samplePoint : samples) {
+            Location sample = getMaxYLocation(w, samplePoint);
+            if (isLocationSpawnable(sample)) {
+                spawnableLocations.add(sample);
+            } else if (isLocationOverWater(sample)) {
+                overWaterLocations.add(sample);
+            }
+        }
+        int totalSize = spawnableLocations.size() + overWaterLocations.size();
+        if (totalSize < numLocations) {
+            throw new IllegalStateException("Not enough locations (" + totalSize + ") were generated.");
+        }
+
+        if (spawnableLocations.size() < numLocations) {
+            int numOverWaterLocations = numLocations - spawnableLocations.size();
+            Collections.shuffle(overWaterLocations);
+            spawnableLocations.addAll(overWaterLocations.subList(0, numOverWaterLocations));
+        }
+
+        Collections.shuffle(spawnableLocations);
+        return spawnableLocations.subList(0, numLocations);
 
     }
 
@@ -629,7 +653,7 @@ public class GameManager implements Listener {
      * @param maximumRange
      * @param minimumSeparation
      */
-    public void spreadPlayersRandom(boolean respectTeams, Location center, double maximumRange, double minimumSeparation) {
+    public void spreadPlayersRandom(boolean respectTeams, double[] center, double maximumRange, double minimumSeparation) {
         if (respectTeams) {
             List<Collection<Player>> groups = new ArrayList<>();
             for (int i : teamManager.getAliveTeams()) {

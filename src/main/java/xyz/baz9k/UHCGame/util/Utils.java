@@ -176,62 +176,62 @@ public final class Utils {
         return w.getHighestBlockAt((int) X, (int) Z).getLocation().add(0, 1, 0);
     }
 
+    public static Location getMaxYLocation(World w, double[] point) {
+        return w.getHighestBlockAt((int) point[0], (int) point[1]).getLocation().add(0, 1, 0);
+    }
     public static double randomDoubleInRange(Random r, double min, double max) {
         return min + ((max - min) * r.nextDouble());
     }
 
     public static boolean isLocationSpawnable(Location l) {
-        Location blockLocation = l.add(0, -1, 0);
-        Material b = blockLocation.getBlock().getType();
-        return (b != Material.LAVA && b != Material.WATER);
+        return (!isLocationOverLava(l) && !isLocationOverWater(l));
     }
 
-    public static boolean isLocationInSquare(Location l, Location center, double squareEdgeLength) {
-        double minX = center.getX() - (squareEdgeLength/2);
-        double maxX = center.getX() + (squareEdgeLength/2);
-        double minZ = center.getZ() - (squareEdgeLength/2);
-        double maxZ = center.getZ() + (squareEdgeLength/2);
-        return isLocationInSquare(l, minX, maxX, minZ, maxZ);
-    }
-    public static boolean isLocationInSquare(Location l, double minX, double maxX, double minZ, double maxZ) {
-        return (minX < l.getX() && l.getX() < maxX && minZ < l.getZ() && l.getZ() < maxZ);
+    public static boolean isLocationOverLava(Location l) {
+        Location blockLocation = l.add(0,-1,0);
+        return (blockLocation.getBlock().getType() == Material.LAVA);
     }
 
-    public static Location uniformRandomLocation(World w, double minX, double maxX, double minZ, double maxZ) {
+    public static boolean isLocationOverWater(Location l) {
+        Location blockLocation = l.add(0,-1,0);
+        return (blockLocation.getBlock().getType() == Material.WATER);
+    }
+
+
+    //point util functions
+    public static boolean isPointInSquare(double[] l, double[] center, double squareEdgeLength) {
+        double minX = center[0] - (squareEdgeLength/2);
+        double maxX = center[0] + (squareEdgeLength/2);
+        double minZ = center[1] - (squareEdgeLength/2);
+        double maxZ = center[1] + (squareEdgeLength/2);
+        return isPointInSquare(l, minX, maxX, minZ, maxZ);
+    }
+    public static boolean isPointInSquare(double[] l, double minX, double maxX, double minZ, double maxZ) {
+        return (minX < l[0] && l[0] < maxX && minZ < l[1] && l[1] < maxZ);
+    }
+
+    public static double[] uniformRandomPoint(double minX, double maxX, double minZ, double maxZ) {
         Random r = new Random();
         double X = randomDoubleInRange(r, minX, maxX);
         double Z = randomDoubleInRange(r, minZ, maxZ);
-        return getMaxYLocation(w, X, Z);
+        return new double[]{X, Z};
     }
 
-    public static Location uniformRandomSpawnableLocation(World w, double minX, double maxX, double minZ, double maxZ) {
-        Location l = uniformRandomLocation(w, minX, maxX, minZ, maxZ);
-        for (int i = 0; i < 30; i++) {
-            l = uniformRandomLocation(w, minX, maxX, minZ, maxZ);
-            if (isLocationSpawnable(l)) {
-                break;
-            }
-        }
-        return l;
+    public static double[] uniformRandomPoint(double[] center, double squareEdgeLength) {
+        double minX = center[0] - (squareEdgeLength/2);
+        double maxX = center[0] + (squareEdgeLength/2);
+        double minZ = center[1] - (squareEdgeLength/2);
+        double maxZ = center[1] + (squareEdgeLength/2);
+        return uniformRandomPoint(minX, maxX, minZ, maxZ);
     }
 
-    public static Location ringRandomLocation(World w, double centerX, double centerZ, double minRadius, double maxRadius) {
+
+    public static double[] ringRandomPoint(double centerX, double centerZ, double minRadius, double maxRadius) {
         Random r = new Random();
         double theta = randomDoubleInRange(r, 0, 2 * Math.PI);
         double radius = randomDoubleInRange(r, minRadius, maxRadius);
         double X = centerX + radius * Math.cos(theta);
         double Z = centerZ + radius * Math.sin(theta);
-        return getMaxYLocation(w, X, Z);
-    }
-
-    public static Location ringRandomSpawnableLocation(World w, double centerX, double centerZ, double minRadius, double maxRadius) {
-        Location l = ringRandomLocation(w, centerX, centerZ, minRadius, maxRadius);
-        for (int i = 0; i < 30; i++) {
-            l = ringRandomLocation(w, centerX, centerZ, minRadius, maxRadius);
-            if (isLocationSpawnable(l)) {
-                break;
-            }
-        }
-        return l;
+        return new double[]{X,Z};
     }
 }
