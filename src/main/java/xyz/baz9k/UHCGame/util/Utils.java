@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import xyz.baz9k.UHCGame.UHCGame;
@@ -136,6 +136,7 @@ public final class Utils {
      * @param y1
      * @param y2
      * @return distance calculation
+     * @see Point2D#dist(Point2D)
      */
     public static double euclideanDistance(double x1, double x2, double y1, double y2) {
         return Math.hypot(x1 - x2, y1 - y2);
@@ -146,13 +147,12 @@ public final class Utils {
      * @param m
      * @param plugin
      * @param delay
+     * @return BukkitTask of the message (can be cancelled)
      */
-    public static void delayedMessage(String m, UHCGame plugin, long delay) {
-        new BukkitRunnable() {
-            public void run() {
-                Bukkit.broadcastMessage(m);
-            }
-        }.runTaskLater(plugin, delay);
+    public static BukkitTask delayedMessage(String m, UHCGame plugin, long delay) {
+        return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Bukkit.broadcastMessage(m);
+        }, delay);
     }
     
     /**
@@ -160,13 +160,12 @@ public final class Utils {
      * @param m
      * @param plugin
      * @param delay
+     * @return BukkitTask of the message (can be cancelled)
      */
-    public static void delayedMessage(BaseComponent[] m, UHCGame plugin, long delay) {
-        new BukkitRunnable() {
-            public void run() {
-                Bukkit.broadcast(m);
-            }
-        }.runTaskLater(plugin, delay);
+    public static BukkitTask delayedMessage(BaseComponent[] m, UHCGame plugin, long delay) {
+        return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Bukkit.broadcast(m);
+        }, delay);
     }
 
 

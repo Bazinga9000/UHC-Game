@@ -18,7 +18,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -49,7 +49,7 @@ public class GameManager implements Listener {
     private HUDManager hudManager;
     private BossbarManager bbManager;
     private Recipes recipes;
-    private BukkitRunnable tick;
+    private BukkitTask tick;
 
     private Instant startTime = null;
     
@@ -243,25 +243,21 @@ public class GameManager implements Listener {
         }
     }
 
-    private void startTick() {
-        tick = new BukkitRunnable() {
-            public void run() {
-                if (!hasUHCStarted()) return;
-
-                bbManager.tick();
-                
-                if (isStageComplete()) {
-                    incrementStage();
-                }
-                
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    hudManager.updateElapsedTimeHUD(p);
-                    hudManager.updateWBHUD(p);
-                }
+    private BukkitTask startTick() {
+        return Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            if (!hasUHCStarted()) return;
+    
+            bbManager.tick();
+            
+            if (isStageComplete()) {
+                incrementStage();
             }
-        };
-
-        tick.runTaskTimer(plugin, 0L, 1L);
+            
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                hudManager.updateElapsedTimeHUD(p);
+                hudManager.updateWBHUD(p);
+            }
+        }, 0L, 1L);
     }
 
     /**
