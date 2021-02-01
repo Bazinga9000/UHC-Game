@@ -169,7 +169,9 @@ public class GameManager implements Listener {
             }
         }
 
-        spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBRadius(), GameStage.WB_STILL.getWBRadius() / 4);
+        Debug.broadcastDebug("Generating Spawn Locations");
+        spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBRadius(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
+        Debug.broadcastDebug("Done!");
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
         startTick();
@@ -515,6 +517,68 @@ public class GameManager implements Listener {
         return locations;
     }
 
+    //poisson disk sampling
+    private List<Location> getRandomLocations(Location center, int numLocations, double squareEdgeLength, double minimumSeparation) {
+        ArrayList<Location> samples = new ArrayList<>();
+        ArrayList<Location> activeList = new ArrayList<>();
+        Random r = new Random();
+
+        double minX = center.getX() - (squareEdgeLength/2);
+        double maxX = center.getX() + (squareEdgeLength/2);
+        double minZ = center.getZ() - (squareEdgeLength/2);
+        double maxZ = center.getZ() + (squareEdgeLength/2);
+
+        final int numPointsPerIteration = 30;
+        World w = getUHCWorld(Environment.NORMAL);
+        Location firstLocation = uniformRandomSpawnableLocation(w, minX, maxX, minZ, maxZ);
+        activeList.add(firstLocation);
+        samples.add(firstLocation);
+
+        int count = 0;
+        while (!activeList.isEmpty()) {
+            count++;
+            if (count % 5 == 0) {
+                Debug.broadcastDebug(samples.size() + " Samples, " + activeList.size() + " Active");
+            }
+            int index = r.nextInt(activeList.size());
+            Location search = activeList.get(index);
+            Location toCheck = ringRandomSpawnableLocation(w, search.getX(), search.getZ(), minimumSeparation, 2 * minimumSeparation);
+            boolean success = false;
+            for (int i = 0; i < numPointsPerIteration; i++) {
+                toCheck = ringRandomSpawnableLocation(w, search.getX(), search.getZ(), minimumSeparation, 2 * minimumSeparation);
+                if (!isLocationInSquare(toCheck, center, squareEdgeLength)) {
+                    continue;
+                }
+                double x = toCheck.getX();
+                double z = toCheck.getZ();
+                double minimumDistance = samples.stream()
+                        .map(l -> euclideanDistance(x, z, l.getX(), l.getZ()))
+                        .min(Double::compareTo)
+                        .orElseThrow();
+
+                if (minimumDistance < minimumSeparation) {
+                    continue;
+                }
+
+                success = true;
+                break;
+
+            }
+
+            if (success) {
+                activeList.add(toCheck);
+                samples.add(toCheck);
+            } else {
+                activeList.remove(index);
+            }
+        }
+
+        Collections.shuffle(samples);
+        return samples.subList(0, numLocations);
+
+    }
+
+    /*
     private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minimumSeparation) {
         ArrayList<Location> locations = new ArrayList<>();
         Random r = new Random();
@@ -554,6 +618,7 @@ public class GameManager implements Listener {
         }
         return locations;
     }
+    */
 
     /**
      * Spreads players randomly
