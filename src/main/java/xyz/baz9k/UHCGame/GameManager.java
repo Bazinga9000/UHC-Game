@@ -22,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import net.md_5.bungee.api.chat.BaseComponent;
+import xyz.baz9k.UHCGame.poisson.Point2D;
 import xyz.baz9k.UHCGame.util.ColoredText;
 import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
@@ -56,7 +57,7 @@ public class GameManager implements Listener {
 
     private HashMap<UUID, Integer> kills = new HashMap<>();
 
-    private final double[] center = {0.5, 0.5};
+    private final Point2D center = new Point2D(0, 0);
 
     private GameStage stage = GameStage.NOT_IN_GAME;
     private Instant lastStageInstant = null;
@@ -151,7 +152,7 @@ public class GameManager implements Listener {
             w.setTime(0);
             w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
             
-            w.getWorldBorder().setCenter(center[0], center[1]);
+            w.getWorldBorder().setCenter(center.x(), center.z());
             w.getWorldBorder().setWarningDistance(25);
 
             Gamerules.set(w);
@@ -171,7 +172,7 @@ public class GameManager implements Listener {
         }
 
         Debug.broadcastDebug("Generating Spawn Locations");
-        spreadPlayersRandom(true, new double[]{0,0}, GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
+        spreadPlayersRandom(true, new Point2D(0,0), GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
         Debug.broadcastDebug("Done!");
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
@@ -483,7 +484,7 @@ public class GameManager implements Listener {
         return getCenterAtY(0);
     }
     private Location getCenterAtY(double y) {
-        return new Location(getUHCWorld(Environment.NORMAL), center[0], y, center[1]);
+        return center.loc(getUHCWorld(Environment.NORMAL), y);
     }
 
     /*
@@ -519,30 +520,30 @@ public class GameManager implements Listener {
     }
 
     //poisson disk sampling
-    private List<Location> getRandomLocations(double[] center, int numLocations, double squareEdgeLength, double minimumSeparation) {
-        ArrayList<double[]> samples = new ArrayList<>();
-        ArrayList<double[]> activeList = new ArrayList<>();
+    private List<Location> getRandomLocations(Point2D center, int numLocations, double squareEdgeLength, double minimumSeparation) {
+        ArrayList<Point2D> samples = new ArrayList<>();
+        ArrayList<Point2D> activeList = new ArrayList<>();
         Random r = new Random();
         final int numPointsPerIteration = 30;
         World w = getUHCWorld(Environment.NORMAL);
-        double[] firstLocation = uniformRandomPoint(center, squareEdgeLength);
+        Point2D firstLocation = uniformRandomPoint(center, squareEdgeLength);
         activeList.add(firstLocation);
         samples.add(firstLocation);
 
         while (!activeList.isEmpty()) {
             int index = r.nextInt(activeList.size());
-            double[] search = activeList.get(index);
-            double[] toCheck = {0,0};
+            Point2D search = activeList.get(index);
+            Point2D toCheck = new Point2D(0,0);
             boolean success = false;
             for (int i = 0; i < numPointsPerIteration; i++) {
-                toCheck = ringRandomPoint(search[0], search[1], minimumSeparation, 2 * minimumSeparation);
+                toCheck = ringRandomPoint(search, minimumSeparation, 2 * minimumSeparation);
                 if (!isPointInSquare(toCheck, center, squareEdgeLength)) {
                     continue;
                 }
 
                 double minimumDistance = Double.MAX_VALUE;
-                for (double[] point : samples) {
-                    double d = euclideanDistance(toCheck, point);
+                for (Point2D point : samples) {
+                    double d = toCheck.dist(point);
                     if (d < minimumDistance) {
                         minimumDistance = d;
                     }
@@ -569,7 +570,7 @@ public class GameManager implements Listener {
 
         ArrayList<Location> spawnableLocations = new ArrayList<>();
         ArrayList<Location> overWaterLocations = new ArrayList<>();
-        for (double[] samplePoint : samples) {
+        for (Point2D samplePoint : samples) {
             Location sample = getHighestLoc(w, samplePoint);
             if (isLocationSpawnable(sample)) {
                 spawnableLocations.add(sample);
@@ -642,7 +643,7 @@ public class GameManager implements Listener {
      * @param maximumRange
      * @param minimumSeparation
      */
-    public void spreadPlayersRandom(boolean respectTeams, double[] center, double maximumRange, double minimumSeparation) {
+    public void spreadPlayersRandom(boolean respectTeams, Point2D center, double maximumRange, double minimumSeparation) {
         if (respectTeams) {
             List<Collection<Player>> groups = new ArrayList<>();
             for (int i : teamManager.getAliveTeams()) {

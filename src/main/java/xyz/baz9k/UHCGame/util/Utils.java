@@ -2,7 +2,6 @@ package xyz.baz9k.UHCGame.util;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,6 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import xyz.baz9k.UHCGame.UHCGame;
+import xyz.baz9k.UHCGame.poisson.Point2D;
 
 public final class Utils {
     private Utils() {}
@@ -141,10 +141,6 @@ public final class Utils {
         return Math.hypot(x1 - x2, y1 - y2);
     }
 
-    public static double euclideanDistance(double[] p, double[] q) {
-        return euclideanDistance(p[0], q[0], p[1], q[1]);
-    }
-
     /**
      * Send a message after some delay.
      * @param m
@@ -188,15 +184,15 @@ public final class Utils {
     /**
      * Get highest location that a player can be tp'd to and be standing.
      * @param w
-     * @param point
+     * @param p
      * @return loc
      */
-    public static Location getHighestLoc(World w, double[] point) {
-        return getHighestLoc(w, point[0], point[1]);
+    public static Location getHighestLoc(World w, Point2D p) {
+        return getHighestLoc(w, p.x(), p.z());
     }
 
-    public static double randomDoubleInRange(Random r, double min, double max) {
-        return min + ((max - min) * r.nextDouble());
+    public static double randomDoubleInRange(double min, double max) {
+        return min + ((max - min) * Math.random());
     }
 
     //random location generation
@@ -216,39 +212,35 @@ public final class Utils {
 
 
     //point util functions
-    public static boolean isPointInSquare(double[] l, double[] center, double squareEdgeLength) {
-        double minX = center[0] - (squareEdgeLength/2);
-        double maxX = center[0] + (squareEdgeLength/2);
-        double minZ = center[1] - (squareEdgeLength/2);
-        double maxZ = center[1] + (squareEdgeLength/2);
+    public static boolean isPointInSquare(Point2D l, Point2D center, double squareEdgeLength) {
+        double minX = center.x() - (squareEdgeLength/2);
+        double maxX = center.x() + (squareEdgeLength/2);
+        double minZ = center.z() - (squareEdgeLength/2);
+        double maxZ = center.z() + (squareEdgeLength/2);
         return isPointInSquare(l, minX, maxX, minZ, maxZ);
     }
-    public static boolean isPointInSquare(double[] l, double minX, double maxX, double minZ, double maxZ) {
-        return (minX < l[0] && l[0] < maxX && minZ < l[1] && l[1] < maxZ);
+    public static boolean isPointInSquare(Point2D l, double minX, double maxX, double minZ, double maxZ) {
+        return (minX < l.x() && l.x() < maxX && minZ < l.z() && l.z() < maxZ);
     }
 
-    public static double[] uniformRandomPoint(double minX, double maxX, double minZ, double maxZ) {
-        Random r = new Random();
-        double X = randomDoubleInRange(r, minX, maxX);
-        double Z = randomDoubleInRange(r, minZ, maxZ);
-        return new double[]{X, Z};
+    public static Point2D uniformRandomPoint(double minX, double maxX, double minZ, double maxZ) {
+        double X = randomDoubleInRange(minX, maxX);
+        double Z = randomDoubleInRange(minZ, maxZ);
+        return new Point2D(X, Z);
     }
 
-    public static double[] uniformRandomPoint(double[] center, double squareEdgeLength) {
-        double minX = center[0] - (squareEdgeLength/2);
-        double maxX = center[0] + (squareEdgeLength/2);
-        double minZ = center[1] - (squareEdgeLength/2);
-        double maxZ = center[1] + (squareEdgeLength/2);
+    public static Point2D uniformRandomPoint(Point2D center, double squareEdgeLength) {
+        double minX = center.x() - (squareEdgeLength/2);
+        double maxX = center.x() + (squareEdgeLength/2);
+        double minZ = center.z() - (squareEdgeLength/2);
+        double maxZ = center.z() + (squareEdgeLength/2);
         return uniformRandomPoint(minX, maxX, minZ, maxZ);
     }
 
 
-    public static double[] ringRandomPoint(double centerX, double centerZ, double minRadius, double maxRadius) {
-        Random r = new Random();
-        double theta = randomDoubleInRange(r, 0, 2 * Math.PI);
-        double radius = randomDoubleInRange(r, minRadius, maxRadius);
-        double X = centerX + radius * Math.cos(theta);
-        double Z = centerZ + radius * Math.sin(theta);
-        return new double[]{X,Z};
+    public static Point2D ringRandomPoint(Point2D center, double minRadius, double maxRadius) {
+        double theta = randomDoubleInRange(0, 2 * Math.PI);
+        double radius = randomDoubleInRange(minRadius, maxRadius);
+        return center.add(radius * Math.cos(theta), radius * Math.sin(theta));
     }
 }
