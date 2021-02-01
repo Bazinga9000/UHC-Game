@@ -174,19 +174,32 @@ public final class Utils {
     }
 
 
-    //random location generation
-
-    public static Location getMaxYLocation(World w, double X, double Z) {
-        return w.getHighestBlockAt((int) X, (int) Z).getLocation().add(0, 1, 0);
+    /**
+     * Get highest location that a player can be tp'd to and be standing.
+     * @param w
+     * @param X
+     * @param Z
+     * @return loc
+     */
+    public static Location getHighestLoc(World w, double X, double Z) {
+        return new Location(w, X, 0, Z).toHighestLocation().add(0, 1, 0);
     }
 
-    public static Location getMaxYLocation(World w, double[] point) {
-        return w.getHighestBlockAt((int) point[0], (int) point[1]).getLocation().add(0, 1, 0);
+    /**
+     * Get highest location that a player can be tp'd to and be standing.
+     * @param w
+     * @param point
+     * @return loc
+     */
+    public static Location getHighestLoc(World w, double[] point) {
+        return getHighestLoc(w, point[0], point[1]);
     }
+
     public static double randomDoubleInRange(Random r, double min, double max) {
         return min + ((max - min) * r.nextDouble());
     }
 
+    //random location generation
     public static boolean isLocationSpawnable(Location l) {
         return (!isLocationOverLava(l) && !isLocationOverWater(l));
     }

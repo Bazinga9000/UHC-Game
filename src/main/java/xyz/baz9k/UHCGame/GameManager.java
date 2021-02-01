@@ -512,8 +512,7 @@ public class GameManager implements Listener {
         for (int i = 0; i < numLocations; i++) {
             double X = center.getX() + (distance * Math.cos(i * 2 * Math.PI / numLocations));
             double Z = center.getZ() + (distance * Math.sin(i * 2 * Math.PI / numLocations));
-            double Y = 2 + w.getHighestBlockYAt((int) X, (int) Z);
-            locations.add(new Location(w, X, Y, Z));
+            locations.add(getHighestLoc(w, X, Z));
         }
         Collections.shuffle(locations);
         return locations;
@@ -571,7 +570,7 @@ public class GameManager implements Listener {
         ArrayList<Location> spawnableLocations = new ArrayList<>();
         ArrayList<Location> overWaterLocations = new ArrayList<>();
         for (double[] samplePoint : samples) {
-            Location sample = getMaxYLocation(w, samplePoint);
+            Location sample = getHighestLoc(w, samplePoint);
             if (isLocationSpawnable(sample)) {
                 spawnableLocations.add(sample);
             } else if (isLocationOverWater(sample)) {
