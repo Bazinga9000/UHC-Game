@@ -141,6 +141,10 @@ public final class Utils {
         return Math.hypot(x1 - x2, y1 - y2);
     }
 
+    public static double euclideanDistance(double[] p, double[] q) {
+        return euclideanDistance(p[0], q[0], p[1], q[1]);
+    }
+
     /**
      * Send a message after some delay.
      * @param m

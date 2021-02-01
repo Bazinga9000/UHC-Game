@@ -524,22 +524,13 @@ public class GameManager implements Listener {
         ArrayList<double[]> samples = new ArrayList<>();
         ArrayList<double[]> activeList = new ArrayList<>();
         Random r = new Random();
-        Debug.broadcastDebug("Center: (" + center[0] + "," + center[1] + ")");
-        Debug.broadcastDebug("Numer of Loactions: " + numLocations);
-        Debug.broadcastDebug("Square Edge Length: " + squareEdgeLength);
-        Debug.broadcastDebug("Minimum Sepraration Distance: " + minimumSeparation);
         final int numPointsPerIteration = 30;
         World w = getUHCWorld(Environment.NORMAL);
         double[] firstLocation = uniformRandomPoint(center, squareEdgeLength);
         activeList.add(firstLocation);
         samples.add(firstLocation);
 
-        int count = 0;
         while (!activeList.isEmpty()) {
-            count++;
-            if (count % 100 == 0) {
-                Debug.broadcastDebug(count + " Iterations, " + samples.size() + " Samples, " + activeList.size() + " Active.");
-            }
             int index = r.nextInt(activeList.size());
             double[] search = activeList.get(index);
             double[] toCheck = {0,0};
@@ -549,11 +540,10 @@ public class GameManager implements Listener {
                 if (!isPointInSquare(toCheck, center, squareEdgeLength)) {
                     continue;
                 }
-                double x = toCheck[0];
-                double z = toCheck[1];
+
                 double minimumDistance = Double.MAX_VALUE;
                 for (double[] point : samples) {
-                    double d = euclideanDistance(x, z, point[0], point[1]);
+                    double d = euclideanDistance(toCheck, point);
                     if (d < minimumDistance) {
                         minimumDistance = d;
                     }
