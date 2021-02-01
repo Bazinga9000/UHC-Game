@@ -11,7 +11,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import xyz.baz9k.UHCGame.UHCGame;
-import xyz.baz9k.UHCGame.poisson.Point2D;
 
 public final class Utils {
     private Utils() {}
@@ -176,8 +175,8 @@ public final class Utils {
      * @param Z
      * @return loc
      */
-    public static Location getHighestLoc(World w, double X, double Z) {
-        return new Location(w, X, 0, Z).toHighestLocation().add(0, 1, 0);
+    public static Location getHighestLoc(World w, double x, double z) {
+        return new Location(w, x, 0, z).toHighestLocation().add(0, 1, 0);
     }
 
     /**

@@ -22,10 +22,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import net.md_5.bungee.api.chat.BaseComponent;
-import xyz.baz9k.UHCGame.poisson.Point2D;
-import xyz.baz9k.UHCGame.util.ColoredText;
-import xyz.baz9k.UHCGame.util.Debug;
-import xyz.baz9k.UHCGame.util.TeamDisplay;
+import xyz.baz9k.UHCGame.util.*;
 
 import java.time.*;
 import java.util.*;

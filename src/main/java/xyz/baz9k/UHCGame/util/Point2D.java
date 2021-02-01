@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.poisson;
+package xyz.baz9k.UHCGame.util;
 
 import org.bukkit.Location;
 import org.bukkit.World;
