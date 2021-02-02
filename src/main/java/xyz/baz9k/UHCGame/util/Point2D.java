@@ -24,6 +24,8 @@ public class Point2D {
     public boolean equals(Object o) {
         if (o == null) return false;
         if (!(o instanceof Point2D)) return false;
+        if (this == o) return true;
+        
         Point2D p = (Point2D) o;
         return x == p.x && z == p.z;
     }
