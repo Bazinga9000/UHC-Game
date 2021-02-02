@@ -214,6 +214,14 @@ public final class Utils {
         return (blockLocation.getBlock().getType() == Material.WATER);
     }
 
+    /**
+     * Takes two iterables, apply a function with the iterator elements as arguments.
+     * @param <T>
+     * @param <U>
+     * @param i1
+     * @param i2
+     * @param fn
+     */
     public static <T, U> void zip(Iterable<T> i1, Iterable<U> i2, BiConsumer<? super T, ? super U> fn) {
         Iterator<T> it1 = i1.iterator();
         Iterator<U> it2 = i2.iterator();
@@ -221,6 +229,16 @@ public final class Utils {
         while (it1.hasNext() && it2.hasNext()) fn.accept(it1.next(), it2.next());
     }
 
+    /**
+     * Takes two iterables, apply a function with iterator elements as arguments.
+     * @param <T>
+     * @param <U>
+     * @param <R>
+     * @param i1
+     * @param i2
+     * @param fn
+     * @return a collection with the results of fn as elements
+     */
     public static <T, U, R> Collection<R> zip(Iterable<T> i1, Iterable<U> i2, BiFunction<? super T, ? super U, ? extends R> fn) {
         Collection<R> c = new ArrayList<>();
         Iterator<T> it1 = i1.iterator();
