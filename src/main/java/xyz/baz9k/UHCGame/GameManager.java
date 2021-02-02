@@ -159,12 +159,12 @@ public class GameManager implements Listener {
             // create beacon in worlds
             w.getBlockAt(0, 1, 0).setType(Material.BEACON);
             w.getBlockAt(0, 2, 0).setType(Material.BEDROCK);
-            for (int x = -1; x < 2; x++) {
-                for (int z = -1; z < 2; z++) {
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
                     w.getBlockAt(x, 0, z).setType(Material.NETHERITE_BLOCK);
                 }
             }
-            for (int y = 3; y < w.getMaxHeight() - 1; y++) {
+            for (int y = 3; y <= w.getMaxHeight() - 2; y++) {
                 w.getBlockAt(0, y, 0).setType(Material.BARRIER);
             }
         }
