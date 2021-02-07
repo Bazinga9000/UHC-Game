@@ -48,8 +48,10 @@ public class TeamManager {
         });
     }
 
-    public void addPlayer(@NotNull Player p) {
-        getNode(p);
+    public void addPlayer(@NotNull Player p, boolean hasStarted) {
+        Node n = getNode(p);
+        if (isAssignedCombatant(p)) return;
+        n.state = hasStarted ? PlayerState.SPECTATOR : PlayerState.COMBATANT_UNASSIGNED;
     }
 
     private void setNode(@NotNull Player p, @NotNull PlayerState s, int team) {

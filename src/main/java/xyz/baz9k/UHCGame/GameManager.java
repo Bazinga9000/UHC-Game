@@ -725,9 +725,8 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        teamManager.addPlayer(p);
-        if(!hasUHCStarted()) return; 
-        if (!teamManager.isAssignedCombatant(p)) teamManager.setSpectator(p);
+        teamManager.addPlayer(p, hasUHCStarted());
+        if(!hasUHCStarted()) return;
         bbManager.addPlayer(p);
         hudManager.initializePlayerHUD(p);
         hudManager.addPlayerToTeams(p);
