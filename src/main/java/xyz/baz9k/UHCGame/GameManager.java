@@ -209,15 +209,17 @@ public class GameManager implements Listener {
 
     private void _endUHC() {
         setStage(GameStage.NOT_IN_GAME);
-        // update display names
         escapeAll();
-        for (Player p : Bukkit.getOnlinePlayers()) resetStatuses(p);
-
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            resetStatuses(p);
+            p.setGameMode(GameMode.SURVIVAL);
+        }
+        
+        // update display names
         for (UUID uuid : previousDisplayNames.keySet()) {
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
             p.setDisplayName(previousDisplayNames.get(uuid));
-            p.setGameMode(GameMode.SURVIVAL);
         }
 
         teamManager.resetAllPlayers();
