@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class TeamManager {
-    private class Node {
+    private static class Node {
         public int team;
         public PlayerState state;
         public Player player;
