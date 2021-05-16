@@ -1,6 +1,5 @@
 package xyz.baz9k.UHCGame.config;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
