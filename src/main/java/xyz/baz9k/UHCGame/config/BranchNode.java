@@ -2,8 +2,6 @@ package xyz.baz9k.UHCGame.config;
 
 import net.md_5.bungee.api.ChatColor;
 
-import java.util.stream.IntStream;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -94,7 +92,8 @@ public class BranchNode extends Node {
             throw new IllegalArgumentException("Invalid slot clicked (Slot cannot be negative or greater than" + slotCount + ".)");
         }
 
-        if (slot == children.length - 1) {
+        // if not root, add go back trigger
+        if (parent != null && slot == slotCount - 1) {
             p.openInventory(parent.inventory);
             return;
         }
