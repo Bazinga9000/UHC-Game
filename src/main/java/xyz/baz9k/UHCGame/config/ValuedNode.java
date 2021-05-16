@@ -26,17 +26,17 @@ public class ValuedNode extends Node {
         switch (type) {
             // TODO impl prompts for int, dbl, string  
             case INTEGER:
-                val = plugin.getConfig().getInt(id);
+                val = cfg.getInt(id);
                 break;
             case DOUBLE:
-                val = plugin.getConfig().getDouble(id);
+                val = cfg.getDouble(id);
                 break;
             case STRING:
-                val = plugin.getConfig().getString(id);
+                val = cfg.getString(id);
                 break;
 
             case BOOLEAN:
-                val = !plugin.getConfig().getBoolean(id);
+                val = !cfg.getBoolean(id);
                 break;
             
             // OPTION impl in OptionValuedNode
@@ -44,7 +44,7 @@ public class ValuedNode extends Node {
             default:
                 throw new UnsupportedOperationException("Type not supported");
             }
-        plugin.getConfig().set(id, val);
+        cfg.set(id, val);
     }
 
     /**
@@ -56,7 +56,7 @@ public class ValuedNode extends Node {
         // perform updates based on data type
         switch (type) {
             case INTEGER:
-                int configValue = plugin.getConfig().getInt(id);
+                int configValue = cfg.getInt(id);
                 this.itemStack.setAmount(configValue);
                 break;
             case DOUBLE:
