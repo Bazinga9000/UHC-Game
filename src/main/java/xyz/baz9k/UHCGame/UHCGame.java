@@ -36,6 +36,11 @@ public class UHCGame extends JavaPlugin {
         gameManager.loadManagerRefs();
     }
 
+    @Override
+    public void onDisable() {
+        this.saveConfig();
+    }
+    
     public TeamManager getTeamManager() {
         return teamManager;
     }
