@@ -2,17 +2,11 @@ package xyz.baz9k.UHCGame;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 
 import xyz.baz9k.UHCGame.config.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class ConfigManager implements Listener {
     private final UHCGame plugin;

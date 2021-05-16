@@ -6,8 +6,6 @@ import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.ObjectInputFilter;
-
 public class UHCGame extends JavaPlugin {
     private TeamManager teamManager;
     private GameManager gameManager;
