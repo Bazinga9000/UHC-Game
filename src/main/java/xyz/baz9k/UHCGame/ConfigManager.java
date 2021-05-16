@@ -9,11 +9,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import xyz.baz9k.UHCGame.config.*;
 
 public class ConfigManager implements Listener {
-    private final UHCGame plugin;
     private final ConfigTree configTree;
 
     public ConfigManager(UHCGame plugin) {
-        this.plugin = plugin;
         this.configTree = new ConfigTree(plugin);
     }
 

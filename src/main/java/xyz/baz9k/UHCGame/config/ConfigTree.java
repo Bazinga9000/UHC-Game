@@ -1,7 +1,6 @@
 package xyz.baz9k.UHCGame.config;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,8 +12,12 @@ import xyz.baz9k.UHCGame.UHCGame;
 
 public class ConfigTree {
     private BranchNode root;
-    private UHCGame plugin;
     private static final int ROOT_HEIGHT = 6;
+
+    public ConfigTree(UHCGame plugin) {
+        Node.setPlugin(plugin);
+        root = generateTree();
+    }
 
     private static int getSlotCoordinate(int x, int y) {
         return y * 9 + x;
@@ -29,11 +32,6 @@ public class ConfigTree {
         
         stack.setItemMeta(m);
         return stack;
-    }
-    
-    public ConfigTree(UHCGame plugin) {
-        Node.setPlugin(plugin);
-        root = generateTree();
     }
 
     private BranchNode generateTree() {
