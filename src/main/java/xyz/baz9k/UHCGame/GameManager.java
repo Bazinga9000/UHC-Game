@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.util.*;
 
 import java.time.*;
@@ -703,7 +704,7 @@ public class GameManager implements Listener {
         if (teamManager.countLivingTeams() > 1) return;
         int winner = teamManager.getAliveTeams()[0];
         TextComponent winMsg = TeamDisplay.getName(winner)
-            .append(Component.text("has won!"));
+            .append(Component.text("has won!", NamedTextColor.WHITE));
 
         // this msg should be displayed after player death
         delayedMessage(winMsg, plugin, 1);
@@ -746,7 +747,7 @@ public class GameManager implements Listener {
             int t = teamManager.getTeam(dead);
             if (teamManager.isTeamEliminated(t)) {
                 Component teamElimMsg = TeamDisplay.getName(t)
-                                                   .append(Component.text(" has been eliminated!"));
+                                                   .append(Component.text(" has been eliminated!", NamedTextColor.WHITE));
                 // this msg should be displayed after player death
                 delayedMessage(teamElimMsg, plugin, 1);
             }

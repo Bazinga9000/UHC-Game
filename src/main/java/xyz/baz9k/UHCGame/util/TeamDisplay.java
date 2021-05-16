@@ -2,6 +2,7 @@ package xyz.baz9k.UHCGame.util;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -105,7 +106,7 @@ public final class TeamDisplay {
      * @return {@link TextComponent}
      */
     public static TextComponent prefixed(int t, String name) {
-        return getPrefix(t).append(Component.space()).append(Component.text(name));
+        return getPrefix(t).append(Component.space()).append(Component.text(name, NamedTextColor.WHITE));
     }
 
     /**

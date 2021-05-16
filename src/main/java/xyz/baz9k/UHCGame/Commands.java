@@ -164,14 +164,14 @@ public class Commands {
         if (players.size() == 0) return;
 
         var b = TeamDisplay.getName(t)
-                           .append(Component.text(": "));
+                           .append(Component.text(": ", NamedTextColor.WHITE));
 
         // list of players one a team, separated by commas
         String tPlayers = players.stream()
-                                 .map(Player::getName)
+                                 .map(p -> p.getName())
                                  .collect(Collectors.joining(", "));
         
-        b.append(Component.text(tPlayers));
+        b.append(Component.text(tPlayers, NamedTextColor.WHITE));
         Bukkit.getServer().sendMessage(b);
     }
 
