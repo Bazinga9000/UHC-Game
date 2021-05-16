@@ -10,7 +10,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class ValuedNode extends Node {
     protected final ValuedNodeType type;
@@ -68,7 +70,7 @@ public class ValuedNode extends Node {
     public void updateItemStack() {
         ItemMeta m = itemStack.getItemMeta();
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        List<String> newDesc = new ArrayList<>(itemDesc);
+        List<Component> newDesc = new ArrayList<>(itemDesc);
 
         // perform updates based on data type
         switch (type) {
@@ -78,22 +80,27 @@ public class ValuedNode extends Node {
                 // use the initially provided desc for format
                 Object val = cfg.get(id);
                 for (int i = 0; i < itemDesc.size(); i++) {
-                    String line = itemDesc.get(i);
-                    newDesc.set(i, String.format(line, val));
+                    // subst lines with the correct content
+                    if (itemDesc.get(i) instanceof TextComponent) {
+                        var lineComp = (TextComponent) itemDesc.get(i);
+                        String line = lineComp.content();
+                        newDesc.set(i, lineComp.content(String.format(line, val)));
+                    }
                 }
             case BOOLEAN:
                 // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
-                String status = ChatColor.WHITE + "Status: ";
+                TextComponent.Builder status = Component.text()
+                    .append(Component.text("Status: ", NamedTextColor.WHITE));
                 
                 if (cfg.getBoolean(id)) {
-                    status += ChatColor.GREEN + "ACTIVE";
+                    status.append(Component.text("ACTIVE", NamedTextColor.GREEN));
                     m.addEnchant(Enchantment.SILK_TOUCH, 1, true);
                 } else {
-                    status += ChatColor.RED + "INACTIVE";
+                    status.append(Component.text("INACTIVE", NamedTextColor.RED));
                     m.removeEnchant(Enchantment.SILK_TOUCH);
                 }
-                newDesc.add("");
-                newDesc.add(status);
+                newDesc.add(Component.empty());
+                newDesc.add(status.asComponent());
                 break;
                 
                 // OPTION impl in OptionValuedNode
@@ -102,7 +109,7 @@ public class ValuedNode extends Node {
                 throw new UnsupportedOperationException("Type not supported");
         }
             
-        m.setLore(newDesc);
+        m.lore(newDesc);
         itemStack.setItemMeta(m);
         // since updating the item does not update it in the inventory, parent has to
         parent.updateSlot(parentSlot);

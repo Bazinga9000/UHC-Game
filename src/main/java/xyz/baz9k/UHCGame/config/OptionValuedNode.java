@@ -8,7 +8,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 
 public class OptionValuedNode extends ValuedNode {
 
@@ -38,22 +40,17 @@ public class OptionValuedNode extends ValuedNode {
 
         ItemMeta m = itemStack.getItemMeta();
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        List<String> newDesc = new ArrayList<>(itemDesc);
+        List<Component> newDesc = new ArrayList<>(itemDesc);
 
         itemStack.setType(dat.getMaterial());
         for (int i = 0; i < optData.length; i++) {
-            ChatColor clr;
+            
+            TextColor clr = i == ind ? NamedTextColor.GREEN : NamedTextColor.RED;
+            newDesc.add(Component.text(optData[i].getName(), clr));
 
-            if (i == ind) {
-                clr = ChatColor.GREEN;
-            } else {
-                clr = ChatColor.RED;
-            }
-
-            newDesc.add(clr + optData[i].getName());
         }
 
-        m.setLore(newDesc);
+        m.lore(newDesc);
         itemStack.setItemMeta(m);
         // since updating the item does not update it in the inventory, parent has to
         parent.updateSlot(parentSlot);

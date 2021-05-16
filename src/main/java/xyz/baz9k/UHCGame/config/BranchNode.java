@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame.config;
 
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -38,13 +39,24 @@ public class BranchNode extends Node {
      * @param guiHeight Number of rows in this node's inventory
      */
     public BranchNode(@Nullable BranchNode parent, int slot, @Nullable ItemStack itemStack, @NotNull String guiName, int guiHeight) {
+        this(parent, slot, itemStack, Component.text(guiName), guiHeight);
+    }
+
+    /**
+     * @param parent Parent node
+     * @param slot lot of this node in parent's inventory
+     * @param itemStack Item stack of this node in parent's inventory
+     * @param guiTitle Title of this node's inventory (with formatting)
+     * @param guiHeight Number of rows in this node's inventory
+     */
+    public BranchNode(@Nullable BranchNode parent, int slot, @Nullable ItemStack itemStack, @NotNull Component guiTitle, int guiHeight) {
         super(parent, slot, itemStack);
         slotCount = 9 * guiHeight;
 
         int arrLen = parent == null ? slotCount : slotCount - 1;
         children = new Node[arrLen];
 
-        inventory = Bukkit.createInventory(null, slotCount, guiName);
+        inventory = Bukkit.createInventory(null, slotCount, guiTitle);
         initInventory();
     }
 
@@ -52,7 +64,7 @@ public class BranchNode extends Node {
         // add glass to all slots
         ItemStack emptyGlass = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
         ItemMeta m = emptyGlass.getItemMeta();
-        m.setDisplayName(ChatColor.BLACK + "");
+        m.displayName(Component.space());
         emptyGlass.setItemMeta(m);
         
         for (int i = 0; i < slotCount; i++) {
@@ -64,7 +76,7 @@ public class BranchNode extends Node {
             ItemStack goBack = new ItemStack(Material.ARROW);
 
             m = goBack.getItemMeta();
-            m.setDisplayName(ChatColor.RED + "Go Back");
+            m.displayName(Component.text("Go Back", NamedTextColor.RED));
             goBack.setItemMeta(m);
 
             inventory.setItem(slotCount - 1, goBack);

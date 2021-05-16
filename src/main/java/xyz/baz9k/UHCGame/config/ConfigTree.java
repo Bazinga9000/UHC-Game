@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import net.kyori.adventure.text.Component;
 import xyz.baz9k.UHCGame.UHCGame;
 
 /**
@@ -27,11 +28,19 @@ public class ConfigTree {
     }
 
     private static ItemStack itemStack(Material type, String name, String... lore) {
+
+        Component[] loreComps = Arrays.stream(lore)
+            .map(Node::withDefaultDescStyle)
+            .toArray(Component[]::new);
+
+        return itemStack(type, Component.text(name), loreComps);
+    }
+    private static ItemStack itemStack(Material type, Component name, Component... lore) {
         ItemStack stack = new ItemStack(type);
         ItemMeta m = stack.getItemMeta();
 
-        m.setDisplayName(name);
-        m.setLore(Arrays.asList(lore));
+        m.displayName(name);
+        m.lore(Arrays.asList(lore));
         
         stack.setItemMeta(m);
         return stack;
@@ -46,13 +55,13 @@ public class ConfigTree {
         new ValuedNode(root, getSlotCoordinate(3, 3), itemStack(Material.DIAMOND, "Dice", "number %s"), ValuedNodeType.INTEGER, "team_count");
 
         new ActionNode(root, getSlotCoordinate(5, 3), itemStack(Material.EMERALD, "Shiny Button", "Click me I dare you"), player -> {
-            Bukkit.broadcastMessage("Clicky Click.");
+            Bukkit.getServer().sendMessage(Component.text("Clicky Click."));
         });
 
         BranchNode subLevel = new BranchNode(root, getSlotCoordinate(4, 4), itemStack(Material.REDSTONE, "schrodinger's box", "except the cat is dead"), "Fuck", 1);
 
         new ActionNode(subLevel, getSlotCoordinate(5,0), itemStack(Material.DIAMOND, "Dice 2"), player -> {
-            Bukkit.broadcastMessage("Fuck.");
+            Bukkit.getServer().sendMessage(Component.text("Fuck."));
         });
 
         return root;
