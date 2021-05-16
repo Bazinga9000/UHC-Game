@@ -1,6 +1,8 @@
 package xyz.baz9k.UHCGame.util;
 
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -22,9 +24,9 @@ public final class Debug {
      */
     public static void printError(CommandSender sender, Throwable e) {
         if (debug) {
-            sender.sendMessage(ChatColor.RED + e.toString());
+            sender.sendMessage(Component.text(e.toString(), NamedTextColor.RED));
             for (var el : e.getStackTrace()) {
-                sender.sendMessage(ChatColor.RED + el.toString());
+                sender.sendMessage(Component.text(el.toString(), NamedTextColor.RED));
             }
         }
 
@@ -37,17 +39,17 @@ public final class Debug {
      */
     public static void printError(Throwable e) {
         if (debug) {
-            Bukkit.broadcastMessage(ChatColor.RED + e.toString());
+            Bukkit.getServer().sendMessage(Component.text(e.toString(), NamedTextColor.RED));
             for (var el : e.getStackTrace()) {
-                Bukkit.broadcastMessage(ChatColor.RED + el.toString());
+                Bukkit.getServer().sendMessage(Component.text(el.toString(), NamedTextColor.RED));
             }
         } else {
             e.printStackTrace();
         }
     }
 
-    private static String fmtDebug(String msg) {
-        return String.format("%s[DEBUG] %s", ChatColor.YELLOW, msg);
+    private static TextComponent fmtDebug(String msg) {
+        return Component.text(String.format("[DEBUG] %s", msg), NamedTextColor.YELLOW);
     }
 
     /**
@@ -56,7 +58,7 @@ public final class Debug {
      */
     public static void broadcastDebug(String msg) {
         if (debug) {
-            Bukkit.broadcastMessage(fmtDebug(msg));
+            Bukkit.getServer().sendMessage(fmtDebug(msg));
         }
     }
 }

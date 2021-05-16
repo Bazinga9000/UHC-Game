@@ -1,12 +1,12 @@
 package xyz.baz9k.UHCGame;
 
 import org.bukkit.Bukkit;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
@@ -16,15 +16,14 @@ public class BossbarManager {
 
     public BossbarManager(UHCGame plugin) {
         this.gameManager = plugin.getGameManager();
-        this.bossbar = Bukkit.createBossBar(null, BarColor.WHITE, BarStyle.SOLID);
+        this.bossbar = BossBar.bossBar(Component.empty(), 1, BossBar.Color.WHITE, BossBar.Overlay.PROGRESS);
     }
 
     /**
      * On game start, this function runs to initialize the bossbar.
      */
     public void enable() {
-        for (Player p : Bukkit.getOnlinePlayers()) bossbar.addPlayer(p);
-        bossbar.setVisible(true);
+        Bukkit.getServer().showBossBar(bossbar);
         updateBossbarStage();
     }
 
@@ -32,7 +31,7 @@ public class BossbarManager {
      * On game end, this function runs to deactivate the bossbar.
      */
     public void disable() {
-        bossbar.setVisible(false);
+        Bukkit.getServer().hideBossBar(bossbar);
     }
 
     /**
@@ -40,7 +39,7 @@ public class BossbarManager {
      * @param p
      */
     public void addPlayer(@NotNull Player p) {
-        bossbar.addPlayer(p);
+        p.showBossBar(bossbar);
     }
 
     /**
@@ -48,42 +47,36 @@ public class BossbarManager {
      */
     public void tick() {
         if (gameManager.isDeathmatch()) {
-            bossbar.setProgress(1);
-            bossbar.setTitle(getBBTitle());
+            bossbar.progress(1);
+            bossbar.name(getBBTitle());
             return;
         }
         // update progress bar
         long remainingSecs = gameManager.getRemainingStageDuration().toSeconds(),
                  totalSecs = gameManager.getStageDuration().toSeconds();
 
-        bossbar.setProgress((double) remainingSecs / totalSecs);
+        bossbar.progress((float) remainingSecs / totalSecs);
         // change display title
-        String display = getBBTitle();
-        display += " | ";
-        display += getTimeString(remainingSecs);
-        bossbar.setTitle(display);
+        var display = getBBTitle()
+            .append(Component.text(" | "))
+            .append(Component.text(getTimeString(remainingSecs)));
+            
+        bossbar.name(display);
     }
 
     /**
      * This function updates the bossbar when the stage increments.
      */
     public void updateBossbarStage() {
-        if (getBBColor() == null) {
-            // should only occur on NOT_IN_GAME
-            bossbar.setColor(BarColor.WHITE);
-            return;
-        }
-        bossbar.setColor(getBBColor());
+        bossbar.color(getBBColor());
         tick();
     }
 
-    @Nullable
-    private BarColor getBBColor() {
+    private BossBar.Color getBBColor() {
         return gameManager.getStage().getBBColor();
     }
 
-    @Nullable
-    private String getBBTitle() {
+    private TextComponent getBBTitle() {
         return gameManager.getStage().getBBTitle();
     }
 }

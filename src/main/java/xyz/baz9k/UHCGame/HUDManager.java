@@ -1,11 +1,15 @@
 package xyz.baz9k.UHCGame;
 
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import xyz.baz9k.UHCGame.util.ColorGradient;
-import xyz.baz9k.UHCGame.util.ColoredText;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import org.bukkit.Bukkit;
@@ -22,7 +26,6 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
-import static xyz.baz9k.UHCGame.util.Formats.*;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -39,23 +42,23 @@ public class HUDManager implements Listener {
     }
 
     private static String createEmptyName(char c){
-        return ChatColor.translateAlternateColorCodes('&', "&"+c);
+        return "\u00A7" + c;
     }
 
     /* FORMATTING */
-    private String formatState(@NotNull Player p) {
+    private TextComponent formatState(@NotNull Player p) {
 
         PlayerState state = teamManager.getPlayerState(p);
         int team = teamManager.getTeam(p);
 
         if (state == PlayerState.COMBATANT_UNASSIGNED) {
-            return ChatColor.ITALIC + "Unassigned";
+            return Component.text("Unassigned", NamedTextColor.WHITE, TextDecoration.ITALIC);
         }
         return TeamDisplay.getName(team);
     }
 
-    private String formatTeammate(@NotNull Player you, @NotNull Player teammate) {
-        ColoredText s = new ColoredText();
+    private Component formatTeammate(@NotNull Player you, @NotNull Player teammate) {
+        TextComponent.Builder s = Component.text();
 
         double teammateHP = teammate.getHealth() + teammate.getAbsorptionAmount();
         double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
@@ -64,26 +67,28 @@ public class HUDManager implements Listener {
         Color NO_HP = new Color(232, 85, 85);
         Color OVER_HEAL = new Color(171, 85, 232);
         Color gradient;
+
         if (teammateHP > teammateMaxHP) {
             gradient = OVER_HEAL;
         } else {
             gradient = ColorGradient.multiColorGradient(teammateHP/teammateMaxHP, NO_HP, HALF_HP, FULL_HP);
         }
+        TextColor tcGradient = TextColor.color(gradient.getRGB());
 
         // prefix if spectator
         if (teamManager.isSpectator(you)) {
             int team = teamManager.getTeam(teammate);
-            s.appendColored(TeamDisplay.getPrefixWithSpace(team));
+            s.append(TeamDisplay.getPrefixWithSpace(team));
         }
 
         // name and health
         if (teamManager.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
-            s.append(teammate.getName(), ChatColor.GRAY, STRIKETHROUGH)
-             .append(" 0♥",ChatColor.GRAY, STRIKETHROUGH);
-            return s.toString();
+            s.append(Component.text(teammate.getName(), NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH))
+             .append(Component.text(" 0♥", NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
+            return s.asComponent();
         } else {
-            s.append(teammate.getName(), gradient);
-            s.append(" " + (int) Math.ceil(teammateHP) + "♥ ", gradient);
+            s.append(Component.text(teammate.getName(), tcGradient));
+            s.append(Component.text(" " + (int) Math.ceil(teammateHP) + "♥ ", tcGradient));
         }
         // direction
         Location youLoc = you.getLocation();
@@ -106,11 +111,11 @@ public class HUDManager implements Listener {
             else if (-157.5 < relAngle && relAngle < -112.5) arrow = "↘";
             else arrow = "↓";
             
-            ChatColor clr = teammate.isOnline() ? ChatColor.GOLD : ChatColor.DARK_GRAY;
-            s.append(arrow, clr);
+            TextColor clr = teammate.isOnline() ? NamedTextColor.GOLD : NamedTextColor.DARK_GRAY;
+            s.append(Component.text(arrow, clr));
         }
 
-        return s.toString();
+        return s.asComponent();
     }
 
     /* HANDLE SCOREBOARD PARITY */
@@ -118,7 +123,7 @@ public class HUDManager implements Listener {
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
             t = s.registerNewTeam(String.valueOf(team));
-            t.setPrefix(TeamDisplay.getPrefixWithSpace(team));
+            t.prefix(TeamDisplay.getPrefixWithSpace(team));
         }
         t.addEntry(p.getName());
     }
@@ -144,7 +149,7 @@ public class HUDManager implements Listener {
         Scoreboard newBoard = Bukkit.getScoreboardManager().getNewScoreboard();
         p.setScoreboard(newBoard);
 
-        Objective hud = newBoard.registerNewObjective("hud", "dummy", p.getName());
+        Objective hud = newBoard.registerNewObjective("hud", "dummy", Component.text(p.getName(), NamedTextColor.WHITE));
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         setTeams(p);
@@ -169,11 +174,11 @@ public class HUDManager implements Listener {
         hud.getScore(pname).setScore(position);
     }
 
-    private void setHUDLine(@NotNull Player p, @NotNull String field, @NotNull String text){
+    private void setHUDLine(@NotNull Player p, @NotNull String field, @NotNull ComponentLike text) {
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(field);
         if(team == null) return;
-        team.setPrefix(text);
+        team.prefix(text.asComponent());
     }
 
     /**
@@ -253,8 +258,10 @@ public class HUDManager implements Listener {
             y = loc.getBlockY(),
             z = loc.getBlockZ();
 
-        var s = ColoredText.of(x + " " + y + " " + z, ChatColor.GREEN) // position format
-                .append(" ( ", ChatColor.WHITE); // rotation format
+        TextComponent.Builder s;
+        s = Component.text()
+            .append(Component.text(x + " " + y + " " + z, NamedTextColor.GREEN)) // position format
+            .append(Component.text(" ( ", NamedTextColor.WHITE)); // rotation format
 
         double yaw = mod(loc.getYaw() + 67.5, 360);
         /*
@@ -273,66 +280,64 @@ public class HUDManager implements Listener {
          * 315 - 360: -X
          */
 
-        if ( 90 <= yaw && yaw < 225) s.append("-X ", ChatColor.RED);
-        if (270 <= yaw || yaw <  45) s.append("+X ", ChatColor.RED);
+        if ( 90 <= yaw && yaw < 225) s.append(Component.text("-X ", NamedTextColor.RED));
+        if (270 <= yaw || yaw <  45) s.append(Component.text("+X ", NamedTextColor.RED));
 
-        if (  0 <= yaw && yaw < 135) s.append("+Z ", ChatColor.BLUE);
-        if (180 <= yaw && yaw < 315) s.append("-Z ", ChatColor.BLUE);
+        if (  0 <= yaw && yaw < 135) s.append(Component.text("+Z ", NamedTextColor.BLUE));
+        if (180 <= yaw && yaw < 315) s.append(Component.text("-Z ", NamedTextColor.BLUE));
 
-        s.append(")", ChatColor.WHITE);
+        s.append(Component.text(")", NamedTextColor.WHITE));
 
-        setHUDLine(p, "posrot", s.toString());
+        setHUDLine(p, "posrot", s);
     }
 
     public void updateWBHUD(@NotNull Player p) {
         Location loc = p.getLocation();
-
-        ColoredText s = new ColoredText();
         
         // world border radius format
         double r = (p.getWorld().getWorldBorder().getSize() / 2);
-        s.append("World Border: ±", ChatColor.AQUA)
-         .append(String.valueOf((int)r), ChatColor.AQUA);
+        TextComponent.Builder s = Component.text()
+            .append(Component.text("World Border: ±", NamedTextColor.AQUA))
+            .append(Component.text((int) r, NamedTextColor.AQUA));
 
         // distance format
         double distance = r - Math.max(Math.abs(loc.getX()), Math.abs(loc.getZ()));
-        s.append(" (" + (int) distance + ")");
+        s.append(Component.text(" (" + (int) distance + ")", NamedTextColor.WHITE));
 
-        setHUDLine(p, "wbpos", s.toString());
+        setHUDLine(p, "wbpos", s);
     }
 
     public void updateElapsedTimeHUD(@NotNull Player p){
         String elapsed = getLongTimeString(gameManager.getElapsedTime());
-        var s = ColoredText.of("Game Time: ", ChatColor.RED)
-                .append(elapsed + " ");
+        var s = Component.text()
+            .append(Component.text("Game Time: ", NamedTextColor.RED))
+            .append(Component.text(elapsed + " ", NamedTextColor.WHITE));
 
         World world = gameManager.getUHCWorld(Environment.NORMAL);
         long time = world.getTime();
         boolean isDay = !(13188 <= time && time <= 22812);
-        Color dayCharacterColor = isDay ? new Color(255, 245, 123) : new Color(43, 47, 119);
-        String dayCharacterString = isDay ? "☀" : "☽";
-        s.append(dayCharacterString, dayCharacterColor);
+        TextColor dayCharColor = isDay ? TextColor.color(255, 245, 123) : TextColor.color(43, 47, 119);
+        String dayCharString = isDay ? "☀" : "☽";
+        s.append(Component.text(dayCharString, dayCharColor));
 
-        setHUDLine(p, "elapsedTime", s.toString());
+        setHUDLine(p, "elapsedTime", s);
 
     }
 
     public void updateCombatantsAliveHUD(@NotNull Player p) {
-        var s = ColoredText.of("Combatants: ", ChatColor.WHITE)
-                .append(teamManager.countLivingCombatants())
-                .append(" / ")
-                .append(teamManager.countCombatants());
+        var s = Component.text() 
+            .append(Component.text("Combatants: ", NamedTextColor.WHITE))
+            .append(Component.text(teamManager.countLivingCombatants() + " / " + teamManager.countCombatants(), NamedTextColor.WHITE));
 
-        setHUDLine(p, "combsalive", s.toString());
+        setHUDLine(p, "combsalive", s);
     }
 
     public void updateTeamsAliveHUD(@NotNull Player p) {
-        var s = ColoredText.of("Teams: ", ChatColor.WHITE)
-                .append(teamManager.countLivingTeams())
-                .append(" / ")
-                .append(teamManager.getNumTeams());
+        var s = Component.text() 
+            .append(Component.text("Teams: ", NamedTextColor.WHITE))
+            .append(Component.text(teamManager.countLivingTeams() + " / " + teamManager.getNumTeams(), NamedTextColor.WHITE));
 
-        setHUDLine(p, "teamsalive", s.toString());
+        setHUDLine(p, "teamsalive", s);
         
     }
 
@@ -340,10 +345,11 @@ public class HUDManager implements Listener {
         OptionalInt k = gameManager.getKills(p);
 
         if (k.isPresent()) {
-            var s = ColoredText.of("Kills: ", ChatColor.WHITE)
-                    .append(k.orElseThrow());
+            var s = Component.text() 
+                .append(Component.text("Kills: ", NamedTextColor.WHITE))
+                .append(Component.text(k.orElseThrow(), NamedTextColor.WHITE));
             
-            setHUDLine(p, "kills", s.toString());
+            setHUDLine(p, "kills", s);
         }
     }
 

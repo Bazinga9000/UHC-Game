@@ -2,16 +2,21 @@ package xyz.baz9k.UHCGame;
 
 import java.time.Duration;
 import java.util.Arrays;
-import static xyz.baz9k.UHCGame.util.Formats.*;
+import java.util.Set;
+
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import net.md_5.bungee.api.ChatColor;
-import xyz.baz9k.UHCGame.util.ColoredText;
+
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 import static java.time.temporal.ChronoUnit.FOREVER;
 
@@ -24,53 +29,54 @@ import static java.time.temporal.ChronoUnit.FOREVER;
  */
 public enum GameStage {
     NOT_IN_GAME,
-    WB_STILL   (BarColor.RED,    Duration.ofMinutes(60), 1200, true,  ChatColor.RED + "Border Begins Shrinking",              "Let the games begin! Our players have been shuffled across the world! ", ChatColor.GREEN, BOLD),
-    WB_1       (BarColor.BLUE,   Duration.ofMinutes(15), 25,   false, ChatColor.BLUE + "Border Stops Shrinking",              "The World Border has begun to shrink! ", ChatColor.RED, BOLD),
-    WB_STOP    (BarColor.RED,    Duration.ofMinutes(5),  25,   true,  ChatColor.RED + "Border Begins Shrinking... Again.",    "The World Border has ground to a halt. ", ChatColor.AQUA),
-    WB_2       (BarColor.BLUE,   Duration.ofMinutes(10), 3,    false, ChatColor.BLUE + "Border Stops Shrinking... Again",     "The World Border has resumed once more! ", ChatColor.RED),
-    DM_WAIT    (BarColor.WHITE,  Duration.ofMinutes(5),  3,    true,  ChatColor.WHITE + "The Battle at the Top of the World", "The World Border has ground to a halt once again! ", ChatColor.DARK_AQUA),
-    DEATHMATCH (BarColor.PURPLE, FOREVER.getDuration(),  20,   true,  ChatColor.DARK_PURPLE + "∞",                            "It is time. Let the Battle At The Top Of The World commence! ", ChatColor.BLUE, BOLD);
+    WB_STILL   (BossBar.Color.RED,    Duration.ofMinutes(60), 1200, true,  Component.text("Border Begins Shrinking", NamedTextColor.RED),             "Let the games begin! Our players have been shuffled across the world! ", NamedTextColor.GREEN, TextDecoration.BOLD),
+    WB_1       (BossBar.Color.BLUE,   Duration.ofMinutes(15), 25,   false, Component.text("Border Stops Shrinking", NamedTextColor.BLUE),             "The World Border has begun to shrink! ", NamedTextColor.RED, TextDecoration.BOLD),
+    WB_STOP    (BossBar.Color.RED,    Duration.ofMinutes(5),  25,   true,  Component.text("Border Begins Shrinking... Again.", NamedTextColor.RED),   "The World Border has ground to a halt. ", NamedTextColor.AQUA),
+    WB_2       (BossBar.Color.BLUE,   Duration.ofMinutes(10), 3,    false, Component.text("Border Stops Shrinking... Again", NamedTextColor.BLUE),    "The World Border has resumed once more! ", NamedTextColor.RED),
+    DM_WAIT    (BossBar.Color.WHITE,  Duration.ofMinutes(5),  3,    true,  Component.text("The Battle at the Top of the World", NamedTextColor.WHITE),"The World Border has ground to a halt once again! ", NamedTextColor.DARK_AQUA),
+    DEATHMATCH (BossBar.Color.PURPLE, FOREVER.getDuration(),  20,   true,  Component.text("∞", NamedTextColor.DARK_PURPLE),                           "It is time. Let the Battle At The Top Of The World commence! ", NamedTextColor.BLUE, TextDecoration.BOLD);
     
-    private final BarColor bbClr;
+    private final BossBar.Color bbClr;
     private final Duration dur;
     private final double wbSize;
-    private final String bbTitle;
+    private final TextComponent bbTitle;
     private final String baseChatMsg;
-    private final ChatColor clr;
-    private final ChatColor[] fmt;
+    private final TextColor bodyClr;
+    private final Set<TextDecoration> bodyFmt;
 
     private final boolean isWBInstant;
     /**
      * NOT_IN_GAME
      */
     private GameStage() { 
-        bbClr = null;
-        dur = null;
-        wbSize = -1;
-        bbTitle = null;
-        baseChatMsg = null;
-        isWBInstant = false;
-        clr = ChatColor.WHITE;
-        fmt = new ChatColor[0];
+        this(BossBar.Color.WHITE, Duration.ZERO, -1, false, Component.empty(), "", NamedTextColor.WHITE);
     }
     
+
     /**
-     * @param bbClr Color of bossbar
-     * @param dur Stage duration
-     * @param wbDiameter Diameter of world border at this stage
-     * @param isWBInstant If true, the world border is immediately set to the size provided by wbSize. If false, the world border gradually reaches wbSize by the end of the stage.
-     * @param bbTitle Title of bossbar
-     * @param baseChatMsg Chat message to send at the START of the stage
+     * @param bbClr Color of the boss bar
+     * @param dur Duration of the stage
+     * @param wbDiameter Diameter of the world border that this stage progresses to
+     * @param isWBInstant True if WB instantly jumps to this border at the start, false if progresses to WB by the end
+     * @param bbTitle Title of the boss bar as a component (so, with colors and formatting)
+     * @param baseChatMsg The base chat message, before color and additional warnings are added
+     * @param bodyClr Color of the body message
+     * @param bodyFmt Formatting of the body message
      */
-    private GameStage(@NotNull BarColor bbClr, @NotNull Duration dur, int wbDiameter, boolean isWBInstant, @NotNull String bbTitle, @NotNull String baseChatMsg, ChatColor clr, ChatColor... fmt) {
+    private GameStage(@NotNull BossBar.Color bbClr, @NotNull Duration dur, int wbDiameter, boolean isWBInstant, @NotNull TextComponent bbTitle, @NotNull String baseChatMsg, TextColor bodyClr, TextDecoration... bodyFmt) {
+        // bossbar
         this.bbClr = bbClr;
         this.bbTitle = bbTitle;
+
+        // stage specific
         this.dur = dur;
         this.wbSize = wbDiameter;
         this.isWBInstant = isWBInstant;
+
+        // message body
         this.baseChatMsg = baseChatMsg;
-        this.clr = clr;
-        this.fmt = fmt;
+        this.bodyClr = bodyClr;
+        this.bodyFmt = Set.of(bodyFmt);
     }
 
     @Nullable
@@ -103,18 +109,14 @@ public enum GameStage {
     }
 
     /* PROPERTIES */
-
-    @Nullable
-    public BarColor getBBColor() {
+    public BossBar.Color getBBColor() {
         return bbClr;
     }
 
-    @Nullable
-    public String getBBTitle() {
+    public TextComponent getBBTitle() {
         return bbTitle;
     }
 
-    @Nullable
     public Duration getDuration() {
         return dur;
     }
@@ -179,14 +181,18 @@ public enum GameStage {
 
 
     /**
+     * Gives a builder that starts a warning message by the game.
      * [warn prefix] [message]
      * <p>
      * {@literal <!> World border is shrinking in ---}
      */
-    private static ColoredText getMessageBuilder() {
-        return ColoredText.of("<", ChatColor.of("#CFCFFF"), BOLD)
-                          .append("The Boxless One", ChatColor.of("#A679FE"), BOLD)
-                          .append("> ", ChatColor.of("#CFCFFF"), BOLD);
+    private static TextComponent.Builder getMessageBuilder() {
+        return Component.text()
+                        .append(
+                            Component.text("<", TextColor.color(0xCFCFFF), TextDecoration.BOLD),
+                            Component.text("The Boxless One", TextColor.color(0xA679FE), TextDecoration.BOLD),
+                            Component.text("> ", TextColor.color(0xCFCFFF), TextDecoration.BOLD)
+                        );
     }
 
     // String.format(-, base, subject, radius, duration)
@@ -206,7 +212,7 @@ public enum GameStage {
     public void sendMessage() {
         if (this == NOT_IN_GAME) return;
         if (this == DEATHMATCH) {
-            Bukkit.broadcast(getMessageBuilder().append(baseChatMsg, clr, fmt).toComponents());
+            Bukkit.getServer().sendMessage(getMessageBuilder().append(Component.text(baseChatMsg, bodyClr, bodyFmt)));
             return;
         }
         /**
@@ -246,12 +252,12 @@ public enum GameStage {
         }
         
         var s = getMessageBuilder()
-                .append(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, getWordTimeString(dur)), clr, fmt);
+                .append(Component.text(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, getWordTimeString(dur)), bodyClr, bodyFmt));
 
         if (this == lastGradualStage()) {
-            s.append(String.format(dmWarn, getWordTimeString(dur)), clr, fmt);
+            s.append(Component.text(String.format(dmWarn, getWordTimeString(dur)), bodyClr, bodyFmt));
         }
         
-        Bukkit.broadcast(s.toComponents());
+        Bukkit.getServer().sendMessage(s);
     }
 }
