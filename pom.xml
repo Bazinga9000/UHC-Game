@@ -22,8 +22,8 @@
             <url>https://raw.githubusercontent.com/JorelAli/CommandAPI/mvn-repo/</url>
         </repository>
         <repository>
-            <id>Multiverse-Core</id>
-            <url>http://repo.onarandombox.com/content/repositories/multiverse/</url>
+            <id>OnARandomBox</id>
+            <url>http://repo.onarandombox.com/content/groups/public/</url>
         </repository>
     </repositories>
 
