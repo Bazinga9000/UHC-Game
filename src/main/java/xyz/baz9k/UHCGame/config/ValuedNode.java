@@ -4,14 +4,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-import xyz.baz9k.UHCGame.UHCGame;
 
 public class ValuedNode extends Node {
     private final ValuedNodeType type;
     private final String id;
 
-    public ValuedNode(UHCGame plugin, BranchNode parent, int slot, ItemStack item, ValuedNodeType type, String id) {
-        super(plugin, parent, slot, item);
+    public ValuedNode(BranchNode parent, int slot, ItemStack item, ValuedNodeType type, String id) {
+        super(parent, slot, item);
         this.type = type;
         this.id = id;
         updateItemStack();

@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.baz9k.UHCGame.UHCGame;
 
 /**
  * {@link Node} that contains an {@link Inventory}.
@@ -27,12 +26,12 @@ public class BranchNode extends Node {
      * @param guiName
      * @param guiHeight
      */
-    public BranchNode(UHCGame plugin, @NotNull String guiName, int guiHeight) {
-        this(plugin, null, 0, null, guiName, guiHeight);
+    public BranchNode(@NotNull String guiName, int guiHeight) {
+        this(null, 0, null, guiName, guiHeight);
     }
 
-    public BranchNode(UHCGame plugin, @Nullable BranchNode parent, int slot, @Nullable ItemStack itemStack, @NotNull String guiName, int guiHeight) {
-        super(plugin, parent, slot, itemStack);
+    public BranchNode(@Nullable BranchNode parent, int slot, @Nullable ItemStack itemStack, @NotNull String guiName, int guiHeight) {
+        super(parent, slot, itemStack);
         slotCount = 9 * guiHeight;
 
         int arrLen = parent == null ? slotCount : slotCount - 1;

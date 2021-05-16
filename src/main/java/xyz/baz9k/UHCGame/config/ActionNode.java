@@ -5,7 +5,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import xyz.baz9k.UHCGame.UHCGame;
 
 import java.util.function.Consumer;
 
@@ -17,8 +16,8 @@ import java.util.function.Consumer;
 public class ActionNode extends Node {
     private Consumer<Player> fn;
 
-    public ActionNode(UHCGame plugin, @NotNull BranchNode parent, int slot, @NotNull ItemStack itemStack, @NotNull Consumer<Player> fn) {
-        super(plugin, parent, slot, itemStack);
+    public ActionNode(@NotNull BranchNode parent, int slot, @NotNull ItemStack itemStack, @NotNull Consumer<Player> fn) {
+        super(parent, slot, itemStack);
         this.fn = fn;
     }
 

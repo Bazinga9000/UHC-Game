@@ -16,25 +16,25 @@ public class ConfigTree {
     }
 
     public ConfigTree(UHCGame plugin) {
-        this.plugin = plugin;
+        Node.setPlugin(plugin);
         root = generateTree();
     }
 
     private BranchNode generateTree() {
-        BranchNode root = new BranchNode(plugin, "Config", ROOT_HEIGHT);
+        BranchNode root = new BranchNode("Config", ROOT_HEIGHT);
 
         ItemStack item1 = new ItemStack(Material.DIAMOND, 1);
-        ValuedNode test1 = new ValuedNode(plugin, root, getSlotCoordinate(3, 3), item1, ValuedNodeType.INTEGER, "team_count");
+        ValuedNode test1 = new ValuedNode(root, getSlotCoordinate(3, 3), item1, ValuedNodeType.INTEGER, "team_count");
 
         ItemStack item2 = new ItemStack(Material.EMERALD, 1);
-        ActionNode test2 = new ActionNode(plugin, root, getSlotCoordinate(5, 3), item2, player -> {
+        ActionNode test2 = new ActionNode(root, getSlotCoordinate(5, 3), item2, player -> {
             Bukkit.broadcastMessage("Clicky Click.");
         });
 
         ItemStack item3 = new ItemStack(Material.REDSTONE, 6);
-        BranchNode subLevel = new BranchNode(plugin, root, getSlotCoordinate(4, 4), item3, "Fuck", 1);
+        BranchNode subLevel = new BranchNode(root, getSlotCoordinate(4, 4), item3, "Fuck", 1);
 
-        ActionNode test4 = new ActionNode(plugin, subLevel, getSlotCoordinate(5,0), item1, player -> {
+        ActionNode test4 = new ActionNode(subLevel, getSlotCoordinate(5,0), item1, player -> {
             Bukkit.broadcastMessage("Fuck.");
         });
 
