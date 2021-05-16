@@ -6,8 +6,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 public class ValuedNode extends Node {
-    private final ValuedNodeType type;
-    private final String id;
+    protected final ValuedNodeType type;
+    protected final String id;
 
     public ValuedNode(BranchNode parent, int slot, ItemStack item, ValuedNodeType type, String id) {
         super(parent, slot, item);
@@ -38,9 +38,9 @@ public class ValuedNode extends Node {
             case BOOLEAN:
                 val = !plugin.getConfig().getBoolean(id);
                 break;
-            // TODO option impl
-            case OPTION:
-                //break;
+            
+            // OPTION impl in OptionValuedNode
+            
             default:
                 throw new UnsupportedOperationException("Type not supported");
             }
@@ -65,8 +65,9 @@ public class ValuedNode extends Node {
                 break;
             case BOOLEAN:
                 break;
-            case OPTION:
-                break;
+
+            // OPTION impl in OptionValuedNode
+
             default:
                 throw new UnsupportedOperationException("Type not supported");
         }
