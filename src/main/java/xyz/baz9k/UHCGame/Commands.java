@@ -163,8 +163,9 @@ public class Commands {
         }
         if (players.size() == 0) return;
 
-        var b = TeamDisplay.getName(t)
-                           .append(Component.text(": ", NamedTextColor.WHITE));
+        var b = Component.text()
+                         .append(TeamDisplay.getName(t))
+                         .append(Component.text(": ", NamedTextColor.WHITE));
 
         // list of players one a team, separated by commas
         String tPlayers = players.stream()

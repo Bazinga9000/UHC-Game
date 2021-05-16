@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -56,8 +57,8 @@ public class HUDManager implements Listener {
         return TeamDisplay.getName(team);
     }
 
-    private TextComponent formatTeammate(@NotNull Player you, @NotNull Player teammate) {
-        TextComponent s = Component.empty();
+    private Component formatTeammate(@NotNull Player you, @NotNull Player teammate) {
+        TextComponent.Builder s = Component.text();
 
         double teammateHP = teammate.getHealth() + teammate.getAbsorptionAmount();
         double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
@@ -84,7 +85,7 @@ public class HUDManager implements Listener {
         if (teamManager.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
             s.append(Component.text(teammate.getName(), NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH))
              .append(Component.text(" 0♥", NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
-            return s;
+            return s.asComponent();
         } else {
             s.append(Component.text(teammate.getName(), tcGradient));
             s.append(Component.text(" " + (int) Math.ceil(teammateHP) + "♥ ", tcGradient));
@@ -114,7 +115,7 @@ public class HUDManager implements Listener {
             s.append(Component.text(arrow, clr));
         }
 
-        return s;
+        return s.asComponent();
     }
 
     /* HANDLE SCOREBOARD PARITY */
@@ -173,11 +174,11 @@ public class HUDManager implements Listener {
         hud.getScore(pname).setScore(position);
     }
 
-    private void setHUDLine(@NotNull Player p, @NotNull String field, @NotNull Component text) {
+    private void setHUDLine(@NotNull Player p, @NotNull String field, @NotNull ComponentLike text) {
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(field);
         if(team == null) return;
-        team.prefix(text);
+        team.prefix(text.asComponent());
     }
 
     /**
@@ -257,8 +258,10 @@ public class HUDManager implements Listener {
             y = loc.getBlockY(),
             z = loc.getBlockZ();
 
-        var s = Component.text(x + " " + y + " " + z, NamedTextColor.GREEN) // position format
-                .append(Component.text(" ( ", NamedTextColor.WHITE)); // rotation format
+        TextComponent.Builder s;
+        s = Component.text()
+            .append(Component.text(x + " " + y + " " + z, NamedTextColor.GREEN)) // position format
+            .append(Component.text(" ( ", NamedTextColor.WHITE)); // rotation format
 
         double yaw = mod(loc.getYaw() + 67.5, 360);
         /*
@@ -293,7 +296,8 @@ public class HUDManager implements Listener {
         
         // world border radius format
         double r = (p.getWorld().getWorldBorder().getSize() / 2);
-        TextComponent s = Component.text("World Border: ±", NamedTextColor.AQUA)
+        TextComponent.Builder s = Component.text()
+            .append(Component.text("World Border: ±", NamedTextColor.AQUA))
             .append(Component.text((int) r, NamedTextColor.AQUA));
 
         // distance format
@@ -305,8 +309,9 @@ public class HUDManager implements Listener {
 
     public void updateElapsedTimeHUD(@NotNull Player p){
         String elapsed = getLongTimeString(gameManager.getElapsedTime());
-        var s = Component.text("Game Time: ", NamedTextColor.RED)
-                .append(Component.text(elapsed + " ", NamedTextColor.WHITE));
+        var s = Component.text()
+            .append(Component.text("Game Time: ", NamedTextColor.RED))
+            .append(Component.text(elapsed + " ", NamedTextColor.WHITE));
 
         World world = gameManager.getUHCWorld(Environment.NORMAL);
         long time = world.getTime();
@@ -320,15 +325,17 @@ public class HUDManager implements Listener {
     }
 
     public void updateCombatantsAliveHUD(@NotNull Player p) {
-        var s = Component.text("Combatants: ", NamedTextColor.WHITE)
-                .append(Component.text(teamManager.countLivingCombatants() + " / " + teamManager.countCombatants(), NamedTextColor.WHITE));
+        var s = Component.text() 
+            .append(Component.text("Combatants: ", NamedTextColor.WHITE))
+            .append(Component.text(teamManager.countLivingCombatants() + " / " + teamManager.countCombatants(), NamedTextColor.WHITE));
 
         setHUDLine(p, "combsalive", s);
     }
 
     public void updateTeamsAliveHUD(@NotNull Player p) {
-        var s = Component.text("Teams: ", NamedTextColor.WHITE)
-                .append(Component.text(teamManager.countLivingTeams() + " / " + teamManager.getNumTeams(), NamedTextColor.WHITE));
+        var s = Component.text() 
+            .append(Component.text("Teams: ", NamedTextColor.WHITE))
+            .append(Component.text(teamManager.countLivingTeams() + " / " + teamManager.getNumTeams(), NamedTextColor.WHITE));
 
         setHUDLine(p, "teamsalive", s);
         
@@ -338,8 +345,9 @@ public class HUDManager implements Listener {
         OptionalInt k = gameManager.getKills(p);
 
         if (k.isPresent()) {
-            var s = Component.text("Kills: ", NamedTextColor.WHITE)
-                    .append(Component.text(k.orElseThrow(), NamedTextColor.WHITE));
+            var s = Component.text() 
+                .append(Component.text("Kills: ", NamedTextColor.WHITE))
+                .append(Component.text(k.orElseThrow(), NamedTextColor.WHITE));
             
             setHUDLine(p, "kills", s);
         }

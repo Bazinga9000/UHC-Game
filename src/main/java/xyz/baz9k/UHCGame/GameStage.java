@@ -181,14 +181,18 @@ public enum GameStage {
 
 
     /**
+     * Gives a builder that starts a warning message by the game.
      * [warn prefix] [message]
      * <p>
      * {@literal <!> World border is shrinking in ---}
      */
-    private static TextComponent getBoxPrefix() {
-        return Component.text("<", TextColor.color(0xCFCFFF), TextDecoration.BOLD)
-                        .append(Component.text("The Boxless One", TextColor.color(0xA679FE), TextDecoration.BOLD))
-                        .append(Component.text("> ", TextColor.color(0xCFCFFF), TextDecoration.BOLD));
+    private static TextComponent.Builder getMessageBuilder() {
+        return Component.text()
+                        .append(
+                            Component.text("<", TextColor.color(0xCFCFFF), TextDecoration.BOLD),
+                            Component.text("The Boxless One", TextColor.color(0xA679FE), TextDecoration.BOLD),
+                            Component.text("> ", TextColor.color(0xCFCFFF), TextDecoration.BOLD)
+                        );
     }
 
     // String.format(-, base, subject, radius, duration)
@@ -208,7 +212,7 @@ public enum GameStage {
     public void sendMessage() {
         if (this == NOT_IN_GAME) return;
         if (this == DEATHMATCH) {
-            Bukkit.getServer().sendMessage(getBoxPrefix().append(Component.text(baseChatMsg, bodyClr, bodyFmt)));
+            Bukkit.getServer().sendMessage(getMessageBuilder().append(Component.text(baseChatMsg, bodyClr, bodyFmt)));
             return;
         }
         /**
@@ -247,7 +251,7 @@ public enum GameStage {
             }
         }
         
-        var s = getBoxPrefix()
+        var s = getMessageBuilder()
                 .append(Component.text(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, getWordTimeString(dur)), bodyClr, bodyFmt));
 
         if (this == lastGradualStage()) {
