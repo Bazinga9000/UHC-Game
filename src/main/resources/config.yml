@@ -1,0 +1,15 @@
+wb_size:
+  initial: 1200
+  first: 25
+  second: 3
+  deathmatch: 20
+
+intervals:
+  start: 3600
+  first_movement: 900
+  stop: 300
+  second_movement: 600
+  deathmatch_wait: 300
+
+team_count: 17
+#esoterics: DO THESE LATER

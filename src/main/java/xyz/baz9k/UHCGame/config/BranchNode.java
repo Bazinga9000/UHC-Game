@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.baz9k.UHCGame.UHCGame;
 
 /**
  * {@link Node} that contains an {@link Inventory}.
@@ -28,12 +29,12 @@ public class BranchNode extends Node {
      * @param guiName
      * @param guiHeight
      */
-    public BranchNode(@NotNull String guiName, int guiHeight) {
-        this(null, 0, null, guiName, guiHeight);
+    public BranchNode(UHCGame plugin, @NotNull String guiName, int guiHeight) {
+        this(plugin, null, 0, null, guiName, guiHeight);
     }
 
-    public BranchNode(@Nullable BranchNode parent, int slot, @Nullable ItemStack itemStack, @NotNull String guiName, int guiHeight) {
-        super(parent, slot, itemStack);
+    public BranchNode(UHCGame plugin, @Nullable BranchNode parent, int slot, @Nullable ItemStack itemStack, @NotNull String guiName, int guiHeight) {
+        super(plugin, parent, slot, itemStack);
         slotCount = 9 * guiHeight;
 
         int arrLen = parent == null ? slotCount : slotCount - 1;
@@ -53,7 +54,7 @@ public class BranchNode extends Node {
         for (int i = 0; i < slotCount; i++) {
             inventory.setItem(i, emptyGlass);
         }
-        if (getParent() != null) {
+        if (parent != null) {
             ItemStack goBack = new ItemStack(Material.ARROW);
 
             m = goBack.getItemMeta();
@@ -80,7 +81,7 @@ public class BranchNode extends Node {
             return;
         }
         children[slot] = child;
-        inventory.setItem(slot, child.getItemStack());
+        inventory.setItem(slot, child.itemStack);
     }
 
     /**
@@ -94,7 +95,7 @@ public class BranchNode extends Node {
         }
 
         if (slot == children.length - 1) {
-            p.openInventory(getParent().inventory);
+            p.openInventory(parent.inventory);
             return;
         }
 
@@ -110,15 +111,10 @@ public class BranchNode extends Node {
 
     /**
      * Updates the {@link ItemStack} of the specified child of the inventory.
-     * @param child
+     * @param slot the slot
      */
-    public void updateChild(Node child) {
-        int ind = IntStream.range(0, children.length)
-                .filter(i -> children[i].equals(child))
-                .findFirst()
-                .orElseThrow();
-
-        inventory.setItem(ind, child.getItemStack());
+    public void updateSlot(int slot) {
+        inventory.setItem(slot, children[slot].itemStack);
     }
 
     @NotNull
