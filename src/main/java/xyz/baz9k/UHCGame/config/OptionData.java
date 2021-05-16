@@ -1,28 +1,29 @@
 package xyz.baz9k.UHCGame.config;
 
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
 
 /**
  * Provides all the data for one option of the options selectable in an {@link OptionValuedNode}.
  */
 public class OptionData {
+    // I'm not 100% sure value is necessary so I'm gonna keep it commented out for now
     private String name;
-    private ItemStack itemStack;
-    private String value;
+    private Material mat;
+    // private String value;
 
-    public OptionData(String name, ItemStack itemStack, String value) {
+    public OptionData(String name, Material mat /*, String value */) {
         this.name = name;
-        this.itemStack = itemStack;
-        this.value = value;
+        this.mat = mat;
+        // this.value = value;
     }
 
     public String getName() {
         return name;
     }
-    public ItemStack getItemStack() {
-        return itemStack;
+    public Material getMaterial() {
+        return mat;
     }
-    public String getValue() {
-        return value;
-    }
+    // public String getValue() {
+    //     return value;
+    // }
 }
