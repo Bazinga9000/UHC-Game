@@ -42,15 +42,17 @@ public class BranchNode extends Node {
     }
 
     private void initInventory() {
-        /* If we aren't root, add a slot for the "Go Back" button */
+        // add glass to all slots
         ItemStack emptyGlass = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
         ItemMeta m = emptyGlass.getItemMeta();
         m.setDisplayName(ChatColor.BLACK + "");
         emptyGlass.setItemMeta(m);
-
+        
         for (int i = 0; i < slotCount; i++) {
             inventory.setItem(i, emptyGlass);
         }
+
+        // If we aren't root, add a slot for the "Go Back" button
         if (parent != null) {
             ItemStack goBack = new ItemStack(Material.ARROW);
 
