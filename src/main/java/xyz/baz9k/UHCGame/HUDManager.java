@@ -5,7 +5,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
@@ -42,7 +41,7 @@ public class HUDManager implements Listener {
     }
 
     private static String createEmptyName(char c){
-        return ChatColor.translateAlternateColorCodes('&', "&"+c);
+        return "\u00A7" + c;
     }
 
     /* FORMATTING */
