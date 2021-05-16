@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -20,15 +19,11 @@ public class BossbarManager {
         this.bossbar = BossBar.bossBar(Component.empty(), 1, BossBar.Color.WHITE, BossBar.Overlay.PROGRESS);
     }
 
-    private Audience onlinePlayers() {
-        return Audience.audience(Bukkit.getOnlinePlayers());
-    }
-
     /**
      * On game start, this function runs to initialize the bossbar.
      */
     public void enable() {
-        onlinePlayers().showBossBar(bossbar);
+        Bukkit.getServer().showBossBar(bossbar);
         updateBossbarStage();
     }
 
@@ -36,7 +31,7 @@ public class BossbarManager {
      * On game end, this function runs to deactivate the bossbar.
      */
     public void disable() {
-        onlinePlayers().hideBossBar(bossbar);
+        Bukkit.getServer().hideBossBar(bossbar);
     }
 
     /**
