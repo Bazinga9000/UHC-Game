@@ -10,18 +10,20 @@ import xyz.baz9k.UHCGame.config.*;
 
 public class ConfigManager implements Listener {
     private final UHCGame plugin;
+    private final ConfigTree configTree;
 
     public ConfigManager(UHCGame plugin) {
         this.plugin = plugin;
+        this.configTree = new ConfigTree(plugin);
     }
 
     public void openMenu(@NotNull Player p) {
-        ConfigTree.getRoot().click(p);
+        configTree.getRoot().click(p);
     }
 
     @EventHandler
     public void onInvClick(InventoryClickEvent e) {
-        BranchNode b = ConfigTree.getNodeFromInventory(e.getInventory());
+        BranchNode b = configTree.getNodeFromInventory(e.getInventory());
 
         if (b == null) return; // interacted view does not have a node inventory
         if (e.getInventory() == e.getClickedInventory()) { // handle clicks IF the clicked inv is the top of the view
@@ -30,11 +32,4 @@ public class ConfigManager implements Listener {
         }
 
     }
-
-    /**
-     * Takes an {@link Inventory} and returns the {@link BranchNode} that is linked to that Inventory.
-     * @param inv The inventory to check
-     * @return the BranchNode matching the Inventory (null if no BranchNode matches the Inventory).
-     */
-
 }
