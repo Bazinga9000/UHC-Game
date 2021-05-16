@@ -6,6 +6,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.md_5.bungee.api.ChatColor;
+import xyz.baz9k.UHCGame.config.ConfigTree;
 import xyz.baz9k.UHCGame.util.ColoredText;
 import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
@@ -462,6 +463,17 @@ public class Commands {
                 }
             }
         );
+    }
+
+    @Command
+    private CommandAPICommand config() {
+        return new CommandAPICommand("config")
+                .executesPlayer(
+                        (sender, args) -> {
+                            ConfigManager cfgManager = plugin.getConfigManager();
+                            cfgManager.openMenu(sender);
+                        }
+                );
     }
 
 }

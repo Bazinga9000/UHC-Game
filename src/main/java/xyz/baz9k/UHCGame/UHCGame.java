@@ -6,11 +6,14 @@ import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.ObjectInputFilter;
+
 public class UHCGame extends JavaPlugin {
     private TeamManager teamManager;
     private GameManager gameManager;
     private HUDManager hudManager;
     private BossbarManager bbManager;
+    private ConfigManager configManager;
     private Recipes recipes;
 
     @Override
@@ -19,10 +22,12 @@ public class UHCGame extends JavaPlugin {
         gameManager = new GameManager(this);
         hudManager = new HUDManager(this);
         bbManager = new BossbarManager(this);
+        configManager = new ConfigManager(this);
         recipes = new Recipes(this);
 
         Bukkit.getPluginManager().registerEvents(gameManager, this);
         Bukkit.getPluginManager().registerEvents(hudManager, this);
+        Bukkit.getPluginManager().registerEvents(configManager, this);
 
         Commands commands = new Commands(this);
         commands.registerAll();
@@ -43,6 +48,10 @@ public class UHCGame extends JavaPlugin {
     public BossbarManager getBossbarManager() {
         return bbManager;
     }
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
     public Recipes getRecipes() {
         return recipes;
     }
