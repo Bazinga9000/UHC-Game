@@ -15,7 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
 
-import net.md_5.bungee.api.chat.BaseComponent;
+import net.kyori.adventure.text.Component;
 import xyz.baz9k.UHCGame.UHCGame;
 
 public final class Utils {
@@ -154,25 +154,11 @@ public final class Utils {
      * @param delay
      * @return BukkitTask of the message (can be cancelled)
      */
-    public static BukkitTask delayedMessage(String m, UHCGame plugin, long delay) {
+    public static BukkitTask delayedMessage(Component m, UHCGame plugin, long delay) {
         return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            Bukkit.broadcastMessage(m);
+            Bukkit.getServer().sendMessage(m);
         }, delay);
     }
-    
-    /**
-     * Send a message after some delay.
-     * @param m
-     * @param plugin
-     * @param delay
-     * @return BukkitTask of the message (can be cancelled)
-     */
-    public static BukkitTask delayedMessage(BaseComponent[] m, UHCGame plugin, long delay) {
-        return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            Bukkit.broadcast(m);
-        }, delay);
-    }
-
 
     /**
      * Get highest location that a player can be tp'd to and be standing.

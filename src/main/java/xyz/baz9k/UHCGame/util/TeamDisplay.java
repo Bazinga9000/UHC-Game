@@ -1,7 +1,10 @@
 package xyz.baz9k.UHCGame.util;
 
-import net.md_5.bungee.api.ChatColor;
-import static xyz.baz9k.UHCGame.util.Formats.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 import java.awt.Color;
 import java.util.Arrays;
@@ -27,7 +30,7 @@ public final class TeamDisplay {
     private static final int NUM_TEAM_COLORS = teamColors.length - 1;
 
     /**
-     * Returns color of type {@link java.awt.Color}.
+     * Returns color of the team in type {@link java.awt.Color}.
      * @param t
      * @return
      */
@@ -42,9 +45,9 @@ public final class TeamDisplay {
     }
 
     /**
-     * Returns color of type {@link org.bukkit.Color}. Please refrain from using this.
+     * Returns color of the team in type {@link org.bukkit.Color}. Please refrain from using this.
      * @see #getColor
-     * @param t
+     * @param t Team number
      * @return Bukkit color
      */
     public static org.bukkit.Color getBukkitColor(int t) {
@@ -52,42 +55,66 @@ public final class TeamDisplay {
     }
 
     /**
-     * Returns color of type {@link ChatColor}.
-     * @param t
-     * @return
+     * Returns color of the team in type {@link TextColor}.
+     * @param t Team number
+     * @return PaperMC {@link TextColor}
      */
-    public static ChatColor getChatColor(int t) {
-        return ChatColor.of(getColor(t));
+    public static TextColor getTextColor(int t) {
+        Color clr = getColor(t);
+        return TextColor.color(clr.getRGB());
+    }
+
+    /**
+     * Returns the formatting of the team.
+     * This is the color & the decoration of the team name and prefix.
+     * @param t Team number
+     * @return PaperMC {@link Style}
+     */
+    public static Style getStyle(int t) {
+        TextDecoration deco = t == 0 ? TextDecoration.ITALIC : TextDecoration.BOLD;
+        return Style.style(getTextColor(t), deco);
     }
 
     public static int getNumTeamColors() {
         return NUM_TEAM_COLORS;
     }
 
-    private static ColoredText getPrefixBuilder(int t) {
-        if (t == 0) {
-            return ColoredText.of("[S]", getChatColor(0), ITALIC);
-        } else {
-            return ColoredText.of("[" + t + "]", getChatColor(t), BOLD);
-        }
-    }
-    public static String getPrefix(int t) {
-        return getPrefixBuilder(t).toString();
-    }
-
-    public static String getPrefixWithSpace(int t) {
-        return getPrefixBuilder(t).append(" ").toString();
+    /**
+     * Returns the chat prefix of the team.
+     * @param t Team number
+     * @return {@link TextComponent} of the prefix
+     */
+    public static TextComponent getPrefix(int t) {
+        String s = String.format("[%s]", t == 0 ? "S" : t);
+        return Component.text(s, getStyle(t));
     }
 
-    public static String prefixed(int t, String name) {
-        return getPrefixBuilder(t).append(" ").append(name).toString();
+    /**
+     * Returns the chat prefix of the team with a space prepended.
+     * @param t Team number
+     * @return {@link TextComponent}
+     */
+    public static TextComponent getPrefixWithSpace(int t) {
+        return Component.space().append(getPrefix(t));
     }
 
-    public static String getName(int t) {
-        if (t == 0) {
-            return ColoredText.of("Spectators", getChatColor(0), ITALIC).toString();
-        } else {
-            return ColoredText.of("Team " + t, getChatColor(t), BOLD).toString();
-        }
+    /**
+     * Returns a player name with the prefix prepended.
+     * @param t Team number
+     * @param name Player name
+     * @return {@link TextComponent}
+     */
+    public static TextComponent prefixed(int t, String name) {
+        return getPrefix(t).append(Component.space()).append(Component.text(name));
+    }
+
+    /**
+     * Returns the name of the team with formatting.
+     * @param t Team number
+     * @return {@link TextComponent}
+     */
+    public static TextComponent getName(int t) {
+        String s = t == 0 ? "Spectators" : "Team " + t;
+        return Component.text(s, getStyle(t));
     }
 }

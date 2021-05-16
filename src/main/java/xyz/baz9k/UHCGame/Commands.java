@@ -5,8 +5,8 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import net.md_5.bungee.api.ChatColor;
-import xyz.baz9k.UHCGame.util.ColoredText;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
@@ -163,15 +163,16 @@ public class Commands {
         }
         if (players.size() == 0) return;
 
-        var b = new ColoredText()
-                .appendColored(TeamDisplay.getName(t))
-                .append(": ");
+        var b = TeamDisplay.getName(t)
+                           .append(Component.text(": "));
 
-        String str = players.stream()
-                            .map(p -> p.getName())
-                            .collect(Collectors.joining(", "));
-        b.append(str);
-        Bukkit.broadcast(b.toComponents());
+        // list of players one a team, separated by commas
+        String tPlayers = players.stream()
+                                 .map(Player::getName)
+                                 .collect(Collectors.joining(", "));
+        
+        b.append(Component.text(tPlayers));
+        Bukkit.getServer().sendMessage(b);
     }
 
     @Command
@@ -230,7 +231,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 plugin.getGameManager().reseedWorlds();
-                sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
+                sender.sendMessage(Component.text("Both dimensions have been reseeded successfully.", NamedTextColor.GREEN));
             }
         );
     }
@@ -245,7 +246,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 plugin.getGameManager().reseedWorlds((String) args[0]);
-                sender.sendMessage(ChatColor.GREEN + "Both dimensions have been reseeded successfully.");
+                sender.sendMessage(Component.text("Both dimensions have been reseeded successfully.", NamedTextColor.GREEN));
             }
         );
     }
@@ -253,7 +254,7 @@ public class Commands {
     private void _respawn(CommandSender sender, Player p, Location loc) {
         TeamManager tm = plugin.getTeamManager();
         if (tm.isSpectator(p)) {
-            sender.sendMessage(String.format("%sCannot respawn spectator %s.", ChatColor.RED, p.getName()));
+            sender.sendMessage(Component.text(String.format("Cannot respawn spectator %s.", p.getName()), NamedTextColor.RED));
             return;
         }
 

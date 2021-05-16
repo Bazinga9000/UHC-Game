@@ -21,7 +21,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-import net.md_5.bungee.api.chat.BaseComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import xyz.baz9k.UHCGame.util.*;
 
 import java.time.*;
@@ -41,7 +42,7 @@ import static xyz.baz9k.UHCGame.util.Utils.*;
 public class GameManager implements Listener {
     private UHCGame plugin;
 
-    private final HashMap<UUID, String> previousDisplayNames;
+    private final HashMap<UUID, Component> previousDisplayNames;
     
     private TeamManager teamManager;
     private HUDManager hudManager;
@@ -124,7 +125,7 @@ public class GameManager implements Listener {
         
         for (Player p : Bukkit.getOnlinePlayers()) {
             // archive previous display name
-            previousDisplayNames.put(p.getUniqueId(), p.getDisplayName());
+            previousDisplayNames.put(p.getUniqueId(), p.displayName());
             resetStatuses(p);
             recipes.discoverFor(p);
 
@@ -139,7 +140,7 @@ public class GameManager implements Listener {
             }
 
             // set player display name
-            p.setDisplayName(TeamDisplay.prefixed(teamManager.getTeam(p),  p.getName()));
+            p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
 
             // activate hud things for all
             hudManager.initializePlayerHUD(p);
@@ -219,7 +220,7 @@ public class GameManager implements Listener {
         for (UUID uuid : previousDisplayNames.keySet()) {
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
-            p.setDisplayName(previousDisplayNames.get(uuid));
+            p.displayName(previousDisplayNames.get(uuid));
         }
 
         teamManager.resetAllPlayers();
@@ -701,10 +702,8 @@ public class GameManager implements Listener {
     private void winMessage() {
         if (teamManager.countLivingTeams() > 1) return;
         int winner = teamManager.getAliveTeams()[0];
-        BaseComponent[] winMsg = new ColoredText()
-            .append(TeamDisplay.getName(winner))
-            .append(" has won!")
-            .toComponents();
+        TextComponent winMsg = TeamDisplay.getName(winner)
+            .append(Component.text("has won!"));
 
         // this msg should be displayed after player death
         delayedMessage(winMsg, plugin, 1);
@@ -746,13 +745,10 @@ public class GameManager implements Listener {
             // check team death
             int t = teamManager.getTeam(dead);
             if (teamManager.isTeamEliminated(t)) {
-                BaseComponent[] teamEliminatedMessage;
-                teamEliminatedMessage = new ColoredText()
-                                            .appendColored(TeamDisplay.getName(t))
-                                            .append(" has been eliminated!")
-                                            .toComponents();
+                Component teamElimMsg = TeamDisplay.getName(t)
+                                                   .append(Component.text(" has been eliminated!"));
                 // this msg should be displayed after player death
-                delayedMessage(teamEliminatedMessage, plugin, 1);
+                delayedMessage(teamElimMsg, plugin, 1);
             }
 
             // set bed spawn
