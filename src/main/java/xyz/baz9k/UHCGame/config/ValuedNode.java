@@ -23,7 +23,29 @@ public class ValuedNode extends Node {
 
     @Override
     public void click(@NotNull Player p) {
+        Object val;
+        switch (type) {
+            // TODO impl prompts for int, dbl, string  
+            case INTEGER:
+                val = plugin.getConfig().getInt(id);
+                break;
+            case DOUBLE:
+                val = plugin.getConfig().getDouble(id);
+                break;
+            case STRING:
+                val = plugin.getConfig().getString(id);
+                break;
 
+            case BOOLEAN:
+                val = !plugin.getConfig().getBoolean(id);
+                break;
+            // TODO option impl
+            case OPTION:
+                //break;
+            default:
+                throw new UnsupportedOperationException("Type not supported");
+            }
+        plugin.getConfig().set(id, val);
     }
 
     /**
