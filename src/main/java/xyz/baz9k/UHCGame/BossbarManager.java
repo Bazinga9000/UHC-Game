@@ -3,7 +3,6 @@ package xyz.baz9k.UHCGame;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
@@ -24,7 +23,7 @@ public class BossbarManager {
     private Audience onlinePlayers() {
         return Audience.audience(Bukkit.getOnlinePlayers());
     }
-    
+
     /**
      * On game start, this function runs to initialize the bossbar.
      */
@@ -74,21 +73,14 @@ public class BossbarManager {
      * This function updates the bossbar when the stage increments.
      */
     public void updateBossbarStage() {
-        if (getBBColor() == null) {
-            // should only occur on NOT_IN_GAME
-            bossbar.color(BossBar.Color.WHITE);
-            return;
-        }
         bossbar.color(getBBColor());
         tick();
     }
 
-    @Nullable
     private BossBar.Color getBBColor() {
         return gameManager.getStage().getBBColor();
     }
 
-    @Nullable
     private TextComponent getBBTitle() {
         return gameManager.getStage().getBBTitle();
     }

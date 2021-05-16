@@ -49,7 +49,7 @@ public enum GameStage {
      * NOT_IN_GAME
      */
     private GameStage() { 
-        this(null, null, -1, false, Component.empty(), "", NamedTextColor.WHITE);
+        this(BossBar.Color.WHITE, Duration.ZERO, -1, false, Component.empty(), "", NamedTextColor.WHITE);
     }
     
 
@@ -109,18 +109,14 @@ public enum GameStage {
     }
 
     /* PROPERTIES */
-
-    @Nullable
     public BossBar.Color getBBColor() {
         return bbClr;
     }
 
-    @Nullable
     public TextComponent getBBTitle() {
         return bbTitle;
     }
 
-    @Nullable
     public Duration getDuration() {
         return dur;
     }
