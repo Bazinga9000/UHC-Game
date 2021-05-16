@@ -17,13 +17,13 @@ public class ValuedNode extends Node {
     protected final String id;
 
     /**
-     * @param parent
-     * @param slot
-     * @param item The item
+     * @param parent Parent node
+     * @param slot lot of this node in parent's inventory
+     * @param item Item stack of this node in parent's inventory
      * <p>
      * If format strings are included in the item's description (%s, %.1f, etc.), those will be substituted with the config value.
-     * @param type
-     * @param id
+     * @param type Type of data this value stores
+     * @param id The config ID for this node
      */
     public ValuedNode(BranchNode parent, int slot, ItemStack item, ValuedNodeType type, String id) {
         super(parent, slot, item);

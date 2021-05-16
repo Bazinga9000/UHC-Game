@@ -11,6 +11,10 @@ public class OptionData {
     private Material mat;
     // private String value;
 
+    /**
+     * @param name Display name of this option in lore
+     * @param mat Material of item when this data is displayed
+     */
     public OptionData(String name, Material mat /*, String value */) {
         this.name = name;
         this.mat = mat;

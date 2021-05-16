@@ -18,6 +18,11 @@ public abstract class Node {
     protected static FileConfiguration cfg;
     protected int parentSlot;
 
+    /**
+     * @param parent Parent node
+     * @param parentSlot lot of this node in parent's inventory
+     * @param item Item stack of this node in parent's inventory
+     */
     public Node(BranchNode parent, int parentSlot, ItemStack item) {
         this.parent = parent;
 
@@ -43,5 +48,9 @@ public abstract class Node {
         Node.cfg = plugin.getConfig();
     }
 
+    /**
+     * Action to run when this node is clicked in parent's inventory
+     * @param p Player who clicked the node
+     */
     public abstract void click(@NotNull Player p);
 }

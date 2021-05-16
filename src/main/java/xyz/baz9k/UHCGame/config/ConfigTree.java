@@ -10,9 +10,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import xyz.baz9k.UHCGame.UHCGame;
 
+/**
+ * Setup for the config GUI tree
+ */
 public class ConfigTree {
     private BranchNode root;
-    private static final int ROOT_HEIGHT = 6;
+    private static final int ROOT_GUI_HEIGHT = 6;
 
     public ConfigTree(UHCGame plugin) {
         Node.setPlugin(plugin);
@@ -34,8 +37,11 @@ public class ConfigTree {
         return stack;
     }
 
+    /**
+     * @return the root of the tree, once built
+     */
     private BranchNode generateTree() {
-        BranchNode root = new BranchNode("Config", ROOT_HEIGHT);
+        BranchNode root = new BranchNode("Config", ROOT_GUI_HEIGHT);
 
         new ValuedNode(root, getSlotCoordinate(3, 3), itemStack(Material.DIAMOND, "Dice", "number %s"), ValuedNodeType.INTEGER, "team_count");
 
@@ -56,11 +62,21 @@ public class ConfigTree {
         return root;
     }
 
+    /**
+     * Returns the node in the tree that has the specified inventory
+     * @param inventory The inventory
+     * @return The node (or null if not present)
+     */
     public BranchNode getNodeFromInventory(Inventory inventory) {
         return scanAllChildrenForInventory(inventory, root);
     }
 
-
+    /**
+     * Traverses the tree of a node for the node that has a specified inventory
+     * @param inventory The inventory
+     * @param node The node tree to traverse
+     * @return The node (or null if not present)
+     */
     private static BranchNode scanAllChildrenForInventory(Inventory inventory, BranchNode node) {
         if (node.getInventory() == inventory) {
             return node;

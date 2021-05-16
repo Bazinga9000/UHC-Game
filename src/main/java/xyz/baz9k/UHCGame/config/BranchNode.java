@@ -22,14 +22,21 @@ public class BranchNode extends Node {
     private final @NotNull Inventory inventory;
 
     /**
-     * Create a root {@link BranchNode}.
-     * @param guiName
-     * @param guiHeight
+     * Create a root {@link BranchNode}. This node does not have a parent.
+     * @param guiName Name of this node's inventory
+     * @param guiHeight Number of rows in this node's inventory
      */
     public BranchNode(@NotNull String guiName, int guiHeight) {
         this(null, 0, null, guiName, guiHeight);
     }
 
+    /**
+     * @param parent Parent node
+     * @param slot lot of this node in parent's inventory
+     * @param itemStack Item stack of this node in parent's inventory
+     * @param guiName Name of this node's inventory
+     * @param guiHeight Number of rows in this node's inventory
+     */
     public BranchNode(@Nullable BranchNode parent, int slot, @Nullable ItemStack itemStack, @NotNull String guiName, int guiHeight) {
         super(parent, slot, itemStack);
         slotCount = 9 * guiHeight;

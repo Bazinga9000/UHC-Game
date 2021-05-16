@@ -13,6 +13,14 @@ import net.md_5.bungee.api.ChatColor;
 public class OptionValuedNode extends ValuedNode {
 
     private OptionData[] optData;
+
+    /**
+     * @param parent Parent node
+     * @param slot lot of this node in parent's inventory
+     * @param stack Item stack of this node in parent's inventory
+     * @param id The config ID for this node
+     * @param optData An array of options that this node supports 
+     */
     public OptionValuedNode(BranchNode parent, int slot, ItemStack stack, String id, OptionData... optData) {
         super(parent, slot, stack, ValuedNodeType.OPTION, id);
         this.optData = optData;

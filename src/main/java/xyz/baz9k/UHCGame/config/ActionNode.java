@@ -16,6 +16,12 @@ import java.util.function.Consumer;
 public class ActionNode extends Node {
     private Consumer<Player> fn;
 
+    /**
+     * @param parent Parent node
+     * @param slot Slot of this node in parent's inventory
+     * @param itemStack Item stack of this node in parent's inventory
+     * @param fn Function ran when this node is clicked
+     */
     public ActionNode(@NotNull BranchNode parent, int slot, @NotNull ItemStack itemStack, @NotNull Consumer<Player> fn) {
         super(parent, slot, itemStack);
         this.fn = fn;
