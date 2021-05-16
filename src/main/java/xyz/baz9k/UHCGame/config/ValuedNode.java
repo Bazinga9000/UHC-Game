@@ -14,6 +14,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+import static xyz.baz9k.UHCGame.util.Utils.*;
+
 public class ValuedNode extends Node {
     protected final ValuedNodeType type;
     protected final String id;
@@ -87,16 +89,17 @@ public class ValuedNode extends Node {
                         newDesc.set(i, lineComp.content(String.format(line, val)));
                     }
                 }
+                break;
             case BOOLEAN:
                 // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
                 TextComponent.Builder status = Component.text()
-                    .append(Component.text("Status: ", NamedTextColor.WHITE));
+                    .append(Component.text("Status: ", noDecoStyle(NamedTextColor.WHITE)));
                 
                 if (cfg.getBoolean(id)) {
-                    status.append(Component.text("ACTIVE", NamedTextColor.GREEN));
+                    status.append(Component.text("ACTIVE", noDecoStyle(NamedTextColor.GREEN)));
                     m.addEnchant(Enchantment.SILK_TOUCH, 1, true);
                 } else {
-                    status.append(Component.text("INACTIVE", NamedTextColor.RED));
+                    status.append(Component.text("INACTIVE", noDecoStyle(NamedTextColor.RED)));
                     m.removeEnchant(Enchantment.SILK_TOUCH);
                 }
                 newDesc.add(Component.empty());

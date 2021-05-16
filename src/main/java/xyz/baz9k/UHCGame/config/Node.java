@@ -14,6 +14,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import xyz.baz9k.UHCGame.UHCGame;
 
+import static xyz.baz9k.UHCGame.util.Utils.*;
+
 public abstract class Node {
     protected BranchNode parent;
     protected ItemStack itemStack;
@@ -25,7 +27,7 @@ public abstract class Node {
     /**
      * This text style (color & formatting) will be used in the description by default
      */
-    public static final Style DEFAULT_LORE_STYLE = Style.style(NamedTextColor.DARK_GRAY);
+    public static final Style DEFAULT_LORE_STYLE = noDecoStyle(NamedTextColor.DARK_GRAY);
 
     /**
      * @param parent Parent node
@@ -39,8 +41,13 @@ public abstract class Node {
 
         // Creates a copy of the lore. 
         // This is necessary because ValuedNodes use the original desc as a template, so they must use this to update their descs.
-        ItemMeta m = item.getItemMeta();
-        this.itemDesc = m.hasLore() ? m.lore() : new ArrayList<>();
+        this.itemDesc = new ArrayList<>();
+        if (item != null) {
+            ItemMeta m = item.getItemMeta();
+            if (m.hasLore()) {
+                this.itemDesc.addAll(m.lore());
+            }
+        }
 
         this.parentSlot = parentSlot;
         if (parent != null) {

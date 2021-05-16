@@ -12,6 +12,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static xyz.baz9k.UHCGame.util.Utils.*;
+
 /**
  * {@link Node} that contains an {@link Inventory}.
  * <p>
@@ -76,7 +78,7 @@ public class BranchNode extends Node {
             ItemStack goBack = new ItemStack(Material.ARROW);
 
             m = goBack.getItemMeta();
-            m.displayName(Component.text("Go Back", NamedTextColor.RED));
+            m.displayName(Component.text("Go Back", noDecoStyle(NamedTextColor.RED)));
             goBack.setItemMeta(m);
 
             inventory.setItem(slotCount - 1, goBack);

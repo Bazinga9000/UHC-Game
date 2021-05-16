@@ -11,6 +11,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import net.kyori.adventure.text.Component;
 import xyz.baz9k.UHCGame.UHCGame;
 
+import static xyz.baz9k.UHCGame.util.Utils.*;
+
 /**
  * Setup for the config GUI tree
  */
@@ -33,7 +35,7 @@ public class ConfigTree {
             .map(Node::withDefaultDescStyle)
             .toArray(Component[]::new);
 
-        return itemStack(type, Component.text(name), loreComps);
+        return itemStack(type, Component.text(name, noDecoStyle(null)), loreComps);
     }
     private static ItemStack itemStack(Material type, Component name, Component... lore) {
         ItemStack stack = new ItemStack(type);

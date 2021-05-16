@@ -12,6 +12,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
+import static xyz.baz9k.UHCGame.util.Utils.*;
+
 public class OptionValuedNode extends ValuedNode {
 
     private OptionData[] optData;
@@ -44,9 +46,9 @@ public class OptionValuedNode extends ValuedNode {
 
         itemStack.setType(dat.getMaterial());
         for (int i = 0; i < optData.length; i++) {
-            
+
             TextColor clr = i == ind ? NamedTextColor.GREEN : NamedTextColor.RED;
-            newDesc.add(Component.text(optData[i].getName(), clr));
+            newDesc.add(Component.text(optData[i].getName(), noDecoStyle(clr)));
 
         }
 
