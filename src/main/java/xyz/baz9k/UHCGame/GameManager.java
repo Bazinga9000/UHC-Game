@@ -243,8 +243,8 @@ public class GameManager implements Listener {
         }
     }
 
-    private BukkitTask startTick() {
-        return Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+    private void startTick() {
+        tick = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (!hasUHCStarted()) return;
     
             bbManager.tick();
