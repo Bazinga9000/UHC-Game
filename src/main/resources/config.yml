@@ -12,4 +12,17 @@ intervals:
   deathmatch_wait: 300
 
 team_count: 17
-#esoterics: DO THESE LATER
+esoteric:
+  gone_fishing: false
+  boss_team: false
+  always_elytra: false
+  sardines: false
+  wither_bonus: true
+  mafia: false
+  fast_dn_cycle: false
+  always_day: false
+  always_night: false
+  nether_spawn: false
+  bomberman: false
+  max_health: 1
+  mv_speed: 1
