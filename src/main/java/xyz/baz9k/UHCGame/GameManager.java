@@ -506,7 +506,7 @@ public class GameManager implements Listener {
     }
 
     private List<Location> getRootsOfUnityLocations(Location center, int numLocations, double distance) {
-        Point2D center2 = new Point2D(center);
+        Point2D center2 = Point2D.fromLocation(center);
         List<Location> locations = new ArrayList<>();
         World w = center.getWorld();
 
@@ -521,7 +521,7 @@ public class GameManager implements Listener {
 
     //poisson disk sampling
     private List<Location> getRandomLocations(Location center, int numLocations, double sideLength, double minSeparation) {
-        Point2D center2 = new Point2D(center);
+        Point2D center2 = Point2D.fromLocation(center);
         List<Point2D> samples = new ArrayList<>();
         List<Point2D> activeList = new ArrayList<>();
         Random r = new Random();
@@ -784,14 +784,13 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerFight(EntityDamageByEntityEvent e) {
         if (!hasUHCStarted()) return;
-        if (!(e.getEntity() instanceof Player)) return;
-        if (!(e.getDamager() instanceof Player)) return;
-        
         // friendly fire
-        Player target = (Player) e.getEntity();
-        Player damager = (Player) e.getDamager();
-        if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
-            e.setCancelled(true);
+        if (e.getEntity() instanceof Player target) {
+            if (e.getDamager() instanceof Player damager) {
+                if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
+                    e.setCancelled(true);
+                }
+            }
         }
     }
 }

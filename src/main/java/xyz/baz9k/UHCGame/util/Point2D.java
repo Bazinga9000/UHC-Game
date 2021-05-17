@@ -4,35 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
-public class Point2D {
-    private final double x;
-    private final double z;
-
-    public Point2D(double x, double z) {
-        this.x = x;
-        this.z = z;
-    }
-
-    public Point2D(Location l) {
-        this.x = l.getX();
-        this.z = l.getZ();
-    }
-
-    public double x() { return x; }
-    public double z() { return z; }
-
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof Point2D)) return false;
-        if (this == o) return true;
-        
-        Point2D p = (Point2D) o;
-        return x == p.x && z == p.z;
-    }
-
-    public String toString() {
-        return String.format("Point2D[%s, %s]", x, z);
-    }
+public record Point2D(double x, double z) {
 
     /**
      * Get Euclidean distance between this point to the specified point.
@@ -84,6 +56,15 @@ public class Point2D {
      */
     public Location loc(World w, double y) {
         return new Location(w, x, y, z);
+    }
+
+    /**
+     * Get a point from the specified {@link Location}.
+     * @param l Location
+     * @return a point
+     */
+    public static Point2D fromLocation(Location l) {
+        return new Point2D(l.getX(), l.getZ());
     }
 
     /**
