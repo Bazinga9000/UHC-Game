@@ -101,8 +101,8 @@ public class ConfigTree {
         }
 
         for (Node child : node.getChildren()) {
-            if (child instanceof BranchNode) {
-                BranchNode check = scanAllChildrenForInventory(inventory, (BranchNode) child);
+            if (child instanceof BranchNode bChild) {
+                BranchNode check = scanAllChildrenForInventory(inventory, bChild);
                 if (check != null) {
                     return check;
                 }

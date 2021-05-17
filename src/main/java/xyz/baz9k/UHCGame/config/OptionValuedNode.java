@@ -45,11 +45,11 @@ public class OptionValuedNode extends ValuedNode {
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         List<Component> newDesc = new ArrayList<>(itemDesc);
 
-        itemStack.setType(dat.getMaterial());
+        itemStack.setType(dat.material());
         for (int i = 0; i < optData.length; i++) {
 
             TextColor clr = i == ind ? NamedTextColor.GREEN : NamedTextColor.RED;
-            newDesc.add(Component.text(optData[i].getName(), noDecoStyle(clr)));
+            newDesc.add(Component.text(optData[i].name(), noDecoStyle(clr)));
 
         }
 

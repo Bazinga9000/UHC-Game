@@ -101,10 +101,9 @@ public class ValuedNode extends Node {
                 Object val = cfg.get(id);
                 for (int i = 0; i < itemDesc.size(); i++) {
                     // subst lines with the correct content
-                    if (itemDesc.get(i) instanceof TextComponent) {
-                        var lineComp = (TextComponent) itemDesc.get(i);
-                        String line = lineComp.content();
-                        newDesc.set(i, lineComp.content(String.format(line, val)));
+                    if (itemDesc.get(i) instanceof TextComponent comp) {
+                        String line = comp.content();
+                        newDesc.set(i, comp.content(String.format(line, val)));
                     }
                 }
                 break;
