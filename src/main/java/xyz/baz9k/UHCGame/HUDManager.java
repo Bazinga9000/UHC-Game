@@ -379,10 +379,10 @@ public class HUDManager implements Listener {
     @EventHandler
     public void onPlayerDamaged(EntityDamageEvent e) {
         if (!gameManager.hasUHCStarted()) return;
-        if (!(e.getEntity() instanceof Player)) return;
 
-        // update hud if dmg taken
-        updateTeammateHUDForViewers((Player) e.getEntity());
+        if (e.getEntity() instanceof Player damaged) {
+            // update hud if dmg taken
+            updateTeammateHUDForViewers((Player) e.getEntity());
+        }
     }
-
 }
