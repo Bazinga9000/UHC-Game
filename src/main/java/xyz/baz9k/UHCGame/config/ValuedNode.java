@@ -62,6 +62,7 @@ public class ValuedNode extends Node {
     public void click(@NotNull Player p) {
         Object val;
         switch (type) {
+            // TODO request value from player for integer/double/string
             case INTEGER:
                 val = cfg.getInt(id);
                 break;
