@@ -26,8 +26,9 @@ public class OptionValuedNode extends ValuedNode {
      * @param optData An array of options that this node supports 
      */
     public OptionValuedNode(BranchNode parent, int slot, ItemStack stack, String id, OptionData... optData) {
-        super(parent, slot, stack, ValuedNodeType.OPTION, id);
+        super(parent, slot, stack, ValuedNodeType.OPTION, id, false);
         this.optData = optData;
+        updateItemStack();
     }
 
     @Override

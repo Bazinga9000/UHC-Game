@@ -67,7 +67,6 @@ public class ConfigTree {
             new OptionData("2", Material.EMERALD),
             new OptionData("3", Material.DIAMOND)
         );
-
         BranchNode subLevel = new BranchNode(root, getSlotCoordinate(4, 4), itemStack(Material.REDSTONE, "schrodinger's box", "except the cat is dead"), "Fuck", 1);
 
         new ActionNode(subLevel, getSlotCoordinate(5,0), itemStack(Material.DIAMOND, "Dice 2"), player -> {
