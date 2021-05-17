@@ -45,6 +45,7 @@ public class OptionValuedNode extends ValuedNode {
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         List<Component> newDesc = new ArrayList<>(itemDesc);
 
+        newDesc.add(Component.empty());
         itemStack.setType(dat.material());
         for (int i = 0; i < optData.length; i++) {
 
