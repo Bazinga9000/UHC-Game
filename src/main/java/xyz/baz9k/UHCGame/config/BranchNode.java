@@ -123,6 +123,10 @@ public class BranchNode extends Node {
         Node node = children[slot];
         if (node != null) {
             node.click(p);
+            if (node instanceof ValuedNode) {
+                ValuedNode vn = (ValuedNode) node;
+                vn.updateItemStack();
+            }
         }
     }
 
