@@ -60,6 +60,14 @@ public class ConfigTree {
             Bukkit.getServer().sendMessage(Component.text("Clicky Click."));
         });
 
+        new ValuedNode(root, getSlotCoordinate(0, 0), itemStack(Material.QUARTZ, "Boolean", "Should toggle maybe???"), ValuedNodeType.BOOLEAN, "esoteric.gone_fishing");
+        new OptionValuedNode(root, getSlotCoordinate(0, 1), itemStack(Material.IRON_INGOT, "Cyclic Thing", "Should flipperoo maybe??"), "esoteric.max_health",
+            new OptionData("0", Material.IRON_INGOT),
+            new OptionData("1", Material.GOLD_INGOT),
+            new OptionData("2", Material.EMERALD),
+            new OptionData("3", Material.DIAMOND)
+        );
+
         BranchNode subLevel = new BranchNode(root, getSlotCoordinate(4, 4), itemStack(Material.REDSTONE, "schrodinger's box", "except the cat is dead"), "Fuck", 1);
 
         new ActionNode(subLevel, getSlotCoordinate(5,0), itemStack(Material.DIAMOND, "Dice 2"), player -> {
