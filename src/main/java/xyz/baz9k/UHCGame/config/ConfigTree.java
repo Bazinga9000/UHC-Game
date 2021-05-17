@@ -18,15 +18,18 @@ import static xyz.baz9k.UHCGame.util.Utils.*;
  */
 public class ConfigTree {
     private BranchNode root;
-    private static final int ROOT_GUI_HEIGHT = 6;
+    private UHCGame plugin;
+
+    private static final int ROOT_GUI_HEIGHT = 3;
 
     public ConfigTree(UHCGame plugin) {
+        this.plugin = plugin;
         Node.setPlugin(plugin);
         root = generateTree();
     }
 
-    private static int getSlotCoordinate(int x, int y) {
-        return y * 9 + x;
+    private static int slotAt(int row, int col) {
+        return row * 9 + col;
     }
 
     private static ItemStack itemStack(Material type, String name, String... lore) {
@@ -89,25 +92,59 @@ public class ConfigTree {
     private BranchNode generateTree() {
         BranchNode root = new BranchNode("Config", ROOT_GUI_HEIGHT);
 
-        new ValuedNode(root, getSlotCoordinate(3, 3), itemStack(Material.DIAMOND, "Dice", "number %s"), ValuedNodeType.INTEGER, "team_count");
+        BranchNode intervals = new BranchNode(root, slotAt(1, 2), itemStack(Material.CLOCK, "Stage Durations", "Set the various timings between game events."),                                 "Stage Durations", 3);
+        BranchNode wbSize    = new BranchNode(root, slotAt(1, 3), itemStack(Material.BLUE_STAINED_GLASS_PANE, "Worldborder Sizes", "Change the widths of the worldborders at various stages."), "Worldborder Sizes", 3);
+        BranchNode teamCount = new BranchNode(root, slotAt(1, 5), itemStack(Material.PLAYER_HEAD, "Team Counts", "Set the number of teams."),                                                   "Team Counts", 3);
+        BranchNode esoterics = new BranchNode(root, slotAt(1, 6), itemStack(Material.NETHER_STAR, "Esoteric", "Toggle various additional settings."),                                           "Esoteric", 6);
 
-        new ActionNode(root, getSlotCoordinate(5, 3), itemStack(Material.EMERALD, "Shiny Button", "Click me I dare you"), player -> {
-            Bukkit.getServer().sendMessage(Component.text("Clicky Click."));
-        });
+        /* INTERVALS (in secs) */
+        new ValuedNode(intervals, slotAt(1, 2), itemStack(Material.RED_CONCRETE,    "Still Border", "Duration: %sm"),          ValuedNodeType.INTEGER, "intervals.start");
+        new ValuedNode(intervals, slotAt(1, 3), itemStack(Material.ORANGE_CONCRETE, "Border 1", "Duration: %sm"),              ValuedNodeType.INTEGER, "intervals.movement1");
+        new ValuedNode(intervals, slotAt(1, 4), itemStack(Material.YELLOW_CONCRETE, "Border Stops", "Duration: %sm"),          ValuedNodeType.INTEGER, "intervals.stop");
+        new ValuedNode(intervals, slotAt(1, 5), itemStack(Material.GREEN_CONCRETE,  "Border 2", "Duration: %sm"),              ValuedNodeType.INTEGER, "intervals.movement2");
+        new ValuedNode(intervals, slotAt(1, 6), itemStack(Material.BLUE_CONCRETE,   "Time Until Deathmatch", "Duration: %sm"), ValuedNodeType.INTEGER, "intervals.dmwait");
 
-        new ValuedNode(root, getSlotCoordinate(0, 0), itemStack(Material.QUARTZ, "Boolean", "Should toggle maybe???"), ValuedNodeType.BOOLEAN, "esoteric.gone_fishing");
-        new OptionValuedNode(root, getSlotCoordinate(0, 1), itemStack(Material.IRON_INGOT, "Cyclic Thing", "Should flipperoo maybe??"), "esoteric.max_health",
-            new OptionData("0", Material.IRON_INGOT),
-            new OptionData("1", Material.GOLD_INGOT),
-            new OptionData("2", Material.EMERALD),
-            new OptionData("3", Material.DIAMOND)
+        /* WB SIZE (diameter) */
+        new ValuedNode(wbSize, slotAt(1, 2), itemStack(Material.RED_STAINED_GLASS,    "Initial World Border", "Diameter: %s"),    ValuedNodeType.DOUBLE, "wbsize.initial");
+        new ValuedNode(wbSize, slotAt(1, 3), itemStack(Material.ORANGE_STAINED_GLASS, "First Movement", "Diameter: %s"),          ValuedNodeType.DOUBLE, "wbsize.border1");
+        new ValuedNode(wbSize, slotAt(1, 5), itemStack(Material.GREEN_STAINED_GLASS,  "Second Movement", "Diameter: %s"),         ValuedNodeType.DOUBLE, "wbsize.border2");
+        new ValuedNode(wbSize, slotAt(1, 6), itemStack(Material.PURPLE_STAINED_GLASS, "Deathmatch World Border", "Diameter: %s"), ValuedNodeType.DOUBLE, "wbsize.deathmatch");
+
+        /* TEAM COUNT */
+        new ValuedNode(teamCount, 0, itemStack(Material.DIAMOND, "Set Team Count", "Number of teams: %s"), ValuedNodeType.INTEGER, "team_count");
+        new ActionNode(teamCount, slotAt(2, 0), itemStack(Material.RED_DYE, "Solos", "Teams of 1"),      p -> { plugin.getTeamManager().setTeamSize("solos");    });
+        new ActionNode(teamCount, slotAt(2, 1), itemStack(Material.ORANGE_DYE, "Duos", "Teams of 2"),    p -> { plugin.getTeamManager().setTeamSize("duos");     });
+        new ActionNode(teamCount, slotAt(2, 2), itemStack(Material.YELLOW_DYE, "Trios", "Teams of 3"),   p -> { plugin.getTeamManager().setTeamSize("trios");    });
+        new ActionNode(teamCount, slotAt(2, 3), itemStack(Material.GREEN_DYE, "Quartets", "Teams of 4"), p -> { plugin.getTeamManager().setTeamSize("quartets"); });
+        new ActionNode(teamCount, slotAt(2, 4), itemStack(Material.BLUE_DYE, "Quintets", "Teams of 5"),  p -> { plugin.getTeamManager().setTeamSize("quintets"); });
+
+        /* ESOTERICS */
+        // TODO fill in esoteric descs, final action node
+        new ValuedNode(esoterics, 0, itemStack(Material.DIAMOND, "Gone Fishing", ""),         ValuedNodeType.BOOLEAN, "esoteric.gone_fishing");
+        new ValuedNode(esoterics, 1, itemStack(Material.DIAMOND, "Boss Team", ""),            ValuedNodeType.BOOLEAN, "esoteric.boss_team");
+        new ValuedNode(esoterics, 2, itemStack(Material.DIAMOND, "Always Elytra", ""),        ValuedNodeType.BOOLEAN, "esoteric.always_elytra");
+        new ValuedNode(esoterics, 3, itemStack(Material.DIAMOND, "Sardines", ""),             ValuedNodeType.BOOLEAN, "esoteric.sardines");
+        new ValuedNode(esoterics, 4, itemStack(Material.DIAMOND, "Wither Bonus Round", ""),   ValuedNodeType.BOOLEAN, "esoteric.wither_bonus");
+        new ValuedNode(esoterics, 5, itemStack(Material.DIAMOND, "Mafia", ""),                ValuedNodeType.BOOLEAN, "esoteric.mafia");
+        new ValuedNode(esoterics, 6, itemStack(Material.DIAMOND, "Fast Day-Night Cycle", ""), ValuedNodeType.BOOLEAN, "esoteric.fast_dn_cycle");
+        new ValuedNode(esoterics, 7, itemStack(Material.DIAMOND, "Always Day", ""),           ValuedNodeType.BOOLEAN, "esoteric.always_day");
+        new ValuedNode(esoterics, 8, itemStack(Material.DIAMOND, "Always Night", ""),         ValuedNodeType.BOOLEAN, "esoteric.always_night");
+        new ValuedNode(esoterics, 9, itemStack(Material.DIAMOND, "Spawn in Nether", ""),      ValuedNodeType.BOOLEAN, "esoteric.nether_spawn");
+        new ValuedNode(esoterics, 10, itemStack(Material.DIAMOND, "Bomberman", ""),           ValuedNodeType.BOOLEAN, "esoteric.bomberman");
+        new OptionValuedNode(esoterics, 11, itemStack(Material.DIAMOND, "Player Health", ""), "esoteric.max_health",
+            new OptionData("❤️ 05", Material.IRON_INGOT),
+            new OptionData("❤️ 10", Material.GOLD_INGOT),
+            new OptionData("❤️ 20", Material.DIAMOND),
+            new OptionData("❤️ 30", Material.EMERALD)
         );
-        BranchNode subLevel = new BranchNode(root, getSlotCoordinate(4, 4), itemStack(Material.REDSTONE, "schrodinger's box", "except the cat is dead"), "Fuck", 1);
-
-        new ActionNode(subLevel, getSlotCoordinate(5,0), itemStack(Material.DIAMOND, "Dice 2"), player -> {
-            Bukkit.getServer().sendMessage(Component.text("Fuck."));
-        });
-
+        new OptionValuedNode(esoterics, 12, itemStack(Material.DIAMOND, "Movement Speed", ""), "esoteric.mv_speed",
+            new OptionData("0.5x", Material.IRON_INGOT),
+            new OptionData("1.0x", Material.GOLD_INGOT),
+            new OptionData("2.0x", Material.DIAMOND),
+            new OptionData("3.0x", Material.EMERALD)
+        );
+        new ActionNode(esoterics, 52, itemStack(Material.CREEPER_HEAD, "Reset to Defaults", ""), p -> { Bukkit.getServer().sendMessage(Component.text("todo")); });
+    
         return root;
     }
 }
