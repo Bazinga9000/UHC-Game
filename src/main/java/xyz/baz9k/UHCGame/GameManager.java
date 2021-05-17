@@ -272,6 +272,7 @@ public class GameManager implements Listener {
         p.setFoodLevel(20);
         p.setSaturation(5.0f);
         p.setExp(0.0f);
+        p.getInventory().clear();
         
         // clear all potion effects
         for (PotionEffect effect : p.getActivePotionEffects()) {
