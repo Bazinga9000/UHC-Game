@@ -48,6 +48,41 @@ public class ConfigTree {
         return stack;
     }
 
+    public BranchNode getRoot() {
+        return root;
+    }
+
+    /**
+     * Returns the node in the tree that has the specified inventory
+     * @param inventory The inventory
+     * @return The node (or null if absent)
+     */
+    public BranchNode getNodeFromInventory(Inventory inventory) {
+        return scanAllChildrenForInventory(inventory, root);
+    }
+
+    /**
+     * Traverses the tree of a node to find the node that has a specified inventory
+     * @param inventory The inventory
+     * @param node The node tree to traverse
+     * @return The node (or null if absent)
+     */
+    private static BranchNode scanAllChildrenForInventory(Inventory inventory, BranchNode node) {
+        if (node.getInventory() == inventory) {
+            return node;
+        }
+
+        for (Node child : node.getChildren()) {
+            if (child instanceof BranchNode bChild) {
+                BranchNode check = scanAllChildrenForInventory(inventory, bChild);
+                if (check != null) {
+                    return check;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * @return the root of the tree, once built
      */
@@ -74,40 +109,5 @@ public class ConfigTree {
         });
 
         return root;
-    }
-
-    public BranchNode getRoot() {
-        return root;
-    }
-
-    /**
-     * Returns the node in the tree that has the specified inventory
-     * @param inventory The inventory
-     * @return The node (or null if not present)
-     */
-    public BranchNode getNodeFromInventory(Inventory inventory) {
-        return scanAllChildrenForInventory(inventory, root);
-    }
-
-    /**
-     * Traverses the tree of a node for the node that has a specified inventory
-     * @param inventory The inventory
-     * @param node The node tree to traverse
-     * @return The node (or null if not present)
-     */
-    private static BranchNode scanAllChildrenForInventory(Inventory inventory, BranchNode node) {
-        if (node.getInventory() == inventory) {
-            return node;
-        }
-
-        for (Node child : node.getChildren()) {
-            if (child instanceof BranchNode bChild) {
-                BranchNode check = scanAllChildrenForInventory(inventory, bChild);
-                if (check != null) {
-                    return check;
-                }
-            }
-        }
-        return null;
     }
 }
