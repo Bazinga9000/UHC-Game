@@ -2,10 +2,11 @@ package xyz.baz9k.UHCGame.util;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import static net.kyori.adventure.text.format.TextDecoration.*;
 
 import java.awt.Color;
 import java.util.Arrays;
@@ -74,7 +75,7 @@ public final class TeamDisplay {
      * @return PaperMC {@link Style}
      */
     public static Style getStyle(int t) {
-        TextDecoration deco = t == 0 ? TextDecoration.ITALIC : TextDecoration.BOLD;
+        TextDecoration deco = t == 0 ? ITALIC : BOLD;
         return Style.style(getTextColor(t), deco);
     }
 
@@ -93,12 +94,12 @@ public final class TeamDisplay {
     }
 
     /**
-     * Returns the chat prefix of the team with a space prepended.
+     * Returns the chat prefix of the team with a space appended.
      * @param t Team number
      * @return {@link TextComponent}
      */
     public static TextComponent getPrefixWithSpace(int t) {
-        return Component.space().append(getPrefix(t));
+        return getPrefix(t).append(Component.space());
     }
 
     /**
@@ -108,7 +109,7 @@ public final class TeamDisplay {
      * @return {@link TextComponent}
      */
     public static TextComponent prefixed(int t, String name) {
-        return getPrefix(t).append(Component.space()).append(Component.text(name, noDecoStyle(NamedTextColor.WHITE)));
+        return getPrefixWithSpace(t).append(Component.text(name, noDeco(WHITE)));
     }
 
     /**

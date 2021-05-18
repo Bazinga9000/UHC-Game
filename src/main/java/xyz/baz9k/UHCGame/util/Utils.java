@@ -245,7 +245,7 @@ public final class Utils {
      * @param clr
      * @return
      */
-    public static Style noDecoStyle(TextColor clr) {
+    public static Style noDeco(TextColor clr) {
         Style.Builder st = Style.style().color(clr);
 
         for (TextDecoration deco : TextDecoration.values()) {

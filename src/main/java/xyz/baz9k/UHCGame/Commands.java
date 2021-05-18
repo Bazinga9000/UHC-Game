@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
+import static xyz.baz9k.UHCGame.util.Utils.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -165,14 +166,14 @@ public class Commands {
 
         var b = Component.text()
                          .append(TeamDisplay.getName(t))
-                         .append(Component.text(": ", NamedTextColor.WHITE));
+                         .append(Component.text(": ", noDeco(NamedTextColor.WHITE)));
 
         // list of players one a team, separated by commas
         String tPlayers = players.stream()
                                  .map(p -> p.getName())
                                  .collect(Collectors.joining(", "));
         
-        b.append(Component.text(tPlayers, NamedTextColor.WHITE));
+        b.append(Component.text(tPlayers, noDeco(NamedTextColor.WHITE)));
         Bukkit.getServer().sendMessage(b);
     }
 

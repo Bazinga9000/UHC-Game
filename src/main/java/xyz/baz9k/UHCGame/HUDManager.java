@@ -5,7 +5,7 @@ import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import static net.kyori.adventure.text.format.TextDecoration.*;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
@@ -52,7 +52,7 @@ public class HUDManager implements Listener {
         int team = teamManager.getTeam(p);
 
         if (state == PlayerState.COMBATANT_UNASSIGNED) {
-            return Component.text("Unassigned", NamedTextColor.WHITE, TextDecoration.ITALIC);
+            return Component.text("Unassigned", NamedTextColor.WHITE, ITALIC);
         }
         return TeamDisplay.getName(team);
     }
@@ -83,8 +83,8 @@ public class HUDManager implements Listener {
 
         // name and health
         if (teamManager.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
-            s.append(Component.text(teammate.getName(), NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH))
-             .append(Component.text(" 0♥", NamedTextColor.GRAY, TextDecoration.STRIKETHROUGH));
+            s.append(Component.text(teammate.getName(), NamedTextColor.GRAY, STRIKETHROUGH))
+             .append(Component.text(" 0♥", NamedTextColor.GRAY, STRIKETHROUGH));
             return s.asComponent();
         } else {
             s.append(Component.text(teammate.getName(), tcGradient));
