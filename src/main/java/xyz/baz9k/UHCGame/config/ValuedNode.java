@@ -60,6 +60,8 @@ public class ValuedNode extends Node {
             case BOOLEAN -> cfg.isBoolean(id);
         };
 
+        // this valid check is based off the assumption that the config values' types are not changed
+        // (by changing the file and then reloading it)
         if (isValid) {
             this.id = id;
         } else {

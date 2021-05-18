@@ -29,16 +29,57 @@ import static java.time.temporal.ChronoUnit.FOREVER;
  */
 public enum GameStage {
     NOT_IN_GAME,
-    WB_STILL   (BossBar.Color.RED,    Duration.ofMinutes(60), 1200, true,  Component.text("Border Begins Shrinking", NamedTextColor.RED),             "Let the games begin! Our players have been shuffled across the world! ", Style.style(NamedTextColor.GREEN, BOLD)),
-    WB_1       (BossBar.Color.BLUE,   Duration.ofMinutes(15), 25,   false, Component.text("Border Stops Shrinking", NamedTextColor.BLUE),             "The World Border has begun to shrink! ",                                 Style.style(NamedTextColor.RED, BOLD)),
-    WB_STOP    (BossBar.Color.RED,    Duration.ofMinutes(5),  25,   true,  Component.text("Border Begins Shrinking... Again.", NamedTextColor.RED),   "The World Border has ground to a halt. ",                                Style.style(NamedTextColor.AQUA)),
-    WB_2       (BossBar.Color.BLUE,   Duration.ofMinutes(10), 3,    false, Component.text("Border Stops Shrinking... Again", NamedTextColor.BLUE),    "The World Border has resumed once more! ",                               Style.style(NamedTextColor.RED)),
-    DM_WAIT    (BossBar.Color.WHITE,  Duration.ofMinutes(5),  3,    true,  Component.text("The Battle at the Top of the World", NamedTextColor.WHITE),"The World Border has ground to a halt once again! ",                     Style.style(NamedTextColor.DARK_AQUA)),
-    DEATHMATCH (BossBar.Color.PURPLE, FOREVER.getDuration(),  20,   true,  Component.text("∞", NamedTextColor.DARK_PURPLE),                           "It is time. Let the Battle At The Top Of The World commence! ",          Style.style(NamedTextColor.BLUE, BOLD));
+    WB_STILL   (BossBar.Color.RED,    new ConfigDur("intervals.start"),     new ConfigWBSize("wb_size.initial"), true,  Component.text("Border Begins Shrinking", NamedTextColor.RED),             "Let the games begin! Our players have been shuffled across the world! ", Style.style(NamedTextColor.GREEN, BOLD)),
+    WB_1       (BossBar.Color.BLUE,   new ConfigDur("intervals.movement1"), new ConfigWBSize("wb_size.border1"), false, Component.text("Border Stops Shrinking", NamedTextColor.BLUE),             "The World Border has begun to shrink! ",                                 Style.style(NamedTextColor.RED, BOLD)),
+    WB_STOP    (BossBar.Color.RED,    new ConfigDur("intervals.stop"),      new ConfigWBSize("wb_size.border1"), true,  Component.text("Border Begins Shrinking... Again.", NamedTextColor.RED),   "The World Border has ground to a halt. ",                                Style.style(NamedTextColor.AQUA)),
+    WB_2       (BossBar.Color.BLUE,   new ConfigDur("intervals.movement2"), new ConfigWBSize("wb_size.border2"), false, Component.text("Border Stops Shrinking... Again", NamedTextColor.BLUE),    "The World Border has resumed once more! ",                               Style.style(NamedTextColor.RED)),
+    DM_WAIT    (BossBar.Color.WHITE,  new ConfigDur("intervals.dmwait"),    new ConfigWBSize("wb_size.border2"), true,  Component.text("The Battle at the Top of the World", NamedTextColor.WHITE),"The World Border has ground to a halt once again! ",                     Style.style(NamedTextColor.DARK_AQUA)),
+    DEATHMATCH (BossBar.Color.PURPLE, new ConfigDur(FOREVER.getDuration()), new ConfigWBSize("wb_size.dmwait"),  true,  Component.text("∞", NamedTextColor.DARK_PURPLE),                           "It is time. Let the Battle At The Top Of The World commence! ",          Style.style(NamedTextColor.BLUE, BOLD));
     
+    private static UHCGame plugin;
+    public static void setPlugin(UHCGame plugin) { GameStage.plugin = plugin; }
+
+    private record ConfigDur(String id, Duration def) {
+        public ConfigDur(String id)    { this(id, null);  }
+        public ConfigDur(Duration def) { this(null, def); }
+
+        ConfigDur {
+            var cfg = plugin.getConfig();
+            // this valid check is based off the assumption that the config values' types are not changed
+            // (by changing the file and then reloading it)
+            if (!cfg.isInt(id)) {
+                throw new RuntimeException(String.format("ID %s either does not exist or does not match the correct value type.", id));
+            }
+        }
+
+        public Duration get() {
+            if (id != null) return Duration.ofSeconds(plugin.getConfig().getInt(id));
+            return def;
+        }
+    }
+
+    private record ConfigWBSize(String id, double def) {
+        public ConfigWBSize(String id)    { this(id, -1);  }
+        public ConfigWBSize(double def)   { this(null, def); }
+
+        ConfigWBSize {
+            var cfg = plugin.getConfig();
+            // this valid check is based off the assumption that the config values' types are not changed
+            // (by changing the file and then reloading it)
+            if (!cfg.isDouble(id)) {
+                throw new RuntimeException(String.format("ID %s either does not exist or does not match the correct value type.", id));
+            }
+        }
+
+        public double get() {
+            if (id != null) return plugin.getConfig().getDouble(id);
+            return def;
+        }
+    }
+
     private final BossBar.Color bbClr;
-    private final Duration dur;
-    private final double wbSize;
+    private final ConfigDur dur;
+    private final ConfigWBSize wbSize;
     private final TextComponent bbTitle;
     private final String baseChatMsg;
     private final Style bodyStyle;
@@ -48,7 +89,7 @@ public enum GameStage {
      * NOT_IN_GAME
      */
     private GameStage() { 
-        this(BossBar.Color.WHITE, Duration.ZERO, -1, false, Component.empty(), "", Style.style(NamedTextColor.WHITE));
+        this(BossBar.Color.WHITE, new ConfigDur(Duration.ZERO), new ConfigWBSize(-1), false, Component.empty(), "", Style.style(NamedTextColor.WHITE));
     }
     
 
@@ -62,7 +103,7 @@ public enum GameStage {
      * @param bodyClr Color of the body message
      * @param bodyFmt Formatting of the body message
      */
-    private GameStage(@NotNull BossBar.Color bbClr, @NotNull Duration dur, int wbDiameter, boolean isWBInstant, @NotNull TextComponent bbTitle, @NotNull String baseChatMsg, Style bodyStyle) {
+    private GameStage(@NotNull BossBar.Color bbClr, @NotNull ConfigDur dur, ConfigWBSize wbDiameter, boolean isWBInstant, @NotNull TextComponent bbTitle, @NotNull String baseChatMsg, Style bodyStyle) {
         // bossbar
         this.bbClr = bbClr;
         this.bbTitle = bbTitle;
@@ -116,15 +157,15 @@ public enum GameStage {
     }
 
     public Duration getDuration() {
-        return dur;
+        return dur.get();
     }
     
     public boolean isInstant() {
-        return dur.isZero();
+        return getDuration().isZero();
     }
 
     public double getWBDiameter() {
-        return wbSize;
+        return wbSize.get();
     }
 
     public double getWBRadius() {
@@ -139,9 +180,9 @@ public enum GameStage {
         if (this == NOT_IN_GAME) return;
         for (World w : worlds) {
             if (isWBInstant) {
-                w.getWorldBorder().setSize(wbSize);
+                w.getWorldBorder().setSize(getWBDiameter());
             } else {
-                w.getWorldBorder().setSize(wbSize, dur.toSeconds());
+                w.getWorldBorder().setSize(getWBDiameter(), getDuration().toSeconds());
             }
         }
     }
@@ -250,10 +291,10 @@ public enum GameStage {
         }
         
         var s = getMessageBuilder()
-                .append(Component.text(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, getWordTimeString(dur)), bodyStyle));
+                .append(Component.text(String.format(fmtStr, baseChatMsg, subject, getWBDiameter() / 2, getWordTimeString(getDuration())), bodyStyle));
 
         if (this == lastGradualStage()) {
-            s.append(Component.text(String.format(dmWarn, getWordTimeString(dur)), bodyStyle));
+            s.append(Component.text(String.format(dmWarn, getWordTimeString(getDuration())), bodyStyle));
         }
         
         Bukkit.getServer().sendMessage(s);
