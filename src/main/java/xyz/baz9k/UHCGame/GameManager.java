@@ -457,20 +457,11 @@ public class GameManager implements Listener {
      */
     public World getUHCWorld(@NotNull Environment env) {
         World[] worlds = getUHCWorlds();
-        World world;
-        switch (env) {
-            case NORMAL:
-                world = worlds[0];
-                break;
-            case NETHER:
-                world = worlds[1];
-                break;
-            case THE_END:
-            default:
-                world = null;
-                break;
-        }
-        return world;
+        return switch (env) {
+            case NORMAL -> worlds[0];
+            case NETHER -> worlds[1];
+            default -> null;
+        };
     }
 
     public World getLobbyWorld() {
