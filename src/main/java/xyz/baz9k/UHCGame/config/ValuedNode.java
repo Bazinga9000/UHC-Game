@@ -115,13 +115,13 @@ public class ValuedNode extends Node {
                 }
                 itemStack.extraLore(List.of(status.asComponent()));
                 
-                ItemMeta m = itemStack.getItemMeta();
-                if (active) {
-                    m.addEnchant(Enchantment.SILK_TOUCH, 1, true);
-                } else {
-                    m.removeEnchant(Enchantment.SILK_TOUCH);
-                }
-                itemStack.setItemMeta(m);
+                itemStack.updateMeta(m -> {
+                    if (active) {
+                        m.addEnchant(Enchantment.SILK_TOUCH, 1, true);
+                    } else {
+                        m.removeEnchant(Enchantment.SILK_TOUCH);
+                    }
+                });
                 break;
                 
                 // OPTION impl in OptionValuedNode

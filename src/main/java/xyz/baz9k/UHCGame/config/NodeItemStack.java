@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
@@ -170,5 +171,11 @@ public class NodeItemStack extends ItemStack {
     public void extraLore(List<Component> lore) {
         extraLore = List.copyOf(lore);
         updateLore();
+    }
+
+    public void updateMeta(Consumer<ItemMeta> mf) {
+        ItemMeta m = getItemMeta();
+        mf.accept(m);
+        setItemMeta(m);
     }
 }
