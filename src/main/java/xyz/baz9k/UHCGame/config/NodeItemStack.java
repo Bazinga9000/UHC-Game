@@ -154,6 +154,15 @@ public class NodeItemStack extends ItemStack {
     public List<Component> extraLore() {
         return Collections.unmodifiableList(extraLore);
     }
+
+    /**
+     * Sets the extra lore of the item
+     * @param lore the extra lore
+     */
+    public void extraLore(Component lore) {
+        extraLore = List.of(lore);
+        updateLore();
+    }
     /**
      * Sets the extra lore of the item
      * @param lore the extra lore

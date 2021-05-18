@@ -97,25 +97,31 @@ public class ValuedNode extends Node {
         itemStack.desc(cfg.get(id));
         
         // perform updates based on data type
-        ItemMeta m = itemStack.getItemMeta();
         switch (type) {
             case INTEGER:
             case DOUBLE:
             case STRING:
                 break;
             case BOOLEAN:
+                boolean active = cfg.getBoolean(id);
                 // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
                 TextComponent.Builder status = Component.text()
-                    .append(Component.text("Status: ", noDecoStyle(NamedTextColor.WHITE)));
+                .append(Component.text("Status: ", noDecoStyle(NamedTextColor.WHITE)));
                 
-                if (cfg.getBoolean(id)) {
+                if (active) {
                     status.append(Component.text("ACTIVE", noDecoStyle(NamedTextColor.GREEN)));
-                    m.addEnchant(Enchantment.SILK_TOUCH, 1, true);
                 } else {
                     status.append(Component.text("INACTIVE", noDecoStyle(NamedTextColor.RED)));
-                    m.removeEnchant(Enchantment.SILK_TOUCH);
                 }
                 itemStack.extraLore(List.of(status.asComponent()));
+                
+                ItemMeta m = itemStack.getItemMeta();
+                if (active) {
+                    m.addEnchant(Enchantment.SILK_TOUCH, 1, true);
+                } else {
+                    m.removeEnchant(Enchantment.SILK_TOUCH);
+                }
+                itemStack.setItemMeta(m);
                 break;
                 
                 // OPTION impl in OptionValuedNode
@@ -123,7 +129,6 @@ public class ValuedNode extends Node {
             default:
                 throw new UnsupportedOperationException("Type not supported");
         }
-        itemStack.setItemMeta(m);
 
         // since updating the item does not update it in the inventory, parent has to
         parent.updateSlot(parentSlot);
