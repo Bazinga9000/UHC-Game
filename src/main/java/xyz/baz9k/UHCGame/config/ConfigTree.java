@@ -98,17 +98,17 @@ public class ConfigTree {
         BranchNode esoterics = new BranchNode(root, slotAt(1, 6), itemStack(Material.NETHER_STAR, "Esoteric", "Toggle various additional settings."),                                           "Esoteric", 6);
 
         /* INTERVALS (in secs) */
-        new ValuedNode(intervals, slotAt(1, 2), itemStack(Material.RED_CONCRETE,    "Still Border", "Duration: %sm"),          ValuedNode.Type.INTEGER, "intervals.start");
-        new ValuedNode(intervals, slotAt(1, 3), itemStack(Material.ORANGE_CONCRETE, "Border 1", "Duration: %sm"),              ValuedNode.Type.INTEGER, "intervals.movement1");
-        new ValuedNode(intervals, slotAt(1, 4), itemStack(Material.YELLOW_CONCRETE, "Border Stops", "Duration: %sm"),          ValuedNode.Type.INTEGER, "intervals.stop");
-        new ValuedNode(intervals, slotAt(1, 5), itemStack(Material.GREEN_CONCRETE,  "Border 2", "Duration: %sm"),              ValuedNode.Type.INTEGER, "intervals.movement2");
-        new ValuedNode(intervals, slotAt(1, 6), itemStack(Material.BLUE_CONCRETE,   "Time Until Deathmatch", "Duration: %sm"), ValuedNode.Type.INTEGER, "intervals.dmwait");
+        new ValuedNode(intervals, slotAt(1, 2), itemStack(Material.RED_CONCRETE,    "Still Border", "Duration: %ss"),          ValuedNode.Type.INTEGER, "intervals.start");
+        new ValuedNode(intervals, slotAt(1, 3), itemStack(Material.ORANGE_CONCRETE, "Border 1", "Duration: %ss"),              ValuedNode.Type.INTEGER, "intervals.movement1");
+        new ValuedNode(intervals, slotAt(1, 4), itemStack(Material.YELLOW_CONCRETE, "Border Stops", "Duration: %ss"),          ValuedNode.Type.INTEGER, "intervals.stop");
+        new ValuedNode(intervals, slotAt(1, 5), itemStack(Material.GREEN_CONCRETE,  "Border 2", "Duration: %ss"),              ValuedNode.Type.INTEGER, "intervals.movement2");
+        new ValuedNode(intervals, slotAt(1, 6), itemStack(Material.BLUE_CONCRETE,   "Time Until Deathmatch", "Duration: %ss"), ValuedNode.Type.INTEGER, "intervals.dmwait");
 
         /* WB SIZE (diameter) */
-        new ValuedNode(wbSize, slotAt(1, 2), itemStack(Material.RED_STAINED_GLASS,    "Initial World Border", "Diameter: %s"),    ValuedNode.Type.DOUBLE, "wbsize.initial");
-        new ValuedNode(wbSize, slotAt(1, 3), itemStack(Material.ORANGE_STAINED_GLASS, "First Movement", "Diameter: %s"),          ValuedNode.Type.DOUBLE, "wbsize.border1");
-        new ValuedNode(wbSize, slotAt(1, 5), itemStack(Material.GREEN_STAINED_GLASS,  "Second Movement", "Diameter: %s"),         ValuedNode.Type.DOUBLE, "wbsize.border2");
-        new ValuedNode(wbSize, slotAt(1, 6), itemStack(Material.PURPLE_STAINED_GLASS, "Deathmatch World Border", "Diameter: %s"), ValuedNode.Type.DOUBLE, "wbsize.deathmatch");
+        new ValuedNode(wbSize, slotAt(1, 2), itemStack(Material.RED_STAINED_GLASS,    "Initial World Border", "Diameter: %s"),    ValuedNode.Type.DOUBLE, "wb_size.initial");
+        new ValuedNode(wbSize, slotAt(1, 3), itemStack(Material.ORANGE_STAINED_GLASS, "First Movement", "Diameter: %s"),          ValuedNode.Type.DOUBLE, "wb_size.border1");
+        new ValuedNode(wbSize, slotAt(1, 5), itemStack(Material.GREEN_STAINED_GLASS,  "Second Movement", "Diameter: %s"),         ValuedNode.Type.DOUBLE, "wb_size.border2");
+        new ValuedNode(wbSize, slotAt(1, 6), itemStack(Material.PURPLE_STAINED_GLASS, "Deathmatch World Border", "Diameter: %s"), ValuedNode.Type.DOUBLE, "wb_size.deathmatch");
 
         /* TEAM COUNT */
         new ValuedNode(teamCount, 0, itemStack(Material.DIAMOND, "Set Team Count", "Number of teams: %s"), ValuedNode.Type.INTEGER, "team_count");
@@ -132,10 +132,10 @@ public class ConfigTree {
         new ValuedNode(esoterics, 9, itemStack(Material.DIAMOND, "Spawn in Nether", ""),      ValuedNode.Type.BOOLEAN, "esoteric.nether_spawn");
         new ValuedNode(esoterics, 10, itemStack(Material.DIAMOND, "Bomberman", ""),           ValuedNode.Type.BOOLEAN, "esoteric.bomberman");
         new OptionValuedNode(esoterics, 11, itemStack(Material.DIAMOND, "Player Health", ""), "esoteric.max_health",
-            new OptionData("❤️ 05", Material.IRON_INGOT),
-            new OptionData("❤️ 10", Material.GOLD_INGOT),
-            new OptionData("❤️ 20", Material.DIAMOND),
-            new OptionData("❤️ 30", Material.EMERALD)
+            new OptionData("\u2764 05", Material.IRON_INGOT),
+            new OptionData("\u2764 10", Material.GOLD_INGOT),
+            new OptionData("\u2764 20", Material.DIAMOND),
+            new OptionData("\u2764 30", Material.EMERALD)
         );
         new OptionValuedNode(esoterics, 12, itemStack(Material.DIAMOND, "Movement Speed", ""), "esoteric.mv_speed",
             new OptionData("0.5x", Material.IRON_INGOT),
