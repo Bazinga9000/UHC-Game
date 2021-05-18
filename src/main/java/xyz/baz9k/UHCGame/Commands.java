@@ -466,4 +466,14 @@ public class Commands {
                 );
     }
 
+    @Command
+    private CommandAPICommand wipeconfig() {
+        return new CommandAPICommand("wipeconfig")
+                .executes(
+                        (sender, args) -> {
+                            this.plugin.saveResource("config.yml", true);
+                        }
+                );
+    }
+
 }
