@@ -42,18 +42,13 @@ public enum GameStage {
     private record ConfigDur(String id, Duration def) {
         public ConfigDur(String id)    { this(id, null);  }
         public ConfigDur(Duration def) { this(null, def); }
-
-        ConfigDur {
+        
+        public Duration get() {
             var cfg = plugin.getConfig();
-            // this valid check is based off the assumption that the config values' types are not changed
-            // (by changing the file and then reloading it)
             if (!cfg.isInt(id)) {
                 throw new RuntimeException(String.format("ID %s either does not exist or does not match the correct value type.", id));
             }
-        }
-
-        public Duration get() {
-            if (id != null) return Duration.ofSeconds(plugin.getConfig().getInt(id));
+            if (id != null) return Duration.ofSeconds(cfg.getInt(id));
             return def;
         }
     }
@@ -61,18 +56,13 @@ public enum GameStage {
     private record ConfigWBSize(String id, double def) {
         public ConfigWBSize(String id)    { this(id, -1);  }
         public ConfigWBSize(double def)   { this(null, def); }
-
-        ConfigWBSize {
+        
+        public double get() {
             var cfg = plugin.getConfig();
-            // this valid check is based off the assumption that the config values' types are not changed
-            // (by changing the file and then reloading it)
             if (!cfg.isDouble(id)) {
                 throw new RuntimeException(String.format("ID %s either does not exist or does not match the correct value type.", id));
             }
-        }
-
-        public double get() {
-            if (id != null) return plugin.getConfig().getDouble(id);
+            if (id != null) return cfg.getDouble(id);
             return def;
         }
     }
