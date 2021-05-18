@@ -6,7 +6,6 @@ import org.bukkit.inventory.Inventory;
 
 import net.kyori.adventure.text.Component;
 import xyz.baz9k.UHCGame.UHCGame;
-import static xyz.baz9k.UHCGame.util.Utils.*;
 
 /**
  * Setup for the config GUI tree
@@ -74,11 +73,11 @@ public class ConfigTree {
         BranchNode esoterics = new BranchNode(root, slotAt(1, 6), new NodeItemStack(Material.NETHER_STAR, "Esoteric", "Toggle various additional settings."),                                           "Esoteric", 6);
 
         /* INTERVALS (in secs) */
-        new ValuedNode(intervals, slotAt(1, 2), new NodeItemStack(Material.RED_CONCRETE,    "Still Border", i -> getTimeString((int) i), "Duration: %s"),          ValuedNode.Type.INTEGER, "intervals.start");
-        new ValuedNode(intervals, slotAt(1, 3), new NodeItemStack(Material.ORANGE_CONCRETE, "Border 1", i -> getTimeString((int) i), "Duration: %s"),              ValuedNode.Type.INTEGER, "intervals.movement1");
-        new ValuedNode(intervals, slotAt(1, 4), new NodeItemStack(Material.YELLOW_CONCRETE, "Border Stops", i -> getTimeString((int) i), "Duration: %s"),          ValuedNode.Type.INTEGER, "intervals.stop");
-        new ValuedNode(intervals, slotAt(1, 5), new NodeItemStack(Material.GREEN_CONCRETE,  "Border 2", i -> getTimeString((int) i), "Duration: %s"),              ValuedNode.Type.INTEGER, "intervals.movement2");
-        new ValuedNode(intervals, slotAt(1, 6), new NodeItemStack(Material.BLUE_CONCRETE,   "Time Until Deathmatch", i -> getTimeString((int) i), "Duration: %s"), ValuedNode.Type.INTEGER, "intervals.dmwait");
+        new ValuedNode(intervals, slotAt(1, 2), new NodeItemStack(Material.RED_CONCRETE,    "Still Border", "Duration: %sm"),          ValuedNode.Type.INTEGER, "intervals.start");
+        new ValuedNode(intervals, slotAt(1, 3), new NodeItemStack(Material.ORANGE_CONCRETE, "Border 1", "Duration: %sm"),              ValuedNode.Type.INTEGER, "intervals.movement1");
+        new ValuedNode(intervals, slotAt(1, 4), new NodeItemStack(Material.YELLOW_CONCRETE, "Border Stops", "Duration: %sm"),          ValuedNode.Type.INTEGER, "intervals.stop");
+        new ValuedNode(intervals, slotAt(1, 5), new NodeItemStack(Material.GREEN_CONCRETE,  "Border 2", "Duration: %sm"),              ValuedNode.Type.INTEGER, "intervals.movement2");
+        new ValuedNode(intervals, slotAt(1, 6), new NodeItemStack(Material.BLUE_CONCRETE,   "Time Until Deathmatch", "Duration: %sm"), ValuedNode.Type.INTEGER, "intervals.dmwait");
 
         /* WB SIZE (diameter) */
         new ValuedNode(wbSize, slotAt(1, 2), new NodeItemStack(Material.RED_STAINED_GLASS,    "Initial World Border", "Diameter: %s"),    ValuedNode.Type.DOUBLE, "wbsize.initial");
