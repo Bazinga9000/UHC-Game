@@ -10,6 +10,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import java.awt.Color;
 import java.util.Arrays;
 
+import static xyz.baz9k.UHCGame.util.Utils.*;
+
 public final class TeamDisplay {
     private TeamDisplay() {}
 
@@ -106,7 +108,7 @@ public final class TeamDisplay {
      * @return {@link TextComponent}
      */
     public static TextComponent prefixed(int t, String name) {
-        return getPrefix(t).append(Component.space()).append(Component.text(name, NamedTextColor.WHITE));
+        return getPrefix(t).append(Component.space()).append(Component.text(name, noDecoStyle(NamedTextColor.WHITE)));
     }
 
     /**

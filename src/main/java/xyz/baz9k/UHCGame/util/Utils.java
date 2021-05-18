@@ -16,6 +16,9 @@ import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
 
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import xyz.baz9k.UHCGame.UHCGame;
 
 public final class Utils {
@@ -235,5 +238,20 @@ public final class Utils {
         }
 
         return Collections.unmodifiableCollection(c);
+    }
+
+    /**
+     * Style with color, but no formatting, no italic, bold, etc.
+     * @param clr
+     * @return
+     */
+    public static Style noDecoStyle(TextColor clr) {
+        Style.Builder st = Style.style().color(clr);
+
+        for (TextDecoration deco : TextDecoration.values()) {
+            st.decoration(deco, false);
+        }
+
+        return st.build();
     }
 }
