@@ -40,7 +40,7 @@ public class BranchNode extends Node {
      * @param guiName Name of this node's inventory
      * @param guiHeight Number of rows in this node's inventory
      */
-    public BranchNode(@Nullable BranchNode parent, int slot, @Nullable ItemStack itemStack, @NotNull String guiName, int guiHeight) {
+    public BranchNode(@Nullable BranchNode parent, int slot, @Nullable NodeItemStack itemStack, @NotNull String guiName, int guiHeight) {
         this(parent, slot, itemStack, Component.text(guiName), guiHeight);
     }
 
@@ -51,7 +51,7 @@ public class BranchNode extends Node {
      * @param guiTitle Title of this node's inventory (with formatting)
      * @param guiHeight Number of rows in this node's inventory
      */
-    public BranchNode(@Nullable BranchNode parent, int slot, @Nullable ItemStack itemStack, @NotNull Component guiTitle, int guiHeight) {
+    public BranchNode(@Nullable BranchNode parent, int slot, @Nullable NodeItemStack itemStack, @NotNull Component guiTitle, int guiHeight) {
         super(parent, slot, itemStack);
         slotCount = 9 * guiHeight;
 
