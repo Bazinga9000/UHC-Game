@@ -156,20 +156,20 @@ public enum GameStage {
         return bbTitle;
     }
 
-    public Duration getDuration() {
+    public Duration duration() {
         return dur.get();
     }
     
     public boolean isInstant() {
-        return getDuration().isZero();
+        return duration().isZero();
     }
 
-    public double getWBDiameter() {
+    public double wbDiameter() {
         return wbSize.get();
     }
 
-    public double getWBRadius() {
-        return getWBDiameter() / 2;
+    public double wbRadius() {
+        return wbDiameter() / 2;
     }
     
     /**
@@ -180,9 +180,9 @@ public enum GameStage {
         if (this == NOT_IN_GAME) return;
         for (World w : worlds) {
             if (isWBInstant) {
-                w.getWorldBorder().setSize(getWBDiameter());
+                w.getWorldBorder().setSize(wbDiameter());
             } else {
-                w.getWorldBorder().setSize(getWBDiameter(), getDuration().toSeconds());
+                w.getWorldBorder().setSize(wbDiameter(), duration().toSeconds());
             }
         }
     }
@@ -291,10 +291,10 @@ public enum GameStage {
         }
         
         var s = getMessageBuilder()
-                .append(Component.text(String.format(fmtStr, baseChatMsg, subject, getWBDiameter() / 2, getWordTimeString(getDuration())), bodyStyle));
+                .append(Component.text(String.format(fmtStr, baseChatMsg, subject, wbDiameter() / 2, getWordTimeString(duration())), bodyStyle));
 
         if (this == lastGradualStage()) {
-            s.append(Component.text(String.format(dmWarn, getWordTimeString(getDuration())), bodyStyle));
+            s.append(Component.text(String.format(dmWarn, getWordTimeString(duration())), bodyStyle));
         }
         
         Bukkit.getServer().sendMessage(s);
