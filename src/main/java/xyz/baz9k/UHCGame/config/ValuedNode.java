@@ -1,7 +1,5 @@
 package xyz.baz9k.UHCGame.config;
 
-import java.util.List;
-
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -124,7 +122,7 @@ public class ValuedNode extends Node {
                 } else {
                     status.append(Component.text("INACTIVE", noDeco(NamedTextColor.RED)));
                 }
-                itemStack.extraLore(List.of(status.asComponent()));
+                itemStack.extraLore(status.asComponent());
                 
                 itemStack.updateMeta(m -> {
                     if (active) {
