@@ -160,5 +160,6 @@ public class NodeItemStack extends ItemStack {
      */
     public void extraLore(List<Component> lore) {
         extraLore = List.copyOf(lore);
+        updateLore();
     }
 }
