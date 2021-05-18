@@ -17,8 +17,16 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 public class ValuedNode extends Node {
-    protected final ValuedNodeType type;
+    protected final Type type;
     protected final String id;
+
+    /**
+     * Enum of the supported types for a {@link ValuedNode}.
+     */
+    public static enum Type {
+        INTEGER, DOUBLE, STRING, BOOLEAN, OPTION
+    }
+
 
     /**
      * @param parent Parent node
@@ -30,7 +38,7 @@ public class ValuedNode extends Node {
      * @param type Type of data this value stores
      * @param id The config ID for this node
      */
-    public ValuedNode(BranchNode parent, int slot, ItemStack item, ValuedNodeType type, String id) {
+    public ValuedNode(BranchNode parent, int slot, ItemStack item, Type type, String id) {
         this(parent, slot, item, type, id, true);
     }
 
@@ -47,7 +55,7 @@ public class ValuedNode extends Node {
      * inheriting classes, updateItemStack needs to occur at the end of the child class's
      * constructor.
      */
-    protected ValuedNode(BranchNode parent, int slot, ItemStack item, ValuedNodeType type, String id, boolean updateStack) {
+    protected ValuedNode(BranchNode parent, int slot, ItemStack item, Type type, String id, boolean updateStack) {
         super(parent, slot, item);
         this.type = type;
         this.id = id;

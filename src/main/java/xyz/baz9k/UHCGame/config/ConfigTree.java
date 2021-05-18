@@ -98,20 +98,20 @@ public class ConfigTree {
         BranchNode esoterics = new BranchNode(root, slotAt(1, 6), itemStack(Material.NETHER_STAR, "Esoteric", "Toggle various additional settings."),                                           "Esoteric", 6);
 
         /* INTERVALS (in secs) */
-        new ValuedNode(intervals, slotAt(1, 2), itemStack(Material.RED_CONCRETE,    "Still Border", "Duration: %sm"),          ValuedNodeType.INTEGER, "intervals.start");
-        new ValuedNode(intervals, slotAt(1, 3), itemStack(Material.ORANGE_CONCRETE, "Border 1", "Duration: %sm"),              ValuedNodeType.INTEGER, "intervals.movement1");
-        new ValuedNode(intervals, slotAt(1, 4), itemStack(Material.YELLOW_CONCRETE, "Border Stops", "Duration: %sm"),          ValuedNodeType.INTEGER, "intervals.stop");
-        new ValuedNode(intervals, slotAt(1, 5), itemStack(Material.GREEN_CONCRETE,  "Border 2", "Duration: %sm"),              ValuedNodeType.INTEGER, "intervals.movement2");
-        new ValuedNode(intervals, slotAt(1, 6), itemStack(Material.BLUE_CONCRETE,   "Time Until Deathmatch", "Duration: %sm"), ValuedNodeType.INTEGER, "intervals.dmwait");
+        new ValuedNode(intervals, slotAt(1, 2), itemStack(Material.RED_CONCRETE,    "Still Border", "Duration: %sm"),          ValuedNode.Type.INTEGER, "intervals.start");
+        new ValuedNode(intervals, slotAt(1, 3), itemStack(Material.ORANGE_CONCRETE, "Border 1", "Duration: %sm"),              ValuedNode.Type.INTEGER, "intervals.movement1");
+        new ValuedNode(intervals, slotAt(1, 4), itemStack(Material.YELLOW_CONCRETE, "Border Stops", "Duration: %sm"),          ValuedNode.Type.INTEGER, "intervals.stop");
+        new ValuedNode(intervals, slotAt(1, 5), itemStack(Material.GREEN_CONCRETE,  "Border 2", "Duration: %sm"),              ValuedNode.Type.INTEGER, "intervals.movement2");
+        new ValuedNode(intervals, slotAt(1, 6), itemStack(Material.BLUE_CONCRETE,   "Time Until Deathmatch", "Duration: %sm"), ValuedNode.Type.INTEGER, "intervals.dmwait");
 
         /* WB SIZE (diameter) */
-        new ValuedNode(wbSize, slotAt(1, 2), itemStack(Material.RED_STAINED_GLASS,    "Initial World Border", "Diameter: %s"),    ValuedNodeType.DOUBLE, "wbsize.initial");
-        new ValuedNode(wbSize, slotAt(1, 3), itemStack(Material.ORANGE_STAINED_GLASS, "First Movement", "Diameter: %s"),          ValuedNodeType.DOUBLE, "wbsize.border1");
-        new ValuedNode(wbSize, slotAt(1, 5), itemStack(Material.GREEN_STAINED_GLASS,  "Second Movement", "Diameter: %s"),         ValuedNodeType.DOUBLE, "wbsize.border2");
-        new ValuedNode(wbSize, slotAt(1, 6), itemStack(Material.PURPLE_STAINED_GLASS, "Deathmatch World Border", "Diameter: %s"), ValuedNodeType.DOUBLE, "wbsize.deathmatch");
+        new ValuedNode(wbSize, slotAt(1, 2), itemStack(Material.RED_STAINED_GLASS,    "Initial World Border", "Diameter: %s"),    ValuedNode.Type.DOUBLE, "wbsize.initial");
+        new ValuedNode(wbSize, slotAt(1, 3), itemStack(Material.ORANGE_STAINED_GLASS, "First Movement", "Diameter: %s"),          ValuedNode.Type.DOUBLE, "wbsize.border1");
+        new ValuedNode(wbSize, slotAt(1, 5), itemStack(Material.GREEN_STAINED_GLASS,  "Second Movement", "Diameter: %s"),         ValuedNode.Type.DOUBLE, "wbsize.border2");
+        new ValuedNode(wbSize, slotAt(1, 6), itemStack(Material.PURPLE_STAINED_GLASS, "Deathmatch World Border", "Diameter: %s"), ValuedNode.Type.DOUBLE, "wbsize.deathmatch");
 
         /* TEAM COUNT */
-        new ValuedNode(teamCount, 0, itemStack(Material.DIAMOND, "Set Team Count", "Number of teams: %s"), ValuedNodeType.INTEGER, "team_count");
+        new ValuedNode(teamCount, 0, itemStack(Material.DIAMOND, "Set Team Count", "Number of teams: %s"), ValuedNode.Type.INTEGER, "team_count");
         new ActionNode(teamCount, slotAt(2, 0), itemStack(Material.RED_DYE, "Solos", "Teams of 1"),      p -> { plugin.getTeamManager().setTeamSize("solos");    });
         new ActionNode(teamCount, slotAt(2, 1), itemStack(Material.ORANGE_DYE, "Duos", "Teams of 2"),    p -> { plugin.getTeamManager().setTeamSize("duos");     });
         new ActionNode(teamCount, slotAt(2, 2), itemStack(Material.YELLOW_DYE, "Trios", "Teams of 3"),   p -> { plugin.getTeamManager().setTeamSize("trios");    });
@@ -120,17 +120,17 @@ public class ConfigTree {
 
         /* ESOTERICS */
         // TODO fill in esoteric descs, final action node
-        new ValuedNode(esoterics, 0, itemStack(Material.DIAMOND, "Gone Fishing", ""),         ValuedNodeType.BOOLEAN, "esoteric.gone_fishing");
-        new ValuedNode(esoterics, 1, itemStack(Material.DIAMOND, "Boss Team", ""),            ValuedNodeType.BOOLEAN, "esoteric.boss_team");
-        new ValuedNode(esoterics, 2, itemStack(Material.DIAMOND, "Always Elytra", ""),        ValuedNodeType.BOOLEAN, "esoteric.always_elytra");
-        new ValuedNode(esoterics, 3, itemStack(Material.DIAMOND, "Sardines", ""),             ValuedNodeType.BOOLEAN, "esoteric.sardines");
-        new ValuedNode(esoterics, 4, itemStack(Material.DIAMOND, "Wither Bonus Round", ""),   ValuedNodeType.BOOLEAN, "esoteric.wither_bonus");
-        new ValuedNode(esoterics, 5, itemStack(Material.DIAMOND, "Mafia", ""),                ValuedNodeType.BOOLEAN, "esoteric.mafia");
-        new ValuedNode(esoterics, 6, itemStack(Material.DIAMOND, "Fast Day-Night Cycle", ""), ValuedNodeType.BOOLEAN, "esoteric.fast_dn_cycle");
-        new ValuedNode(esoterics, 7, itemStack(Material.DIAMOND, "Always Day", ""),           ValuedNodeType.BOOLEAN, "esoteric.always_day");
-        new ValuedNode(esoterics, 8, itemStack(Material.DIAMOND, "Always Night", ""),         ValuedNodeType.BOOLEAN, "esoteric.always_night");
-        new ValuedNode(esoterics, 9, itemStack(Material.DIAMOND, "Spawn in Nether", ""),      ValuedNodeType.BOOLEAN, "esoteric.nether_spawn");
-        new ValuedNode(esoterics, 10, itemStack(Material.DIAMOND, "Bomberman", ""),           ValuedNodeType.BOOLEAN, "esoteric.bomberman");
+        new ValuedNode(esoterics, 0, itemStack(Material.DIAMOND, "Gone Fishing", ""),         ValuedNode.Type.BOOLEAN, "esoteric.gone_fishing");
+        new ValuedNode(esoterics, 1, itemStack(Material.DIAMOND, "Boss Team", ""),            ValuedNode.Type.BOOLEAN, "esoteric.boss_team");
+        new ValuedNode(esoterics, 2, itemStack(Material.DIAMOND, "Always Elytra", ""),        ValuedNode.Type.BOOLEAN, "esoteric.always_elytra");
+        new ValuedNode(esoterics, 3, itemStack(Material.DIAMOND, "Sardines", ""),             ValuedNode.Type.BOOLEAN, "esoteric.sardines");
+        new ValuedNode(esoterics, 4, itemStack(Material.DIAMOND, "Wither Bonus Round", ""),   ValuedNode.Type.BOOLEAN, "esoteric.wither_bonus");
+        new ValuedNode(esoterics, 5, itemStack(Material.DIAMOND, "Mafia", ""),                ValuedNode.Type.BOOLEAN, "esoteric.mafia");
+        new ValuedNode(esoterics, 6, itemStack(Material.DIAMOND, "Fast Day-Night Cycle", ""), ValuedNode.Type.BOOLEAN, "esoteric.fast_dn_cycle");
+        new ValuedNode(esoterics, 7, itemStack(Material.DIAMOND, "Always Day", ""),           ValuedNode.Type.BOOLEAN, "esoteric.always_day");
+        new ValuedNode(esoterics, 8, itemStack(Material.DIAMOND, "Always Night", ""),         ValuedNode.Type.BOOLEAN, "esoteric.always_night");
+        new ValuedNode(esoterics, 9, itemStack(Material.DIAMOND, "Spawn in Nether", ""),      ValuedNode.Type.BOOLEAN, "esoteric.nether_spawn");
+        new ValuedNode(esoterics, 10, itemStack(Material.DIAMOND, "Bomberman", ""),           ValuedNode.Type.BOOLEAN, "esoteric.bomberman");
         new OptionValuedNode(esoterics, 11, itemStack(Material.DIAMOND, "Player Health", ""), "esoteric.max_health",
             new OptionData("❤️ 05", Material.IRON_INGOT),
             new OptionData("❤️ 10", Material.GOLD_INGOT),
