@@ -52,21 +52,8 @@ public class ValuedNode extends Node {
     protected ValuedNode(BranchNode parent, int slot, NodeItemStack item, Type type, String id, boolean updateStack) {
         super(parent, slot, item);
         this.type = type;
-
-        boolean isValid = switch (type) {
-            case INTEGER, OPTION -> cfg.isInt(id);
-            case DOUBLE -> cfg.isDouble(id);
-            case STRING -> cfg.isString(id);
-            case BOOLEAN -> cfg.isBoolean(id);
-        };
-
-        // this valid check is based off the assumption that the config values' types are not changed
-        // (by changing the file and then reloading it)
-        if (isValid) {
-            this.id = id;
-        } else {
-            throw new RuntimeException(String.format("ID %s either does not exist or does not match the value type %s.", id, type));
-        }
+        this.id = id;
+        
         if (updateStack) updateItemStack();
     }
 

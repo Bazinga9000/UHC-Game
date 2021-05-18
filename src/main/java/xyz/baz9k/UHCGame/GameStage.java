@@ -45,9 +45,6 @@ public enum GameStage {
         
         public Duration get() {
             var cfg = plugin.getConfig();
-            if (!cfg.isInt(id)) {
-                throw new RuntimeException(String.format("ID %s either does not exist or does not match the correct value type.", id));
-            }
             if (id != null) return Duration.ofSeconds(cfg.getInt(id));
             return def;
         }
@@ -59,9 +56,6 @@ public enum GameStage {
         
         public double get() {
             var cfg = plugin.getConfig();
-            if (!cfg.isDouble(id)) {
-                throw new RuntimeException(String.format("ID %s either does not exist or does not match the correct value type.", id));
-            }
             if (id != null) return cfg.getDouble(id);
             return def;
         }
