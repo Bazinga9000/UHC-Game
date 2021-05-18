@@ -333,12 +333,8 @@ public class Commands {
                 TeamManager tm = plugin.getTeamManager();
                 for (Player p : (Collection<Player>) args[0]) {
                     switch ((String) args[1]) {
-                        case "spectator":
-                            tm.setSpectator(p);
-                            break;
-                        case "combatant":
-                            tm.setUnassignedCombatant(p);
-                            break;
+                        case "spectator" -> tm.setSpectator(p);
+                        case "combatant" -> tm.setUnassignedCombatant(p);
                     }
                     sender.sendMessage(String.format("Set %s to team %s.", p.getName(), tm.getPlayerState(p)));
                 }

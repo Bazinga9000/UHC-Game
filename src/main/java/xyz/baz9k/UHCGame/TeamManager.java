@@ -309,36 +309,17 @@ public class TeamManager {
      * @param s "solos", "duos", "trios", "quartets", "quintets", "sextets", "septets", "octets"
      */
     public void setTeamSize(String s) {
-        int tsize;
-        switch (s) {
-            case "solos":
-                tsize = 1;
-                break;
-            case "duos":
-                tsize = 2;
-                break;
-            case "trios":
-                tsize = 3;
-                break;
-            case "quartets":
-                tsize = 4;
-                break;
-            case "quintets":
-                tsize = 5;
-                break;
-            case "sextets":
-                tsize = 6;
-                break;
-            case "septets":
-                tsize = 7;
-                break;
-            case "octets":
-                tsize = 8;
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-        setTeamSize(tsize);
+        setTeamSize(switch (s) {
+            case "solos" -> 1;
+            case "duos" -> 2;
+            case "trios" -> 3;
+            case "quartets" -> 4;
+            case "quintets" -> 5;
+            case "sextets" -> 6;
+            case "septets" -> 7;
+            case "octets" -> 8;
+            default -> throw new IllegalArgumentException();
+        });
     }
 
     /**
