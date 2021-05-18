@@ -1,12 +1,9 @@
 package xyz.baz9k.UHCGame.config;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +35,7 @@ public class ValuedNode extends Node {
      * @param type Type of data this value stores
      * @param id The config ID for this node
      */
-    public ValuedNode(BranchNode parent, int slot, ItemStack item, Type type, String id) {
+    public ValuedNode(BranchNode parent, int slot, NodeItemStack item, Type type, String id) {
         this(parent, slot, item, type, id, true);
     }
 
@@ -55,7 +52,7 @@ public class ValuedNode extends Node {
      * inheriting classes, updateItemStack needs to occur at the end of the child class's
      * constructor.
      */
-    protected ValuedNode(BranchNode parent, int slot, ItemStack item, Type type, String id, boolean updateStack) {
+    protected ValuedNode(BranchNode parent, int slot, NodeItemStack item, Type type, String id, boolean updateStack) {
         super(parent, slot, item);
         this.type = type;
         this.id = id;
@@ -97,25 +94,15 @@ public class ValuedNode extends Node {
      * Update the item stack based on the current config value for the node
      */
     public void updateItemStack() {
-        ItemMeta m = itemStack.getItemMeta();
-        m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        List<Component> newDesc = new ArrayList<>(itemDesc);
-
+        itemStack.desc(cfg.get(id));
+        
         // perform updates based on data type
+        ItemMeta m = itemStack.getItemMeta();
         switch (type) {
             case INTEGER:
             case DOUBLE:
             case STRING:
-                // use the initially provided desc for format
-                Object val = cfg.get(id);
-                for (int i = 0; i < itemDesc.size(); i++) {
-                    // subst lines with the correct content
-                    if (itemDesc.get(i) instanceof TextComponent comp) {
-                        String line = comp.content();
-                        newDesc.set(i, comp.content(String.format(line, val)));
-                    }
-                }
-                break;
+                return;
             case BOOLEAN:
                 // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
                 TextComponent.Builder status = Component.text()
@@ -128,8 +115,7 @@ public class ValuedNode extends Node {
                     status.append(Component.text("INACTIVE", noDecoStyle(NamedTextColor.RED)));
                     m.removeEnchant(Enchantment.SILK_TOUCH);
                 }
-                newDesc.add(Component.empty());
-                newDesc.add(status.asComponent());
+                itemStack.extraLore(List.of(status.asComponent()));
                 break;
                 
                 // OPTION impl in OptionValuedNode
@@ -137,9 +123,8 @@ public class ValuedNode extends Node {
             default:
                 throw new UnsupportedOperationException("Type not supported");
         }
-            
-        m.lore(newDesc);
         itemStack.setItemMeta(m);
+
         // since updating the item does not update it in the inventory, parent has to
         parent.updateSlot(parentSlot);
     }
