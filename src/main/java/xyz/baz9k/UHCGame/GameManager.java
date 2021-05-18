@@ -102,7 +102,7 @@ public class GameManager implements Listener {
                 }
             }
             if (!worldsRegened) {
-                throw new IllegalStateException("UHC worlds have not been regenerated. Run /reseed to regenerate.");
+                throw new IllegalStateException("UHC worlds have not been regenerated. Run /uhc reseed to regenerate.");
             }
         } else {
             Debug.broadcastDebug("Skipping starting requirements");
@@ -272,6 +272,7 @@ public class GameManager implements Listener {
         p.setFoodLevel(20);
         p.setSaturation(5.0f);
         p.setExp(0.0f);
+        p.getInventory().clear();
         
         // clear all potion effects
         for (PotionEffect effect : p.getActivePotionEffects()) {

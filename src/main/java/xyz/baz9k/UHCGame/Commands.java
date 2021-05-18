@@ -435,14 +435,10 @@ public class Commands {
         .withAliases("verbose")
         .executes(
             (sender, args) -> {
-                Debug.setDebug(!Debug.getDebug());
-                boolean d = Debug.getDebug();
+                Debug.setDebug(!Debug.isDebugging());
 
-                if (d) {
-                    sender.sendMessage("Verbose messages on");
-                } else {
-                    sender.sendMessage("Verbose messages off");
-                }
+                String onOff = Debug.isDebugging() ? "on" : "off";
+                sender.sendMessage("Verbose messages " + onOff);
             }
         );
     }
@@ -454,14 +450,10 @@ public class Commands {
         .withArguments(new BooleanArgument("status"))
         .executes(
             (sender, args) -> {
-                boolean d = (boolean) args[0];
-                Debug.setDebug(d);
+                Debug.setDebug((boolean) args[0]);
 
-                if (d) {
-                    sender.sendMessage("Verbose messages on");
-                } else {
-                    sender.sendMessage("Verbose messages off");
-                }
+                String onOff = Debug.isDebugging() ? "on" : "off";
+                sender.sendMessage("Verbose messages " + onOff);
             }
         );
     }
