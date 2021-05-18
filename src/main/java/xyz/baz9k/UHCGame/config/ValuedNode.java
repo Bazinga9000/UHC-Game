@@ -21,7 +21,6 @@ public class ValuedNode extends Node {
         INTEGER, DOUBLE, STRING, BOOLEAN, OPTION
     }
 
-
     /**
      * @param parent Parent node
      * @param slot lot of this node in parent's inventory
@@ -31,30 +30,15 @@ public class ValuedNode extends Node {
      * those will be substituted with the config value.
      * @param type Type of data this value stores
      * @param id The config ID for this node
+     * @implNote Inheriting classes should cancel the updateItemStack and recall it after
+     * all its properties are set.
      */
     public ValuedNode(BranchNode parent, int slot, NodeItemStack item, Type type, String id) {
-        this(parent, slot, item, type, id, true);
-    }
-
-    /**
-     * @param parent Parent node
-     * @param slot lot of this node in parent's inventory
-     * @param item Item stack of this node in parent's inventory
-     * <p>
-     * If format strings are included in the item's description (%s, %.1f, etc.), 
-     * those will be substituted with the config value.
-     * @param type Type of data this value stores
-     * @param id The config ID for this node
-     * @param updateStack ItemStack should always be updated at init, but in the case of 
-     * inheriting classes, updateItemStack needs to occur at the end of the child class's
-     * constructor.
-     */
-    protected ValuedNode(BranchNode parent, int slot, NodeItemStack item, Type type, String id, boolean updateStack) {
         super(parent, slot, item);
         this.type = type;
         this.id = id;
         
-        if (updateStack) updateItemStack();
+        updateItemStack();
     }
 
     public String getId() {

@@ -22,7 +22,7 @@ public class OptionValuedNode extends ValuedNode {
      * @param optData An array of options that this node supports 
      */
     public OptionValuedNode(BranchNode parent, int slot, NodeItemStack stack, String id, OptionData... optData) {
-        super(parent, slot, stack, ValuedNode.Type.OPTION, id, false);
+        super(parent, slot, stack, ValuedNode.Type.OPTION, id);
         this.optData = optData;
         updateItemStack();
     }
@@ -34,6 +34,7 @@ public class OptionValuedNode extends ValuedNode {
     }
 
     public void updateItemStack() {
+        if (optData == null) return;
         int ind = cfg.getInt(id) % optData.length;
         OptionData dat = optData[ind];
         itemStack.desc(dat.name());
