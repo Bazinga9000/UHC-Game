@@ -1,6 +1,7 @@
 
 package xyz.baz9k.UHCGame.config;
 
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -21,7 +22,7 @@ public class ActionNode extends Node {
      * @param itemStack Item stack of this node in parent's inventory
      * @param fn Function ran when this node is clicked
      */
-    public ActionNode(@NotNull BranchNode parent, int slot, @NotNull NodeItemStack itemStack, @NotNull Consumer<Player> fn) {
+    public ActionNode(@NotNull BranchNode parent, int slot, @NotNull ItemStack itemStack, @NotNull Consumer<Player> fn) {
         super(parent, slot, itemStack);
         this.fn = fn;
     }

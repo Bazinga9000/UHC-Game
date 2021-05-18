@@ -1,8 +1,12 @@
 package xyz.baz9k.UHCGame.config;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,7 +25,7 @@ public class OptionValuedNode extends ValuedNode {
      * @param id The config ID for this node
      * @param optData An array of options that this node supports 
      */
-    public OptionValuedNode(BranchNode parent, int slot, NodeItemStack stack, String id, OptionData... optData) {
+    public OptionValuedNode(BranchNode parent, int slot, ItemStack stack, String id, OptionData... optData) {
         super(parent, slot, stack, ValuedNode.Type.OPTION, id, false);
         this.optData = optData;
         updateItemStack();
@@ -36,17 +40,22 @@ public class OptionValuedNode extends ValuedNode {
     public void updateItemStack() {
         int ind = cfg.getInt(id) % optData.length;
         OptionData dat = optData[ind];
-        itemStack.desc(dat.name());
 
+        ItemMeta m = itemStack.getItemMeta();
+        m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        List<Component> newDesc = new ArrayList<>(itemDesc);
+
+        newDesc.add(Component.empty());
         itemStack.setType(dat.material());
-        var extraLore = new ArrayList<Component>();
         for (int i = 0; i < optData.length; i++) {
+
             TextColor clr = i == ind ? NamedTextColor.GREEN : NamedTextColor.RED;
-            extraLore.add(Component.text(optData[i].name(), noDecoStyle(clr)));
+            newDesc.add(Component.text(optData[i].name(), noDecoStyle(clr)));
 
         }
-        itemStack.extraLore(extraLore);
 
+        m.lore(newDesc);
+        itemStack.setItemMeta(m);
         // since updating the item does not update it in the inventory, parent has to
         parent.updateSlot(parentSlot);
     }
