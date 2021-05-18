@@ -102,7 +102,7 @@ public class GameManager implements Listener {
                 }
             }
             if (!worldsRegened) {
-                throw new IllegalStateException("UHC worlds have not been regenerated. Run /reseed to regenerate.");
+                throw new IllegalStateException("UHC worlds have not been regenerated. Run /uhc reseed to regenerate.");
             }
         } else {
             Debug.broadcastDebug("Skipping starting requirements");
