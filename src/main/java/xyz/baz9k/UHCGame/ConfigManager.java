@@ -25,8 +25,11 @@ public class ConfigManager implements Listener {
 
         if (b == null) return; // interacted view does not have a node inventory
         if (e.getInventory() == e.getClickedInventory()) { // handle clicks IF the clicked inv is the top of the view
-            if (e.getCurrentItem() != null) b.onClick((Player) e.getWhoClicked(), e.getSlot());
-            e.setCancelled(true);
+            try {
+                if (e.getCurrentItem() != null) b.onClick((Player) e.getWhoClicked(), e.getSlot());
+            } finally {
+                e.setCancelled(true);
+            }
         }
 
     }
