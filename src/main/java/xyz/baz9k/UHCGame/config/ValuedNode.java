@@ -105,12 +105,12 @@ public class ValuedNode extends Node {
                 boolean active = cfg.getBoolean(id);
                 // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
                 TextComponent.Builder status = Component.text()
-                .append(Component.text("Status: ", noDecoStyle(NamedTextColor.WHITE)));
+                .append(Component.text("Status: ", noDeco(NamedTextColor.WHITE)));
                 
                 if (active) {
-                    status.append(Component.text("ACTIVE", noDecoStyle(NamedTextColor.GREEN)));
+                    status.append(Component.text("ACTIVE", noDeco(NamedTextColor.GREEN)));
                 } else {
-                    status.append(Component.text("INACTIVE", noDecoStyle(NamedTextColor.RED)));
+                    status.append(Component.text("INACTIVE", noDeco(NamedTextColor.RED)));
                 }
                 itemStack.extraLore(List.of(status.asComponent()));
                 

@@ -78,7 +78,7 @@ public class BranchNode extends Node {
             ItemStack goBack = new ItemStack(Material.ARROW);
 
             m = goBack.getItemMeta();
-            m.displayName(Component.text("Go Back", noDecoStyle(NamedTextColor.RED)));
+            m.displayName(Component.text("Go Back", noDeco(NamedTextColor.RED)));
             goBack.setItemMeta(m);
 
             inventory.setItem(slotCount - 1, goBack);

@@ -50,11 +50,11 @@ public class NodeItemStack extends ItemStack {
     /**
      * This text style (color & formatting) will be used in the description by default
      */
-    public static final Style DEFAULT_NAME_STYLE = noDecoStyle(null);
+    public static final Style DEFAULT_NAME_STYLE = noDeco(null);
     /**
      * This text style (color & formatting) will be used in the description by default
      */
-    public static final Style DEFAULT_DESC_STYLE = noDecoStyle(NamedTextColor.DARK_GRAY);
+    public static final Style DEFAULT_DESC_STYLE = noDeco(NamedTextColor.DARK_GRAY);
 
     /**
      * @param mat Material of item

@@ -42,7 +42,7 @@ public class OptionValuedNode extends ValuedNode {
         var extraLore = new ArrayList<Component>();
         for (int i = 0; i < optData.length; i++) {
             TextColor clr = i == ind ? NamedTextColor.GREEN : NamedTextColor.RED;
-            extraLore.add(Component.text(optData[i].name(), noDecoStyle(clr)));
+            extraLore.add(Component.text(optData[i].name(), noDeco(clr)));
 
         }
         itemStack.extraLore(extraLore);
