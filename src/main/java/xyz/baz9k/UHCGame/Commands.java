@@ -454,15 +454,4 @@ public class Commands {
             }
         );
     }
-
-    @Command
-    private CommandAPICommand debugTest() {
-        return new CommandAPICommand("debugtest")
-        .executes(
-            (sender, args) -> {
-                Debug.broadcastDebug("msg");
-                Debug.printError(new NullPointerException());
-            }
-        );
-    }
 }
