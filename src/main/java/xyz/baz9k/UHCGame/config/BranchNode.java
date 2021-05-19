@@ -92,8 +92,8 @@ public class BranchNode extends Node {
      * @param child
      */
     public void setChild(int slot, @Nullable Node child) {
-        if (0 > slot || slot > (slotCount - 1)) {
-            throw new IllegalArgumentException("Invalid slot (Slot cannot be negative or the final slot.)");
+        if (0 > slot || slot > children.length) {
+            throw new IndexOutOfBoundsException(String.format("Cannot set child at slot %s. Slot must be a positive integer less than %s.", slot, children.length));
         }
 
         if (child == null) {
