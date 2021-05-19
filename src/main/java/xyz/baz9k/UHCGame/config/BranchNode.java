@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -121,6 +122,7 @@ public class BranchNode extends Node {
         }
 
         Node node = children[slot];
+        p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2);
         if (node != null) node.click(p);
     }
 
