@@ -74,20 +74,20 @@ public class ConfigTree {
         BranchNode esoterics = new BranchNode(root, slotAt(1, 6), new NodeItemStack(Material.NETHER_STAR, "Esoteric", "Toggle various additional settings."),                                           "Esoteric", 6);
 
         /* INTERVALS (in secs) */
-        new ValuedNode(intervals, slotAt(1, 2), new NodeItemStack(Material.RED_CONCRETE,    "Still Border", i -> getTimeString((int) i), "Duration: %s"),          ValuedNode.Type.INTEGER, "intervals.start");
-        new ValuedNode(intervals, slotAt(1, 3), new NodeItemStack(Material.ORANGE_CONCRETE, "Border 1", i -> getTimeString((int) i), "Duration: %s"),              ValuedNode.Type.INTEGER, "intervals.movement1");
-        new ValuedNode(intervals, slotAt(1, 4), new NodeItemStack(Material.YELLOW_CONCRETE, "Border Stops", i -> getTimeString((int) i), "Duration: %s"),          ValuedNode.Type.INTEGER, "intervals.stop");
-        new ValuedNode(intervals, slotAt(1, 5), new NodeItemStack(Material.GREEN_CONCRETE,  "Border 2", i -> getTimeString((int) i), "Duration: %s"),              ValuedNode.Type.INTEGER, "intervals.movement2");
-        new ValuedNode(intervals, slotAt(1, 6), new NodeItemStack(Material.BLUE_CONCRETE,   "Time Until Deathmatch", i -> getTimeString((int) i), "Duration: %s"), ValuedNode.Type.INTEGER, "intervals.dmwait");
+        new ValuedNode(intervals, slotAt(1, 2), new NodeItemStack(Material.RED_CONCRETE,    "Still Border", i -> getTimeString((int) i), "Duration: %s"),          ValuedNode.Type.INTEGER, "intervals.start", i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 3), new NodeItemStack(Material.ORANGE_CONCRETE, "Border 1", i -> getTimeString((int) i), "Duration: %s"),              ValuedNode.Type.INTEGER, "intervals.movement1", i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 4), new NodeItemStack(Material.YELLOW_CONCRETE, "Border Stops", i -> getTimeString((int) i), "Duration: %s"),          ValuedNode.Type.INTEGER, "intervals.stop", i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 5), new NodeItemStack(Material.GREEN_CONCRETE,  "Border 2", i -> getTimeString((int) i), "Duration: %s"),              ValuedNode.Type.INTEGER, "intervals.movement2", i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 6), new NodeItemStack(Material.BLUE_CONCRETE,   "Time Until Deathmatch", i -> getTimeString((int) i), "Duration: %s"), ValuedNode.Type.INTEGER, "intervals.dmwait", i -> clamp(0, i.intValue(), 7200));
 
         /* WB SIZE (diameter) */
-        new ValuedNode(wbSize, slotAt(1, 2), new NodeItemStack(Material.RED_STAINED_GLASS,    "Initial World Border", "Diameter: %s"),    ValuedNode.Type.DOUBLE, "wb_size.initial");
-        new ValuedNode(wbSize, slotAt(1, 3), new NodeItemStack(Material.ORANGE_STAINED_GLASS, "First Movement", "Diameter: %s"),          ValuedNode.Type.DOUBLE, "wb_size.border1");
-        new ValuedNode(wbSize, slotAt(1, 5), new NodeItemStack(Material.GREEN_STAINED_GLASS,  "Second Movement", "Diameter: %s"),         ValuedNode.Type.DOUBLE, "wb_size.border2");
-        new ValuedNode(wbSize, slotAt(1, 6), new NodeItemStack(Material.PURPLE_STAINED_GLASS, "Deathmatch World Border", "Diameter: %s"), ValuedNode.Type.DOUBLE, "wb_size.deathmatch");
+        new ValuedNode(wbSize, slotAt(1, 2), new NodeItemStack(Material.RED_STAINED_GLASS,    "Initial World Border", "Diameter: %s"),    ValuedNode.Type.DOUBLE, "wb_size.initial"   , d -> clamp(0, d.doubleValue(), 60000000));
+        new ValuedNode(wbSize, slotAt(1, 3), new NodeItemStack(Material.ORANGE_STAINED_GLASS, "First Movement", "Diameter: %s"),          ValuedNode.Type.DOUBLE, "wb_size.border1"   , d -> clamp(0, d.doubleValue(), 60000000));
+        new ValuedNode(wbSize, slotAt(1, 5), new NodeItemStack(Material.GREEN_STAINED_GLASS,  "Second Movement", "Diameter: %s"),         ValuedNode.Type.DOUBLE, "wb_size.border2"   , d -> clamp(0, d.doubleValue(), 60000000));
+        new ValuedNode(wbSize, slotAt(1, 6), new NodeItemStack(Material.PURPLE_STAINED_GLASS, "Deathmatch World Border", "Diameter: %s"), ValuedNode.Type.DOUBLE, "wb_size.deathmatch", d -> clamp(0, d.doubleValue(), 60000000));
 
         /* TEAM COUNT */
-        new ValuedNode(teamCount, 0, new NodeItemStack(Material.DIAMOND, "Set Team Count", "Number of teams: %s"), ValuedNode.Type.INTEGER, "team_count");
+        new ValuedNode(teamCount, 0, new NodeItemStack(Material.DIAMOND, "Set Team Count", "Number of teams: %s"), ValuedNode.Type.INTEGER, "team_count", i -> Math.min(i.intValue(), 1));
         new ActionNode(teamCount, slotAt(2, 0), new NodeItemStack(Material.RED_DYE, "Solos", "Teams of 1"),      p -> { plugin.getTeamManager().setTeamSize("solos");    });
         new ActionNode(teamCount, slotAt(2, 1), new NodeItemStack(Material.ORANGE_DYE, "Duos", "Teams of 2"),    p -> { plugin.getTeamManager().setTeamSize("duos");     });
         new ActionNode(teamCount, slotAt(2, 2), new NodeItemStack(Material.YELLOW_DYE, "Trios", "Teams of 3"),   p -> { plugin.getTeamManager().setTeamSize("trios");    });

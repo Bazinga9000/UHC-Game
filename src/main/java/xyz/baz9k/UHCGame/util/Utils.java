@@ -254,4 +254,11 @@ public final class Utils {
 
         return st.build();
     }
+
+    public static int clamp(int min, int x, int max) {
+        return Math.max(min, Math.min(x, max));
+    }
+    public static double clamp(double min, double x, double max) {
+        return Math.max(min, Math.min(x, max));
+    }
 }
