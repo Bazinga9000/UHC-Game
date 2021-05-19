@@ -1,10 +1,8 @@
 package xyz.baz9k.UHCGame.config;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
-import net.kyori.adventure.text.Component;
 import xyz.baz9k.UHCGame.UHCGame;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
@@ -95,7 +93,7 @@ public class ConfigTree {
         new ActionNode(teamCount, slotAt(2, 4), new NodeItemStack(Material.BLUE_DYE, "Quintets", "Teams of 5"),  p -> { plugin.getTeamManager().setTeamSize("quintets"); });
 
         /* ESOTERICS */
-        // TODO fill in esoteric descs, final action node
+        // TODO fill in esoteric info
         new ValuedNode(esoterics, 0, new NodeItemStack(Material.DIAMOND, "Gone Fishing", ""),         ValuedNode.Type.BOOLEAN, "esoteric.gone_fishing");
         new ValuedNode(esoterics, 1, new NodeItemStack(Material.DIAMOND, "Boss Team", ""),            ValuedNode.Type.BOOLEAN, "esoteric.boss_team");
         new ValuedNode(esoterics, 2, new NodeItemStack(Material.DIAMOND, "Always Elytra", ""),        ValuedNode.Type.BOOLEAN, "esoteric.always_elytra");
@@ -119,7 +117,14 @@ public class ConfigTree {
             new OptionData("2.0x", Material.DIAMOND),
             new OptionData("3.0x", Material.EMERALD)
         );
-        new ActionNode(esoterics, 52, new NodeItemStack(Material.CREEPER_HEAD, "Reset to Defaults", ""), p -> { Bukkit.getServer().sendMessage(Component.text("todo")); });
+        new ActionNode(esoterics, 52, new NodeItemStack(Material.CREEPER_HEAD, "Reset to Defaults", ""), p -> { 
+            var defaults = plugin.getConfig().getConfigurationSection("esoteric").getDefaultSection();
+            for (Node n : esoterics.getChildren()) {
+                if (n instanceof ValuedNode vn) {
+                    vn.set(defaults.get(vn.id));
+                }
+            }
+         });
     
         return root;
     }
