@@ -10,9 +10,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
+import java.util.function.UnaryOperator;
+
 public class ValuedNode extends Node {
     protected final Type type;
     protected final String id;
+    protected UnaryOperator<Number> restrict = UnaryOperator.identity();
 
     /**
      * Enum of the supported types for a {@link ValuedNode}.
@@ -41,35 +44,50 @@ public class ValuedNode extends Node {
         updateItemStack();
     }
 
+    /**
+     * @param parent Parent node
+     * @param slot lot of this node in parent's inventory
+     * @param item Item stack of this node in parent's inventory
+     * <p>
+     * If format strings are included in the item's description (%s, %.1f, etc.), 
+     * those will be substituted with the config value.
+     * @param type Type of data this value stores
+     * <p>
+     * WITH A RESTRICTING FUNCTION, THE TYPE MUST BE NUMERIC.
+     * @param id The config ID for this node
+     * @param restrict This function maps invalid numeric values to the correct values.
+     * @implNote Inheriting classes should cancel the updateItemStack and recall it after
+     * all its properties are set.
+     */
+    public ValuedNode(BranchNode parent, int slot, NodeItemStack item, Type type, String id, UnaryOperator<Number> restrict) {
+        this(parent, slot, item, switch (type) {
+            case INTEGER, DOUBLE -> type;
+            default -> throw new IllegalArgumentException(String.format("Type %s is not a numeric type.", type));
+        }, id);
+        
+        this.restrict = restrict;
+        cfg.set(id, restrict.apply((Number) cfg.get(id)));
+        updateItemStack();
+    }
+
     public String getId() {
         return id;
     }
 
+    public Type getType() {
+        return type;
+    }
+
     @Override
     public void click(@NotNull Player p) {
-        Object val;
         switch (type) {
-            // TODO request value from player for integer/double/string
-            case INTEGER:
-                val = cfg.getInt(id);
-                break;
-            case DOUBLE:
-                val = cfg.getDouble(id);
-                break;
-            case STRING:
-                val = cfg.getString(id);
-                break;
-
-            case BOOLEAN:
-                val = !cfg.getBoolean(id);
-                break;
-            
-            // OPTION impl in OptionValuedNode
-            
-            default:
-                throw new UnsupportedOperationException("Type not supported");
+            case INTEGER, DOUBLE, STRING -> new ValueRequest(plugin, p, this);
+            case BOOLEAN -> this.set(!cfg.getBoolean(id));
+            // case OPTION -> see OptionValuedNode#click
+            default -> {
+                throw new IllegalArgumentException(String.format("Type %s not implemented", type));
             }
-        cfg.set(id, val);
+        }
     }
 
     /**
@@ -109,10 +127,15 @@ public class ValuedNode extends Node {
                 // OPTION impl in OptionValuedNode
                 
             default:
-                throw new UnsupportedOperationException("Type not supported");
+                throw new IllegalArgumentException(String.format("Type %s not implemented", type));
         }
 
         // since updating the item does not update it in the inventory, parent has to
         parent.updateSlot(parentSlot);
+    }
+
+    public void set(Object value) {
+        cfg.set(id, value);
+        updateItemStack();
     }
 }

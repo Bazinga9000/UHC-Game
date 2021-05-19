@@ -30,7 +30,7 @@ public class OptionValuedNode extends ValuedNode {
     @Override
     public void click(Player p) {
         int currIndex = cfg.getInt(id);
-        cfg.set(id, (currIndex + 1) % optData.length);
+        this.set((currIndex + 1) % optData.length);
     }
 
     public void updateItemStack() {

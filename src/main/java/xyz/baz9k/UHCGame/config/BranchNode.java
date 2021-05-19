@@ -121,12 +121,7 @@ public class BranchNode extends Node {
         }
 
         Node node = children[slot];
-        if (node != null) {
-            node.click(p);
-            if (node instanceof ValuedNode vn) {
-                vn.updateItemStack();
-            }
-        }
+        if (node != null) node.click(p);
     }
 
     public void click(Player p) {
