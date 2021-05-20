@@ -1,5 +1,7 @@
 package xyz.baz9k.UHCGame;
 
+import java.util.Locale;
+
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 
@@ -63,5 +65,9 @@ public class UHCGame extends JavaPlugin {
 
     public MVWorldManager getMVWorldManager() {
         return getMVCore().getMVWorldManager();
+    }
+
+    public static Locale getLocale() {
+        return LangManager.getLocale();
     }
 }

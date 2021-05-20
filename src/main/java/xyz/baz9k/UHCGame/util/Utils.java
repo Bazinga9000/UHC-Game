@@ -1,5 +1,6 @@
 package xyz.baz9k.UHCGame.util;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -279,5 +280,22 @@ public final class Utils {
                 return rendered.toString();
             })
             .collect(Collectors.joining());
+    }
+    
+    public static String componentString(Component c) {
+        return componentString(UHCGame.getLocale(), c);
+    }
+
+    public static <X extends Throwable> X translatableErr(Class<X> exc, Locale l, Component msg) {
+        try {
+            return exc.getConstructor(String.class).newInstance(componentString(l, msg));
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static <X extends Throwable> X translatableErr(Class<X> exc, Component c) {
+        return translatableErr(exc, UHCGame.getLocale(), c);
     }
 }

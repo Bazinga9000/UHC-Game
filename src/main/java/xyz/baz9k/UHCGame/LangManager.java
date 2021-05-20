@@ -14,12 +14,13 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 
 public class LangManager {
+    private static final Locale DEFAULT_LOCALE = Locale.US;
+    private static Locale pluginLocale = DEFAULT_LOCALE;
+
     private final UHCGame plugin;
     private TranslationRegistry reg;
-    private Locale locale = DEFAULT_LOCALE;
     private final Map<Locale, Map<String, MessageFormat>> cfgCache = new HashMap<>();
 
-    private static final Locale DEFAULT_LOCALE = Locale.US;
 
     public LangManager(UHCGame plugin) {
         this.plugin = plugin;
@@ -32,16 +33,16 @@ public class LangManager {
         loadLang(DEFAULT_LOCALE);
     }
 
-    public Locale getLocale() { return locale; }
+    public static Locale getLocale() { return pluginLocale; }
 
     public void setLang(Locale l) {
         loadLang(l);
-        this.locale = l;
+        pluginLocale = l;
     }
 
     private void loadLang(Locale l) {
         if (cfgCache.containsKey(l)) return; // already loaded
-        reg.registerAll(locale, langEntries(locale));
+        reg.registerAll(pluginLocale, langEntries(pluginLocale));
     }
 
     private Map<String, MessageFormat> langEntries(Locale l) {
