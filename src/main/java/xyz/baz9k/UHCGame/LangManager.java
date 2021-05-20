@@ -12,7 +12,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 
@@ -53,10 +52,11 @@ public class LangManager {
         
         // get file in yml form
         InputStreamReader langResource;
+        String filename = String.format("lang/%s.yml", l);
         try {
-            langResource = new InputStreamReader(plugin.getResource(String.format("lang/%s.yml", l)));
+            langResource = new InputStreamReader(plugin.getResource(filename));
         } catch (NullPointerException e) {
-            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.lang.missing_file").args(Component.text("lang/" + l + ".yml")));
+            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.lang.missing_file", filename);
         }
 
         Configuration langCfg = YamlConfiguration.loadConfiguration(langResource);

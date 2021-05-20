@@ -31,12 +31,12 @@ import static java.time.temporal.ChronoUnit.FOREVER;
  */
 public enum GameStage {
     NOT_IN_GAME,
-    WB_STILL   (BossBar.Color.RED,    Duration.ofMinutes(60), 1200, true,  Component.translatable("xyz.baz9k.uhc.bossbar.wb_still",   NamedTextColor.RED),         Component.text("xyz.baz9k.uhc.chat.stage_base.wb_still", NamedTextColor.GREEN, BOLD)),
-    WB_1       (BossBar.Color.BLUE,   Duration.ofMinutes(15), 25,   false, Component.translatable("xyz.baz9k.uhc.bossbar.wb_1",       NamedTextColor.BLUE),        Component.text("xyz.baz9k.uhc.chat.stage_base.wb_1", NamedTextColor.RED, BOLD)),
-    WB_STOP    (BossBar.Color.RED,    Duration.ofMinutes(5),  25,   true,  Component.translatable("xyz.baz9k.uhc.bossbar.wb_stop",    NamedTextColor.RED),         Component.text("xyz.baz9k.uhc.chat.stage_base.wb_stop", NamedTextColor.AQUA)),
-    WB_2       (BossBar.Color.BLUE,   Duration.ofMinutes(10), 3,    false, Component.translatable("xyz.baz9k.uhc.bossbar.wb_2",       NamedTextColor.BLUE),        Component.text("xyz.baz9k.uhc.chat.stage_base.wb_2", NamedTextColor.RED)),
-    DM_WAIT    (BossBar.Color.WHITE,  Duration.ofMinutes(5),  3,    true,  Component.translatable("xyz.baz9k.uhc.bossbar.dm_wait",    NamedTextColor.WHITE),       Component.text("xyz.baz9k.uhc.chat.stage_base.dm_wait", NamedTextColor.DARK_AQUA)),
-    DEATHMATCH (BossBar.Color.PURPLE, FOREVER.getDuration(),  20,   true,  Component.translatable("xyz.baz9k.uhc.bossbar.deathmatch", NamedTextColor.DARK_PURPLE), Component.text("xyz.baz9k.uhc.chat.stage_base.deathmatch", NamedTextColor.BLUE, BOLD));
+    WB_STILL   (BossBar.Color.RED,    Duration.ofMinutes(60), 1200, true,  trans("xyz.baz9k.uhc.bossbar.wb_still").color(NamedTextColor.RED),           Component.translatable("xyz.baz9k.uhc.chat.stage_base.wb_still", NamedTextColor.GREEN, BOLD)),
+    WB_1       (BossBar.Color.BLUE,   Duration.ofMinutes(15), 25,   false, trans("xyz.baz9k.uhc.bossbar.wb_1").color(NamedTextColor.BLUE),              Component.translatable("xyz.baz9k.uhc.chat.stage_base.wb_1", NamedTextColor.RED, BOLD)),
+    WB_STOP    (BossBar.Color.RED,    Duration.ofMinutes(5),  25,   true,  trans("xyz.baz9k.uhc.bossbar.wb_stop").color(NamedTextColor.RED),            Component.translatable("xyz.baz9k.uhc.chat.stage_base.wb_stop", NamedTextColor.AQUA)),
+    WB_2       (BossBar.Color.BLUE,   Duration.ofMinutes(10), 3,    false, trans("xyz.baz9k.uhc.bossbar.wb_2").color(NamedTextColor.BLUE),              Component.translatable("xyz.baz9k.uhc.chat.stage_base.wb_2", NamedTextColor.RED)),
+    DM_WAIT    (BossBar.Color.WHITE,  Duration.ofMinutes(5),  3,    true,  trans("xyz.baz9k.uhc.bossbar.dm_wait").color(NamedTextColor.WHITE),          Component.translatable("xyz.baz9k.uhc.chat.stage_base.dm_wait", NamedTextColor.DARK_AQUA)),
+    DEATHMATCH (BossBar.Color.PURPLE, FOREVER.getDuration(),  20,   true,  trans("xyz.baz9k.uhc.bossbar.deathmatch").color(NamedTextColor.DARK_PURPLE), Component.translatable("xyz.baz9k.uhc.chat.stage_base.deathmatch", NamedTextColor.BLUE, BOLD));
     
     private final BossBar.Color bbClr;
     private final Duration dur;

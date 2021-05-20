@@ -164,7 +164,7 @@ public class HUDManager implements Listener {
             team = b.registerNewTeam(name);
         }
         if (position < 1 || position > 15) {
-            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.hud.must_fit"));
+            throw translatableErr(IllegalArgumentException.class, trans("xyz.baz9k.uhc.err.hud.must_fit"));
         }
         String pname = createEmptyName(Integer.toString(position, 16).charAt(0));
         team.addEntry(pname);
@@ -258,11 +258,6 @@ public class HUDManager implements Listener {
             y = loc.getBlockY(),
             z = loc.getBlockZ();
 
-        TextComponent.Builder s;
-        s = Component.text()
-            .append(Component.text(x + " " + y + " " + z, NamedTextColor.GREEN)) // position format
-            .append(Component.text(" ( ", NamedTextColor.WHITE)); // rotation format
-
         double yaw = mod(loc.getYaw() + 67.5, 360);
         Component xc = Component.empty(), zc = Component.empty();
         /*
@@ -281,19 +276,15 @@ public class HUDManager implements Listener {
          * 315 - 360: -X
          */
 
-        if ( 90 <= yaw && yaw < 225) xc = Component.translatable("xyz.baz9k.uhc.hud.pos_x", NamedTextColor.RED);
-        if (270 <= yaw || yaw <  45) xc = Component.translatable("xyz.baz9k.uhc.hud.neg_x", NamedTextColor.RED);
+        if ( 90 <= yaw && yaw < 225) xc = trans("xyz.baz9k.uhc.hud.pos_x").color(NamedTextColor.RED);
+        if (270 <= yaw || yaw <  45) xc = trans("xyz.baz9k.uhc.hud.neg_x").color(NamedTextColor.RED);
 
-        if (  0 <= yaw && yaw < 135) zc = Component.translatable("xyz.baz9k.uhc.hud.pos_z", NamedTextColor.BLUE);
-        if (180 <= yaw && yaw < 315) zc = Component.translatable("xyz.baz9k.uhc.hud.neg_z", NamedTextColor.BLUE);
+        if (  0 <= yaw && yaw < 135) zc = trans("xyz.baz9k.uhc.hud.pos_z").color(NamedTextColor.BLUE);
+        if (180 <= yaw && yaw < 315) zc = trans("xyz.baz9k.uhc.hud.neg_z").color(NamedTextColor.BLUE);
 
-        s.append(Component.text(")", NamedTextColor.WHITE));
-        Component pos = Component.translatable("xyz.baz9k.uhc.hud.position", NamedTextColor.GREEN).args(
-            Component.text(x), Component.text(y), Component.text(z)
-        );
-        Component rot = Component.translatable("xyz.baz9k.uhc.hud.rotation", NamedTextColor.WHITE).args(
-            Component.join(Component.space(), xc, zc)
-        );
+        Component pos = trans("xyz.baz9k.uhc.hud.position", x, y, z).color(NamedTextColor.GREEN);
+        Component rot = trans("xyz.baz9k.uhc.hud.rotation", Component.join(Component.space(), xc, zc))
+            .color(NamedTextColor.WHITE);
         setHUDLine(p, "posrot", Component.join(Component.space(), pos, rot));
     }
 
@@ -302,14 +293,11 @@ public class HUDManager implements Listener {
         
         // world border radius format
         double r = (p.getWorld().getWorldBorder().getSize() / 2);
-        Component wbrad = Component.translatable("xyz.baz9k.uhc.hud.wbradius", NamedTextColor.AQUA)
-            .args(Component.text((int) r));
-
+        Component wbrad = trans("xyz.baz9k.uhc.hud.wbradius", (int) r).color(NamedTextColor.AQUA);
         // distance format
         double distance = r - Math.max(Math.abs(loc.getX()), Math.abs(loc.getZ()));
-        Component wbdist = Component.translatable("xyz.baz9k.uhc.hud.wbdistance", NamedTextColor.WHITE)
-            .args(Component.text((int) distance));
-
+        Component wbdist = trans("xyz.baz9k.uhc.hud.wbdistance", (int) distance).color(NamedTextColor.WHITE)
+;
         setHUDLine(p, "wbpos", Component.join(Component.space(), wbrad, wbdist));
     }
 
@@ -322,31 +310,28 @@ public class HUDManager implements Listener {
         TextColor dayCharColor = isDay ? TextColor.color(255, 245, 123) : TextColor.color(43, 47, 119);
         String dayCharString = isDay ? "☀" : "☽";
 
-        Component s = Component.translatable("xyz.baz9k.uhc.hud.gametime", NamedTextColor.RED)
-            .args(
-                Component.text(elapsed, NamedTextColor.WHITE),
-                Component.text(dayCharString, dayCharColor)
-            );
+        Component s = trans("xyz.baz9k.uhc.hud.gametime",
+            Component.text(elapsed, NamedTextColor.WHITE),
+            Component.text(dayCharString, dayCharColor)
+        ).color(NamedTextColor.RED);
 
         setHUDLine(p, "elapsedTime", s);
 
     }
 
     public void updateCombatantsAliveHUD(@NotNull Player p) {
-        var s = Component.translatable("xyz.baz9k.uhc.hud.combcount", NamedTextColor.WHITE)
-            .args(
-                Component.text(teamManager.countLivingCombatants(), NamedTextColor.WHITE),
-                Component.text(teamManager.countCombatants(), NamedTextColor.WHITE)
-            );
+        var s = trans("xyz.baz9k.uhc.hud.combcount",
+            Component.text(teamManager.countLivingCombatants(), NamedTextColor.WHITE),
+            Component.text(teamManager.countCombatants(), NamedTextColor.WHITE)
+        ).color(NamedTextColor.WHITE);
         setHUDLine(p, "combsalive", s);
     }
 
     public void updateTeamsAliveHUD(@NotNull Player p) {
-        var s = Component.translatable("xyz.baz9k.uhc.hud.teamcount", NamedTextColor.WHITE)
-            .args(
-                Component.text(teamManager.countLivingTeams(), NamedTextColor.WHITE),
-                Component.text(teamManager.getNumTeams(), NamedTextColor.WHITE)
-            );
+        var s = trans("xyz.baz9k.uhc.hud.teamcount",
+            Component.text(teamManager.countLivingTeams(), NamedTextColor.WHITE),
+            Component.text(teamManager.getNumTeams(), NamedTextColor.WHITE)
+        ).color(NamedTextColor.WHITE);
 
         setHUDLine(p, "teamsalive", s);
         
@@ -356,8 +341,8 @@ public class HUDManager implements Listener {
         OptionalInt k = gameManager.getKills(p);
 
         if (k.isPresent()) {
-            var s = Component.translatable("xyz.baz9k.uhc.hud.killcount", NamedTextColor.WHITE) 
-                .args(Component.text(k.orElseThrow(), NamedTextColor.WHITE));
+            var s = trans("xyz.baz9k.uhc.hud.killcount", Component.text(k.orElseThrow(), NamedTextColor.WHITE)) 
+                .color(NamedTextColor.WHITE);
             
             setHUDLine(p, "kills", s);
         }

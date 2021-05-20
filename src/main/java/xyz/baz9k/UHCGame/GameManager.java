@@ -91,28 +91,28 @@ public class GameManager implements Listener {
      * @param skipChecks If true, all checks are ignored.
      */
     public void startUHC(boolean skipChecks) {
-        Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.try"));
+        Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.try"));
         if (!skipChecks) {
             // check if game is OK to start
             requireNotStarted();
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
-                    throw translatableErr(IllegalStateException.class, Component.translatable("xyz.baz9k.uhc.err.team.must_assigned"));
+                    throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.team.must_assigned");
                 }
             }
             if (!worldsRegened) {
-                throw translatableErr(IllegalStateException.class, Component.translatable("xyz.baz9k.uhc.err.world.must_regened"));
+                throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.must_regened");
             }
         } else {
-            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.force"));
+            Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.force"));
         }
 
         try {
             _startUHC();
-            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.complete"));
+            Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.complete"));
         } catch (Exception e) {
             setStage(GameStage.NOT_IN_GAME);
-            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.fail"));
+            Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.fail"));
             Debug.printError(e);
         }
     }
@@ -170,9 +170,9 @@ public class GameManager implements Listener {
             }
         }
 
-        Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.start"));
+        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
         spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
-        Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.end"));
+        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
         startTick();
@@ -190,20 +190,20 @@ public class GameManager implements Listener {
      * @param skipChecks If true, started game checks are ignored.
      */
     public void endUHC(boolean skipChecks) {
-        Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.try"));
+        Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.try"));
         if (!skipChecks) {
             // check if game is OK to end
             requireStarted();
         } else {
-            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.force"));
+            Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.force"));
         }
         
         try {
             _endUHC();
-            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.complete"));
+            Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.complete"));
         } catch (Exception e) {
             setStage(GameStage.WB_STILL);
-            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.fail"));
+            Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.fail"));
             Debug.printError(e);
         }
     }
@@ -234,13 +234,13 @@ public class GameManager implements Listener {
 
     public void requireStarted() {
         if (!hasUHCStarted()) {
-            throw translatableErr(IllegalStateException.class, Component.translatable("xyz.baz9k.uhc.err.not_started"));
+            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.not_started");
         }
     }
 
     public void requireNotStarted() {
         if (hasUHCStarted()) {
-            throw translatableErr(IllegalStateException.class, Component.translatable("xyz.baz9k.uhc.err.already_started"));
+            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.already_started");
         }
     }
 
@@ -560,7 +560,7 @@ public class GameManager implements Listener {
             }
         }
 
-        Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.generated").args(Component.text(samples.size())));
+        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.generated", samples.size()));
 
         List<Location> spawnableLocations = new ArrayList<>();
         List<Location> overWaterLocations = new ArrayList<>();
@@ -575,7 +575,7 @@ public class GameManager implements Listener {
         }
         int totalSize = spawnableLocations.size() + overWaterLocations.size();
         if (totalSize < numLocations) {
-            throw translatableErr(IllegalStateException.class, Component.translatable("xyz.baz9k.uhc.err.world.missing_spread_locs").args(Component.text(totalSize)));
+            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.missing_spread_locs", totalSize);
         }
 
         if (spawnableLocations.size() < numLocations) {
@@ -694,8 +694,8 @@ public class GameManager implements Listener {
     private void winMessage() {
         if (teamManager.countLivingTeams() > 1) return;
         int winner = teamManager.getAliveTeams()[0];
-        Component winMsg = Component.translatable("xyz.baz9k.uhc.win", noDeco(NamedTextColor.WHITE))
-            .args(TeamDisplay.getName(winner));
+        Component winMsg = trans("xyz.baz9k.uhc.win", TeamDisplay.getName(winner))
+            .style(noDeco(NamedTextColor.WHITE));
 
         // this msg should be displayed after player death
         delayedMessage(winMsg, plugin, 1);
@@ -737,8 +737,8 @@ public class GameManager implements Listener {
             // check team death
             int t = teamManager.getTeam(dead);
             if (teamManager.isTeamEliminated(t)) {
-                Component teamElimMsg = Component.translatable("xyz.baz9k.uhc.eliminated", noDeco(NamedTextColor.WHITE))
-                    .args(TeamDisplay.getName(t));
+                Component teamElimMsg = trans("xyz.baz9k.uhc.eliminated", TeamDisplay.getName(t))
+                    .style(noDeco(NamedTextColor.WHITE));
                 // this msg should be displayed after player death
                 delayedMessage(teamElimMsg, plugin, 1);
             }

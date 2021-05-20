@@ -3,6 +3,7 @@ package xyz.baz9k.UHCGame.util;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -21,6 +22,7 @@ import org.bukkit.scheduler.BukkitTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -297,5 +299,19 @@ public final class Utils {
     
     public static <X extends Throwable> X translatableErr(Class<X> exc, Component c) {
         return translatableErr(exc, UHCGame.getLocale(), c);
+    }
+
+    public static TranslatableComponent trans(String key, Object... args) {
+        Component[] cargs = Arrays.stream(args)
+            .map(o -> {
+                if (o instanceof ComponentLike cl) return cl.asComponent();
+                return Component.text(String.valueOf(o));
+            })
+            .toArray(Component[]::new);
+        return Component.translatable(key).args(cargs);
+    }
+
+    public static <X extends Throwable> X translatableErr(Class<X> exc, String key, Object... args) {
+        return translatableErr(exc, trans(key, args));
     }
 }

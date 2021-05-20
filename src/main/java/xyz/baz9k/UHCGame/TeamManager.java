@@ -4,8 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import net.kyori.adventure.text.Component;
-
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -88,7 +86,7 @@ public class TeamManager {
      */
     public void assignPlayerToTeam(@NotNull Player p, int t) {
         if (t <= 0 || t > numTeams) {
-            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.team.invalid"));
+            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.team.invalid");
         }
 
         setNode(p, PlayerState.COMBATANT_ALIVE, t);
@@ -151,7 +149,7 @@ public class TeamManager {
      */
     public void setCombatantAliveStatus(@NotNull Player p, boolean aliveStatus) {
         if (!isAssignedCombatant(p)) {
-            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.team.must_assigned_comb"));
+            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.must_assigned_comb");
         }
         
         Node n = getNode(p);
@@ -225,7 +223,7 @@ public class TeamManager {
     @NotNull
     public Set<Player> getAllCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
-            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.team.invalid"));
+            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.invalid");
         }
 
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR && n.state != PlayerState.COMBATANT_UNASSIGNED && n.team == team);
@@ -323,7 +321,7 @@ public class TeamManager {
             case "sextets" -> 6;
             case "septets" -> 7;
             case "octets" -> 8;
-            default -> throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.team.size_name_invalid").args(Component.text(s)));
+            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.size_name_invalid", s);
         });
     }
 
@@ -338,7 +336,7 @@ public class TeamManager {
 
     public void setNumTeams(int n) {
         if (n <= 0) {
-            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.team.count_must_pos"));
+            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.count_must_pos");
         }
 
         numTeams = n;
