@@ -232,6 +232,7 @@ public class Commands {
         return new CommandAPICommand("reseed")
         .executes(
             (sender, args) -> {
+                sender.sendMessage(Component.text("Beginning reseed...", NamedTextColor.YELLOW));
                 plugin.getGameManager().reseedWorlds();
                 sender.sendMessage(Component.text("Both dimensions have been reseeded successfully.", NamedTextColor.GREEN));
             }
@@ -247,6 +248,7 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
+                sender.sendMessage(Component.text("Beginning reseed...", NamedTextColor.YELLOW));
                 plugin.getGameManager().reseedWorlds((String) args[0]);
                 sender.sendMessage(Component.text("Both dimensions have been reseeded successfully.", NamedTextColor.GREEN));
             }
