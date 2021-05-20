@@ -22,7 +22,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.util.*;
 
@@ -94,7 +93,7 @@ public class GameManager implements Listener {
      * @param skipChecks If true, all checks are ignored.
      */
     public void startUHC(boolean skipChecks) {
-        debugPrinter.printDebug("UHC attempting start");
+        debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.try"));
         if (!skipChecks) {
             // check if game is OK to start
             requireNotStarted();
@@ -107,15 +106,15 @@ public class GameManager implements Listener {
                 throw new IllegalStateException("UHC worlds have not been regenerated. Run /uhc reseed to regenerate.");
             }
         } else {
-            debugPrinter.printDebug("Skipping starting requirements");
+            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.force"));
         }
 
         try {
             _startUHC();
-            debugPrinter.printDebug("UHC started");
+            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.complete"));
         } catch (Exception e) {
             setStage(GameStage.NOT_IN_GAME);
-            debugPrinter.printDebug("UHC cancelling start due to error");
+            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.fail"));
             debugPrinter.printError(e);
         }
     }
@@ -173,9 +172,9 @@ public class GameManager implements Listener {
             }
         }
 
-        debugPrinter.printDebug("Generating Spawn Locations");
+        debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.start"));
         spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
-        debugPrinter.printDebug("Done!");
+        debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.end"));
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
         startTick();
@@ -193,20 +192,20 @@ public class GameManager implements Listener {
      * @param skipChecks If true, started game checks are ignored.
      */
     public void endUHC(boolean skipChecks) {
-        debugPrinter.printDebug("UHC attempting end");
+        debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.try"));
         if (!skipChecks) {
             // check if game is OK to end
             requireStarted();
         } else {
-            debugPrinter.printDebug("Skipping ending requirements");
+            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.force"));
         }
         
         try {
             _endUHC();
-            debugPrinter.printDebug("UHC ended");
+            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.complete"));
         } catch (Exception e) {
             setStage(GameStage.WB_STILL);
-            debugPrinter.printDebug("UHC cancelling end due to error");
+            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.fail"));
             debugPrinter.printError(e);
         }
     }
@@ -563,7 +562,7 @@ public class GameManager implements Listener {
             }
         }
 
-        debugPrinter.printDebug(samples.size() + " points generated.");
+        debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.generated").args(Component.text(samples.size())));
 
         List<Location> spawnableLocations = new ArrayList<>();
         List<Location> overWaterLocations = new ArrayList<>();
@@ -697,8 +696,8 @@ public class GameManager implements Listener {
     private void winMessage() {
         if (teamManager.countLivingTeams() > 1) return;
         int winner = teamManager.getAliveTeams()[0];
-        TextComponent winMsg = TeamDisplay.getName(winner)
-            .append(Component.text("has won!", noDeco(NamedTextColor.WHITE)));
+        Component winMsg = Component.translatable("xyz.baz9k.uhc.win", noDeco(NamedTextColor.WHITE))
+            .args(TeamDisplay.getName(winner));
 
         // this msg should be displayed after player death
         delayedMessage(winMsg, plugin, 1);
@@ -740,8 +739,8 @@ public class GameManager implements Listener {
             // check team death
             int t = teamManager.getTeam(dead);
             if (teamManager.isTeamEliminated(t)) {
-                Component teamElimMsg = TeamDisplay.getName(t)
-                                                   .append(Component.text(" has been eliminated!", noDeco(NamedTextColor.WHITE)));
+                Component teamElimMsg = Component.translatable("xyz.baz9k.uhc.eliminated", noDeco(NamedTextColor.WHITE))
+                    .args(TeamDisplay.getName(t));
                 // this msg should be displayed after player death
                 delayedMessage(teamElimMsg, plugin, 1);
             }

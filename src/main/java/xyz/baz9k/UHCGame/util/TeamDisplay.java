@@ -117,8 +117,9 @@ public final class TeamDisplay {
      * @param t Team number
      * @return {@link TextComponent}
      */
-    public static TextComponent getName(int t) {
-        String s = t == 0 ? "Spectators" : "Team " + t;
-        return Component.text(s, getStyle(t));
+    public static Component getName(int t) {
+        String key = t == 0 ? "xyz.baz9k.uhc.team.spectator" : "xyz.baz9k.uhc.team.teamed";
+        return Component.translatable(key, getStyle(t))
+            .args(Component.text(key));
     }
 }

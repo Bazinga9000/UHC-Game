@@ -57,9 +57,7 @@ public final class DebugPrinter {
     }
 
     private static Component fmtDebug(Component msg) {
-        return Component.text("[DEBUG]", NamedTextColor.YELLOW)
-            .append(Component.space())
-            .append(msg);
+        return Component.translatable("xyz.baz9k.uhc.debug.prefix", NamedTextColor.YELLOW).args(msg);
     }
 
     /**

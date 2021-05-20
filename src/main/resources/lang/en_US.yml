@@ -1,0 +1,39 @@
+xyz:
+  baz9k:
+    uhc:
+      debug:
+        prefix: "[DEBUG] {0}"
+        start: 
+          try: "UHC attempting start"
+          force: "Skipping starting requirements"
+          complete: "UHC started"
+          fail: "UHC cancelling start due to error"
+        end:
+          try: "UHC attempting end"
+          force: "Skipping ending requirements"
+          complete: "UHC ended"
+          fail: "UHC cancelling end due to error"
+        spreadplayers:
+          start: "Generating Spawn Locations"
+          generated: "{0} points generated."
+          end: "Done!"
+
+      hud:
+        position: "{0} {1} {2}" # x y z
+        rotation: "( {0} )" # ±X ±Z
+        pos_x: "+X"
+        pos_z: "+Z"
+        neg_x: "-X"
+        neg_z: "-Z"
+        wbradius: "World Border: ±{0}"
+        wbdistance: "( {0} )"
+        gametime: "Game Time: {0} {1}" # Game Time: 0:00:00 <symbol>
+        combcount: "Combatants: {0} / {1}"
+        teamcount: "Teams: {0} / {1}"
+        killcount: "Kills: {0}"
+      team:
+        spectator: "Spectator"
+        unassigned: "Unassigned"
+        teamed: "Team {0}"
+      elimination: "{0} has been eliminated!"
+      win: "{0} has won!"
