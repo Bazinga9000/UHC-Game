@@ -152,9 +152,13 @@ public class HUDManager implements Listener {
 
         Objective hud = newBoard.registerNewObjective("hud", "dummy", Component.text(p.getName(), NamedTextColor.WHITE));
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
-        Objective hearts = newBoard.registerNewObjective("hearts", "health", Component.text("♥"), RenderType.HEARTS);
-        hearts.setDisplaySlot(DisplaySlot.PLAYER_LIST);
-        hearts.setDisplaySlot(DisplaySlot.BELOW_NAME);
+
+        // bukkit et al apparently do not allow one obj in multiple display slots even though vanilla is 100% okay with that. no clue.
+        Objective hearts1 = newBoard.registerNewObjective("hearts1", "health", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
+        Objective hearts2 = newBoard.registerNewObjective("hearts2", "health", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
+        hearts1.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+        hearts2.setDisplaySlot(DisplaySlot.BELOW_NAME);
+        
         setTeams(p);
 
     }
