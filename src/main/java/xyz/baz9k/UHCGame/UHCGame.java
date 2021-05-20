@@ -12,11 +12,13 @@ public class UHCGame extends JavaPlugin {
     private GameManager gameManager;
     private HUDManager hudManager;
     private BossbarManager bbManager;
+    private LangManager langManager;
     private Recipes recipes;
 
     @Override
     public void onEnable() {
         debugPrinter = new DebugPrinter(this);
+        langManager = new LangManager(this);
         teamManager = new TeamManager();
         gameManager = new GameManager(this);
         hudManager = new HUDManager(this);
@@ -47,6 +49,9 @@ public class UHCGame extends JavaPlugin {
     }
     public BossbarManager getBossbarManager() {
         return bbManager;
+    }
+    public LangManager getLangManager() {
+        return langManager;
     }
     public Recipes getRecipes() {
         return recipes;
