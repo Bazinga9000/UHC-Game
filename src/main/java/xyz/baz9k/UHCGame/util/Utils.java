@@ -6,8 +6,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,10 +17,13 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.translation.GlobalTranslator;
 import xyz.baz9k.UHCGame.UHCGame;
 
 public final class Utils {
@@ -260,4 +265,19 @@ public final class Utils {
     }
     public static double clamp(double min, double x, double max) {
         return Math.max(min, Math.min(x, max));
-    }}
+    }
+
+    public static String componentString(Locale l, Component c) {
+        List<Component> components = new ArrayList<>();
+        components.add(c);
+        components.addAll(c.children());
+
+        return components.stream()
+            .map(cpt -> {
+                Component rendered = GlobalTranslator.render(cpt, l);
+                if (rendered instanceof TextComponent renderedText) return renderedText.content();
+                return rendered.toString();
+            })
+            .collect(Collectors.joining());
+    }
+}

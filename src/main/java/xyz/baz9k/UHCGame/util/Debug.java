@@ -2,9 +2,11 @@ package xyz.baz9k.UHCGame.util;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+import static xyz.baz9k.UHCGame.util.Utils.*;
+
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,8 +54,10 @@ public final class Debug {
         printError(onlinePlayers(), e);
     }
 
-    private static TextComponent fmtDebug(String msg) {
-        return Component.text(String.format("[DEBUG] %s", msg), NamedTextColor.YELLOW);
+    private static Component fmtDebug(Component msg) {
+        return Component.text("[DEBUG]", NamedTextColor.YELLOW)
+            .append(Component.space())
+            .append(msg);
     }
 
     /**
@@ -61,8 +65,16 @@ public final class Debug {
      * @param msg
      */
     public static void broadcastDebug(String msg) {
+        broadcastDebug(Component.text(msg));
+    }
+
+    /**
+     * Broadcast a debug message in chat
+     * @param msg
+     */
+    public static void broadcastDebug(Component msg) {
         if (isDebugging()) {
-            logger.log(Level.INFO, fmtDebug(msg).content());
+            logger.log(Level.INFO, componentString(Locale.US, fmtDebug(msg)));
             onlinePlayers().sendMessage(fmtDebug(msg));
         }
     }
