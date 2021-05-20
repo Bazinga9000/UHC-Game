@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.RenderType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -151,7 +152,9 @@ public class HUDManager implements Listener {
 
         Objective hud = newBoard.registerNewObjective("hud", "dummy", Component.text(p.getName(), NamedTextColor.WHITE));
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
-
+        Objective hearts = newBoard.registerNewObjective("hearts", "health", Component.text("♥"), RenderType.HEARTS);
+        hearts.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+        hearts.setDisplaySlot(DisplaySlot.BELOW_NAME);
         setTeams(p);
 
     }
