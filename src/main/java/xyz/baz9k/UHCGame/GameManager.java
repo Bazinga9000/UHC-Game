@@ -16,6 +16,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -720,10 +721,13 @@ public class GameManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
         teamManager.addPlayer(p, hasUHCStarted());
+        new PermissionAttachment(plugin, p)
+            .setPermission("mv.bypass.gamemode.*", true);
         if(!hasUHCStarted()) return;
         bbManager.addPlayer(p);
         hudManager.initializePlayerHUD(p);
         hudManager.addPlayerToTeams(p);
+
     }
 
     @EventHandler
