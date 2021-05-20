@@ -15,7 +15,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.TextColor;
+
 import static net.kyori.adventure.text.format.TextDecoration.*;
 
 import static java.time.temporal.ChronoUnit.FOREVER;
@@ -29,12 +31,12 @@ import static java.time.temporal.ChronoUnit.FOREVER;
  */
 public enum GameStage {
     NOT_IN_GAME,
-    WB_STILL   (BossBar.Color.RED,    Duration.ofMinutes(60), 1200, true,  Component.text("Border Begins Shrinking",            NamedTextColor.RED),         Component.text("Let the games begin! Our players have been shuffled across the world! ", NamedTextColor.GREEN, BOLD)),
-    WB_1       (BossBar.Color.BLUE,   Duration.ofMinutes(15), 25,   false, Component.text("Border Stops Shrinking",             NamedTextColor.BLUE),        Component.text("The World Border has begun to shrink! ",                                 NamedTextColor.RED, BOLD)),
-    WB_STOP    (BossBar.Color.RED,    Duration.ofMinutes(5),  25,   true,  Component.text("Border Begins Shrinking... Again.",  NamedTextColor.RED),         Component.text("The World Border has ground to a halt. ",                                NamedTextColor.AQUA)),
-    WB_2       (BossBar.Color.BLUE,   Duration.ofMinutes(10), 3,    false, Component.text("Border Stops Shrinking... Again",    NamedTextColor.BLUE),        Component.text("The World Border has resumed once more! ",                               NamedTextColor.RED)),
-    DM_WAIT    (BossBar.Color.WHITE,  Duration.ofMinutes(5),  3,    true,  Component.text("The Battle at the Top of the World", NamedTextColor.WHITE),       Component.text("The World Border has ground to a halt once again! ",                     NamedTextColor.DARK_AQUA)),
-    DEATHMATCH (BossBar.Color.PURPLE, FOREVER.getDuration(),  20,   true,  Component.text("∞",                                  NamedTextColor.DARK_PURPLE), Component.text("It is time. Let the Battle At The Top Of The World commence! ",          NamedTextColor.BLUE, BOLD));
+    WB_STILL   (BossBar.Color.RED,    Duration.ofMinutes(60), 1200, true,  Component.translatable("xyz.baz9k.uhc.bossbar.wb_still",   NamedTextColor.RED),         Component.text("xyz.baz9k.uhc.chat.stage_base.wb_still", NamedTextColor.GREEN, BOLD)),
+    WB_1       (BossBar.Color.BLUE,   Duration.ofMinutes(15), 25,   false, Component.translatable("xyz.baz9k.uhc.bossbar.wb_1",       NamedTextColor.BLUE),        Component.text("xyz.baz9k.uhc.chat.stage_base.wb_1", NamedTextColor.RED, BOLD)),
+    WB_STOP    (BossBar.Color.RED,    Duration.ofMinutes(5),  25,   true,  Component.translatable("xyz.baz9k.uhc.bossbar.wb_stop",    NamedTextColor.RED),         Component.text("xyz.baz9k.uhc.chat.stage_base.wb_stop", NamedTextColor.AQUA)),
+    WB_2       (BossBar.Color.BLUE,   Duration.ofMinutes(10), 3,    false, Component.translatable("xyz.baz9k.uhc.bossbar.wb_2",       NamedTextColor.BLUE),        Component.text("xyz.baz9k.uhc.chat.stage_base.wb_2", NamedTextColor.RED)),
+    DM_WAIT    (BossBar.Color.WHITE,  Duration.ofMinutes(5),  3,    true,  Component.translatable("xyz.baz9k.uhc.bossbar.dm_wait",    NamedTextColor.WHITE),       Component.text("xyz.baz9k.uhc.chat.stage_base.dm_wait", NamedTextColor.DARK_AQUA)),
+    DEATHMATCH (BossBar.Color.PURPLE, FOREVER.getDuration(),  20,   true,  Component.translatable("xyz.baz9k.uhc.bossbar.deathmatch", NamedTextColor.DARK_PURPLE), Component.text("xyz.baz9k.uhc.chat.stage_base.deathmatch", NamedTextColor.BLUE, BOLD));
     
     private final BossBar.Color bbClr;
     private final Duration dur;
@@ -186,21 +188,10 @@ public enum GameStage {
         return Component.text()
                         .append(
                             Component.text("<", TextColor.color(0xCFCFFF), BOLD),
-                            Component.text("The Boxless One", TextColor.color(0xA679FE), BOLD),
+                            Component.translatable("uhc.baz9k.xyz.chat.name", TextColor.color(0xA679FE), BOLD),
                             Component.text("> ", TextColor.color(0xCFCFFF), BOLD)
                         );
     }
-
-    // String.format(-, base, subject, radius, duration)
-    // subject = "It" or "The World Border"
-    private static final String wbWillShrinkInstant = "%s%s will immediately shrink to ±%s in %s! Watch out!";
-    private static final String wbWillShrink = "%s%s will begin shrinking to ±%s in %s!";
-
-    private static final String wbJustShrinkInstant = "%s has immediately shrank to ±%s!";
-    private static final String wbJustShrink = "%s%s will stop at ±%s in %s.";
-
-    // String.format(-, duration)
-    private static final String dmWarn = "If the game does not end within %s, I shall end it myself!";
 
     /**
      * Sends the linked message in chat.
@@ -228,34 +219,22 @@ public enum GameStage {
          * 
          */
 
-        String fmtStr = "%s";
-        String subject = this == WB_STILL ? "The World Border" : "It";
+        TranslatableComponent situation = Component.translatable("uhc.baz9k.xyz.chat.warning.no_warn", bodyStyle);
+        Component subject = Component.translatable(this == WB_STILL ? "uhc.baz9k.xyz.chat.wb.name" : "uhc.baz9k.xyz.chat.wb.pronoun");
 
         GameStage nextGrad = nextGradualStage();
         if (!nextGrad.isWBInstant) {
-            if (nextGrad.isInstant()) {
-                fmtStr = wbWillShrinkInstant;
-            } else {
-                fmtStr = wbWillShrink;
-            }
+            situation = Component.translatable(nextGrad.isInstant() ? "uhc.baz9k.xyz.chat.warning.wb_will_instant_shrink" : "uhc.baz9k.xyz.chat.warning.wb_will_shrink");
         }
         if (!isWBInstant) {
-            if (isInstant()) {
-                fmtStr = wbJustShrinkInstant;
-            } else {
-                fmtStr = wbJustShrink;
-            }
+            situation = Component.translatable(isInstant() ? "uhc.baz9k.xyz.chat.warning.wb_just_instant_shrink" : "uhc.baz9k.xyz.chat.warning.wb_just_shrink");
         }
         
         TextComponent.Builder s = getMessageBuilder();
-        if (fmtStr.equals(wbJustShrinkInstant)) {
-            s.append(Component.text(String.format(fmtStr, subject, wbSize / 2, getWordTimeString(dur)), bodyStyle));
-        } else {
-            s.append(Component.text(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, getWordTimeString(dur)), bodyStyle));
-        }
-
+        
+        s.append(situation.args(baseChatMsg, subject, Component.text(wbSize / 2), Component.text(getWordTimeString(dur))));
         if (this == lastGradualStage()) {
-            s.append(Component.text(String.format(dmWarn, getWordTimeString(dur)), bodyStyle));
+            s.append(Component.translatable("uhc.baz9k.xyz.chat.warning.dm_warn", bodyStyle).args(Component.text(getWordTimeString(dur))));
         }
         
         Bukkit.getServer().sendMessage(s);

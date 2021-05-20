@@ -1,6 +1,14 @@
 xyz:
   baz9k:
     uhc:
+      bossbar:
+        wb_still: "Border Begins Shrinking"
+        wb_1: "Border Stops Shrinking"
+        wb_stop: "Border Begins Shrinking... Again."
+        wb_2: "Border Stops Shrinking... Again"
+        dm_wait: "The Battle at the Top of the World"
+        deathmatch: "∞"
+
       debug:
         prefix: "[DEBUG] {0}"
         start: 
@@ -31,9 +39,34 @@ xyz:
         combcount: "Combatants: {0} / {1}"
         teamcount: "Teams: {0} / {1}"
         killcount: "Kills: {0}"
+        
       team:
         spectator: "Spectator"
         unassigned: "Unassigned"
         teamed: "Team {0}"
+
       elimination: "{0} has been eliminated!"
       win: "{0} has won!"
+
+      chat:
+        name: "The Boxless One"
+        stage_base: # occurs at start of stage
+          wb_still: "Let the games begin! Our players have been shuffled across the world!"
+          wb_1: "The World Border has begun to shrink!"
+          wb_stop: "The World Border has ground to a halt."
+          wb_2: "The World Border has resumed once more!"
+          dm_wait: "The World Border has ground to a halt once again!"
+          deathmatch: "It is time. Let the Battle At The Top Of The World commence!"
+        wb:
+          name: "The World Border"
+          pronoun: "It"
+        warning:
+          # base, "the world border", radius, duration 
+          no_warn: "{0}" # just the base message
+          wb_will_shrink: "{0} {1} will begin shrinking to ±{2} in {3}!"
+          wb_will_instant_shrink: "{0} {1} will immediately shrink to ±{2} in {3}! Watch out!"
+          wb_just_shrink: "{0} {1} will stop at ±{2} in {3}."
+          wb_just_instant_shrink: "{1} has immediately shrank to ±{2}!"
+
+          dm_warn: "If the game does not end within {0}, I shall end it myself!" # duration
+          
