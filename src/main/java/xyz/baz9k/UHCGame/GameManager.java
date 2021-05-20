@@ -381,6 +381,17 @@ public class GameManager implements Listener {
                     w.getBlockAt(x, w.getMaxHeight() - 2, z).setType(Material.BARRIER);
                 }
             }
+
+            for (int x = -radius; x <= radius; x++) {
+                w.getBlockAt(x, w.getMaxHeight() - 1, -radius - 1).setType(Material.BARRIER);
+                w.getBlockAt(x, w.getMaxHeight() - 1, radius + 1).setType(Material.BARRIER);
+            }
+
+            for (int z = -radius; z <= radius; z++) {
+                w.getBlockAt(-radius - 1, w.getMaxHeight() - 1, z).setType(Material.BARRIER);
+                w.getBlockAt(radius + 1, w.getMaxHeight() - 1, z).setType(Material.BARRIER);
+            }
+
             for (Player p : teamManager.getAllCombatants()) {
                 p.addPotionEffects(Arrays.asList(
                     PotionEffectType.DAMAGE_RESISTANCE.createEffect(10 * 20, 10),
