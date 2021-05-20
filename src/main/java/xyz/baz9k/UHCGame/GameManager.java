@@ -125,29 +125,6 @@ public class GameManager implements Listener {
         startTime = lastStageInstant = Instant.now();
         kills.clear();
         
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            // archive previous display name
-            previousDisplayNames.put(p.getUniqueId(), p.displayName());
-            resetStatuses(p);
-            recipes.discoverFor(p);
-
-            // 60s grace period
-            PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
-
-            if (teamManager.isSpectator(p)) {
-                p.setGameMode(GameMode.SPECTATOR);
-            } else {
-                p.setGameMode(GameMode.SURVIVAL);
-                kills.put(p.getUniqueId(), 0);
-            }
-
-            // set player display name
-            p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
-
-            // activate hud things for all
-            hudManager.initializePlayerHUD(p);
-        }
-        
         for (World w : getUHCWorlds()) {
             // set time to 0 and delete rain
             w.setTime(0);
@@ -170,6 +147,29 @@ public class GameManager implements Listener {
             for (int y = 3; y <= w.getMaxHeight() - 1; y++) {
                 w.getBlockAt(0, y, 0).setType(Material.BARRIER);
             }
+        }
+        
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            // archive previous display name
+            previousDisplayNames.put(p.getUniqueId(), p.displayName());
+            resetStatuses(p);
+            recipes.discoverFor(p);
+
+            // 60s grace period
+            PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
+
+            if (teamManager.isSpectator(p)) {
+                p.setGameMode(GameMode.SPECTATOR);
+            } else {
+                p.setGameMode(GameMode.SURVIVAL);
+                kills.put(p.getUniqueId(), 0);
+            }
+
+            // set player display name
+            p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
+
+            // activate hud things for all
+            hudManager.initializePlayerHUD(p);
         }
 
         Debug.broadcastDebug("Generating Spawn Locations");
