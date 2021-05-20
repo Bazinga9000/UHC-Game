@@ -454,4 +454,40 @@ public class Commands {
             }
         );
     }
+
+    @Command
+    private CommandAPICommand config() {
+        return new CommandAPICommand("config")
+        .executesPlayer(
+                (sender, args) -> {
+                    ConfigManager cfgManager = plugin.getConfigManager();
+                    cfgManager.openMenu(sender);
+                }
+        );
+    }
+
+    @Command
+    private CommandAPICommand configWipe() {
+        return new CommandAPICommand("config")
+        .withArguments(new LiteralArgument("wipe"))
+        .executes(
+                (sender, args) -> {
+                    this.plugin.saveResource("config.yml", true);
+                    this.plugin.reloadConfig();
+                }
+        );
+    }
+
+    @Command
+    private CommandAPICommand configGet() {
+        return new CommandAPICommand("config")
+        .withArguments(new LiteralArgument("get"))
+        .withArguments(new StringArgument("path"))
+        .executes(
+                (sender, args) -> {
+                    sender.sendMessage(Component.text(plugin.getConfig().getString((String) args[0])));
+                }
+        );
+    }
+
 }

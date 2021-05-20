@@ -1,0 +1,28 @@
+wb_size:
+  initial: 1200
+  border1: 25
+  border2: 3
+  deathmatch: 20
+
+intervals:
+  start: 3600
+  movement1: 900
+  stop: 300
+  movement2: 600
+  dmwait: 300
+
+team_count: 17
+esoteric:
+  gone_fishing: false
+  boss_team: false
+  always_elytra: false
+  sardines: false
+  wither_bonus: true
+  mafia: false
+  fast_dn_cycle: false
+  always_day: false
+  always_night: false
+  nether_spawn: false
+  bomberman: false
+  max_health: 1
+  mv_speed: 1

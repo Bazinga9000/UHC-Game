@@ -260,4 +260,5 @@ public final class Utils {
     }
     public static double clamp(double min, double x, double max) {
         return Math.max(min, Math.min(x, max));
-    }}
+    }
+}
