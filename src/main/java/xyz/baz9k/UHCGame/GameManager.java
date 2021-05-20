@@ -167,7 +167,7 @@ public class GameManager implements Listener {
                     w.getBlockAt(x, 0, z).setType(Material.NETHERITE_BLOCK);
                 }
             }
-            for (int y = 3; y <= w.getMaxHeight() - 2; y++) {
+            for (int y = 3; y <= w.getMaxHeight() - 1; y++) {
                 w.getBlockAt(0, y, 0).setType(Material.BARRIER);
             }
         }
@@ -374,9 +374,10 @@ public class GameManager implements Listener {
         if (isDeathmatch()) {
             World w = getUHCWorld(Environment.NORMAL);
 
-            int radius = (int) GameStage.DEATHMATCH.wbRadius();
+            int radius = 1 + (int) GameStage.DEATHMATCH.wbRadius();
             for (int x = -radius; x <= radius; x++) {
                 for (int z = -radius; z <= radius; z++) {
+                    w.getBlockAt(x, w.getMaxHeight() - 1, z).setType(Material.AIR);
                     w.getBlockAt(x, w.getMaxHeight() - 2, z).setType(Material.BARRIER);
                 }
             }
