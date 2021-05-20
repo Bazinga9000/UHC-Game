@@ -130,8 +130,10 @@ public class GameManager implements Listener {
             w.setTime(0);
             w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
             
-            w.getWorldBorder().setCenter(center.x(), center.z());
+            w.getWorldBorder().setCenter(0.5, 0.5);
             w.getWorldBorder().setWarningDistance(25);
+            w.getWorldBorder().setDamageBuffer(0);
+            w.getWorldBorder().setDamageAmount(1);
 
             Gamerules.set(w);
             purgeWorld(w);
@@ -514,12 +516,12 @@ public class GameManager implements Listener {
         Point2D center2 = Point2D.fromLocation(center);
         List<Location> locations = new ArrayList<>();
         World w = center.getWorld();
-
         for (int i = 0; i < numLocations; i++) {
             double theta = i * 2 * Math.PI / numLocations;
             center2.addPolar(distance, theta);
             locations.add(getHighestLoc(w, center2));
         }
+        Debug.broadcastDebug(locations.toString());
         Collections.shuffle(locations);
         return Collections.unmodifiableList(locations);
     }
