@@ -70,6 +70,20 @@ xyz:
 
           dm_warn: "If the game does not end within {0}, I shall end it myself!" # duration
 
+      cmd:
+        succ:
+          clearteams: "All teams have been reset."
+          reseed: "Both dimensions have been reseeded successfully."
+          respawn: "Respawned {0}!"
+          state_get: "{0} is a {1} on team {2}." # player, state, team
+          state_set: "Set {0} to {1} on team {2}." # player, state, team
+          stage_set: "Set stage to {0}."
+          debug:
+            "on": "Verbose messages on"
+            "off": "Verbose messages off"
+        fail:
+          respawn:
+            spectator: "Cannot respawn spectator {0}."
       # TODO actually use
       err:
         team:

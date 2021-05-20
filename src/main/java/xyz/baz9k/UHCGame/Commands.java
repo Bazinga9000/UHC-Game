@@ -220,7 +220,7 @@ public class Commands {
             (sender, args) -> {
                 TeamManager tm = plugin.getTeamManager();
                 tm.resetAllPlayers();
-                sender.sendMessage("All teams have been reset.");
+                sender.sendMessage(Component.translatable("xyz.baz9k.uhc.cmd.succ.clearteams"));
             }
         );
     }
@@ -232,7 +232,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 plugin.getGameManager().reseedWorlds();
-                sender.sendMessage(Component.text("Both dimensions have been reseeded successfully.", NamedTextColor.GREEN));
+                sender.sendMessage(Component.translatable("xyz.baz9k.uhc.cmd.succ.reseed", NamedTextColor.GREEN));
             }
         );
     }
@@ -247,7 +247,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 plugin.getGameManager().reseedWorlds((String) args[0]);
-                sender.sendMessage(Component.text("Both dimensions have been reseeded successfully.", NamedTextColor.GREEN));
+                sender.sendMessage(Component.translatable("xyz.baz9k.uhc.cmd.succ.reseed", NamedTextColor.GREEN));
             }
         );
     }
@@ -255,14 +255,14 @@ public class Commands {
     private void _respawn(CommandSender sender, Player p, Location loc) {
         TeamManager tm = plugin.getTeamManager();
         if (tm.isSpectator(p)) {
-            sender.sendMessage(Component.text(String.format("Cannot respawn spectator %s.", p.getName()), NamedTextColor.RED));
+            sender.sendMessage(Component.translatable("xyz.baz9k.uhc.cmd.fail.respawn.spectator", NamedTextColor.RED).args(Component.text(p.getName())));
             return;
         }
 
         p.teleport(loc);
         tm.setCombatantAliveStatus(p, true);
         p.setGameMode(GameMode.SURVIVAL);
-        sender.sendMessage(String.format("Respawned %s!", p.getName()));
+        sender.sendMessage(Component.translatable("xyz.baz9k.uhc.cmd.succ.respawn").args(Component.text(p.getName())));
     }
 
     @Command
@@ -313,7 +313,7 @@ public class Commands {
                 for (Player p : (Collection<Player>) args[0]) {
                     int team = tm.getTeam(p);
                     PlayerState state = tm.getPlayerState(p);
-                    sender.sendMessage(String.format("%s is a %s on team %s.", p.getName(), state, team));
+                    sender.sendMessage(Component.translatable("xyz.baz9k.uhc.cmd.succ.state_get").args(Component.text(p.getName()), Component.text(state.toString()), Component.text(team)));
                 }
             }
         );
@@ -335,7 +335,7 @@ public class Commands {
                         case "spectator" -> tm.setSpectator(p);
                         case "combatant" -> tm.setUnassignedCombatant(p);
                     }
-                    sender.sendMessage(String.format("Set %s to team %s.", p.getName(), tm.getPlayerState(p)));
+                    sender.sendMessage(Component.translatable("xyz.baz9k.uhc.cmd.succ.state_set").args(Component.text(p.getName()), Component.text(tm.getPlayerState(p).toString()), Component.text(tm.getTeam(p))));
                 }
             }
         );
@@ -361,7 +361,7 @@ public class Commands {
                 }
                 for (Player p : (Collection<Player>) args[0]) {
                     plugin.getTeamManager().assignPlayerToTeam(p, t);
-                    sender.sendMessage(String.format("Set %s to team %s.", p.getName(), tm.getPlayerState(p)));
+                    sender.sendMessage(Component.translatable("xyz.baz9k.uhc.cmd.succ.state_set").args(Component.text(p.getName()), Component.text(tm.getPlayerState(p).toString()), Component.text(tm.getTeam(p))));
                 }
             }
         );
@@ -378,7 +378,7 @@ public class Commands {
                 GameManager gm = plugin.getGameManager();
 
                 gm.incrementStage();
-                sender.sendMessage("Set stage to " + gm.getStage());
+                sender.sendMessage(Component.translatable("xyz.baz9k.uhc.succ.stage_set").args(Component.text(gm.getStage().toString())));
             }
         );
     }
@@ -396,7 +396,7 @@ public class Commands {
                 GameStage s = GameStage.fromIndex((int) args[0]);
 
                 gm.setStage(s);
-                sender.sendMessage("Set stage to " + s);
+                sender.sendMessage(Component.translatable("xyz.baz9k.uhc.succ.stage_set").args(Component.text(gm.getStage().toString())));
             }
         );
     }
@@ -433,8 +433,8 @@ public class Commands {
             (sender, args) -> {
                 plugin.getDebugPrinter().setDebug(!plugin.getDebugPrinter().isDebugging());
 
-                String onOff = plugin.getDebugPrinter().isDebugging() ? "on" : "off";
-                sender.sendMessage("Verbose messages " + onOff);
+                String onOff = plugin.getDebugPrinter().isDebugging() ? "xyz.baz9k.uhc.cmd.succ.debug.on" : "xyz.baz9k.uhc.cmd.succ.debug.off";
+                sender.sendMessage(Component.translatable(onOff));
             }
         );
     }
@@ -448,8 +448,8 @@ public class Commands {
             (sender, args) -> {
                 plugin.getDebugPrinter().setDebug((boolean) args[0]);
 
-                String onOff = plugin.getDebugPrinter().isDebugging() ? "on" : "off";
-                sender.sendMessage("Verbose messages " + onOff);
+                String onOff = plugin.getDebugPrinter().isDebugging() ? "xyz.baz9k.uhc.cmd.succ.debug.on" : "xyz.baz9k.uhc.cmd.succ.debug.off";
+                sender.sendMessage(Component.translatable(onOff));
             }
         );
     }
