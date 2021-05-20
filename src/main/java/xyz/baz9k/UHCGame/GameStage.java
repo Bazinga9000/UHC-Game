@@ -29,18 +29,18 @@ import static java.time.temporal.ChronoUnit.FOREVER;
  */
 public enum GameStage {
     NOT_IN_GAME,
-    WB_STILL   (BossBar.Color.RED,    Duration.ofMinutes(60), 1200, true,  Component.text("Border Begins Shrinking", NamedTextColor.RED),             "Let the games begin! Our players have been shuffled across the world! ", Style.style(NamedTextColor.GREEN, BOLD)),
-    WB_1       (BossBar.Color.BLUE,   Duration.ofMinutes(15), 25,   false, Component.text("Border Stops Shrinking", NamedTextColor.BLUE),             "The World Border has begun to shrink! ",                                 Style.style(NamedTextColor.RED, BOLD)),
-    WB_STOP    (BossBar.Color.RED,    Duration.ofMinutes(5),  25,   true,  Component.text("Border Begins Shrinking... Again.", NamedTextColor.RED),   "The World Border has ground to a halt. ",                                Style.style(NamedTextColor.AQUA)),
-    WB_2       (BossBar.Color.BLUE,   Duration.ofMinutes(10), 3,    false, Component.text("Border Stops Shrinking... Again", NamedTextColor.BLUE),    "The World Border has resumed once more! ",                               Style.style(NamedTextColor.RED)),
-    DM_WAIT    (BossBar.Color.WHITE,  Duration.ofMinutes(5),  3,    true,  Component.text("The Battle at the Top of the World", NamedTextColor.WHITE),"The World Border has ground to a halt once again! ",                     Style.style(NamedTextColor.DARK_AQUA)),
-    DEATHMATCH (BossBar.Color.PURPLE, FOREVER.getDuration(),  20,   true,  Component.text("∞", NamedTextColor.DARK_PURPLE),                           "It is time. Let the Battle At The Top Of The World commence! ",          Style.style(NamedTextColor.BLUE, BOLD));
+    WB_STILL   (BossBar.Color.RED,    Duration.ofMinutes(60), 1200, true,  Component.text("Border Begins Shrinking",            NamedTextColor.RED),         Component.text("Let the games begin! Our players have been shuffled across the world! ", NamedTextColor.GREEN, BOLD)),
+    WB_1       (BossBar.Color.BLUE,   Duration.ofMinutes(15), 25,   false, Component.text("Border Stops Shrinking",             NamedTextColor.BLUE),        Component.text("The World Border has begun to shrink! ",                                 NamedTextColor.RED, BOLD)),
+    WB_STOP    (BossBar.Color.RED,    Duration.ofMinutes(5),  25,   true,  Component.text("Border Begins Shrinking... Again.",  NamedTextColor.RED),         Component.text("The World Border has ground to a halt. ",                                NamedTextColor.AQUA)),
+    WB_2       (BossBar.Color.BLUE,   Duration.ofMinutes(10), 3,    false, Component.text("Border Stops Shrinking... Again",    NamedTextColor.BLUE),        Component.text("The World Border has resumed once more! ",                               NamedTextColor.RED)),
+    DM_WAIT    (BossBar.Color.WHITE,  Duration.ofMinutes(5),  3,    true,  Component.text("The Battle at the Top of the World", NamedTextColor.WHITE),       Component.text("The World Border has ground to a halt once again! ",                     NamedTextColor.DARK_AQUA)),
+    DEATHMATCH (BossBar.Color.PURPLE, FOREVER.getDuration(),  20,   true,  Component.text("∞",                                  NamedTextColor.DARK_PURPLE), Component.text("It is time. Let the Battle At The Top Of The World commence! ",          NamedTextColor.BLUE, BOLD));
     
     private final BossBar.Color bbClr;
     private final Duration dur;
     private final double wbSize;
-    private final TextComponent bbTitle;
-    private final String baseChatMsg;
+    private final Component bbTitle;
+    private final Component baseChatMsg;
     private final Style bodyStyle;
 
     private final boolean isWBInstant;
@@ -48,7 +48,7 @@ public enum GameStage {
      * NOT_IN_GAME
      */
     private GameStage() { 
-        this(BossBar.Color.WHITE, Duration.ZERO, -1, false, Component.empty(), "", Style.style(NamedTextColor.WHITE));
+        this(BossBar.Color.WHITE, Duration.ZERO, -1, false, Component.empty(), Component.empty());
     }
     
 
@@ -59,10 +59,8 @@ public enum GameStage {
      * @param isWBInstant True if WB instantly jumps to this border at the start, false if progresses to WB by the end
      * @param bbTitle Title of the boss bar as a component (so, with colors and formatting)
      * @param baseChatMsg The base chat message, before color and additional warnings are added
-     * @param bodyClr Color of the body message
-     * @param bodyFmt Formatting of the body message
      */
-    private GameStage(@NotNull BossBar.Color bbClr, @NotNull Duration dur, int wbDiameter, boolean isWBInstant, @NotNull TextComponent bbTitle, @NotNull String baseChatMsg, Style bodyStyle) {
+    private GameStage(@NotNull BossBar.Color bbClr, @NotNull Duration dur, int wbDiameter, boolean isWBInstant, @NotNull Component bbTitle, @NotNull Component baseChatMsg) {
         // bossbar
         this.bbClr = bbClr;
         this.bbTitle = bbTitle;
@@ -74,7 +72,7 @@ public enum GameStage {
 
         // message body
         this.baseChatMsg = baseChatMsg;
-        this.bodyStyle = bodyStyle;
+        this.bodyStyle = baseChatMsg.style();
     }
 
     @Nullable
@@ -111,7 +109,7 @@ public enum GameStage {
         return bbClr;
     }
 
-    public TextComponent getBBTitle() {
+    public Component getBBTitle() {
         return bbTitle;
     }
 
@@ -210,7 +208,7 @@ public enum GameStage {
     public void sendMessage() {
         if (this == NOT_IN_GAME) return;
         if (this == DEATHMATCH) {
-            Bukkit.getServer().sendMessage(getMessageBuilder().append(Component.text(baseChatMsg, bodyStyle)));
+            Bukkit.getServer().sendMessage(getMessageBuilder().append(baseChatMsg));
             return;
         }
         /**

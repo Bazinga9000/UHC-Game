@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
@@ -76,7 +75,7 @@ public class BossbarManager {
         return gameManager.getStage().getBBColor();
     }
 
-    private TextComponent getBBTitle() {
+    private Component getBBTitle() {
         return gameManager.getStage().getBBTitle();
     }
 }
