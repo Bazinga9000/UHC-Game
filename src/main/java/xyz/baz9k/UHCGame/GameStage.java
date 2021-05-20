@@ -196,7 +196,7 @@ public enum GameStage {
     private static final String wbWillShrinkInstant = "%s%s will immediately shrink to ±%s in %s! Watch out!";
     private static final String wbWillShrink = "%s%s will begin shrinking to ±%s in %s!";
 
-    private static final String wbJustShrinkInstant = "%2$s has immediately shrank to ±%3$s!";
+    private static final String wbJustShrinkInstant = "%s has immediately shrank to ±%s!";
     private static final String wbJustShrink = "%s%s will stop at ±%s in %s.";
 
     // String.format(-, duration)
@@ -247,8 +247,12 @@ public enum GameStage {
             }
         }
         
-        var s = getMessageBuilder()
-                .append(Component.text(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, getWordTimeString(dur)), bodyStyle));
+        TextComponent.Builder s = getMessageBuilder();
+        if (fmtStr.equals(wbJustShrinkInstant)) {
+            s.append(Component.text(String.format(fmtStr, subject, wbSize / 2, getWordTimeString(dur)), bodyStyle));
+        } else {
+            s.append(Component.text(String.format(fmtStr, baseChatMsg, subject, wbSize / 2, getWordTimeString(dur)), bodyStyle));
+        }
 
         if (this == lastGradualStage()) {
             s.append(Component.text(String.format(dmWarn, getWordTimeString(dur)), bodyStyle));
