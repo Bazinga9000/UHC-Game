@@ -171,7 +171,7 @@ public class GameManager implements Listener {
         }
 
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
-        spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
+        spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.wbDiameter(), GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams()));
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
@@ -372,7 +372,7 @@ public class GameManager implements Listener {
         if (isDeathmatch()) {
             World w = getUHCWorld(Environment.NORMAL);
 
-            int radius = (int) GameStage.DEATHMATCH.getWBRadius();
+            int radius = (int) GameStage.DEATHMATCH.wbRadius();
             for (int x = -radius; x <= radius; x++) {
                 for (int z = -radius; z <= radius; z++) {
                     w.getBlockAt(x, w.getMaxHeight() - 2, z).setType(Material.BARRIER);
@@ -390,7 +390,7 @@ public class GameManager implements Listener {
                 p.teleport(getCenterAtY(255));
             }
 
-            spreadPlayersRootsOfUnity(true, getCenter(), GameStage.DEATHMATCH.getWBRadius() - 1);
+            spreadPlayersRootsOfUnity(true, getCenter(), GameStage.DEATHMATCH.wbRadius() - 1);
 
         }
 
@@ -402,7 +402,7 @@ public class GameManager implements Listener {
     @NotNull
     public Duration getStageDuration() {
         requireStarted();
-        return stage.getDuration();
+        return stage.duration();
     }
 
     /**
@@ -428,7 +428,7 @@ public class GameManager implements Listener {
      */
     public boolean isStageComplete() {
         if (isDeathmatch()) return false;
-        Instant end = lastStageInstant.plus(stage.getDuration());
+        Instant end = lastStageInstant.plus(stage.duration());
         return !end.isAfter(Instant.now());
     }
 
