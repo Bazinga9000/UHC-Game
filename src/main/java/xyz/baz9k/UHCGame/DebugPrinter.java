@@ -66,17 +66,18 @@ public final class DebugPrinter {
      * Broadcast a debug message in chat
      * @param msg
      */
-    public void broadcastDebug(String msg) {
-        broadcastDebug(Component.text(msg));
+    public void printDebug(String msg) {
+        printDebug(Component.text(msg));
     }
 
     /**
      * Broadcast a debug message in chat
      * @param msg
      */
-    public void broadcastDebug(Component msg) {
+    public void printDebug(Component msg) {
+        var locale = plugin.getLangManager().getLocale();
         if (isDebugging()) {
-            logger.log(Level.INFO, componentString(plugin.getLangManager().getLocale(), fmtDebug(msg)));
+            logger.info(componentString(locale, fmtDebug(msg)));
             onlinePlayers().sendMessage(fmtDebug(msg));
         }
     }

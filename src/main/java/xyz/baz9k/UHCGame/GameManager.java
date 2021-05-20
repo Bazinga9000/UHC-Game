@@ -94,7 +94,7 @@ public class GameManager implements Listener {
      * @param skipChecks If true, all checks are ignored.
      */
     public void startUHC(boolean skipChecks) {
-        debugPrinter.broadcastDebug("UHC attempting start");
+        debugPrinter.printDebug("UHC attempting start");
         if (!skipChecks) {
             // check if game is OK to start
             requireNotStarted();
@@ -107,15 +107,15 @@ public class GameManager implements Listener {
                 throw new IllegalStateException("UHC worlds have not been regenerated. Run /uhc reseed to regenerate.");
             }
         } else {
-            debugPrinter.broadcastDebug("Skipping starting requirements");
+            debugPrinter.printDebug("Skipping starting requirements");
         }
 
         try {
             _startUHC();
-            debugPrinter.broadcastDebug("UHC started");
+            debugPrinter.printDebug("UHC started");
         } catch (Exception e) {
             setStage(GameStage.NOT_IN_GAME);
-            debugPrinter.broadcastDebug("UHC cancelling start due to error");
+            debugPrinter.printDebug("UHC cancelling start due to error");
             debugPrinter.printError(e);
         }
     }
@@ -173,9 +173,9 @@ public class GameManager implements Listener {
             }
         }
 
-        debugPrinter.broadcastDebug("Generating Spawn Locations");
+        debugPrinter.printDebug("Generating Spawn Locations");
         spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
-        debugPrinter.broadcastDebug("Done!");
+        debugPrinter.printDebug("Done!");
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
         startTick();
@@ -193,20 +193,20 @@ public class GameManager implements Listener {
      * @param skipChecks If true, started game checks are ignored.
      */
     public void endUHC(boolean skipChecks) {
-        debugPrinter.broadcastDebug("UHC attempting end");
+        debugPrinter.printDebug("UHC attempting end");
         if (!skipChecks) {
             // check if game is OK to end
             requireStarted();
         } else {
-            debugPrinter.broadcastDebug("Skipping ending requirements");
+            debugPrinter.printDebug("Skipping ending requirements");
         }
         
         try {
             _endUHC();
-            debugPrinter.broadcastDebug("UHC ended");
+            debugPrinter.printDebug("UHC ended");
         } catch (Exception e) {
             setStage(GameStage.WB_STILL);
-            debugPrinter.broadcastDebug("UHC cancelling end due to error");
+            debugPrinter.printDebug("UHC cancelling end due to error");
             debugPrinter.printError(e);
         }
     }
@@ -563,7 +563,7 @@ public class GameManager implements Listener {
             }
         }
 
-        debugPrinter.broadcastDebug(samples.size() + " points generated.");
+        debugPrinter.printDebug(samples.size() + " points generated.");
 
         List<Location> spawnableLocations = new ArrayList<>();
         List<Location> overWaterLocations = new ArrayList<>();
