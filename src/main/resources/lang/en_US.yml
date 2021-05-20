@@ -69,4 +69,23 @@ xyz:
           wb_just_instant_shrink: "{1} has immediately shrank to ±{2}!"
 
           dm_warn: "If the game does not end within {0}, I shall end it myself!" # duration
-          
+
+      # TODO actually use
+      err:
+        team:
+          display:
+            index_must_pos: "Team index must be positive."
+            index_must_under_max: "Team index must be less than number of predefined team colors ({0})."
+          must_assigned: "Teams have not been assigned."
+          must_assigned_comb: "Player must be an assigned combatant."
+          invalid: "Invalid team (Team must be positive and less than the team count.)"
+          count_must_pos: "Team count must be positive."
+        world:
+          must_regened: "UHC worlds have not been regenerated. Run /uhc reseed to regenerate."
+          missing_spread_locs: "Not enough locations ({0}) were generated."
+        not_started: "UHC has not started"
+        already_started: "UHC has already started"
+        hud:
+          must_fit: "Position needs to be between 1 and 15."
+        lang:
+          missing_file: "Missing file {0}"
