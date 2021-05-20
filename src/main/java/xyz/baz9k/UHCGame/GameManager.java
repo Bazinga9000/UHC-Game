@@ -44,7 +44,6 @@ public class GameManager implements Listener {
 
     private final HashMap<UUID, Component> previousDisplayNames;
     
-    private DebugPrinter debugPrinter;
     private TeamManager teamManager;
     private HUDManager hudManager;
     private BossbarManager bbManager;
@@ -75,7 +74,6 @@ public class GameManager implements Listener {
      * After all managers are initialized, this function is run to give gameManager references to all other managers.
      */
     public void loadManagerRefs() {
-        debugPrinter = plugin.getDebugPrinter();
         teamManager = plugin.getTeamManager();
         hudManager = plugin.getHUDManager();
         bbManager = plugin.getBossbarManager();
@@ -93,7 +91,7 @@ public class GameManager implements Listener {
      * @param skipChecks If true, all checks are ignored.
      */
     public void startUHC(boolean skipChecks) {
-        debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.try"));
+        Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.try"));
         if (!skipChecks) {
             // check if game is OK to start
             requireNotStarted();
@@ -106,16 +104,16 @@ public class GameManager implements Listener {
                 throw new IllegalStateException("UHC worlds have not been regenerated. Run /uhc reseed to regenerate.");
             }
         } else {
-            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.force"));
+            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.force"));
         }
 
         try {
             _startUHC();
-            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.complete"));
+            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.complete"));
         } catch (Exception e) {
             setStage(GameStage.NOT_IN_GAME);
-            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.fail"));
-            debugPrinter.printError(e);
+            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.fail"));
+            Debug.printError(e);
         }
     }
     private void _startUHC() {
@@ -172,9 +170,9 @@ public class GameManager implements Listener {
             }
         }
 
-        debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.start"));
+        Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.start"));
         spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
-        debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.end"));
+        Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.end"));
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
         startTick();
@@ -192,21 +190,21 @@ public class GameManager implements Listener {
      * @param skipChecks If true, started game checks are ignored.
      */
     public void endUHC(boolean skipChecks) {
-        debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.try"));
+        Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.try"));
         if (!skipChecks) {
             // check if game is OK to end
             requireStarted();
         } else {
-            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.force"));
+            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.force"));
         }
         
         try {
             _endUHC();
-            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.complete"));
+            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.complete"));
         } catch (Exception e) {
             setStage(GameStage.WB_STILL);
-            debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.fail"));
-            debugPrinter.printError(e);
+            Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.end.fail"));
+            Debug.printError(e);
         }
     }
 
@@ -562,7 +560,7 @@ public class GameManager implements Listener {
             }
         }
 
-        debugPrinter.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.generated").args(Component.text(samples.size())));
+        Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.spreadplayers.generated").args(Component.text(samples.size())));
 
         List<Location> spawnableLocations = new ArrayList<>();
         List<Location> overWaterLocations = new ArrayList<>();

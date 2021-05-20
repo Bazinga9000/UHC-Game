@@ -7,6 +7,7 @@ import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
@@ -102,7 +103,7 @@ public class Commands {
                     plugin.getGameManager().endUHC(false);
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    plugin.getDebugPrinter().printError(sender, e);
+                    Debug.printError(sender, e);
                 }
             }
         );
@@ -120,7 +121,7 @@ public class Commands {
                     plugin.getGameManager().startUHC(true);
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    plugin.getDebugPrinter().printError(sender, e);
+                    Debug.printError(sender, e);
                 }
             }
         );
@@ -138,7 +139,7 @@ public class Commands {
                     plugin.getGameManager().endUHC(true);
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    plugin.getDebugPrinter().printError(sender, e);
+                    Debug.printError(sender, e);
                 }
             }
         );
@@ -431,9 +432,9 @@ public class Commands {
         .withAliases("verbose")
         .executes(
             (sender, args) -> {
-                plugin.getDebugPrinter().setDebug(!plugin.getDebugPrinter().isDebugging());
+                Debug.setDebug(!Debug.isDebugging());
 
-                String onOff = plugin.getDebugPrinter().isDebugging() ? "xyz.baz9k.uhc.cmd.succ.debug.on" : "xyz.baz9k.uhc.cmd.succ.debug.off";
+                String onOff = Debug.isDebugging() ? "xyz.baz9k.uhc.cmd.succ.debug.on" : "xyz.baz9k.uhc.cmd.succ.debug.off";
                 sender.sendMessage(Component.translatable(onOff));
             }
         );
@@ -446,9 +447,9 @@ public class Commands {
         .withArguments(new BooleanArgument("status"))
         .executes(
             (sender, args) -> {
-                plugin.getDebugPrinter().setDebug((boolean) args[0]);
+                Debug.setDebug((boolean) args[0]);
 
-                String onOff = plugin.getDebugPrinter().isDebugging() ? "xyz.baz9k.uhc.cmd.succ.debug.on" : "xyz.baz9k.uhc.cmd.succ.debug.off";
+                String onOff = Debug.isDebugging() ? "xyz.baz9k.uhc.cmd.succ.debug.on" : "xyz.baz9k.uhc.cmd.succ.debug.off";
                 sender.sendMessage(Component.translatable(onOff));
             }
         );

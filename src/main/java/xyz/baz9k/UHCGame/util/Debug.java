@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame;
+package xyz.baz9k.UHCGame.util;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -11,33 +11,30 @@ import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 
-public final class DebugPrinter {
-    private UHCGame plugin;
-    private Logger logger;
+public final class Debug {
+    private Debug() { }
+    private static boolean debug = true;
+    private static Logger logger = null;
 
-    private boolean debug = true;
-    public DebugPrinter(UHCGame plugin) { 
-        this.plugin = plugin;
-        this.logger = plugin.getLogger();
-    }
-
-    public boolean isDebugging() {
+    public static boolean isDebugging() {
         return debug && logger != null;
     }
-    public void setDebug(boolean d) {
+    public static void setDebug(boolean d) {
         debug = d;
     }
+    public static void setLogger(Logger log) {
+        logger = log;
+    }
     
-    private static Audience onlinePlayers() {
+    public static Audience onlinePlayers() {
         return Audience.audience(Bukkit.getOnlinePlayers());
     }
-
     /**
      * Display a stack trace error to an audience and also print a log
      * @param audience
      * @param e
      */
-    public void printError(Audience audience, Throwable err) {
+    public static void printError(Audience audience, Throwable err) {
         if (isDebugging()) {
             audience.sendMessage(Component.text(err.toString(), NamedTextColor.RED));
             for (var line : err.getStackTrace()) {
@@ -52,7 +49,7 @@ public final class DebugPrinter {
      * Display a stack trace error to chat and also print a log
      * @param e
      */
-    public void printError(Throwable e) {
+    public static void printError(Throwable e) {
         printError(onlinePlayers(), e);
     }
 
@@ -64,7 +61,7 @@ public final class DebugPrinter {
      * Broadcast a debug message in chat
      * @param msg
      */
-    public void printDebug(String msg) {
+    public static void printDebug(String msg) {
         printDebug(Component.text(msg));
     }
 
@@ -72,11 +69,11 @@ public final class DebugPrinter {
      * Broadcast a debug message in chat
      * @param msg
      */
-    public void printDebug(Component msg) {
-        var locale = plugin.getLangManager().getLocale();
+    public static void printDebug(Component msg) {
         if (isDebugging()) {
-            logger.info(componentString(locale, fmtDebug(msg)));
-            onlinePlayers().sendMessage(fmtDebug(msg));
+            Component dmsg = fmtDebug(msg);
+            logger.info(componentString(dmsg));
+            onlinePlayers().sendMessage(dmsg);
         }
     }
 }
