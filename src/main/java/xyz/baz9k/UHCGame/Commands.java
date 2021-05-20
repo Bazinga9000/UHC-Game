@@ -7,7 +7,6 @@ import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
@@ -103,7 +102,7 @@ public class Commands {
                     plugin.getGameManager().endUHC(false);
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    Debug.printError(sender, e);
+                    plugin.getDebugPrinter().printError(sender, e);
                 }
             }
         );
@@ -121,7 +120,7 @@ public class Commands {
                     plugin.getGameManager().startUHC(true);
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    Debug.printError(sender, e);
+                    plugin.getDebugPrinter().printError(sender, e);
                 }
             }
         );
@@ -139,7 +138,7 @@ public class Commands {
                     plugin.getGameManager().endUHC(true);
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    Debug.printError(sender, e);
+                    plugin.getDebugPrinter().printError(sender, e);
                 }
             }
         );
@@ -432,9 +431,9 @@ public class Commands {
         .withAliases("verbose")
         .executes(
             (sender, args) -> {
-                Debug.setDebug(!Debug.isDebugging());
+                plugin.getDebugPrinter().setDebug(!plugin.getDebugPrinter().isDebugging());
 
-                String onOff = Debug.isDebugging() ? "on" : "off";
+                String onOff = plugin.getDebugPrinter().isDebugging() ? "on" : "off";
                 sender.sendMessage("Verbose messages " + onOff);
             }
         );
@@ -447,9 +446,9 @@ public class Commands {
         .withArguments(new BooleanArgument("status"))
         .executes(
             (sender, args) -> {
-                Debug.setDebug((boolean) args[0]);
+                plugin.getDebugPrinter().setDebug((boolean) args[0]);
 
-                String onOff = Debug.isDebugging() ? "on" : "off";
+                String onOff = plugin.getDebugPrinter().isDebugging() ? "on" : "off";
                 sender.sendMessage("Verbose messages " + onOff);
             }
         );

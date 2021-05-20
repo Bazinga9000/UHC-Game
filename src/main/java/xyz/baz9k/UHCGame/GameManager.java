@@ -45,6 +45,7 @@ public class GameManager implements Listener {
 
     private final HashMap<UUID, Component> previousDisplayNames;
     
+    private DebugPrinter debugPrinter;
     private TeamManager teamManager;
     private HUDManager hudManager;
     private BossbarManager bbManager;
@@ -75,6 +76,7 @@ public class GameManager implements Listener {
      * After all managers are initialized, this function is run to give gameManager references to all other managers.
      */
     public void loadManagerRefs() {
+        debugPrinter = plugin.getDebugPrinter();
         teamManager = plugin.getTeamManager();
         hudManager = plugin.getHUDManager();
         bbManager = plugin.getBossbarManager();
@@ -92,7 +94,7 @@ public class GameManager implements Listener {
      * @param skipChecks If true, all checks are ignored.
      */
     public void startUHC(boolean skipChecks) {
-        Debug.broadcastDebug("UHC attempting start");
+        debugPrinter.broadcastDebug("UHC attempting start");
         if (!skipChecks) {
             // check if game is OK to start
             requireNotStarted();
@@ -105,16 +107,16 @@ public class GameManager implements Listener {
                 throw new IllegalStateException("UHC worlds have not been regenerated. Run /uhc reseed to regenerate.");
             }
         } else {
-            Debug.broadcastDebug("Skipping starting requirements");
+            debugPrinter.broadcastDebug("Skipping starting requirements");
         }
 
         try {
             _startUHC();
-            Debug.broadcastDebug("UHC started");
+            debugPrinter.broadcastDebug("UHC started");
         } catch (Exception e) {
             setStage(GameStage.NOT_IN_GAME);
-            Debug.broadcastDebug("UHC cancelling start due to error");
-            Debug.printError(e);
+            debugPrinter.broadcastDebug("UHC cancelling start due to error");
+            debugPrinter.printError(e);
         }
     }
     private void _startUHC() {
@@ -171,9 +173,9 @@ public class GameManager implements Listener {
             }
         }
 
-        Debug.broadcastDebug("Generating Spawn Locations");
+        debugPrinter.broadcastDebug("Generating Spawn Locations");
         spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.getWBDiameter(), GameStage.WB_STILL.getWBDiameter() / (1 + teamManager.getNumTeams()));
-        Debug.broadcastDebug("Done!");
+        debugPrinter.broadcastDebug("Done!");
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
         startTick();
@@ -191,21 +193,21 @@ public class GameManager implements Listener {
      * @param skipChecks If true, started game checks are ignored.
      */
     public void endUHC(boolean skipChecks) {
-        Debug.broadcastDebug("UHC attempting end");
+        debugPrinter.broadcastDebug("UHC attempting end");
         if (!skipChecks) {
             // check if game is OK to end
             requireStarted();
         } else {
-            Debug.broadcastDebug("Skipping ending requirements");
+            debugPrinter.broadcastDebug("Skipping ending requirements");
         }
         
         try {
             _endUHC();
-            Debug.broadcastDebug("UHC ended");
+            debugPrinter.broadcastDebug("UHC ended");
         } catch (Exception e) {
             setStage(GameStage.WB_STILL);
-            Debug.broadcastDebug("UHC cancelling end due to error");
-            Debug.printError(e);
+            debugPrinter.broadcastDebug("UHC cancelling end due to error");
+            debugPrinter.printError(e);
         }
     }
 
@@ -561,7 +563,7 @@ public class GameManager implements Listener {
             }
         }
 
-        Debug.broadcastDebug(samples.size() + " points generated.");
+        debugPrinter.broadcastDebug(samples.size() + " points generated.");
 
         List<Location> spawnableLocations = new ArrayList<>();
         List<Location> overWaterLocations = new ArrayList<>();

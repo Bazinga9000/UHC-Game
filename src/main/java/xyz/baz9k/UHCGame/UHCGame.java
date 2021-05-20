@@ -6,9 +6,8 @@ import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import xyz.baz9k.UHCGame.util.Debug;
-
 public class UHCGame extends JavaPlugin {
+    private DebugPrinter debugPrinter;
     private TeamManager teamManager;
     private GameManager gameManager;
     private HUDManager hudManager;
@@ -17,7 +16,7 @@ public class UHCGame extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Debug.setLogger(getLogger());
+        debugPrinter = new DebugPrinter(this);
         teamManager = new TeamManager();
         gameManager = new GameManager(this);
         hudManager = new HUDManager(this);
@@ -34,6 +33,9 @@ public class UHCGame extends JavaPlugin {
         gameManager.loadManagerRefs();
     }
 
+    public DebugPrinter getDebugPrinter() {
+        return debugPrinter;
+    }
     public TeamManager getTeamManager() {
         return teamManager;
     }
