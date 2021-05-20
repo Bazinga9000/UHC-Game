@@ -54,7 +54,7 @@ public class BossbarManager {
         long remainingSecs = gameManager.getRemainingStageDuration().toSeconds(),
                  totalSecs = gameManager.getStageDuration().toSeconds();
 
-        bossbar.progress((float) remainingSecs / totalSecs);
+        bossbar.progress((float) clamp(0, (double) remainingSecs / totalSecs, 1));
         // change display title
         var display = getBBTitle()
             .append(Component.text(" | "))
