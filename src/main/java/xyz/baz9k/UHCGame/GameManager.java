@@ -97,11 +97,11 @@ public class GameManager implements Listener {
             requireNotStarted();
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
-                    throw new IllegalStateException("Teams have not been assigned.");
+                    throw translatableErr(IllegalStateException.class, Component.translatable("xyz.baz9k.uhc.err.team.must_assigned"));
                 }
             }
             if (!worldsRegened) {
-                throw new IllegalStateException("UHC worlds have not been regenerated. Run /uhc reseed to regenerate.");
+                throw translatableErr(IllegalStateException.class, Component.translatable("xyz.baz9k.uhc.err.world.must_regened"));
             }
         } else {
             Debug.printDebug(Component.translatable("xyz.baz9k.uhc.debug.start.force"));
@@ -234,13 +234,13 @@ public class GameManager implements Listener {
 
     public void requireStarted() {
         if (!hasUHCStarted()) {
-            throw new IllegalStateException("UHC has not started");
+            throw translatableErr(IllegalStateException.class, Component.translatable("xyz.baz9k.uhc.err.not_started"));
         }
     }
 
     public void requireNotStarted() {
         if (hasUHCStarted()) {
-            throw new IllegalStateException("UHC has already started");
+            throw translatableErr(IllegalStateException.class, Component.translatable("xyz.baz9k.uhc.err.already_started"));
         }
     }
 
@@ -575,7 +575,7 @@ public class GameManager implements Listener {
         }
         int totalSize = spawnableLocations.size() + overWaterLocations.size();
         if (totalSize < numLocations) {
-            throw new IllegalStateException("Not enough locations (" + totalSize + ") were generated.");
+            throw translatableErr(IllegalStateException.class, Component.translatable("xyz.baz9k.uhc.err.world.missing_spread_locs").args(Component.text(totalSize)));
         }
 
         if (spawnableLocations.size() < numLocations) {

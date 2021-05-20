@@ -93,6 +93,7 @@ xyz:
           must_assigned: "Teams have not been assigned."
           must_assigned_comb: "Player must be an assigned combatant."
           invalid: "Invalid team (Team must be positive and less than the team count.)"
+          size_name_invalid: "Unrecognized option '{0}'"
           count_must_pos: "Team count must be positive."
         world:
           must_regened: "UHC worlds have not been regenerated. Run /uhc reseed to regenerate."

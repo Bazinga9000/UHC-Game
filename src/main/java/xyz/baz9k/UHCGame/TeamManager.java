@@ -4,10 +4,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import net.kyori.adventure.text.Component;
+
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static xyz.baz9k.UHCGame.util.Utils.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.IntStream;
@@ -83,7 +88,7 @@ public class TeamManager {
      */
     public void assignPlayerToTeam(@NotNull Player p, int t) {
         if (t <= 0 || t > numTeams) {
-            throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
+            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.team.invalid"));
         }
 
         setNode(p, PlayerState.COMBATANT_ALIVE, t);
@@ -146,7 +151,7 @@ public class TeamManager {
      */
     public void setCombatantAliveStatus(@NotNull Player p, boolean aliveStatus) {
         if (!isAssignedCombatant(p)) {
-            throw new IllegalArgumentException("Player must be an assigned combatant.");
+            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.team.must_assigned_comb"));
         }
         
         Node n = getNode(p);
@@ -220,7 +225,7 @@ public class TeamManager {
     @NotNull
     public Set<Player> getAllCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
-            throw new IllegalArgumentException("Invalid team (Team must be positive and less than the team count.)");
+            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.team.invalid"));
         }
 
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR && n.state != PlayerState.COMBATANT_UNASSIGNED && n.team == team);
@@ -318,7 +323,7 @@ public class TeamManager {
             case "sextets" -> 6;
             case "septets" -> 7;
             case "octets" -> 8;
-            default -> throw new IllegalArgumentException();
+            default -> throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.team.size_name_invalid").args(Component.text(s)));
         });
     }
 
@@ -333,7 +338,7 @@ public class TeamManager {
 
     public void setNumTeams(int n) {
         if (n <= 0) {
-            throw new IllegalArgumentException("Team count must be positive.");
+            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.team.count_must_pos"));
         }
 
         numTeams = n;

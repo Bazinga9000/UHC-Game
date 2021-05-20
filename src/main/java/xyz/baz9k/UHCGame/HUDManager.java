@@ -164,7 +164,7 @@ public class HUDManager implements Listener {
             team = b.registerNewTeam(name);
         }
         if (position < 1 || position > 15) {
-            throw new IllegalArgumentException("Position needs to be between 1 and 15.");
+            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.hud.must_fit"));
         }
         String pname = createEmptyName(Integer.toString(position, 16).charAt(0));
         team.addEntry(pname);

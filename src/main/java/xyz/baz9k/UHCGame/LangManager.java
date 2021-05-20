@@ -1,5 +1,7 @@
 package xyz.baz9k.UHCGame;
 
+import static xyz.baz9k.UHCGame.util.Utils.*;
+
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -10,6 +12,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 
@@ -53,7 +56,7 @@ public class LangManager {
         try {
             langResource = new InputStreamReader(plugin.getResource(String.format("lang/%s.yml", l)));
         } catch (NullPointerException e) {
-            throw new IllegalArgumentException(String.format("Missing file %s", "lang/" + l + ".yml"));
+            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.lang.missing_file").args(Component.text("lang/" + l + ".yml")));
         }
 
         Configuration langCfg = YamlConfiguration.loadConfiguration(langResource);

@@ -40,10 +40,10 @@ public final class TeamDisplay {
      */
     public static Color getColor(int t) {
         if (t < 0) {
-            throw new IllegalArgumentException("Team index must be positive.");
+            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.team.display.index_must_pos"));
         }
         if (t > NUM_TEAM_COLORS) {
-            throw new IllegalArgumentException("Team index must be less than number of predefined team colors (" + NUM_TEAM_COLORS + ")");
+            throw translatableErr(IllegalArgumentException.class, Component.translatable("xyz.baz9k.uhc.err.team.display_index_must_under_max").args(Component.text(NUM_TEAM_COLORS)));
         }
         return teamColors[t];
     }
