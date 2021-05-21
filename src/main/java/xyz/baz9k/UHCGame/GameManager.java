@@ -733,8 +733,11 @@ public class GameManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
         teamManager.addPlayer(p, hasUHCStarted());
+
+        // set this perm for crossdim travel
         p.addAttachment(plugin, "mv.bypass.gamemode.*", true);
         p.recalculatePermissions();
+
         if(!hasUHCStarted()) return;
         bbManager.addPlayer(p);
         hudManager.initializePlayerHUD(p);
