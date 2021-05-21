@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import xyz.baz9k.UHCGame.UHCGame;
+import static xyz.baz9k.UHCGame.util.Utils.*;
 
 /**
  * Used to get a value from the {@link Player} once a prompting {@link ValuedNode} asks for one.
@@ -25,7 +26,7 @@ public class ValueRequest {
         Prompt firstPrompt = switch (node.type) {
             case INTEGER, DOUBLE -> new NumberRequestPrompt();
             case STRING -> new StringRequestPrompt();
-            default -> throw new IllegalArgumentException(String.format("Value request on unsupported type %s", node.type));
+            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.prompt.wrong_type", node.type);
         };
 
         new ConversationFactory(plugin)
@@ -35,7 +36,8 @@ public class ValueRequest {
             .withEscapeSequence("cancel")
             .addConversationAbandonedListener(e -> {
                 if (!e.gracefulExit()) {
-                    e.getContext().getForWhom().sendRawMessage("Prompt cancelled.");
+                    Player p = (Player) e.getContext().getForWhom();
+                    p.sendMessage(trans("xyz.baz9k.uhc.config.cancel"));
                 }
             })
             .buildConversation(converser)
@@ -47,7 +49,7 @@ public class ValueRequest {
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
             Object id = context.getSessionData("id");
-            return String.format("Enter new value for '%s' (type 'cancel' to cancel): ", id);
+            return componentString(trans("xyz.baz9k.uhc.config.ask", id));
         }
         
         @Override
@@ -63,7 +65,7 @@ public class ValueRequest {
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
             Object id = context.getSessionData("id");
-            return String.format("Enter new value for '%s' (type 'cancel' to cancel): ", id);
+            return componentString(trans("xyz.baz9k.uhc.config.prompt.ask", id));
         }
 
         @Override
@@ -84,7 +86,7 @@ public class ValueRequest {
 
             node.set(newValue);
             node.parent.click((Player) context.getForWhom());
-            return String.format("Set '%s' to %s!", id, newValue);
+            return componentString(trans("xyz.baz9k.uhc.config.prompt.succ", id, newValue));
         }
 
         @Override

@@ -104,3 +104,17 @@ xyz:
           must_fit: "Position needs to be between 1 and 15."
         lang:
           missing_file: "Missing file {0}"
+        config:
+          prompt:
+            wrong_type: "Value request on unsupported type {0}"
+      
+      config:
+        name:
+          a: "3"
+        desc:
+          a: "3"
+        prompt:
+          ask: "Enter new value for '{0}' (type 'cancel' to cancel): "
+          cancel: "Prompt cancelled."
+          succ: "Set '{0}' to {1}!"
+
