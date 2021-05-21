@@ -166,7 +166,6 @@ public class GameManager implements Listener {
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
         startTick();
-        bbManager.enable();
     }
 
     /**
@@ -209,8 +208,6 @@ public class GameManager implements Listener {
         hudManager.cleanup();
         kills.clear();
         tick.cancel();
-
-        bbManager.disable();
 
     }
 
@@ -490,6 +487,8 @@ public class GameManager implements Listener {
         resetStatuses(p);
         p.setGameMode(GameMode.SURVIVAL);
         p.displayName(previousDisplayNames.remove(p.getUniqueId()));
+        
+        bbManager.disable(p);
     }
 
     /**
@@ -518,7 +517,7 @@ public class GameManager implements Listener {
         hudManager.initializePlayerHUD(p);
         hudManager.addPlayerToTeams(p);
 
-        bbManager.addPlayer(p);
+        bbManager.enable(p);
 
     }
 
