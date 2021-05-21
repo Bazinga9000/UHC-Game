@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
@@ -151,26 +154,10 @@ public class GameManager implements Listener {
         }
         
         for (Player p : Bukkit.getOnlinePlayers()) {
-            // archive previous display name
-            previousDisplayNames.put(p.getUniqueId(), p.displayName());
-            resetStatuses(p);
-            recipes.discoverFor(p);
+            prepareToGame(p);
 
             // 60s grace period
             PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
-
-            if (teamManager.isSpectator(p)) {
-                p.setGameMode(GameMode.SPECTATOR);
-            } else {
-                p.setGameMode(GameMode.SURVIVAL);
-                kills.put(p.getUniqueId(), 0);
-            }
-
-            // set player display name
-            p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
-
-            // activate hud things for all
-            hudManager.initializePlayerHUD(p);
         }
 
         Debug.broadcastDebug("Generating Spawn Locations");
@@ -210,21 +197,13 @@ public class GameManager implements Listener {
             Debug.printError(e);
         }
     }
-
+    
     private void _endUHC() {
         setStage(GameStage.NOT_IN_GAME);
-        escapeAll();
         for (Player p : Bukkit.getOnlinePlayers()) {
-            resetStatuses(p);
-            p.setGameMode(GameMode.SURVIVAL);
+            prepareToLobby(p);
         }
-        
-        // update display names
-        for (UUID uuid : previousDisplayNames.keySet()) {
-            Player p = Bukkit.getPlayer(uuid);
-            if (p == null) continue;
-            p.displayName(previousDisplayNames.get(uuid));
-        }
+        escapeAll();
 
         teamManager.resetAllPlayers();
         hudManager.cleanup();
@@ -498,6 +477,67 @@ public class GameManager implements Listener {
     }
     */
 
+    private boolean inLobby(Player p) { return getLobbyWorld().equals(p.getWorld()); }
+    private boolean inGame(Player p) { return Arrays.asList(getUHCWorlds()).contains(p.getWorld()); }
+
+    /**
+     * Prepares a player to be tp'd into lobby
+     * @param p
+     */
+    private void prepareToLobby(Player p) {
+        if (inLobby(p)) return;
+
+        resetStatuses(p);
+        p.setGameMode(GameMode.SURVIVAL);
+        p.displayName(previousDisplayNames.remove(p.getUniqueId()));
+    }
+
+    /**
+     * Prepares a player to be tp'd into game state
+     * @param p
+     */
+    private void prepareToGame(Player p) {
+        if (inGame(p)) return;
+
+        resetStatuses(p);
+        recipes.discoverFor(p);
+
+        // store prev name and update disp name to proper name
+        previousDisplayNames.putIfAbsent(p.getUniqueId(), p.displayName());
+        p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
+
+        
+        if (teamManager.isSpectator(p)) {
+            p.setGameMode(GameMode.SPECTATOR);
+        } else {
+            p.setGameMode(GameMode.SURVIVAL);
+            kills.putIfAbsent(p.getUniqueId(), 0);
+        }
+
+        // activate hud things for player, add player to all huds
+        hudManager.initializePlayerHUD(p);
+        hudManager.addPlayerToTeams(p);
+
+        bbManager.addPlayer(p);
+
+    }
+
+    /**
+     * Sends player to the correct location
+     * @param p The player
+     * @param lobbyLoc Loc generator for if player must be tp'd to lobby
+     * @param gameLoc Loc generator for if player must be tp'd to game
+     */
+    private void toRightPlace(Player p, Supplier<? extends Location> lobbyLoc, Supplier<? extends Location> gameLoc) {
+        if (hasUHCStarted()) {
+            prepareToGame(p);
+            if (inLobby(p)) p.teleport(gameLoc.get());
+        } else {
+            prepareToLobby(p);
+            if (inLobby(p)) p.teleport(lobbyLoc.get());
+        }
+    }
+
     /**
      * Returns the number of kills that this combatant has dealt.
      * @param p
@@ -738,10 +778,45 @@ public class GameManager implements Listener {
         p.addAttachment(plugin, "mv.bypass.gamemode.*", true);
         p.recalculatePermissions();
 
-        if(!hasUHCStarted()) return;
-        bbManager.addPlayer(p);
-        hudManager.initializePlayerHUD(p);
-        hudManager.addPlayerToTeams(p);
+        toRightPlace(p,
+            () -> getLobbyWorld().getSpawnLocation(),
+            () -> {
+                Location MAIN_SPAWN = getUHCWorld(Environment.NORMAL).getSpawnLocation();
+                Predicate<Player> isAlive = q -> teamManager.getPlayerState(q) == PlayerState.COMBATANT_ALIVE;
+                
+                return switch (p.getGameMode()) {
+                    case SURVIVAL -> {
+                        // if unassigned, go to main (shouldn't happen?)
+                        // if alive and no tmates, tp to main
+                        // if alive and tmates, tp to random tmate
+                        int t = teamManager.getTeam(p);
+                        if (t == 0) yield MAIN_SPAWN;
+
+                        var aliveTmates = teamManager.getAllCombatantsOnTeam(t).stream()
+                        .filter(isAlive)
+                        .collect(Collectors.toList());
+
+                        int size = aliveTmates.size();
+                        if (size == 0) yield MAIN_SPAWN;
+                        yield aliveTmates.get(new Random().nextInt(size)).getLocation();
+                    }
+                    case SPECTATOR -> {
+                        // if alive and no alive combs, go to main
+                        // if alive and alive combs, tp to random comb
+
+                        // get all alive combatants in a list
+                        var aliveCombs = teamManager.getAllCombatants().stream()
+                        .filter(isAlive)
+                        .collect(Collectors.toList());
+
+                        int size = aliveCombs.size();
+                        if (size == 0) yield MAIN_SPAWN;
+                        yield aliveCombs.get(new Random().nextInt(size)).getLocation();
+                    }
+                    default -> MAIN_SPAWN;
+                };
+            }
+        );
 
     }
 
