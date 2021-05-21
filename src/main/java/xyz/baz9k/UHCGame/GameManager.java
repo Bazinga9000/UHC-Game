@@ -376,7 +376,7 @@ public class GameManager implements Listener {
         if (isDeathmatch()) {
             World w = getUHCWorld(Environment.NORMAL);
 
-            int radius = 1 + (int) GameStage.DEATHMATCH.wbRadius();
+            int radius = (int) GameStage.DEATHMATCH.wbRadius();
             for (int x = -radius; x <= radius; x++) {
                 for (int z = -radius; z <= radius; z++) {
                     w.getBlockAt(x, w.getMaxHeight() - 1, z).setType(Material.AIR);
