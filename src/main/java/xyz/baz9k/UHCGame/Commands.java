@@ -462,6 +462,8 @@ public class Commands {
         return new CommandAPICommand("config")
         .executesPlayer(
                 (sender, args) -> {
+                    plugin.getGameManager().requireNotStarted();
+                    
                     ConfigManager cfgManager = plugin.getConfigManager();
                     cfgManager.openMenu(sender);
                 }
