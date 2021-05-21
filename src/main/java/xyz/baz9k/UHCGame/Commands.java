@@ -5,6 +5,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.util.Debug;
@@ -59,6 +60,20 @@ public class Commands {
         uhc.register();
     }
 
+    private void requireNotStarted() throws WrapperCommandSyntaxException {
+        try {
+            plugin.getGameManager().requireNotStarted();
+        } catch (IllegalStateException e) {
+            CommandAPI.fail(e.getMessage());
+        }
+    }
+    private void requireStarted() throws WrapperCommandSyntaxException {
+        try {
+            plugin.getGameManager().requireStarted();
+        } catch (IllegalStateException e) {
+            CommandAPI.fail(e.getMessage());
+        }
+    }
     /*
     /uhc start
     /uhc end
@@ -276,7 +291,7 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                plugin.getGameManager().requireStarted();
+                requireStarted();
                 
                 for (Player p : (Collection<Player>) args[0]) {
                     _respawn(sender, p, p.getBedSpawnLocation());
@@ -294,7 +309,7 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                plugin.getGameManager().requireStarted();
+                requireStarted();
                 
                 for (Player p : (Collection<Player>) args[0]) {
                     _respawn(sender, p, (Location) args[1]);
@@ -462,7 +477,7 @@ public class Commands {
         return new CommandAPICommand("config")
         .executesPlayer(
                 (sender, args) -> {
-                    plugin.getGameManager().requireNotStarted();
+                    requireNotStarted();
                     
                     ConfigManager cfgManager = plugin.getConfigManager();
                     cfgManager.openMenu(sender);
