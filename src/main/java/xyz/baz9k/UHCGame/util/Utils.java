@@ -270,6 +270,12 @@ public final class Utils {
         return Math.max(min, Math.min(x, max));
     }
 
+    /**
+     * Converts a component to text (for TextComponent & TranslatableComponent)
+     * @param l locale to use
+     * @param c component
+     * @return string of the component text
+     */
     public static String componentString(Locale l, Component c) {
         List<Component> components = new ArrayList<>();
         components.add(c);
@@ -284,10 +290,24 @@ public final class Utils {
             .collect(Collectors.joining());
     }
     
+    /**
+     * Converts a component to text (for TextComponent & TranslatableComponent). 
+     * This uses the plugin's locale.
+     * @param c component
+     * @return string of the component text
+     */
     public static String componentString(Component c) {
         return componentString(UHCGame.getLocale(), c);
     }
 
+    /**
+     * Returns an exception of type X, with a translatable component message
+     * @param <X> 
+     * @param exc Exception type
+     * @param l Locale
+     * @param msg Component message
+     * @return The exception, which can be thrown.
+     */
     public static <X extends Throwable> X translatableErr(Class<X> exc, Locale l, Component msg) {
         try {
             return exc.getConstructor(String.class).newInstance(componentString(l, msg));
@@ -297,10 +317,24 @@ public final class Utils {
         }
     }
     
+    /**
+     * Returns an exception of type X, with a translatable component message.
+     * This uses the plugin's locale.
+     * @param <X> 
+     * @param exc Exception type
+     * @param msg Component message
+     * @return The exception, which can be thrown.
+     */
     public static <X extends Throwable> X translatableErr(Class<X> exc, Component c) {
         return translatableErr(exc, UHCGame.getLocale(), c);
     }
 
+    /**
+     * Shorthand for {@link Component#translatable}. 
+     * @param key Translation key
+     * @param args Objects which are passed as strings to the translatable component. (Components stay as components)
+     * @return component
+     */
     public static TranslatableComponent trans(String key, Object... args) {
         Component[] cargs = Arrays.stream(args)
             .map(o -> {
@@ -311,6 +345,14 @@ public final class Utils {
         return Component.translatable(key).args(cargs);
     }
 
+    /**
+     * Returns an exception of type X, with a translatable component message.
+     * This uses the plugin's locale.
+     * @param <X> 
+     * @param key Translation key
+     * @param args Objects which are passed as strings to the translatable component. (Components stay as components)
+     * @return The exception, which can be thrown.
+     */
     public static <X extends Throwable> X translatableErr(Class<X> exc, String key, Object... args) {
         return translatableErr(exc, trans(key, args));
     }
