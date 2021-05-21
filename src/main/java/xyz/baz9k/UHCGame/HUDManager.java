@@ -122,6 +122,13 @@ public class HUDManager implements Listener {
     }
 
     /* HANDLE SCOREBOARD PARITY */
+    
+    /**
+     * Adds a player onto a {@link TeamManager} team on a scoreboard
+     * @param s the scoreboard
+     * @param p the player
+     * @param team the TeamManager team (not Minecraft {@link Team})
+     */
     private void addPlayerToScoreboardTeam(@NotNull Scoreboard s, @NotNull Player p, int team){
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
@@ -131,6 +138,10 @@ public class HUDManager implements Listener {
         t.addEntry(p.getName());
     }
 
+    /**
+     * Registers all online users' teams to a player's scoreboard
+     * @param player the player to register to
+     */
     private void setTeams(@NotNull Player player){
         Scoreboard s = player.getScoreboard();
         for(Player p : Bukkit.getOnlinePlayers()){
@@ -139,6 +150,10 @@ public class HUDManager implements Listener {
         }
     }
 
+    /**
+     * Registers a player's team to all online users' scoreboards
+     * @param player the player to register
+     */
     public void addPlayerToTeams(@NotNull Player player){
         int team = teamManager.getTeam(player);
         for(Player p : Bukkit.getOnlinePlayers()){
@@ -147,6 +162,10 @@ public class HUDManager implements Listener {
         }
     }
 
+    /**
+     * Creates the scoreboard for a player, adds necessary objectives (the main hud, hearts), registers all online players to it
+     * @param p
+     */
     private void createHUDScoreboard(@NotNull Player p){
         // give player scoreboard & objective
         Scoreboard newBoard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -166,6 +185,13 @@ public class HUDManager implements Listener {
     }
 
     /* INITIALIZING HUD */
+
+    /**
+     * Reserves a space for a HUD line at a position in a player's scoreboard
+     * @param p the player whose scoreboard will have a HUD line added
+     * @param name Identifier to reference the HUD line again (to add stuff to it)
+     * @param position Position to reserve
+     */
     private void addHUDLine(@NotNull Player p, @NotNull String name, int position){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(name);
@@ -191,7 +217,7 @@ public class HUDManager implements Listener {
     }
 
     /**
-     * Setup a player's HUD on join.
+     * Setup a player's HUD (create scoreboard, reserve all the slots, load data onto all the slots)
      * @param p
      */
     public void initializePlayerHUD(@NotNull Player p) {
@@ -220,7 +246,7 @@ public class HUDManager implements Listener {
     }
 
     /**
-     * Remove player HUD (for the main HUD)
+     * Trash the player's scoreboard and return to the main scoreboard.
      */
     public void cleanup() {
         Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -229,6 +255,9 @@ public class HUDManager implements Listener {
         }
     }
 
+    /**
+     * 2D distance between two 3D locations, two different worlds results in null
+     */
     private static Double dist2d(Location pl, Location ql) {
         if (pl.getWorld() != ql.getWorld()) return null;
         Point2D p = Point2D.fromLocation(pl),
