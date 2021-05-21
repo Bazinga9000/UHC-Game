@@ -518,10 +518,9 @@ public class GameManager implements Listener {
         World w = center.getWorld();
         for (int i = 0; i < numLocations; i++) {
             double theta = i * 2 * Math.PI / numLocations;
-            center2.addPolar(distance, theta);
-            locations.add(getHighestLoc(w, center2));
+            Point2D newPt = center2.addPolar(distance, theta);
+            locations.add(getHighestLoc(w, newPt));
         }
-        Debug.broadcastDebug(locations.toString());
         Collections.shuffle(locations);
         return Collections.unmodifiableList(locations);
     }
