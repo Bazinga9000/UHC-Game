@@ -16,7 +16,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -406,7 +405,7 @@ public class GameManager implements Listener {
                 p.teleport(getCenterAtY(255));
             }
 
-            spreadPlayersRootsOfUnity(true, getCenter(), GameStage.DEATHMATCH.wbRadius() - 1);
+            spreadPlayersRootsOfUnity(true, new Point2D(0.5, 0.5).loc(w, 0), GameStage.DEATHMATCH.wbRadius() - 1);
 
         }
 
