@@ -154,7 +154,10 @@ public class GameManager implements Listener {
         }
         
         for (Player p : Bukkit.getOnlinePlayers()) {
-            prepareToGame(p);
+            toGame(p, () -> {
+                if (teamManager.isAssignedCombatant(p)) return null; // let spreadplayers do that
+                return getUHCWorld(Environment.NORMAL).getSpawnLocation();
+            });
 
             // 60s grace period
             PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
@@ -200,7 +203,7 @@ public class GameManager implements Listener {
     private void _endUHC() {
         setStage(GameStage.NOT_IN_GAME);
         for (Player p : Bukkit.getOnlinePlayers()) {
-            prepareToLobby(p);
+            toLobby(p, () -> getLobbyWorld().getSpawnLocation());
         }
         escapeAll();
 
@@ -474,29 +477,40 @@ public class GameManager implements Listener {
     }
     */
 
-    private boolean inLobby(Player p) { return getLobbyWorld().equals(p.getWorld()); }
-    private boolean inGame(Player p) { return Arrays.asList(getUHCWorlds()).contains(p.getWorld()); }
+    private boolean isLobbyWorld(World w) { return getLobbyWorld().equals(w); }
+    private boolean isGameWorld(World w) { return Arrays.asList(getUHCWorlds()).contains(w); }
 
     /**
      * Prepares a player to be tp'd into lobby
      * @param p
      */
-    private void prepareToLobby(Player p) {
-        if (inLobby(p)) return;
-
+    private void toLobby(Player p, Supplier<? extends Location> l) {
+        if (isLobbyWorld(p.getWorld())) return;
+        Location to = l.get();
+        if (to == null || !isGameWorld(to.getWorld())) {
+            throw new IllegalArgumentException("Location generated was null or not in a game world.");
+        }
+        
         resetStatuses(p);
         p.setGameMode(GameMode.SURVIVAL);
         p.displayName(previousDisplayNames.remove(p.getUniqueId()));
         
         bbManager.disable(p);
+        
+        p.teleport(to);
     }
 
     /**
      * Prepares a player to be tp'd into game state
      * @param p
      */
-    private void prepareToGame(Player p) {
-        if (inGame(p)) return;
+    private void toGame(Player p, Supplier<? extends Location> l) {
+        if (isGameWorld(p.getWorld())) return;
+
+        Location to = l.get();
+        if (to == null || !isGameWorld(to.getWorld())) {
+            throw new IllegalArgumentException("Location generated was null or not in a game world.");
+        }
 
         resetStatuses(p);
         recipes.discoverFor(p);
@@ -519,6 +533,7 @@ public class GameManager implements Listener {
 
         bbManager.enable(p);
 
+        p.teleport(to);
     }
 
     /**
@@ -529,11 +544,9 @@ public class GameManager implements Listener {
      */
     private void toRightPlace(Player p, Supplier<? extends Location> lobbyLoc, Supplier<? extends Location> gameLoc) {
         if (hasUHCStarted()) {
-            prepareToGame(p);
-            if (inLobby(p)) p.teleport(gameLoc.get());
+            toGame(p, lobbyLoc);
         } else {
-            prepareToLobby(p);
-            if (inLobby(p)) p.teleport(lobbyLoc.get());
+            toLobby(p, gameLoc);
         }
     }
 
@@ -788,16 +801,18 @@ public class GameManager implements Listener {
                         // if unassigned, go to main (shouldn't happen?)
                         // if alive and no tmates, tp to main
                         // if alive and tmates, tp to random tmate
-                        int t = teamManager.getTeam(p);
-                        if (t == 0) yield MAIN_SPAWN;
+                        if (teamManager.isAssignedCombatant(p)) {
+                            int t = teamManager.getTeam(p);
+                            var aliveTmates = teamManager.getAllCombatantsOnTeam(t).stream()
+                            .filter(isAlive)
+                            .collect(Collectors.toList());
+    
+                            int size = aliveTmates.size();
+                            if (size == 0) yield MAIN_SPAWN;
+                            yield aliveTmates.get(new Random().nextInt(size)).getLocation();
+                        }
+                        yield MAIN_SPAWN;
 
-                        var aliveTmates = teamManager.getAllCombatantsOnTeam(t).stream()
-                        .filter(isAlive)
-                        .collect(Collectors.toList());
-
-                        int size = aliveTmates.size();
-                        if (size == 0) yield MAIN_SPAWN;
-                        yield aliveTmates.get(new Random().nextInt(size)).getLocation();
                     }
                     case SPECTATOR -> {
                         // if spec and no alive combs, go to main

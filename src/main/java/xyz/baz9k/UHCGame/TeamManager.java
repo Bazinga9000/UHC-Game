@@ -255,6 +255,7 @@ public class TeamManager {
         return playerMap.values().stream()
                                  .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
                                  .mapToInt(n -> n.team)
+                                 .filter(n -> n > 0)
                                  .distinct();
     }
 
