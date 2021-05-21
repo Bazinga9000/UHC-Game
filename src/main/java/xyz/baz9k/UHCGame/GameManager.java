@@ -800,8 +800,8 @@ public class GameManager implements Listener {
                         yield aliveTmates.get(new Random().nextInt(size)).getLocation();
                     }
                     case SPECTATOR -> {
-                        // if alive and no alive combs, go to main
-                        // if alive and alive combs, tp to random comb
+                        // if spec and no alive combs, go to main
+                        // if spec and alive combs, tp to random comb
 
                         // get all alive combatants in a list
                         var aliveCombs = teamManager.getAllCombatants().stream()
