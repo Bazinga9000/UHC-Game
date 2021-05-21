@@ -84,7 +84,7 @@ xyz:
         fail:
           respawn:
             spectator: "Cannot respawn spectator {0}."
-      # TODO actually use
+
       err:
         team:
           display:
