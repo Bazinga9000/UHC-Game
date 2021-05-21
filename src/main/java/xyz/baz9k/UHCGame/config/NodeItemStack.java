@@ -30,7 +30,7 @@ public class NodeItemStack extends ItemStack {
     /**
      * Raw description without replaced strings.
      */
-    private List<Component> rawDesc;
+    private final List<Component> rawDesc;
     /**
      * Description after replaced strings.
      */
@@ -44,7 +44,7 @@ public class NodeItemStack extends ItemStack {
     /**
      * Function that maps the value to another value, which is used in formatting strings.
      */
-    private UnaryOperator<Object> mapper;
+    private final UnaryOperator<Object> mapper;
 
     // TEXT STYLES
     /**
@@ -56,6 +56,26 @@ public class NodeItemStack extends ItemStack {
      */
     public static final Style DEFAULT_DESC_STYLE = noDeco(NamedTextColor.GRAY);
 
+    private static final String NAME_ID_FORMAT = "xyz.baz9k.uhc.config.name.%s";
+    private static final String DESC_ID_FORMAT = "xyz.baz9k.uhc.config.desc.%s";
+
+    public NodeItemStack(Material mat, String id) {
+        this(mat, id, UnaryOperator.identity());
+    }
+    public NodeItemStack(Material mat, String id, UnaryOperator<Object> mapper) {
+        super(mat);
+        this.rawDesc = List.of(trans(String.format(DESC_ID_FORMAT, id)));
+        this.displayDesc = new ArrayList<>(this.rawDesc);
+        this.mapper = mapper;
+
+        updateLore();
+
+        ItemMeta m = getItemMeta();
+        m.displayName(trans(String.format(NAME_ID_FORMAT, id)));
+        m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        setItemMeta(m);
+        
+    }
     /**
      * @param mat Material of item
      * @param name Name of item
