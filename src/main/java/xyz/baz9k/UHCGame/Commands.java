@@ -75,9 +75,9 @@ public class Commands {
         }
     }
 
-    private void fail(String key, Object... args) throws WrapperCommandSyntaxException {
-        CommandAPI.fail(componentString(trans(key, args)));
-    }
+    // private void fail(String key, Object... args) throws WrapperCommandSyntaxException {
+    //     CommandAPI.fail(componentString(trans(key, args)));
+    // }
 
     /*
     /uhc start
@@ -241,7 +241,7 @@ public class Commands {
             (sender, args) -> {
                 TeamManager tm = plugin.getTeamManager();
                 tm.resetAllPlayers();
-                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.clearteams"));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.clearteams.succ"));
             }
         );
     }
@@ -254,7 +254,7 @@ public class Commands {
             (sender, args) -> {
                 sender.sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.start").color(NamedTextColor.YELLOW));
                 plugin.getGameManager().reseedWorlds();
-                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.reseed").color(NamedTextColor.YELLOW));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.succ").color(NamedTextColor.YELLOW));
             }
         );
     }
@@ -270,7 +270,7 @@ public class Commands {
             (sender, args) -> {
                 sender.sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.start").color(NamedTextColor.YELLOW));
                 plugin.getGameManager().reseedWorlds((String) args[0]);
-                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.reseed").color(NamedTextColor.YELLOW));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.succ").color(NamedTextColor.YELLOW));
             }
         );
     }
@@ -278,14 +278,14 @@ public class Commands {
     private void _respawn(CommandSender sender, Player p, Location loc) {
         TeamManager tm = plugin.getTeamManager();
         if (tm.isSpectator(p)) {
-            sender.sendMessage(trans("xyz.baz9k.uhc.cmd.fail.respawn.spectator", p.getName()).color(NamedTextColor.RED));
+            sender.sendMessage(trans("xyz.baz9k.uhc.cmd.respawn.fail.spectator", p.getName()).color(NamedTextColor.RED));
             return;
         }
 
         p.teleport(loc);
         tm.setCombatantAliveStatus(p, true);
         p.setGameMode(GameMode.SURVIVAL);
-        sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.respawn", p.getName()));
+        sender.sendMessage(trans("xyz.baz9k.uhc.cmd.respawn.succ", p.getName()));
     }
 
     @Command
@@ -336,7 +336,7 @@ public class Commands {
                 for (Player p : (Collection<Player>) args[0]) {
                     int team = tm.getTeam(p);
                     PlayerState state = tm.getPlayerState(p);
-                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.state_get", p.getName(), state, team));
+                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.state_get.succ", p.getName(), state, team));
                 }
             }
         );
@@ -358,7 +358,7 @@ public class Commands {
                         case "spectator" -> tm.setSpectator(p);
                         case "combatant" -> tm.setUnassignedCombatant(p);
                     }
-                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.state_get", p.getName(), tm.getPlayerState(p), tm.getTeam(p)));
+                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.state_get.succ", p.getName(), tm.getPlayerState(p), tm.getTeam(p)));
                 }
             }
         );
@@ -376,15 +376,14 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 TeamManager tm = plugin.getTeamManager();
-                int max = tm.getNumTeams();
                 int t = (int) args[1];
-                if (t > max) {
-                    fail("xyz.baz9k.uhc.cmd.fail.state_set_team.team_not_exist", max);
-                    return;
-                }
-                for (Player p : (Collection<Player>) args[0]) {
-                    plugin.getTeamManager().assignPlayerToTeam(p, t);
-                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.state_set", p.getName(), tm.getPlayerState(p), tm.getTeam(p)));
+                try {
+                    for (Player p : (Collection<Player>) args[0]) {
+                        plugin.getTeamManager().assignPlayerToTeam(p, t);
+                        sender.sendMessage(trans("xyz.baz9k.uhc.cmd.state_set.succ", p.getName(), tm.getPlayerState(p), tm.getTeam(p)));
+                    }
+                } catch (IllegalArgumentException e) {
+                    CommandAPI.fail(e.getMessage());
                 }
             }
         );
@@ -401,7 +400,7 @@ public class Commands {
                 GameManager gm = plugin.getGameManager();
 
                 gm.incrementStage();
-                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.stage_set", gm.getStage()));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.stage_set.succ", gm.getStage()));
             }
         );
     }
@@ -419,7 +418,7 @@ public class Commands {
                 GameStage s = GameStage.fromIndex((int) args[0]);
 
                 gm.setStage(s);
-                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.stage_set", gm.getStage()));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.stage_set.succ", gm.getStage()));
             }
         );
     }
@@ -430,7 +429,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 if (plugin.getGameManager().hasUHCStarted()) {
-                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.has_started"));
+                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.has_started.succ"));
                     return;
                 }
                 requireStarted();
@@ -456,7 +455,7 @@ public class Commands {
             (sender, args) -> {
                 Debug.setDebug(!Debug.isDebugging());
 
-                String onOff = Debug.isDebugging() ? "xyz.baz9k.uhc.cmd.succ.debug.on" : "xyz.baz9k.uhc.cmd.succ.debug.off";
+                String onOff = Debug.isDebugging() ? "xyz.baz9k.uhc.cmd.debug.on" : "xyz.baz9k.uhc.cmd.debug.off";
                 sender.sendMessage(trans(onOff));
             }
         );
@@ -471,7 +470,7 @@ public class Commands {
             (sender, args) -> {
                 Debug.setDebug((boolean) args[0]);
 
-                String onOff = Debug.isDebugging() ? "xyz.baz9k.uhc.cmd.succ.debug.on" : "xyz.baz9k.uhc.cmd.succ.debug.off";
+                String onOff = Debug.isDebugging() ? "xyz.baz9k.uhc.cmd.debug.on" : "xyz.baz9k.uhc.cmd.debug.off";
                 sender.sendMessage(trans(onOff));
             }
         );

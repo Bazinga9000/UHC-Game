@@ -223,7 +223,7 @@ public class TeamManager {
     @NotNull
     public Set<Player> getAllCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.invalid");
+            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.invalid", team, numTeams);
         }
 
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR && n.state != PlayerState.COMBATANT_UNASSIGNED && n.team == team);

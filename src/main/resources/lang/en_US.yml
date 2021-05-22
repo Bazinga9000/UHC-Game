@@ -73,24 +73,26 @@ xyz:
           dm_warn: "If the game does not end within {0}, I shall end it myself!" # duration
 
       cmd:
-        succ:
-          clearteams: "All teams have been reset."
-          reseed: "Both dimensions have been reseeded successfully."
-          respawn: "Respawned {0}!"
-          state_get: "{0} is a {1} on team {2}." # player, state, team
-          state_set: "Set {0} to {1} on team {2}." # player, state, team
-          stage_set: "Set stage to {0}."
-          has_started: "UHC has started"
-          debug:
-            "on": "Verbose messages on"
-            "off": "Verbose messages off"
-        fail:
-          respawn:
-            spectator: "Cannot respawn spectator {0}."
-          state_set_team:
-            team_not_exist: "Invalid team (There are only {0} teams.)"
-        reseed:
+        clearteams: 
+          succ: "All teams have been reset."
+        reseed: 
           start: "Reseeding..."
+          succ: "Both dimensions have been reseeded successfully."
+        respawn: 
+          succ: "Respawned {0}!"
+          fail:
+            spectator: "Cannot respawn spectator {0}."
+        state_get: 
+          succ: "{0} is a {1} on team {2}." # player, state, team
+        state_set: 
+          succ: "Set {0} to {1} on team {2}." # player, state, team
+        stage_set: 
+          succ: "Set stage to {0}."
+        has_started: 
+          succ: "UHC has started"
+        debug:
+          "on": "Verbose messages on"
+          "off": "Verbose messages off"
         
       time:
         day: "{0}d"
@@ -104,7 +106,7 @@ xyz:
             index_must_under_max: "Team index must be less than number of predefined team colors ({0})."
           must_assigned: "Teams have not been assigned."
           must_assigned_comb: "Player must be an assigned combatant."
-          invalid: "Invalid team (Team must be positive and less than the team count.)"
+          invalid: "Invalid team {0}. Team must be positive and cannot exceed the number of teams ({1})."
           size_name_invalid: "Unrecognized option '{0}'"
           count_must_pos: "Team count must be positive."
         world:
