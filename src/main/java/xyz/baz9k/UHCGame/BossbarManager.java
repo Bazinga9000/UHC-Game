@@ -1,9 +1,6 @@
 package xyz.baz9k.UHCGame;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 
@@ -19,26 +16,20 @@ public class BossbarManager {
     }
 
     /**
-     * On game start, this function runs to initialize the bossbar.
+     * Shows the boss bar to some audience.
+     * @param audience the audience
      */
-    public void enable() {
-        Bukkit.getServer().showBossBar(bossbar);
+    public void enable(Audience audience) {
+        audience.showBossBar(bossbar);
         updateBossbarStage();
     }
 
     /**
-     * On game end, this function runs to deactivate the bossbar.
+     * Hides the boss bar to some audience.
+     * @param audience the audience
      */
-    public void disable() {
-        Bukkit.getServer().hideBossBar(bossbar);
-    }
-
-    /**
-     * If a player joins midgame, this function runs to display the bossbar to the joining player.
-     * @param p
-     */
-    public void addPlayer(@NotNull Player p) {
-        p.showBossBar(bossbar);
+    public void disable(Audience audience) {
+        audience.hideBossBar(bossbar);
     }
 
     /**
@@ -54,7 +45,7 @@ public class BossbarManager {
         long remainingSecs = gameManager.getRemainingStageDuration().toSeconds(),
                  totalSecs = gameManager.getStageDuration().toSeconds();
 
-        bossbar.progress((float) remainingSecs / totalSecs);
+        bossbar.progress((float) clamp(0, (double) remainingSecs / totalSecs, 1));
         // change display title
         var display = getBBTitle()
             .append(Component.text(" | "))

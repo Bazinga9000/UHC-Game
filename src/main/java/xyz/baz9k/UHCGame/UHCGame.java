@@ -25,6 +25,8 @@ public class UHCGame extends JavaPlugin {
         
         Debug.setLogger(getLogger());
         langManager = new LangManager(this);
+        
+        GameStage.setPlugin(this);
         teamManager = new TeamManager();
         gameManager = new GameManager(this);
         hudManager = new HUDManager(this);

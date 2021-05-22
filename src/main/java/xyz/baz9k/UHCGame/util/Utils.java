@@ -263,9 +263,24 @@ public final class Utils {
         return st.build();
     }
 
+    /**
+     * Clamps x to the bound min and max. If it exceeds min or max, the respective value is returned.
+     * @param min
+     * @param x
+     * @param max
+     * @return
+     */
     public static int clamp(int min, int x, int max) {
         return Math.max(min, Math.min(x, max));
     }
+
+    /**
+     * Clamps x to the bound min and max. If it exceeds min or max, the respective value is returned.
+     * @param min
+     * @param x
+     * @param max
+     * @return
+     */
     public static double clamp(double min, double x, double max) {
         return Math.max(min, Math.min(x, max));
     }

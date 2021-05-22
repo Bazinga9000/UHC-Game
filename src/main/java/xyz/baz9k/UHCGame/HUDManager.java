@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import xyz.baz9k.UHCGame.util.ColorGradient;
+import xyz.baz9k.UHCGame.util.Point2D;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import org.bukkit.Bukkit;
@@ -21,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.RenderType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 import java.awt.Color;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -119,6 +122,13 @@ public class HUDManager implements Listener {
     }
 
     /* HANDLE SCOREBOARD PARITY */
+    
+    /**
+     * Adds a player onto a {@link TeamManager} team on a scoreboard
+     * @param s the scoreboard
+     * @param p the player
+     * @param team the TeamManager team (not Minecraft {@link Team})
+     */
     private void addPlayerToScoreboardTeam(@NotNull Scoreboard s, @NotNull Player p, int team){
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
@@ -128,6 +138,10 @@ public class HUDManager implements Listener {
         t.addEntry(p.getName());
     }
 
+    /**
+     * Registers all online users' teams to a player's scoreboard
+     * @param player the player to register to
+     */
     private void setTeams(@NotNull Player player){
         Scoreboard s = player.getScoreboard();
         for(Player p : Bukkit.getOnlinePlayers()){
@@ -136,6 +150,10 @@ public class HUDManager implements Listener {
         }
     }
 
+    /**
+     * Registers a player's team to all online users' scoreboards
+     * @param player the player to register
+     */
     public void addPlayerToTeams(@NotNull Player player){
         int team = teamManager.getTeam(player);
         for(Player p : Bukkit.getOnlinePlayers()){
@@ -144,6 +162,10 @@ public class HUDManager implements Listener {
         }
     }
 
+    /**
+     * Creates the scoreboard for a player, adds necessary objectives (the main hud, hearts), registers all online players to it
+     * @param p
+     */
     private void createHUDScoreboard(@NotNull Player p){
         // give player scoreboard & objective
         Scoreboard newBoard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -152,11 +174,24 @@ public class HUDManager implements Listener {
         Objective hud = newBoard.registerNewObjective("hud", "dummy", Component.text(p.getName(), NamedTextColor.WHITE));
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
 
+        // bukkit et al apparently do not allow one obj in multiple display slots even though vanilla is 100% okay with that. no clue.
+        Objective hearts1 = newBoard.registerNewObjective("hearts1", "health", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
+        Objective hearts2 = newBoard.registerNewObjective("hearts2", "health", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
+        hearts1.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+        hearts2.setDisplaySlot(DisplaySlot.BELOW_NAME);
+        
         setTeams(p);
 
     }
 
     /* INITIALIZING HUD */
+
+    /**
+     * Reserves a space for a HUD line at a position in a player's scoreboard
+     * @param p the player whose scoreboard will have a HUD line added
+     * @param name Identifier to reference the HUD line again (to add stuff to it)
+     * @param position Position to reserve
+     */
     private void addHUDLine(@NotNull Player p, @NotNull String name, int position){
         Scoreboard b = p.getScoreboard();
         Team team = b.getTeam(name);
@@ -182,7 +217,7 @@ public class HUDManager implements Listener {
     }
 
     /**
-     * Setup a player's HUD on join.
+     * Setup a player's HUD (create scoreboard, reserve all the slots, load data onto all the slots)
      * @param p
      */
     public void initializePlayerHUD(@NotNull Player p) {
@@ -211,7 +246,7 @@ public class HUDManager implements Listener {
     }
 
     /**
-     * Remove player HUD (for the main HUD)
+     * Trash the player's scoreboard and return to the main scoreboard.
      */
     public void cleanup() {
         Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -220,21 +255,39 @@ public class HUDManager implements Listener {
         }
     }
 
+    /**
+     * 2D distance between two 3D locations, two different worlds results in null
+     */
+    private static Double dist2d(Location pl, Location ql) {
+        if (pl.getWorld() != ql.getWorld()) return null;
+        Point2D p = Point2D.fromLocation(pl),
+                q = Point2D.fromLocation(ql);
+        return p.dist(q);
+    }
+
     /* UPDATING SECTIONS OF HUD */
     private void updateTeammateHUD(@NotNull Player p) {
         Scoreboard b = p.getScoreboard();
 
         int team = teamManager.getTeam(p);
         Set<Player> teammateSet;
+        Comparator<? super Player> sorter;
         if (teamManager.isAssignedCombatant(p)) {
             teammateSet = teamManager.getAllCombatantsOnTeam(team);
+            sorter = (t1, t2) -> Double.compare(t1.getHealth(), t2.getHealth());
         } else {
             teammateSet = teamManager.getAllCombatants();
+            sorter = (t1, t2) -> {
+                Location pl = p.getLocation(),
+                        t1l = t1.getLocation(),
+                        t2l = t2.getLocation();
+                return Comparator.nullsLast(Double::compare).compare(dist2d(pl, t1l), dist2d(pl, t2l));
+            };
         }
 
         Iterable<Player> tmates = teammateSet.stream()
             .filter(e -> !e.equals(p))
-            .sorted((t1, t2) -> Double.compare(t1.getHealth(), t2.getHealth()))
+            .sorted(sorter)
             .limit(5)
             ::iterator;
 

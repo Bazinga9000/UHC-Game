@@ -45,7 +45,7 @@ xyz:
         unassigned: "Unassigned"
         teamed: "Team {0}"
 
-      elimination: "{0} has been eliminated!"
+      eliminated: "{0} has been eliminated!"
       win: "{0} has won!"
 
       chat:
