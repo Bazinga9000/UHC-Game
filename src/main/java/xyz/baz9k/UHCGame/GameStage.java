@@ -257,9 +257,9 @@ public enum GameStage {
         
         TextComponent.Builder s = getMessageBuilder();
         
-        s.append(situation.style(bodyStyle).args(baseChatMsg, subject, Component.text(wbDiameter() / 2), Component.text(getWordTimeString(duration()))));
+        s.append(situation.style(bodyStyle).args(baseChatMsg, subject, Component.text(wbDiameter() / 2), getWordTime(duration())));
         if (this == lastGradualStage()) {
-            s.append(Component.space()).append(Component.translatable("xyz.baz9k.uhc.chat.warning.dm_warn", bodyStyle).args(Component.text(getWordTimeString(duration()))));
+            s.append(Component.space()).append(Component.translatable("xyz.baz9k.uhc.chat.warning.dm_warn", bodyStyle).args(getWordTime(duration())));
         }
         
         Bukkit.getServer().sendMessage(s);

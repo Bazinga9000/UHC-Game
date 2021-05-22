@@ -74,6 +74,11 @@ public class Commands {
             CommandAPI.fail(e.getMessage());
         }
     }
+
+    private void fail(String key, Object... args) throws WrapperCommandSyntaxException {
+        CommandAPI.fail(componentString(trans(key, args)));
+    }
+
     /*
     /uhc start
     /uhc end
@@ -247,9 +252,9 @@ public class Commands {
         return new CommandAPICommand("reseed")
         .executes(
             (sender, args) -> {
-                sender.sendMessage(Component.text("Beginning reseed...", NamedTextColor.YELLOW));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.start").color(NamedTextColor.YELLOW));
                 plugin.getGameManager().reseedWorlds();
-                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.reseed").color(NamedTextColor.GREEN));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.reseed").color(NamedTextColor.YELLOW));
             }
         );
     }
@@ -263,9 +268,9 @@ public class Commands {
         )
         .executes(
             (sender, args) -> {
-                sender.sendMessage(Component.text("Beginning reseed...", NamedTextColor.YELLOW));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.start").color(NamedTextColor.YELLOW));
                 plugin.getGameManager().reseedWorlds((String) args[0]);
-                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.reseed").color(NamedTextColor.GREEN));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.reseed").color(NamedTextColor.YELLOW));
             }
         );
     }
@@ -374,7 +379,7 @@ public class Commands {
                 int max = tm.getNumTeams();
                 int t = (int) args[1];
                 if (t > max) {
-                    CommandAPI.fail("Team must not be greater than the number of teams.");
+                    fail("xyz.baz9k.uhc.cmd.fail.state_set_team.team_not_exist", max);
                     return;
                 }
                 for (Player p : (Collection<Player>) args[0]) {
@@ -425,10 +430,10 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 if (plugin.getGameManager().hasUHCStarted()) {
-                    sender.sendMessage("UHC has started");
+                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.has_started"));
                     return;
                 }
-                CommandAPI.fail("UHC has not started");
+                requireStarted();
             }
         );
     }

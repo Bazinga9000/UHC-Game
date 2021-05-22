@@ -88,9 +88,9 @@ public final class TeamDisplay {
      * @param t Team number
      * @return {@link TextComponent} of the prefix
      */
-    public static TextComponent getPrefix(int t) {
-        String s = String.format("[%s]", t == 0 ? "S" : t);
-        return Component.text(s, getStyle(t));
+    public static Component getPrefix(int t) {
+        return trans("xyz.baz9k.uhc.team.prefix", t == 0 ? trans("xyz.baz9k.uhc.team.spectator_abbr") : t)
+            .style(getStyle(t));
     }
 
     /**
@@ -98,7 +98,7 @@ public final class TeamDisplay {
      * @param t Team number
      * @return {@link TextComponent}
      */
-    public static TextComponent getPrefixWithSpace(int t) {
+    public static Component getPrefixWithSpace(int t) {
         return getPrefix(t).append(Component.space());
     }
 
@@ -108,7 +108,7 @@ public final class TeamDisplay {
      * @param name Player name
      * @return {@link TextComponent}
      */
-    public static TextComponent prefixed(int t, String name) {
+    public static Component prefixed(int t, String name) {
         return getPrefixWithSpace(t).append(Component.text(name, noDeco(WHITE)));
     }
 

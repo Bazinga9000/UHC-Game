@@ -44,6 +44,8 @@ xyz:
         spectator: "Spectator"
         unassigned: "Unassigned"
         teamed: "Team {0}"
+        prefix: "[{0}]"
+        spectator_abbr: "S"
 
       eliminated: "{0} has been eliminated!"
       win: "{0} has won!"
@@ -78,13 +80,23 @@ xyz:
           state_get: "{0} is a {1} on team {2}." # player, state, team
           state_set: "Set {0} to {1} on team {2}." # player, state, team
           stage_set: "Set stage to {0}."
+          has_started: "UHC has started"
           debug:
             "on": "Verbose messages on"
             "off": "Verbose messages off"
         fail:
           respawn:
             spectator: "Cannot respawn spectator {0}."
-
+          state_set_team:
+            team_not_exist: "Invalid team (There are only {0} teams.)"
+        reseed:
+          start: "Reseeding..."
+        
+      time:
+        day: "{0}d"
+        hour: "{0}h"
+        minute: "{0}m"
+        second: "{0}s"
       err:
         team:
           display:
