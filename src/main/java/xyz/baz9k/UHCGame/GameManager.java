@@ -56,7 +56,7 @@ public class GameManager implements Listener {
 
     private HashMap<UUID, Integer> kills = new HashMap<>();
 
-    private final Point2D center = new Point2D(0, 0);
+    private final Point2D center = new Point2D(0.5, 0.5);
 
     private GameStage stage = GameStage.NOT_IN_GAME;
     private Instant lastStageInstant = null;
@@ -128,7 +128,7 @@ public class GameManager implements Listener {
             w.setTime(0);
             w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
             
-            w.getWorldBorder().setCenter(0.5, 0.5);
+            w.getWorldBorder().setCenter(center.x(), center.z());
             w.getWorldBorder().setWarningDistance(25);
             w.getWorldBorder().setDamageBuffer(0);
             w.getWorldBorder().setDamageAmount(1);
@@ -402,7 +402,7 @@ public class GameManager implements Listener {
                 p.teleport(getCenterAtY(255));
             }
 
-            spreadPlayersRootsOfUnity(true, new Point2D(0.5, 0.5).loc(w, 0), GameStage.DEATHMATCH.wbRadius() - 1);
+            spreadPlayersRootsOfUnity(true, center.loc(w, 0), GameStage.DEATHMATCH.wbRadius() - 1);
 
         }
 
@@ -487,13 +487,6 @@ public class GameManager implements Listener {
     private Location getCenterAtY(double y) {
         return center.loc(getUHCWorld(Environment.NORMAL), y);
     }
-
-    /*
-    private void setCenter(double x, double z) {
-        center[0] = x;
-        center[1] = z;
-    }
-    */
 
     /**
      * Returns the number of kills that this combatant has dealt.
