@@ -172,6 +172,7 @@ public class GameManager implements Listener {
             hudManager.initializePlayerHUD(p);
         }
 
+        bbManager.enable(Bukkit.getServer());
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
         spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.wbDiameter(), GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams()));
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
