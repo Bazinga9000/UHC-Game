@@ -213,7 +213,7 @@ public enum GameStage {
         return Component.text()
                         .append(
                             Component.text("<", TextColor.color(0xCFCFFF), BOLD),
-                            Component.translatable("uhc.baz9k.xyz.chat.name", TextColor.color(0xA679FE), BOLD),
+                            Component.translatable("xyz.baz9k.uhc.chat.name", TextColor.color(0xA679FE), BOLD),
                             Component.text("> ", TextColor.color(0xCFCFFF), BOLD)
                         );
     }
@@ -244,22 +244,22 @@ public enum GameStage {
          * 
          */
 
-        TranslatableComponent situation = Component.translatable("uhc.baz9k.xyz.chat.warning.no_warn", bodyStyle);
-        Component subject = Component.translatable(this == WB_STILL ? "uhc.baz9k.xyz.chat.wb.name" : "uhc.baz9k.xyz.chat.wb.pronoun");
+        TranslatableComponent situation = Component.translatable("xyz.baz9k.uhc.chat.warning.no_warn", bodyStyle);
+        Component subject = Component.translatable(this == WB_STILL ? "xyz.baz9k.uhc.chat.wb.name" : "xyz.baz9k.uhc.chat.wb.pronoun");
 
         GameStage nextGrad = nextGradualStage();
         if (!nextGrad.isWBInstant) {
-            situation = Component.translatable(nextGrad.isInstant() ? "uhc.baz9k.xyz.chat.warning.wb_will_instant_shrink" : "uhc.baz9k.xyz.chat.warning.wb_will_shrink");
+            situation = Component.translatable(nextGrad.isInstant() ? "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink" : "xyz.baz9k.uhc.chat.warning.wb_will_shrink");
         }
         if (!isWBInstant) {
-            situation = Component.translatable(isInstant() ? "uhc.baz9k.xyz.chat.warning.wb_just_instant_shrink" : "uhc.baz9k.xyz.chat.warning.wb_just_shrink");
+            situation = Component.translatable(isInstant() ? "xyz.baz9k.uhc.chat.warning.wb_just_instant_shrink" : "xyz.baz9k.uhc.chat.warning.wb_just_shrink");
         }
         
         TextComponent.Builder s = getMessageBuilder();
         
-        s.append(situation.args(baseChatMsg, subject, Component.text(wbDiameter() / 2), Component.text(getWordTimeString(duration()))));
+        s.append(situation.style(bodyStyle).args(baseChatMsg, subject, Component.text(wbDiameter() / 2), Component.text(getWordTimeString(duration()))));
         if (this == lastGradualStage()) {
-            s.append(Component.translatable("uhc.baz9k.xyz.chat.warning.dm_warn", bodyStyle).args(Component.text(getWordTimeString(duration()))));
+            s.append(Component.translatable("xyz.baz9k.uhc.chat.warning.dm_warn", bodyStyle).args(Component.text(getWordTimeString(duration()))));
         }
         
         Bukkit.getServer().sendMessage(s);

@@ -396,7 +396,7 @@ public class Commands {
                 GameManager gm = plugin.getGameManager();
 
                 gm.incrementStage();
-                sender.sendMessage(trans("xyz.baz9k.uhc.succ.stage_set", gm.getStage()));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.stage_set", gm.getStage()));
             }
         );
     }
@@ -414,7 +414,7 @@ public class Commands {
                 GameStage s = GameStage.fromIndex((int) args[0]);
 
                 gm.setStage(s);
-                sender.sendMessage(trans("xyz.baz9k.uhc.succ.stage_set", gm.getStage()));
+                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.succ.stage_set", gm.getStage()));
             }
         );
     }
