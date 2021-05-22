@@ -123,6 +123,32 @@ public class GameManager implements Listener {
         startTime = lastStageInstant = Instant.now();
         kills.clear();
         
+        for (World w : getUHCWorlds()) {
+            // set time to 0 and delete rain
+            w.setTime(0);
+            w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
+            
+            w.getWorldBorder().setCenter(0.5, 0.5);
+            w.getWorldBorder().setWarningDistance(25);
+            w.getWorldBorder().setDamageBuffer(0);
+            w.getWorldBorder().setDamageAmount(1);
+
+            Gamerules.set(w);
+            purgeWorld(w);
+
+            // create beacon in worlds
+            w.getBlockAt(0, 1, 0).setType(Material.BEACON);
+            w.getBlockAt(0, 2, 0).setType(Material.BEDROCK);
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    w.getBlockAt(x, 0, z).setType(Material.NETHERITE_BLOCK);
+                }
+            }
+            for (int y = 3; y <= w.getMaxHeight() - 1; y++) {
+                w.getBlockAt(0, y, 0).setType(Material.BARRIER);
+            }
+        }
+        
         for (Player p : Bukkit.getOnlinePlayers()) {
             // archive previous display name
             previousDisplayNames.put(p.getUniqueId(), p.displayName());
@@ -145,30 +171,6 @@ public class GameManager implements Listener {
             // activate hud things for all
             hudManager.initializePlayerHUD(p);
         }
-        
-        for (World w : getUHCWorlds()) {
-            // set time to 0 and delete rain
-            w.setTime(0);
-            w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
-            
-            w.getWorldBorder().setCenter(center.x(), center.z());
-            w.getWorldBorder().setWarningDistance(25);
-
-            Gamerules.set(w);
-            purgeWorld(w);
-
-            // create beacon in worlds
-            w.getBlockAt(0, 1, 0).setType(Material.BEACON);
-            w.getBlockAt(0, 2, 0).setType(Material.BEDROCK);
-            for (int x = -1; x <= 1; x++) {
-                for (int z = -1; z <= 1; z++) {
-                    w.getBlockAt(x, 0, z).setType(Material.NETHERITE_BLOCK);
-                }
-            }
-            for (int y = 3; y <= w.getMaxHeight() - 2; y++) {
-                w.getBlockAt(0, y, 0).setType(Material.BARRIER);
-            }
-        }
 
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
         spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.wbDiameter(), GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams()));
@@ -176,7 +178,6 @@ public class GameManager implements Listener {
         Bukkit.unloadWorld(getLobbyWorld(), true);
 
         startTick();
-        bbManager.enable();
     }
 
     /**
@@ -227,8 +228,6 @@ public class GameManager implements Listener {
         hudManager.cleanup();
         kills.clear();
         tick.cancel();
-
-        bbManager.disable();
 
     }
 
@@ -375,9 +374,21 @@ public class GameManager implements Listener {
             int radius = (int) GameStage.DEATHMATCH.wbRadius();
             for (int x = -radius; x <= radius; x++) {
                 for (int z = -radius; z <= radius; z++) {
+                    w.getBlockAt(x, w.getMaxHeight() - 1, z).setType(Material.AIR);
                     w.getBlockAt(x, w.getMaxHeight() - 2, z).setType(Material.BARRIER);
                 }
             }
+
+            for (int x = -radius; x <= radius; x++) {
+                w.getBlockAt(x, w.getMaxHeight() - 1, -radius - 1).setType(Material.BARRIER);
+                w.getBlockAt(x, w.getMaxHeight() - 1, radius + 1).setType(Material.BARRIER);
+            }
+
+            for (int z = -radius; z <= radius; z++) {
+                w.getBlockAt(-radius - 1, w.getMaxHeight() - 1, z).setType(Material.BARRIER);
+                w.getBlockAt(radius + 1, w.getMaxHeight() - 1, z).setType(Material.BARRIER);
+            }
+
             for (Player p : teamManager.getAllCombatants()) {
                 p.addPotionEffects(Arrays.asList(
                     PotionEffectType.DAMAGE_RESISTANCE.createEffect(10 * 20, 10),
@@ -390,7 +401,7 @@ public class GameManager implements Listener {
                 p.teleport(getCenterAtY(255));
             }
 
-            spreadPlayersRootsOfUnity(true, getCenter(), GameStage.DEATHMATCH.wbRadius() - 1);
+            spreadPlayersRootsOfUnity(true, new Point2D(0.5, 0.5).loc(w, 0), GameStage.DEATHMATCH.wbRadius() - 1);
 
         }
 
@@ -500,11 +511,10 @@ public class GameManager implements Listener {
         Point2D center2 = Point2D.fromLocation(center);
         List<Location> locations = new ArrayList<>();
         World w = center.getWorld();
-
         for (int i = 0; i < numLocations; i++) {
             double theta = i * 2 * Math.PI / numLocations;
-            center2.addPolar(distance, theta);
-            locations.add(getHighestLoc(w, center2));
+            Point2D newPt = center2.addPolar(distance, theta);
+            locations.add(getHighestLoc(w, newPt));
         }
         Collections.shuffle(locations);
         return Collections.unmodifiableList(locations);
@@ -719,10 +729,16 @@ public class GameManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
         teamManager.addPlayer(p, hasUHCStarted());
+
+        // set this perm for crossdim travel
+        p.addAttachment(plugin, "mv.bypass.gamemode.*", true);
+        p.recalculatePermissions();
+
         if(!hasUHCStarted()) return;
-        bbManager.addPlayer(p);
+        bbManager.enable(p);
         hudManager.initializePlayerHUD(p);
         hudManager.addPlayerToTeams(p);
+
     }
 
     @EventHandler
