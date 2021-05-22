@@ -173,6 +173,7 @@ public class GameManager implements Listener {
             hudManager.initializePlayerHUD(p);
         }
 
+        bbManager.enable(Bukkit.getServer());
         Debug.broadcastDebug("Generating Spawn Locations");
         spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.wbDiameter(), GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams()));
         Debug.broadcastDebug("Done!");
