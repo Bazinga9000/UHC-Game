@@ -486,10 +486,6 @@ public class GameManager implements Listener {
      */
     private void toLobby(Player p, Supplier<? extends Location> l) {
         if (isLobbyWorld(p.getWorld())) return;
-        Location to = l.get();
-        if (to == null || !isGameWorld(to.getWorld())) {
-            throw new IllegalArgumentException("Location generated was null or not in a game world.");
-        }
         
         resetStatuses(p);
         p.setGameMode(GameMode.SURVIVAL);
@@ -497,7 +493,13 @@ public class GameManager implements Listener {
         
         bbManager.disable(p);
         
-        p.teleport(to);
+        Location to = l.get();
+        if (to != null) {
+            if (!isLobbyWorld(to.getWorld())) {
+                throw new IllegalArgumentException("Location generated was not in a lobby world.");
+            }
+            p.teleport(to);
+        }
     }
 
     /**
@@ -506,11 +508,6 @@ public class GameManager implements Listener {
      */
     private void toGame(Player p, Supplier<? extends Location> l) {
         if (isGameWorld(p.getWorld())) return;
-
-        Location to = l.get();
-        if (to == null || !isGameWorld(to.getWorld())) {
-            throw new IllegalArgumentException("Location generated was null or not in a game world.");
-        }
 
         resetStatuses(p);
         recipes.discoverFor(p);
@@ -533,7 +530,14 @@ public class GameManager implements Listener {
 
         bbManager.enable(p);
 
-        p.teleport(to);
+        Location to = l.get();
+        if (to != null) {
+            if (!isGameWorld(to.getWorld())) {
+                throw new IllegalArgumentException("Location generated was not in a game world.");
+            }
+            
+            p.teleport(to);
+        }
     }
 
     /**
