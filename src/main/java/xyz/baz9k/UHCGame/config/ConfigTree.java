@@ -95,27 +95,28 @@ public class ConfigTree {
         new ActionNode(teamCount, slotAt(2, 4), "quintets",   new NodeItemStack.Info(Material.BLUE_DYE),   p -> { plugin.getTeamManager().setTeamSize("quintets"); });
 
         /* ESOTERICS */
-        new ValuedNode(esoterics, 0, "gone_fishing",  new NodeItemStack.Info(Material.FISHING_ROD,           TextColor.color(0x3730FF)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, 1, "boss_team",     new NodeItemStack.Info(Material.DRAGON_HEAD,           TextColor.color(0xA100FF)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, 2, "always_elytra", new NodeItemStack.Info(Material.ELYTRA,                TextColor.color(0xB5B8FF)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, 3, "sardines",      new NodeItemStack.Info(Material.TROPICAL_FISH,         TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, 4, "wither_bonus",  new NodeItemStack.Info(Material.WITHER_SKELETON_SKULL, TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
-        new OptionValuedNode(esoterics, 5, "dn_cycle", new NodeItemStack.Info(null, TextColor.color(0xFFEB85)),
+        int i = 0;
+        new ValuedNode(esoterics, i++, "gone_fishing",  new NodeItemStack.Info(Material.FISHING_ROD,           TextColor.color(0x3730FF)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(esoterics, i++, "boss_team",     new NodeItemStack.Info(Material.DRAGON_HEAD,           TextColor.color(0xA100FF)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(esoterics, i++, "always_elytra", new NodeItemStack.Info(Material.ELYTRA,                TextColor.color(0xB5B8FF)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(esoterics, i++, "sardines",      new NodeItemStack.Info(Material.TROPICAL_FISH,         TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(esoterics, i++, "wither_bonus",  new NodeItemStack.Info(Material.WITHER_SKELETON_SKULL, TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
+        new OptionValuedNode(esoterics, i++, "dn_cycle", new NodeItemStack.Info(null, TextColor.color(0xFFEB85)),
             new OptionData("05:00 per cycle", Material.CLOCK),
             new OptionData("10:00 per cycle", Material.COMPASS),
             new OptionData("20:00 per cycle", Material.SNOWBALL)
         );
-        new ValuedNode(esoterics, 6, "always_day",    new NodeItemStack.Info(Material.GLOWSTONE,             TextColor.color(0xDFED5C)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, 7, "always_night",  new NodeItemStack.Info(Material.LIGHT_GRAY_CONCRETE,   TextColor.color(0x371DA8)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, 8, "nether_spawn",  new NodeItemStack.Info(Material.NETHERRACK,            TextColor.color(0x9C4040)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, 9, "bomberman",     new NodeItemStack.Info(Material.GUNPOWDER,             TextColor.color(0x800000)), ValuedNode.Type.BOOLEAN);
-        new OptionValuedNode(esoterics, 10, "max_health", new NodeItemStack.Info(null, TextColor.color(0xFF2121)),
+        new ValuedNode(esoterics, i++, "always_day",    new NodeItemStack.Info(Material.GLOWSTONE,           TextColor.color(0xDFED5C)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(esoterics, i++, "always_night",  new NodeItemStack.Info(Material.LIGHT_GRAY_CONCRETE, TextColor.color(0x371DA8)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(esoterics, i++, "nether_spawn",  new NodeItemStack.Info(Material.NETHERRACK,          TextColor.color(0x9C4040)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(esoterics, i++, "bomberman",     new NodeItemStack.Info(Material.GUNPOWDER,           TextColor.color(0x800000)), ValuedNode.Type.BOOLEAN);
+        new OptionValuedNode(esoterics, i++, "max_health", new NodeItemStack.Info(null, TextColor.color(0xFF2121)),
             new OptionData("\u2764 05", Material.SPIDER_EYE),
             new OptionData("\u2764 10", Material.APPLE),
             new OptionData("\u2764 20", Material.GOLDEN_APPLE),
             new OptionData("\u2764 30", Material.ENCHANTED_GOLDEN_APPLE)
         );
-        new OptionValuedNode(esoterics, 11, "mv_speed", new NodeItemStack.Info(null, TextColor.color(0x61A877)),
+        new OptionValuedNode(esoterics, i++, "mv_speed", new NodeItemStack.Info(null, TextColor.color(0x61A877)),
             new OptionData("0.5x", Material.SOUL_SAND),
             new OptionData("1.0x", Material.GRASS_BLOCK),
             new OptionData("2.0x", Material.ICE),
