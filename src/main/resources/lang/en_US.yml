@@ -93,12 +93,7 @@ xyz:
         debug:
           "on": "Verbose messages on"
           "off": "Verbose messages off"
-        
-      time:
-        day: "{0}d"
-        hour: "{0}h"
-        minute: "{0}m"
-        second: "{0}s"
+
       err:
         team:
           display:

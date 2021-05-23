@@ -23,8 +23,8 @@ public class UHCGame extends JavaPlugin {
     public void onEnable() {
         this.saveDefaultConfig();
         
-        Debug.setLogger(getLogger());
         langManager = new LangManager(this);
+        Debug.setLogger(getLogger());
         
         GameStage.setPlugin(this);
         teamManager = new TeamManager();

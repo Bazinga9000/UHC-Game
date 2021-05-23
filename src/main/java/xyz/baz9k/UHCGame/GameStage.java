@@ -244,22 +244,22 @@ public enum GameStage {
          * 
          */
 
-        TranslatableComponent situation = Component.translatable("xyz.baz9k.uhc.chat.warning.no_warn", bodyStyle);
-        Component subject = Component.translatable(this == WB_STILL ? "xyz.baz9k.uhc.chat.wb.name" : "xyz.baz9k.uhc.chat.wb.pronoun");
+        TranslatableComponent situation = trans("xyz.baz9k.uhc.chat.warning.no_warn").style(bodyStyle);
+        Component subject = trans(this == WB_STILL ? "xyz.baz9k.uhc.chat.wb.name" : "xyz.baz9k.uhc.chat.wb.pronoun");
 
         GameStage nextGrad = nextGradualStage();
         if (!nextGrad.isWBInstant) {
-            situation = Component.translatable(nextGrad.isInstant() ? "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink" : "xyz.baz9k.uhc.chat.warning.wb_will_shrink");
+            situation = trans(nextGrad.isInstant() ? "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink" : "xyz.baz9k.uhc.chat.warning.wb_will_shrink");
         }
         if (!isWBInstant) {
-            situation = Component.translatable(isInstant() ? "xyz.baz9k.uhc.chat.warning.wb_just_instant_shrink" : "xyz.baz9k.uhc.chat.warning.wb_just_shrink");
+            situation = trans(isInstant() ? "xyz.baz9k.uhc.chat.warning.wb_just_instant_shrink" : "xyz.baz9k.uhc.chat.warning.wb_just_shrink");
         }
         
         TextComponent.Builder s = getMessageBuilder();
         
         s.append(situation.style(bodyStyle).args(baseChatMsg, subject, Component.text(wbDiameter() / 2), getWordTime(duration())));
         if (this == lastGradualStage()) {
-            s.append(Component.space()).append(Component.translatable("xyz.baz9k.uhc.chat.warning.dm_warn", bodyStyle).args(getWordTime(duration())));
+            s.append(Component.space()).append(trans("xyz.baz9k.uhc.chat.warning.dm_warn", getWordTime(duration())).style(bodyStyle));
         }
         
         Bukkit.getServer().sendMessage(s);
