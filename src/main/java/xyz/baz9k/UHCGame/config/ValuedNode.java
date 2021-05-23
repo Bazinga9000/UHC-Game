@@ -65,10 +65,6 @@ public class ValuedNode extends Node {
         updateItemStack();
     }
 
-    public Type getType() {
-        return type;
-    }
-
     @Override
     public void click(@NotNull Player p) {
         switch (type) {
