@@ -132,8 +132,134 @@ xyz:
           "on": "ACTIVE"
           "off": "INACTIVE"
         inv:
-          go_back: "Go Back"
+          go_back:
+            name: "Go Back"
+            desc: ""
           root:
             name: "Config"
+          intervals:
+            root:
+              name: "Stage Durations"
+              desc: |-
+                Set the various timings between game events.
+            start:
+              name: "Still Border"
+              desc: "Duration: {0}"
+            movement1:
+              name: "Border 1"
+              desc: "Duration: {0}"
+            stop:
+              name: "Border Stops"
+              desc: "Duration: {0}"
+            movement2:
+              name: "Border 2"
+              desc: "Duration: {0}"
+            dmwait:
+              name: "Time Until Deathmatch"
+              desc: "Duration: {0}"
+          wb_size:
+            root:
+              name: "Worldborder Sizes"
+              desc: |-
+                Change the widths of the worldborders at 
+                various stages.
+            initial:
+              name: "Initial World Border"
+              desc: "Diameter: {0}"
+            border1:
+              name: "First Movement"
+              desc: "Diameter: {0}"
+            border2:
+              name: "Second Movement"
+              desc: "Diameter: {0}"
+            deathmatch:
+              name: "Deathmatch"
+              desc: "Diameter: {0}"
+          team_count:
+            root:
+              name: "Team Counts"
+              desc: "Set the number of teams."
+            team_count:
+              name: "Set Team Count"
+              desc: "Number of teams: {0}"
+            solos:
+              name: "Solos"
+              desc: "Teams of 1"
+            duos:
+              name: "Duos"
+              desc: "Teams of 2"
+            trios:
+              name: "Trios"
+              desc: "Teams of 3"
+            quartets:
+              name: "Quartets"
+              desc: "Teams of 4"
+            quintets:
+              name: "Quintets"
+              desc: "Teams of 5"
+          esoteric:
+            root:
+              name: "Esoterics"
+              desc: |-
+                Toggle various additional settings for 
+                untraditional gameplay.
+            gone_fishing:
+              name: "Gone Fishing"
+              desc: |-
+                Each player receives:
+                   - An unbreakable maxed Fishing Rod
+                   - 64 Anvils
+                   - 1000 Levels
+            boss_team:
+              name: "Boss Team"
+              desc: |-
+                Team 1 gets double health,
+                but has fewer people.
+            always_elytra:
+              name: "Always Elytra"
+              desc: |-
+                Everyone is in a
+                flying state for
+                the entire game.
+                Each player receives:
+                    - Unbreakable Elytra w/ Curse of Binding
+            sardines:
+              name: "Sardines"
+              desc: |-
+                Players that find each other
+                in game join into teams.
+            wither_bonus:
+              name: "Wither Bonus Round"
+              desc: |-
+                After the game ends,
+                the winning team gets
+                a Wither to fight.
+            fast_dn_cycle:
+              name: "Fast Day-Night Cycle"
+              desc: ""
+            always_day:
+              name: "Always Day"
+              desc: ""
+            always_night:
+              name: "Always Night"
+              desc: ""
+            nether_spawn:
+              name: "Spawn in Nether"
+              desc: ""
+            bomberman:
+              name:  "Bomberman"
+              desc: |-
+                Direct combat is disabled.
+                Each player receives:
+                    - 128 TNT
+            max_health:
+              name: "Player Health"
+              desc: ""
+            mv_speed:
+              name: "Movement Speed"
+              desc: ""
+            reset_to_defaults:
+              name: "Reset to Defaults"
+              desc: ""
 
 

@@ -19,7 +19,6 @@ esoteric:
   always_elytra: false
   sardines: false
   wither_bonus: true
-  mafia: false
   fast_dn_cycle: false
   always_day: false
   always_night: false

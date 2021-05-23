@@ -75,6 +75,8 @@ public class NodeItemStack extends ItemStack {
         public Info(Material mat, TextColor clr) { this(mat, noDeco(clr), UnaryOperator.identity()); }
         public Info(Material mat, Style nameStyle) { this(mat, nameStyle, UnaryOperator.identity()); }
         public Info(Material mat, UnaryOperator<Object> mapper) { this(mat, DEFAULT_NAME_STYLE, mapper); }
+    
+        public Info withMaterial(Material mat) { return new Info(mat, nameStyle(), mapper()); }
     }
 
     /**

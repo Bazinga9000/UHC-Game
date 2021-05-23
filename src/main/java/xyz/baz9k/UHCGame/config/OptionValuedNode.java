@@ -20,8 +20,8 @@ public class OptionValuedNode extends ValuedNode {
      * @param nodeName Node name, which is used to determine the ID
      * @param optData An array of options that this node supports 
      */
-    public OptionValuedNode(BranchNode parent, int slot, String nodeName, OptionData... optData) {
-        super(parent, slot, nodeName, new NodeItemStack.Info(optData[0].material()), ValuedNode.Type.OPTION);
+    public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.Info info, OptionData... optData) {
+        super(parent, slot, nodeName, info.withMaterial(optData[0].material()), ValuedNode.Type.OPTION);
         this.optData = optData;
         updateItemStack();
     }
