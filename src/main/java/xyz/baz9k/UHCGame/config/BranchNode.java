@@ -115,6 +115,8 @@ public class BranchNode extends Node {
             throw new IllegalArgumentException("Invalid slot clicked (Slot cannot be negative or greater than" + slotCount + ".)");
         }
 
+        p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2);
+        
         // if not root, add go back trigger
         if (parent != null && slot == slotCount - 1) {
             p.openInventory(parent.inventory);
@@ -122,7 +124,6 @@ public class BranchNode extends Node {
         }
 
         Node node = children[slot];
-        p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2);
         if (node != null) node.click(p);
     }
 
