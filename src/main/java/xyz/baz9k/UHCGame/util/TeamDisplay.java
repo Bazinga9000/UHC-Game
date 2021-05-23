@@ -43,7 +43,7 @@ public final class TeamDisplay {
             throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.display.index_must_pos");
         }
         if (t > NUM_TEAM_COLORS) {
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.display_index_must_under_max", NUM_TEAM_COLORS);
+            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.display.index_must_under_max", NUM_TEAM_COLORS);
         }
         return teamColors[t];
     }

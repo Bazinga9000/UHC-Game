@@ -299,6 +299,8 @@ public final class Utils {
      * @return string of the component text
      */
     public static String componentString(Locale l, Component c) {
+        if (c instanceof TextComponent tc && c.children().size() == 0) return tc.content();
+
         List<Component> components = new ArrayList<>();
         components.add(c);
         components.addAll(c.children());
@@ -306,8 +308,13 @@ public final class Utils {
         return components.stream()
             .map(cpt -> {
                 Component rendered = GlobalTranslator.render(cpt, l);
-                if (rendered instanceof TextComponent renderedText) return renderedText.content();
-                return rendered.toString();
+                if (rendered instanceof TextComponent renderedText) {
+                    String buf = "";
+                    buf += renderedText.content();
+                    for (Component child : renderedText.children()) buf += componentString(l, child);
+                    return buf;
+                };
+                return rendered.toString(); // if not text, then can't really do anything
             })
             .collect(Collectors.joining());
     }
