@@ -292,6 +292,10 @@ public final class Utils {
         return Math.max(min, Math.min(x, max));
     }
 
+    public static Component render(Component c) {
+        return GlobalTranslator.render(c, UHCGame.getLocale());
+    }
+
     /**
      * Converts a component to text (for TextComponent & TranslatableComponent)
      * @param l locale to use

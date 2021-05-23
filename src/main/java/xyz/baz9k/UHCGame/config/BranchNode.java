@@ -67,11 +67,7 @@ public class BranchNode extends Node {
 
         // If we aren't root, add a slot for the "Go Back" button
         if (parent != null) {
-            ItemStack goBack = new ItemStack(Material.ARROW);
-
-            m = goBack.getItemMeta();
-            m.displayName(trans("xyz.baz9k.uhc.config.inv.go_back").style(noDeco(NamedTextColor.RED)));
-            goBack.setItemMeta(m);
+            ItemStack goBack = new NodeItemStack("go_back", new NodeItemStack.Info(Material.ARROW, noDeco(NamedTextColor.RED)));
 
             inventory.setItem(slotCount - 1, goBack);
         }
@@ -115,6 +111,11 @@ public class BranchNode extends Node {
     }
 
     public void click(Player p) {
+        // update all slots to make sure translation goes through
+        for (int i = 0; i < children.length; i++) {
+            if (children[i] != null) updateSlot(i);
+        }
+
         p.openInventory(inventory);
     }
 
@@ -123,7 +124,7 @@ public class BranchNode extends Node {
      * @param slot the slot
      */
     public void updateSlot(int slot) {
-        inventory.setItem(slot, children[slot].itemStack);
+        inventory.setItem(slot, children[slot].itemStack.updateAll());
     }
 
     @NotNull
@@ -137,7 +138,8 @@ public class BranchNode extends Node {
 
     @Override
     public String id() {
-        if (super.id().equals("")) return "root";
-        return super.id() + ".root";
+        String nid = super.id();
+        if (nid.equals("")) return "root";
+        return nid + ".root";
     }
 }

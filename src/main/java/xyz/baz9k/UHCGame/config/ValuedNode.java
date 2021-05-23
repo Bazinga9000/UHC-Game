@@ -101,9 +101,9 @@ public class ValuedNode extends Node {
                 } else {
                     status = trans("xyz.baz9k.uhc.config.bool_valued.off").style(noDeco(NamedTextColor.RED));
                 }
-                itemStack.extraLore(trans("xyz.baz9k.uhc.config.bool_valued.status", status));
+                itemStack.extraLore("xyz.baz9k.uhc.config.bool_valued.status", status);
                 
-                itemStack.updateMeta(m -> {
+                itemStack.editMeta(m -> {
                     if (active) {
                         m.addEnchant(Enchantment.SILK_TOUCH, 1, true);
                     } else {
@@ -123,7 +123,8 @@ public class ValuedNode extends Node {
     }
 
     public void set(Object value) {
-        cfg.set(id(), restrict.apply((Number) value));
+        if (value == Type.INTEGER || value == Type.DOUBLE) value = restrict.apply((Number) value);
+        cfg.set(id(), value);
         updateItemStack();
     }
 }

@@ -1,5 +1,6 @@
 package xyz.baz9k.UHCGame.config;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -24,12 +25,13 @@ public abstract class Node {
     public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.Info info) {
         this.parent = parent;
         this.nodeName = nodeName;
-        this.itemStack = info.mat() == null ? null : new NodeItemStack(nodeName, info);
+        this.itemStack = info.mat() == null ? null : new NodeItemStack(id(), info);
 
         this.parentSlot = parentSlot;
         if (parent != null) {
             parent.setChild(parentSlot, this);
         }
+        Bukkit.getLogger().info(id());
     }
 
     /**
