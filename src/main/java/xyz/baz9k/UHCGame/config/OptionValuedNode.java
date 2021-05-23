@@ -2,6 +2,7 @@ package xyz.baz9k.UHCGame.config;
 
 import java.util.ArrayList;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import net.kyori.adventure.text.Component;
@@ -21,8 +22,22 @@ public class OptionValuedNode extends ValuedNode {
      * @param id The config ID for this node
      * @param optData An array of options that this node supports 
      */
+    @Deprecated
     public OptionValuedNode(BranchNode parent, int slot, NodeItemStack stack, String id, OptionData... optData) {
         super(parent, slot, stack, ValuedNode.Type.OPTION, id);
+        this.optData = optData;
+        updateItemStack();
+    }
+
+    /**
+     * @param parent Parent node
+     * @param slot lot of this node in parent's inventory
+     * @param stack Item stack of this node in parent's inventory
+     * @param id The config ID for this node
+     * @param optData An array of options that this node supports 
+     */
+    public OptionValuedNode(BranchNode parent, int slot, String nodeName, Material mat, OptionData... optData) {
+        super(parent, slot, nodeName, mat, ValuedNode.Type.OPTION);
         this.optData = optData;
         updateItemStack();
     }

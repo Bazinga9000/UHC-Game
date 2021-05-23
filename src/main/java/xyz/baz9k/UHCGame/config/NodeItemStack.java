@@ -64,14 +64,14 @@ public class NodeItemStack extends ItemStack {
     }
     public NodeItemStack(Material mat, String id, UnaryOperator<Object> mapper) {
         super(mat);
-        this.rawDesc = List.of(trans(String.format(DESC_ID_FORMAT, id)));
+        this.rawDesc = descOf(id);
         this.displayDesc = new ArrayList<>(this.rawDesc);
         this.mapper = mapper;
 
         updateLore();
 
         ItemMeta m = getItemMeta();
-        m.displayName(trans(String.format(NAME_ID_FORMAT, id)));
+        m.displayName(nameOf(id));
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         setItemMeta(m);
         
@@ -197,5 +197,15 @@ public class NodeItemStack extends ItemStack {
         ItemMeta m = getItemMeta();
         mf.accept(m);
         setItemMeta(m);
+    }
+
+    public static Component nameOf(String id) {
+        String key = String.format(NAME_ID_FORMAT, id);
+        return trans(key);
+    }
+
+    public static List<Component> descOf(String id) {
+        String key = String.format(DESC_ID_FORMAT, id);
+        return List.of(trans(key));
     }
 }
