@@ -86,12 +86,12 @@ public class ConfigTree {
         new ValuedNode(wbSize, slotAt(1, 6), "deathmatch", new NodeItemStack.Info(Material.PURPLE_STAINED_GLASS), ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
 
         /* TEAM COUNT */
-        new ValuedNode(teamCount, 0, "team_count", new NodeItemStack.Info(Material.DIAMOND), ValuedNode.Type.INTEGER, i -> Math.min(i.intValue(), 1));
-        new ActionNode(teamCount, slotAt(2, 0), "solos",    new NodeItemStack.Info(Material.RED_DYE),    p -> { plugin.getTeamManager().setTeamSize("solos");    });
-        new ActionNode(teamCount, slotAt(2, 1), "duos",     new NodeItemStack.Info(Material.ORANGE_DYE), p -> { plugin.getTeamManager().setTeamSize("duos");     });
-        new ActionNode(teamCount, slotAt(2, 2), "trios",    new NodeItemStack.Info(Material.YELLOW_DYE), p -> { plugin.getTeamManager().setTeamSize("trios");    });
-        new ActionNode(teamCount, slotAt(2, 3), "quartets", new NodeItemStack.Info(Material.GREEN_DYE),  p -> { plugin.getTeamManager().setTeamSize("quartets"); });
-        new ActionNode(teamCount, slotAt(2, 4), "quintets", new NodeItemStack.Info(Material.BLUE_DYE),   p -> { plugin.getTeamManager().setTeamSize("quintets"); });
+        new ValuedNode(teamCount, 0,            "team_count", new NodeItemStack.Info(Material.DIAMOND),    ValuedNode.Type.INTEGER, i -> Math.min(i.intValue(), 1));
+        new ActionNode(teamCount, slotAt(2, 0), "solos",      new NodeItemStack.Info(Material.RED_DYE),    p -> { plugin.getTeamManager().setTeamSize("solos");    });
+        new ActionNode(teamCount, slotAt(2, 1), "duos",       new NodeItemStack.Info(Material.ORANGE_DYE), p -> { plugin.getTeamManager().setTeamSize("duos");     });
+        new ActionNode(teamCount, slotAt(2, 2), "trios",      new NodeItemStack.Info(Material.YELLOW_DYE), p -> { plugin.getTeamManager().setTeamSize("trios");    });
+        new ActionNode(teamCount, slotAt(2, 3), "quartets",   new NodeItemStack.Info(Material.GREEN_DYE),  p -> { plugin.getTeamManager().setTeamSize("quartets"); });
+        new ActionNode(teamCount, slotAt(2, 4), "quintets",   new NodeItemStack.Info(Material.BLUE_DYE),   p -> { plugin.getTeamManager().setTeamSize("quintets"); });
 
         /* ESOTERICS */
         // TODO fill in esoteric info
