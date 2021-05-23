@@ -20,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -82,43 +83,49 @@ public final class Utils {
     }
 
     /**
-     * Get a string of format "X hours, X minutes, and X seconds" from a number of seconds.
+     * Get a string of format "XhXmXs" from a number of seconds.
      * <p>
-     * A clause can be comitted if there is zero of the unit of that clause.
+     * A clause can be omitted if there is zero of the unit of that clause.
      * @param s
      * @return the time string
      */
-    public static String getWordTimeString(long s) {
-        if (s == 0) return "";
+    public static Component getWordTime(long s) {
+        if (s == 0) return Component.empty();
 
-        long[] segs = {s / 3600, (s % 3600) / 60, (s % 60)};
-        String[] unit = {"hour", "minute", "second"};
-        List<String> segStrs = new ArrayList<>();
+        TranslatableComponent[] units = {
+            trans("xyz.baz9k.uhc.time.hour"),
+            trans("xyz.baz9k.uhc.time.minute"),
+            trans("xyz.baz9k.uhc.time.second"),
+        };
 
-        for (int i = 0; i < 3; i++) {
-            long seg = segs[i];
+        List<Long> segs = new ArrayList<>();
+        for (int i = 0; i < units.length; i++) {
+            segs.add(0, s % 60);
+            s /= 60;
+        }
+
+        ComponentBuilder<?, ?> buf = Component.text();
+
+        for (int i = 0; i < segs.size(); i++) {
+            long seg = segs.get(i);
+            TranslatableComponent unit = units[i];
+
             if (seg == 0) continue;
-            if (seg == 1) {
-                segStrs.add(String.format("%s %s", seg, unit[i]));
-                continue;
-            }
-            segStrs.add(String.format("%s %ss", seg, unit[i]));
+            buf.append(unit.args(Component.text(seg)));
         }
     
-        int size = segStrs.size();
-        if (size == 1) return segStrs.get(0);
-        return String.format("%s, and %s", String.join(", ", segStrs.subList(0, size - 1)), segStrs.get(size - 1));
+        return buf.build();
     }
 
     /**
-     * Get a string of format "X hours, X minutes, and X seconds" from the provided {@link Duration}'s duration.
+     * Get a string of format "XhXmXs" from the provided {@link Duration}'s duration.
      * <p>
-     * A clause can be comitted if there is zero of the unit of that clause.
+     * A clause can be omitted if there is zero of the unit of that clause.
      * @param d
      * @return the time string
      */
-    public static String getWordTimeString(Duration d) {
-        return getWordTimeString(d.toSeconds());
+    public static Component getWordTime(Duration d) {
+        return getWordTime(d.toSeconds());
     }
 
     /**
