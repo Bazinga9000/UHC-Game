@@ -1,7 +1,5 @@
 package xyz.baz9k.UHCGame.config;
 
-import java.util.function.Function;
-
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -12,24 +10,10 @@ public abstract class Node {
     protected final BranchNode parent;
     protected final NodeItemStack itemStack;
     protected final int parentSlot;
-    protected String nodeName;
+    protected final String nodeName;
     
     protected static UHCGame plugin;
     protected static FileConfiguration cfg;
-    /**
-     * @param parent Parent node
-     * @param parentSlot lot of this node in parent's inventory
-     * @param item Item stack of this node in parent's inventory
-     */
-    public Node(BranchNode parent, int parentSlot, NodeItemStack item) {
-        this.parent = parent;
-        this.itemStack = item;
-
-        this.parentSlot = parentSlot;
-        if (parent != null) {
-            parent.setChild(parentSlot, this);
-        }
-    }
 
     /**
      * @param parent Parent node
@@ -39,6 +23,7 @@ public abstract class Node {
      */
     public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.Info info) {
         this.parent = parent;
+        this.nodeName = nodeName;
         this.itemStack = info.mat() == null ? null : new NodeItemStack(nodeName, info);
 
         this.parentSlot = parentSlot;
@@ -68,12 +53,9 @@ public abstract class Node {
      * @return the ID
      */
     public String id() {
-        // branch nodes should end with ".root", but that shouldn't be used for every other id's node, 
-        // so use a function instead of a direct call
-        Function<Node, String> idf = Node::id;
+        if (parent == null) return "";
 
-        String pid = idf.apply(parent);
-        if (pid == null) return "";
+        String pid = parent.id().replaceFirst("\\.?root", "");
         if (pid.equals("")) return nodeName;
         return pid + "." + nodeName;
     }

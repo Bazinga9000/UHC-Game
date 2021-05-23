@@ -17,20 +17,6 @@ public class OptionValuedNode extends ValuedNode {
     /**
      * @param parent Parent node
      * @param slot lot of this node in parent's inventory
-     * @param stack Item stack of this node in parent's inventory
-     * @param id The config ID for this node
-     * @param optData An array of options that this node supports 
-     */
-    @Deprecated
-    public OptionValuedNode(BranchNode parent, int slot, NodeItemStack stack, String id, OptionData... optData) {
-        super(parent, slot, stack, ValuedNode.Type.OPTION, id);
-        this.optData = optData;
-        updateItemStack();
-    }
-
-    /**
-     * @param parent Parent node
-     * @param slot lot of this node in parent's inventory
      * @param nodeName Node name, which is used to determine the ID
      * @param optData An array of options that this node supports 
      */
@@ -42,13 +28,13 @@ public class OptionValuedNode extends ValuedNode {
 
     @Override
     public void click(Player p) {
-        int currIndex = cfg.getInt(id);
+        int currIndex = cfg.getInt(id());
         this.set((currIndex + 1) % optData.length);
     }
 
     public void updateItemStack() {
         if (optData == null) return;
-        int ind = cfg.getInt(id) % optData.length;
+        int ind = cfg.getInt(id()) % optData.length;
         OptionData dat = optData[ind];
         itemStack.desc(dat.name());
 

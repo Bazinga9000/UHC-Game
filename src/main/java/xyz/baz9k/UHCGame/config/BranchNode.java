@@ -29,53 +29,11 @@ public class BranchNode extends Node {
 
     /**
      * Create a root {@link BranchNode}. This node does not have a parent.
-     * @param nodeName Node name, which is used to determine the ID
      * @param guiHeight Number of rows in this node's inventory
      */
     // remove tmp when impl complete
-    public BranchNode(@NotNull String nodeName, int guiHeight, boolean tmp) {
-        this(null, 0, nodeName, new NodeItemStack.Info(null), guiHeight);
-    }
-
-    /**
-     * Create a root {@link BranchNode}. This node does not have a parent.
-     * @param guiName Name of this node's inventory
-     * @param guiHeight Number of rows in this node's inventory
-     */
-    @Deprecated
-    public BranchNode(@NotNull String guiName, int guiHeight) {
-        this(null, 0, null, guiName, guiHeight);
-    }
-
-    /**
-     * @param parent Parent node
-     * @param slot lot of this node in parent's inventory
-     * @param itemStack Item stack of this node in parent's inventory
-     * @param guiName Name of this node's inventory
-     * @param guiHeight Number of rows in this node's inventory
-     */
-    @Deprecated
-    public BranchNode(@Nullable BranchNode parent, int slot, @Nullable NodeItemStack itemStack, @NotNull String guiName, int guiHeight) {
-        this(parent, slot, itemStack, Component.text(guiName), guiHeight);
-    }
-
-    /**
-     * @param parent Parent node
-     * @param slot lot of this node in parent's inventory
-     * @param itemStack Item stack of this node in parent's inventory
-     * @param guiTitle Title of this node's inventory (with formatting)
-     * @param guiHeight Number of rows in this node's inventory
-     */
-    @Deprecated
-    public BranchNode(@Nullable BranchNode parent, int slot, @Nullable NodeItemStack itemStack, @NotNull Component guiTitle, int guiHeight) {
-        super(parent, slot, itemStack);
-        slotCount = 9 * guiHeight;
-
-        int arrLen = parent == null ? slotCount : slotCount - 1;
-        children = new Node[arrLen];
-
-        inventory = Bukkit.createInventory(null, slotCount, guiTitle);
-        initInventory();
+    public BranchNode(int guiHeight) {
+        this(null, 0, null, new NodeItemStack.Info(null), guiHeight);
     }
 
     /**
@@ -179,6 +137,7 @@ public class BranchNode extends Node {
 
     @Override
     public String id() {
+        if (super.id().equals("")) return "root";
         return super.id() + ".root";
     }
 }

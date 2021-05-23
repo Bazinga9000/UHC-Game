@@ -18,18 +18,6 @@ public class ActionNode extends Node {
     /**
      * @param parent Parent node
      * @param slot Slot of this node in parent's inventory
-     * @param itemStack Item stack of this node in parent's inventory
-     * @param fn Function ran when this node is clicked
-     */
-    @Deprecated
-    public ActionNode(@NotNull BranchNode parent, int slot, @NotNull NodeItemStack itemStack, @NotNull Consumer<Player> fn) {
-        super(parent, slot, itemStack);
-        this.fn = fn;
-    }
-
-    /**
-     * @param parent Parent node
-     * @param slot Slot of this node in parent's inventory
      * @param nodeName Node name, which is used to determine the ID
      * @param info {@link NodeItemStack#Info}
      * @param fn Function ran when this node is clicked
