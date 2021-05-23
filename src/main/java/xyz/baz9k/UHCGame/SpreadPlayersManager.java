@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -124,9 +125,12 @@ public class SpreadPlayersManager {
     }
 
 
-    //random location generation
-    private static boolean isLocationSpawnable(Location l) {
-        return (!isLocationOverLava(l) && !isLocationOverWater(l));
+     //random location generation
+     private static boolean isLocationUnspawnable(Location l) {
+        return isLocationOverLava(l);
+    }
+    private static boolean isLocationAvoidSpawn(Location l) {
+        return isLocationOverWater(l);
     }
 
     private static boolean isLocationOverLava(Location l) {
@@ -140,11 +144,12 @@ public class SpreadPlayersManager {
     }
 
     //poisson disk sampling
-    private List<Location> getRandomLocations(Location center, int numLocations, double sideLength, double minSeparation) {
+    private static List<Location> getRandomLocations(Location center, int numLocations, double sideLength, double minSeparation) {
         Point2D center2 = Point2D.fromLocation(center);
         List<Point2D> samples = new ArrayList<>();
         List<Point2D> activeList = new ArrayList<>();
         Random r = new Random();
+        World w = center.getWorld();
 
         final int POINTS_PER_ITER = 30;
         
@@ -155,62 +160,49 @@ public class SpreadPlayersManager {
         while (!activeList.isEmpty()) {
             int index = r.nextInt(activeList.size());
             Point2D search = activeList.get(index);
-            Point2D toCheck = new Point2D(0,0);
-            boolean success = false;
 
-            for (int i = 0; i < POINTS_PER_ITER; i++) {
-                toCheck = Point2D.ringRand(search, minSeparation, 2 * minSeparation);
-                if (!toCheck.inSquare(center2, sideLength)) {
-                    continue;
-                }
-
-                double minDist = Double.MAX_VALUE;
-                for (Point2D point : samples) {
-                    double d = toCheck.dist(point);
-                    if (d < minDist) {
-                        minDist = d;
-                    }
-                }
-
-                if (minDist < minSeparation) {
-                    continue;
-                }
-
-                success = true;
-                break;
-
-            }
-
-            if (success) {
-                activeList.add(toCheck);
-                samples.add(toCheck);
-            } else {
-                activeList.remove(index);
-            }
+            Stream.generate(() -> Point2D.ringRand(search, minSeparation, 2 * minSeparation))
+                    .limit(POINTS_PER_ITER)
+                    .filter(p -> p.inSquare(center2, sideLength))
+                    .filter(p -> {
+                        double minDist = samples.stream()
+                                                .mapToDouble(p::dist)
+                                                .min()
+                                                .orElseThrow();
+                        return minDist >= minSeparation;
+                    })
+                    .filter(p -> !isLocationUnspawnable(getHighestLoc(w, p)))
+                    .findAny()
+                    .ifPresentOrElse(
+                        p -> {
+                            activeList.add(p);
+                            samples.add(p);
+                        }, 
+                        () -> {
+                            activeList.remove(index);
+                    });
         }
 
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.generated", samples.size()));
 
-        List<Location> spawnableLocations = new ArrayList<>();
-        List<Location> overWaterLocations = new ArrayList<>();
-        World w = center.getWorld();
-        for (Point2D samplePoint : samples) {
-            Location sample = getHighestLoc(w, samplePoint);
-            if (isLocationSpawnable(sample)) {
-                spawnableLocations.add(sample);
-            } else if (isLocationOverWater(sample)) {
-                overWaterLocations.add(sample);
-            }
-        }
-        int totalSize = spawnableLocations.size() + overWaterLocations.size();
-        if (totalSize < numLocations) {
-            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.missing_spread_locs", totalSize, numLocations);
+        if (samples.size() < numLocations) {
+            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.missing_spread_locs", samples.size(), numLocations);
         }
 
+        Map<Boolean, List<Location>> spawns =
+        samples.stream()
+                .map(p -> getHighestLoc(w, p))
+                .collect(Collectors.partitioningBy(SpreadPlayersManager::isLocationAvoidSpawn));
+
+
+        List<Location> spawnableLocations = spawns.get(false);
+        List<Location> avoidLocations = spawns.get(true);
+        
+
         if (spawnableLocations.size() < numLocations) {
-            int numOverWaterLocations = numLocations - spawnableLocations.size();
-            Collections.shuffle(overWaterLocations);
-            spawnableLocations.addAll(overWaterLocations.subList(0, numOverWaterLocations));
+            int numAvoidLocations = numLocations - spawnableLocations.size();
+            Collections.shuffle(avoidLocations);
+            spawnableLocations.addAll(avoidLocations.subList(0, numAvoidLocations));
         }
 
         Collections.shuffle(spawnableLocations);
