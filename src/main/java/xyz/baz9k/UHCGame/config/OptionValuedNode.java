@@ -31,12 +31,11 @@ public class OptionValuedNode extends ValuedNode {
     /**
      * @param parent Parent node
      * @param slot lot of this node in parent's inventory
-     * @param stack Item stack of this node in parent's inventory
-     * @param id The config ID for this node
+     * @param nodeName Node name, which is used to determine the ID
      * @param optData An array of options that this node supports 
      */
     public OptionValuedNode(BranchNode parent, int slot, String nodeName, OptionData... optData) {
-        super(parent, slot, nodeName, optData[0].material(), ValuedNode.Type.OPTION);
+        super(parent, slot, nodeName, new NodeItemStack.Info(optData[0].material()), ValuedNode.Type.OPTION);
         this.optData = optData;
         updateItemStack();
     }

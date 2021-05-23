@@ -34,7 +34,7 @@ public class BranchNode extends Node {
      */
     // remove tmp when impl complete
     public BranchNode(@NotNull String nodeName, int guiHeight, boolean tmp) {
-        this(null, 0, null, nodeName, guiHeight);
+        this(null, 0, nodeName, new NodeItemStack.Info(null), guiHeight);
     }
 
     /**
@@ -82,11 +82,11 @@ public class BranchNode extends Node {
      * @param parent Parent node
      * @param slot lot of this node in parent's inventory
      * @param nodeName Node name, which is used to determine the ID
-     * @param mat Material for the item stack
+     * @param info {@link NodeItemStack#Info}
      * @param guiHeight Number of rows in this node's inventory
      */
-    public BranchNode(@Nullable BranchNode parent, int slot, String nodeName, @Nullable Material mat, int guiHeight) {
-        super(parent, slot, nodeName, mat);
+    public BranchNode(@Nullable BranchNode parent, int slot, String nodeName, NodeItemStack.Info info, int guiHeight) {
+        super(parent, slot, nodeName, info);
         slotCount = 9 * guiHeight;
 
         int arrLen = parent == null ? slotCount : slotCount - 1;

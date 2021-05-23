@@ -2,7 +2,6 @@
 package xyz.baz9k.UHCGame.config;
 
 import org.jetbrains.annotations.NotNull;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
@@ -32,11 +31,11 @@ public class ActionNode extends Node {
      * @param parent Parent node
      * @param slot Slot of this node in parent's inventory
      * @param nodeName Node name, which is used to determine the ID
-     * @param mat Material for the item stack
+     * @param info {@link NodeItemStack#Info}
      * @param fn Function ran when this node is clicked
      */
-    public ActionNode(@NotNull BranchNode parent, int slot, String nodeName, @NotNull Material mat, @NotNull Consumer<Player> fn) {
-        super(parent, slot, nodeName, mat);
+    public ActionNode(@NotNull BranchNode parent, int slot, String nodeName, @NotNull NodeItemStack.Info info, @NotNull Consumer<Player> fn) {
+        super(parent, slot, nodeName, info);
         this.fn = fn;
     }
 

@@ -2,7 +2,6 @@ package xyz.baz9k.UHCGame.config;
 
 import java.util.function.Function;
 
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -36,11 +35,11 @@ public abstract class Node {
      * @param parent Parent node
      * @param parentSlot lot of this node in parent's inventory
      * @param nodeName Node name, which is used to determine the ID
-     * @param mat Material for the item stack
+     * @param info {@link NodeItemStack#Info}
      */
-    public Node(BranchNode parent, int parentSlot, String nodeName, Material mat) {
+    public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.Info info) {
         this.parent = parent;
-        this.itemStack = mat == null ? null : new NodeItemStack(mat, nodeName);
+        this.itemStack = info.mat() == null ? null : new NodeItemStack(nodeName, info);
 
         this.parentSlot = parentSlot;
         if (parent != null) {

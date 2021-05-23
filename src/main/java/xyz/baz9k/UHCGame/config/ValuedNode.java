@@ -1,6 +1,5 @@
 package xyz.baz9k.UHCGame.config;
 
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -48,20 +47,20 @@ public class ValuedNode extends Node {
     /**
      * @param parent Parent node
      * @param slot lot of this node in parent's inventory
-     * @param item Item stack of this node in parent's inventory
+     * @param nodeName Node name, which is used to determine the ID
+     * @param info {@link NodeItemStack#Info}
      * <p>
      * If format strings are included in the item's description (%s, %.1f, etc.), 
      * those will be substituted with the config value.
      * @param type Type of data this value stores
      * <p>
      * WITH A RESTRICTING FUNCTION, THE TYPE MUST BE NUMERIC.
-     * @param id The config ID for this node
      * @param restrict This function maps invalid numeric values to the correct values.
      * @implNote Inheriting classes should cancel the updateItemStack and recall it after
      * all its properties are set.
      */
-    public ValuedNode(BranchNode parent, int slot, String nodeName, Material mat, Type type, UnaryOperator<Number> restrict) {
-        this(parent, slot, nodeName, mat, switch (type) {
+    public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.Info info, Type type, UnaryOperator<Number> restrict) {
+        this(parent, slot, nodeName, info, switch (type) {
             case INTEGER, DOUBLE -> type;
             default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.not_numeric_type", type);
         });
@@ -73,17 +72,17 @@ public class ValuedNode extends Node {
     /**
      * @param parent Parent node
      * @param slot lot of this node in parent's inventory
-     * @param item Item stack of this node in parent's inventory
+     * @param nodeName Node name, which is used to determine the ID
+     * @param info {@link NodeItemStack#Info}
      * <p>
      * If format strings are included in the item's description (%s, %.1f, etc.), 
      * those will be substituted with the config value.
      * @param type Type of data this value stores
-     * @param id The config ID for this node
      * @implNote Inheriting classes should cancel the updateItemStack and recall it after
      * all its properties are set.
      */
-    public ValuedNode(BranchNode parent, int slot, String nodeName, Material mat, Type type) {
-        super(parent, slot, nodeName, mat);
+    public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.Info info, Type type) {
+        super(parent, slot, nodeName, info);
         this.type = type;
         this.id = id();
         

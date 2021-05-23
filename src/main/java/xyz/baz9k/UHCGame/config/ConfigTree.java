@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
 import xyz.baz9k.UHCGame.UHCGame;
+
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 /**
