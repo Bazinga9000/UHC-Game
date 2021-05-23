@@ -106,7 +106,7 @@ xyz:
           count_must_pos: "Team count must be positive."
         world:
           must_regened: "UHC worlds have not been regenerated. Run /uhc reseed to regenerate."
-          missing_spread_locs: "Not enough locations ({0}) were generated."
+          missing_spread_locs: "Not enough locations ({0}, {1} required) were generated."
         not_started: "UHC has not started"
         already_started: "UHC has already started"
         hud:

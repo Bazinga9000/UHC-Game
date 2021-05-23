@@ -4,12 +4,17 @@ import xyz.baz9k.UHCGame.util.*;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,6 +26,89 @@ public class SpreadPlayersManager {
     public SpreadPlayersManager(UHCGame plugin) {
         this.plugin = plugin;
     }
+
+    /**
+     * Stores information for determining what groups to spread together
+     */
+    private static record Grouping(Function<UHCGame, Collection<? extends Collection<Player>>> groupGen, Location def) {
+        public Collection<? extends Collection<Player>> groups(UHCGame plugin) { return groupGen.apply(plugin); }
+    }
+    
+    /**
+     * Generates a collection with each player in separate groups, meaning that all players are spread separately.
+     * @return a new generator that spreads all players separately
+     */
+    public static Grouping BY_PLAYERS() {
+        return BY_PLAYERS(null);
+    };
+        
+    /**
+     * Generates a collection with each player in separate groups, meaning that all players are spread separately.
+     * @param def All other online players (specs, etc) will be teleported here
+     * @return a new generator that spreads all players separately
+     */
+    public static Grouping BY_PLAYERS(Location def) {
+        return new Grouping(pl -> {
+            return pl.getTeamManager().getAllCombatants()
+                .stream()
+                .map(Collections::singleton)
+                .toList();
+        }, def);
+    };
+
+    /**
+     * Generates a collection with each team in separate groups, meaning that all teams are spread together.
+     * <p> Completely dead teams do not spread with this generator.
+     * @return a new generator that spreads based on teams
+     */
+    public static Grouping BY_TEAMS() {
+        return BY_TEAMS(null);
+    }
+    
+    /**
+     * Generates a collection with each team in separate groups, meaning that all teams are spread together.
+     * <p> Completely dead teams do not spread with this generator.
+     * @param def All other online players (specs, etc) will be teleported here
+     * @return a new generator that spreads based on teams
+     */
+    public static Grouping BY_TEAMS(Location def) {
+        return new Grouping(pl -> {
+            var tm = pl.getTeamManager();
+            return Arrays.stream(tm.getAliveTeams())
+                .mapToObj(tm::getAllCombatantsOnTeam)
+                .toList();
+        }, def);
+    }
+    
+    /**
+     * Generates a collection based on the provided key map. Players mapping to the same key are spread together.
+     * <p>
+     * If a player is mapped to null, they will not be spread.
+     * @param <K> Key return type, can be int, can be enum, can be w/e.
+     * @param key Function that maps a player to a key
+     * @return a new generator that spreads based on provided key
+     */
+    public static <K> Grouping BY(Function<Player, K> key) {
+        return BY(key, null);
+    };
+    /**
+     * Generates a collection based on the provided key map. Players mapping to the same key are spread together.
+     * <p>
+     * If a player is mapped to null, they will not be spread.
+     * @param <K> Key return type, can be int, can be enum, can be w/e.
+     * @param key Function that maps a player to a key
+     * @param def All other online players (specs, etc) will be teleported here
+     * @return a new generator that spreads based on provided key
+     */
+    public static <K> Grouping BY(Function<Player, K> key, Location def) {
+        return new Grouping(pl -> {
+            Map<K, List<Player>> g = pl.getTeamManager().getAllCombatants()
+                .stream()
+                .collect(Collectors.groupingBy(key));
+            g.remove(null);
+            return g.values();
+        }, def);
+    };
 
     private List<Location> getRootsOfUnityLocations(Location center, int numLocations, double distance) {
         Point2D center2 = Point2D.fromLocation(center);
@@ -116,7 +204,7 @@ public class SpreadPlayersManager {
         }
         int totalSize = spawnableLocations.size() + overWaterLocations.size();
         if (totalSize < numLocations) {
-            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.missing_spread_locs", totalSize);
+            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.missing_spread_locs", totalSize, numLocations);
         }
 
         if (spawnableLocations.size() < numLocations) {
@@ -130,105 +218,49 @@ public class SpreadPlayersManager {
 
     }
 
-    /*
-    private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minSeparation) {
-        ArrayList<Location> locations = new ArrayList<>();
-        Random r = new Random();
-        World w = getUHCWorld(Environment.NORMAL);
-
-        for (int i = 0; i < numLocations; i++) {
-            Location newLocation = null;
-            while (true) {
-                double x = center.getX() + (r.nextDouble() - 0.5) * maximumRange;
-                double z = center.getZ() + (r.nextDouble() - 0.5) * maximumRange;
-
-                if (!locations.isEmpty()) {
-                    double minDist = locations.stream()
-                                                      .map(l -> euclideanDistance(x, z, l.getX(), l.getZ()))
-                                                      .min(Double::compareTo)
-                                                      .orElseThrow();
-                    if (minDist < minSeparation) {
-                        continue;
-                    }
-                }
-                newLocation = new Location(w, x, 2 + w.getHighestBlockYAt((int) x, (int) z), z);
-
-                Material blockType = w.getBlockAt(newLocation).getType();
-
-                if (blockType == Material.LAVA) {
-                    continue;
-                }
-
-                if (blockType == Material.WATER) {
-                    continue;
-                }
-
-                break;
-            }
-
-            locations.add(newLocation);
-        }
-        return locations;
-    }
-    */
-
-    // TODO: spreadPlayers groups, for groups not aligning with teams
     /**
      * Spreads players to a list of locations by the given generator
-     * @param respectTeams Should teams be separated together?
+     * @param grouping Should teams be separated together?
      * @param locGenerator Takes in int n, returns a list of locations of size n
      */
-    private void spreadPlayers(boolean respectTeams, IntFunction<List<Location>> locGenerator) {
-        if (respectTeams) {
-            List<Collection<Player>> groups = new ArrayList<>();
-            for (int i : plugin.getTeamManager().getAliveTeams()) {
-                groups.add(plugin.getTeamManager().getAllCombatantsOnTeam(i));
-            }
-            
-            List<Location> loc = locGenerator.apply(groups.size());
-            teleportPlayersToLocations(groups, loc);
-        } else {
-            Collection<Player> players = plugin.getTeamManager().getAllCombatants();
-
-            List<Location> loc = locGenerator.apply(players.size());
-            teleportPlayersToLocations(players, loc);
+    private void spreadPlayers(Grouping grouping, IntFunction<List<Location>> locGenerator) {
+        var def = grouping.def();
+        if (def != null) {
+            teleportGroup(Bukkit.getOnlinePlayers(), def);
         }
+
+        var groups = grouping.groups(plugin);
+        var locs = locGenerator.apply(groups.size());
+        
+        var groupIter = groups.iterator();
+        var locsIter = locs.iterator();
+
+        while (groupIter.hasNext() && locsIter.hasNext()) teleportGroup(groupIter.next(), locsIter.next());
     }
 
     /**
      * Spreads players randomly
-     * @param respectTeams
+     * @param grouping
      * @param center
      * @param maximumRange
      * @param minSeparation
      */
-    public void random(boolean respectTeams, Location center, double maximumRange, double minSeparation) {
-        spreadPlayers(respectTeams, n -> getRandomLocations(center, n, maximumRange, minSeparation));
+    public void random(Grouping grouping, Location center, double maximumRange, double minSeparation) {
+        spreadPlayers(grouping, n -> getRandomLocations(center, n, maximumRange, minSeparation));
     }
 
     /**
      * Spreads players based on the roots of unity
-     * @param respectTeams
+     * @param grouping
      * @param center
      * @param distance
      */
-    public void rootsOfUnity(boolean respectTeams, Location center, double distance) {
-        spreadPlayers(respectTeams, n -> getRootsOfUnityLocations(center, n, distance));
+    public void rootsOfUnity(Grouping grouping, Location center, double distance) {
+        spreadPlayers(grouping, n -> getRootsOfUnityLocations(center, n, distance));
     }
 
-    private void teleportPlayersToLocations(Collection<Player> players, List<Location> locations) {
-        int index = 0;
-        for (Player p : players) {
-            p.teleport(locations.get(index));
-            index++;
-        }
+    private void teleportGroup(Collection<? extends Player> group, Location location) {
+        for (Player p : group) p.teleport(location);
     }
 
-    private void teleportPlayersToLocations(List<Collection<Player>> groups, List<Location> locations) {
-        for (int i = 0; i < groups.size(); i++) {
-            for (Player p : groups.get(i)) {
-                p.teleport(locations.get(i));
-            }
-        }
-    }
 }

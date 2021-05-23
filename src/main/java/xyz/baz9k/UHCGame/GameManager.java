@@ -139,7 +139,9 @@ public class GameManager implements Listener {
 
         double max = GameStage.WB_STILL.wbDiameter(),
                min = GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams());
-        plugin.spreadPlayers().random(true, worldManager.getCenter(), max, min);
+        Location defaultLoc = worldManager.getUHCWorld(0).getSpawnLocation();
+
+        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
         Bukkit.unloadWorld(worldManager.getLobbyWorld(), true);
 
@@ -336,7 +338,7 @@ public class GameManager implements Listener {
             }
 
             double rad = GameStage.DEATHMATCH.wbRadius() - 1;
-            plugin.spreadPlayers().rootsOfUnity(true, worldManager.getCenter(), rad);
+            plugin.spreadPlayers().rootsOfUnity(SpreadPlayersManager.BY_TEAMS(worldManager.getHighCenter()), worldManager.getCenter(), rad);
 
         }
 

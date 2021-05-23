@@ -1,5 +1,7 @@
 package xyz.baz9k.UHCGame;
 
+import static xyz.baz9k.UHCGame.util.Utils.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -136,5 +138,9 @@ public class WorldManager {
     
     public Location getCenterAtY(double y) {
         return center.loc(getUHCWorld(0), y);
+    }
+
+    public Location getHighCenter() {
+        return getHighestLoc(getUHCWorld(0), center);
     }
 }
