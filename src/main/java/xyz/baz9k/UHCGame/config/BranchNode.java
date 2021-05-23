@@ -98,16 +98,20 @@ public class BranchNode extends Node {
     public void onClick(@NotNull Player p, int slot) {
         Objects.checkIndex(0, slotCount);
 
-        p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2);
-        
+        boolean succ = false;
         // if not root, add go back trigger
         if (parent != null && slot == slotCount - 1) {
             p.openInventory(parent.inventory);
-            return;
+            succ = true;
+        } else {
+            Node node = children[slot];
+            if (node != null) {
+                node.click(p);
+                succ = true;
+            }
         }
-
-        Node node = children[slot];
-        if (node != null) node.click(p);
+        
+        if (succ) p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, 2);
     }
 
     public void click(Player p) {
