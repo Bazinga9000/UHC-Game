@@ -7,7 +7,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import static net.kyori.adventure.text.format.TextDecoration.*;
 import org.bukkit.World;
-import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import xyz.baz9k.UHCGame.util.ColorGradient;
 import xyz.baz9k.UHCGame.util.Point2D;
@@ -36,10 +35,12 @@ import java.util.OptionalInt;
 import java.util.Set;
 
 public class HUDManager implements Listener {
-    private GameManager gameManager;
-    private TeamManager teamManager;
+    private final GameManager gameManager;
+    private final TeamManager teamManager;
+    private final UHCGame plugin;
 
     public HUDManager(UHCGame plugin) {
+        this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.teamManager = plugin.getTeamManager();
     }
@@ -357,7 +358,7 @@ public class HUDManager implements Listener {
     public void updateElapsedTimeHUD(@NotNull Player p){
         String elapsed = getLongTimeString(gameManager.getElapsedTime());
 
-        World world = gameManager.getUHCWorld(Environment.NORMAL);
+        World world = plugin.getWorldManager().getUHCWorld(0);
         long time = world.getTime();
         boolean isDay = !(13188 <= time && time <= 22812);
         TextColor dayCharColor = isDay ? TextColor.color(255, 245, 123) : TextColor.color(43, 47, 119);
