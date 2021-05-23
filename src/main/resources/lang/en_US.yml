@@ -124,9 +124,9 @@ xyz:
       
       config:
         prompt:
-          ask: "Enter new value for '{0}' (type 'cancel' to cancel): "
+          ask: "Enter new value for \"{0}\" (type 'cancel' to cancel): "
           cancel: "Prompt cancelled."
-          succ: "Set '{0}' to {1}!"
+          succ: "Set \"{0}\" to {1}!"
         bool_valued:
           status: "Status: {0}"
           "on": "ACTIVE"
@@ -135,7 +135,5 @@ xyz:
           go_back: "Go Back"
           root:
             name: "Config"
-          
-          
 
 

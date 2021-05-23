@@ -37,7 +37,7 @@ public class ValueRequest {
             .addConversationAbandonedListener(e -> {
                 if (!e.gracefulExit()) {
                     Player p = (Player) e.getContext().getForWhom();
-                    p.sendMessage(trans("xyz.baz9k.uhc.config.cancel"));
+                    p.sendMessage(trans("xyz.baz9k.uhc.config.prompt.cancel"));
                 }
             })
             .buildConversation(converser)
@@ -49,7 +49,7 @@ public class ValueRequest {
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
             Object id = context.getSessionData("id");
-            return componentString(trans("xyz.baz9k.uhc.config.ask", id));
+            return componentString(trans("xyz.baz9k.uhc.config.prompt.ask", id));
         }
         
         @Override
