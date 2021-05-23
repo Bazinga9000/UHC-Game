@@ -100,7 +100,11 @@ public class ConfigTree {
         new ValuedNode(esoterics, 2, "always_elytra", new NodeItemStack.Info(Material.ELYTRA,                TextColor.color(0xB5B8FF)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, 3, "sardines",      new NodeItemStack.Info(Material.TROPICAL_FISH,         TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, 4, "wither_bonus",  new NodeItemStack.Info(Material.WITHER_SKELETON_SKULL, TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, 5, "fast_dn_cycle", new NodeItemStack.Info(Material.CLOCK,                 TextColor.color(0xFFEB85)), ValuedNode.Type.BOOLEAN);
+        new OptionValuedNode(esoterics, 5, "dn_cycle", new NodeItemStack.Info(null, TextColor.color(0xFFEB85)),
+            new OptionData("05:00 per cycle", Material.CLOCK),
+            new OptionData("10:00 per cycle", Material.COMPASS),
+            new OptionData("20:00 per cycle", Material.SNOWBALL)
+        );
         new ValuedNode(esoterics, 6, "always_day",    new NodeItemStack.Info(Material.GLOWSTONE,             TextColor.color(0xDFED5C)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, 7, "always_night",  new NodeItemStack.Info(Material.LIGHT_GRAY_CONCRETE,   TextColor.color(0x371DA8)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, 8, "nether_spawn",  new NodeItemStack.Info(Material.NETHERRACK,            TextColor.color(0x9C4040)), ValuedNode.Type.BOOLEAN);

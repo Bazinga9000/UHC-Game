@@ -234,7 +234,7 @@ xyz:
                 After the game ends,
                 the winning team gets
                 a Wither to fight.
-            fast_dn_cycle:
+            dn_cycle:
               name: "Fast Day-Night Cycle"
               desc: ""
             always_day:
