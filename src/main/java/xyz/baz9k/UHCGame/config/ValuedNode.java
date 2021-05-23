@@ -4,8 +4,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
@@ -62,7 +61,7 @@ public class ValuedNode extends Node {
     public ValuedNode(BranchNode parent, int slot, NodeItemStack item, Type type, String id, UnaryOperator<Number> restrict) {
         this(parent, slot, item, switch (type) {
             case INTEGER, DOUBLE -> type;
-            default -> throw new IllegalArgumentException(String.format("Type %s is not a numeric type.", type));
+            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.not_numeric_type", type);
         }, id);
         
         this.restrict = restrict;
@@ -84,9 +83,8 @@ public class ValuedNode extends Node {
             case INTEGER, DOUBLE, STRING -> new ValueRequest(plugin, p, this);
             case BOOLEAN -> this.set(!cfg.getBoolean(id));
             // case OPTION -> see OptionValuedNode#click
-            default -> {
-                throw new IllegalArgumentException(String.format("Type %s not implemented", type));
-            }
+            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.needs_impl", type);
+
         }
     }
 
@@ -105,15 +103,13 @@ public class ValuedNode extends Node {
             case BOOLEAN:
                 boolean active = cfg.getBoolean(id);
                 // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
-                TextComponent.Builder status = Component.text()
-                .append(Component.text("Status: ", noDeco(NamedTextColor.WHITE)));
-                
+                TranslatableComponent status;
                 if (active) {
-                    status.append(Component.text("ACTIVE", noDeco(NamedTextColor.GREEN)));
+                    status = trans("xyz.baz9k.uhc.config.bool_valued.on").style(noDeco(NamedTextColor.GREEN));
                 } else {
-                    status.append(Component.text("INACTIVE", noDeco(NamedTextColor.RED)));
+                    status = trans("xyz.baz9k.uhc.config.bool_valued.off").style(noDeco(NamedTextColor.RED));
                 }
-                itemStack.extraLore(status.asComponent());
+                itemStack.extraLore(trans("xyz.baz9k.uhc.config.bool_valued.status", status));
                 
                 itemStack.updateMeta(m -> {
                     if (active) {
@@ -127,7 +123,7 @@ public class ValuedNode extends Node {
                 // OPTION impl in OptionValuedNode
                 
             default:
-                throw new IllegalArgumentException(String.format("Type %s not implemented", type));
+                throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.needs_impl", type);
         }
 
         // since updating the item does not update it in the inventory, parent has to

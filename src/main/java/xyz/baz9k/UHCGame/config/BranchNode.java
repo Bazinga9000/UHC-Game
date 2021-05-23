@@ -15,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
+import java.util.Objects;
+
 /**
  * {@link Node} that contains an {@link Inventory}.
  * <p>
@@ -79,7 +81,7 @@ public class BranchNode extends Node {
             ItemStack goBack = new ItemStack(Material.ARROW);
 
             m = goBack.getItemMeta();
-            m.displayName(Component.text("Go Back", noDeco(NamedTextColor.RED)));
+            m.displayName(trans("xyz.baz9k.uhc.config.go_back").style(noDeco(NamedTextColor.RED)));
             goBack.setItemMeta(m);
 
             inventory.setItem(slotCount - 1, goBack);
@@ -92,9 +94,7 @@ public class BranchNode extends Node {
      * @param child
      */
     public void setChild(int slot, @Nullable Node child) {
-        if (0 > slot || slot > children.length) {
-            throw new IndexOutOfBoundsException(String.format("Cannot set child at slot %s. Slot must be a positive integer less than %s.", slot, children.length));
-        }
+        Objects.checkIndex(slot, children.length);
 
         if (child == null) {
             children[slot] = null;
@@ -111,9 +111,7 @@ public class BranchNode extends Node {
      * @param slot
      */
     public void onClick(@NotNull Player p, int slot) {
-        if (0 > slot || slot >= slotCount) {
-            throw new IllegalArgumentException("Invalid slot clicked (Slot cannot be negative or greater than" + slotCount + ".)");
-        }
+        Objects.checkIndex(0, slotCount);
 
         // if not root, add go back trigger
         if (parent != null && slot == slotCount - 1) {

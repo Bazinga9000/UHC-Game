@@ -121,6 +121,11 @@ xyz:
         config:
           prompt:
             wrong_type: "Value request on unsupported type {0}"
+          needs_impl: "Type {0} is missing implementation for this method call"
+          not_numeric_type: "Type {0} is not a valid numeric type"
+          inventory:
+            invalid_slot_set: "Cannot set child at slot {0}. Slot must be a positive integer less than {1}."
+            invalid_slot_clicked: "Invalid slot clicked (Slot cannot be negative or greater than {0}.)"
       
       config:
         name:
@@ -131,4 +136,10 @@ xyz:
           ask: "Enter new value for '{0}' (type 'cancel' to cancel): "
           cancel: "Prompt cancelled."
           succ: "Set '{0}' to {1}!"
+        bool_valued:
+          status: "Status: {0}"
+          "on": "ACTIVE"
+          "off": "INACTIVE"
+        go_back: "Go Back"
+
 
