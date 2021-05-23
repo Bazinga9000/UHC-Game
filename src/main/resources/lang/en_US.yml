@@ -128,10 +128,6 @@ xyz:
             invalid_slot_clicked: "Invalid slot clicked (Slot cannot be negative or greater than {0}.)"
       
       config:
-        name:
-          a: "3"
-        desc:
-          a: "3"
         prompt:
           ask: "Enter new value for '{0}' (type 'cancel' to cancel): "
           cancel: "Prompt cancelled."
@@ -140,6 +136,11 @@ xyz:
           status: "Status: {0}"
           "on": "ACTIVE"
           "off": "INACTIVE"
-        go_back: "Go Back"
+        inv:
+          go_back: "Go Back"
+          root:
+            name: "Config"
+          
+          
 
 

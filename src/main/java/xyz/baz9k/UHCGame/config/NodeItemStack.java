@@ -56,8 +56,8 @@ public class NodeItemStack extends ItemStack {
      */
     public static final Style DEFAULT_DESC_STYLE = noDeco(NamedTextColor.GRAY);
 
-    private static final String NAME_ID_FORMAT = "xyz.baz9k.uhc.config.name.%s";
-    private static final String DESC_ID_FORMAT = "xyz.baz9k.uhc.config.desc.%s";
+    private static final String NAME_ID_FORMAT = "xyz.baz9k.uhc.config.inv.%s.name";
+    private static final String DESC_ID_FORMAT = "xyz.baz9k.uhc.config.inv.%s.desc";
 
     public NodeItemStack(Material mat, String id) {
         this(mat, id, UnaryOperator.identity());
