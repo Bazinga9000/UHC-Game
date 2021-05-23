@@ -313,6 +313,12 @@ public final class Utils {
                     buf += renderedText.content();
                     for (Component child : renderedText.children()) buf += componentString(l, child);
                     return buf;
+                } else if (rendered instanceof TranslatableComponent renderedTrans) {
+                    String buf = "";
+                    buf += renderedTrans.key();
+                    for (Component child : renderedTrans.children()) buf += componentString(l, child);
+                    return buf;
+
                 };
                 return rendered.toString(); // if not text, then can't really do anything
             })
