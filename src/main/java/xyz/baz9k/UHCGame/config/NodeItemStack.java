@@ -1,7 +1,6 @@
 package xyz.baz9k.UHCGame.config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -80,56 +79,6 @@ public class NodeItemStack extends ItemStack {
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         setItemMeta(m);
         
-    }
-    /**
-     * @param mat Material of item
-     * @param name Name of item
-     * @param mapper Function that maps the value to another value, which is used in formatting strings.
-     * @param desc Description of item
-     */
-    public NodeItemStack(Material mat, Component name, UnaryOperator<Object> mapper, Component... desc) {
-        super(mat);
-        this.rawDesc = List.of(desc);
-        this.displayDesc = new ArrayList<>(this.rawDesc);
-        this.mapper = mapper;
-
-        updateLore();
-
-        ItemMeta m = getItemMeta();
-        m.displayName(name);
-        m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        setItemMeta(m);
-        
-    }
-
-    /**
-     * @param mat Material of item
-     * @param name Name of item
-     * @param mapper Function that maps the value to another value, which is used in formatting strings.
-     * @param desc Description of item
-     */
-    public NodeItemStack(Material mat, String name, UnaryOperator<Object> mapper, String... desc) {
-        this(mat, Component.text(name, DEFAULT_NAME_STYLE), mapper, 
-            Arrays.stream(desc).map(l -> Component.text(l, DEFAULT_DESC_STYLE)).toArray(Component[]::new)
-        );
-    }
-
-    /**
-     * @param mat Material of item
-     * @param name Name of item
-     * @param desc Description of item
-     */
-    public NodeItemStack(Material mat, Component name, Component... desc) {
-        this(mat, name, UnaryOperator.identity(), desc);
-    }
-
-    /**
-     * @param mat Material of item
-     * @param name Name of item
-     * @param desc Description of item
-     */
-    public NodeItemStack(Material mat, String name, String... desc) {
-        this(mat, name, UnaryOperator.identity(), desc);
     }
 
     /**
