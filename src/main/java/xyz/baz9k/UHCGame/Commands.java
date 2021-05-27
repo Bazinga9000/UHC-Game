@@ -87,21 +87,27 @@ public class Commands {
     /uhc end
     /uhc start force
     /uhc end force
-    /uhc assignteams <solos|duos|trios|quartets|quintets|n: int>
-    /uhc clearteams
-    /uhc reseed (seed: string)
-    /uhc respawn <target: players> (loc: location)
+    /uhc teams assign <solos|duos|trios|quartets|quintets>
+    /uhc teams assign <n: int>
+    /uhc teams clear
+    /uhc reseed <seed: str>
+    /uhc respawn <target: players>
+    /uhc respawn <target: players> <loc: location>
     /uhc state get <target: players>
     /uhc state set <target: players> <spectator|combatant>
-    /uhc state set <target: players> combatant <team: int>
+    /uhc state set <target: players> <combatant> <team: int>
     /uhc stage next
-    /uhc stage set <n: int>
-    /uhc hasstarted ~ use w/ /execute store success
+    /uhc stage set <stage: stage>
+    /uhc hasstarted
     /uhc escape
     /uhc debug
-    /uhc debug <on|off>
+    /uhc debug <true|false>
+    /uhc config
+    /uhc config wipe
+    /uhc config get <path: str>
      */
 
+    // uhc start
     @Command
     private CommandAPICommand start() {
         return new CommandAPICommand("start")
@@ -117,6 +123,7 @@ public class Commands {
         );
     }
 
+    // uhc end
     @Command
     private CommandAPICommand end() {
         return new CommandAPICommand("end")
@@ -132,6 +139,7 @@ public class Commands {
         );
     }
 
+    // uhc start force
     @Command
     private CommandAPICommand startForce() {
         return new CommandAPICommand("start")
@@ -150,6 +158,7 @@ public class Commands {
         );
     }
 
+    // uhc end force
     @Command
     private CommandAPICommand endForce() {
         return new CommandAPICommand("end")
@@ -200,10 +209,12 @@ public class Commands {
         Bukkit.getServer().sendMessage(b);
     }
 
+    // uhc teams assign <solos|duos|trios|quartets|quintets>
     @Command
     private CommandAPICommand assignTeamsLiteral() {
-        return new CommandAPICommand("assignteams")
+        return new CommandAPICommand("teams")
         .withArguments(
+            new LiteralArgument("assign"),
             new MultiLiteralArgument("solos", "duos", "trios", "quartets", "quintets")
         )
         .executes(
@@ -219,10 +230,12 @@ public class Commands {
         );
     }
 
+    // uhc teams assign <n: int>
     @Command
     private CommandAPICommand assignTeamsNTeams() {
-        return new CommandAPICommand("assignteams")
+        return new CommandAPICommand("teams")
         .withArguments(
+            new LiteralArgument("assign"),
             new IntegerArgument("n", 1)
         )
         .executes(
@@ -237,9 +250,13 @@ public class Commands {
         );
     }
 
+    // uhc teams clear
     @Command
     private CommandAPICommand clearTeams() {
-        return new CommandAPICommand("clearteams")
+        return new CommandAPICommand("teams")
+        .withArguments(
+            new LiteralArgument("clear")
+        )
         .executes(
             (sender, args) -> {
                 TeamManager tm = plugin.getTeamManager();
@@ -249,6 +266,7 @@ public class Commands {
         );
     }
 
+    // uhc reseed
     @Command
     private CommandAPICommand reseed() {
         // reseeds worlds
@@ -262,6 +280,7 @@ public class Commands {
         );
     }
 
+    // uhc reseed <seed: str>
     @Command
     private CommandAPICommand reseedSpecified() {
         // reseeds worlds
@@ -291,6 +310,7 @@ public class Commands {
         sender.sendMessage(trans("xyz.baz9k.uhc.cmd.respawn.succ", p.getName()));
     }
 
+    // uhc respawn <target: players>
     @Command
     private CommandAPICommand respawn() {
         return new CommandAPICommand("respawn")
@@ -308,6 +328,7 @@ public class Commands {
         );
     }
 
+    // uhc respawn <target: players> <loc: location>
     @Command
     private CommandAPICommand respawnLoc() {
         return new CommandAPICommand("respawn")
@@ -326,6 +347,7 @@ public class Commands {
         );
     }
 
+    // uhc state get <target: players>
     @Command
     private CommandAPICommand stateGet() {
         return new CommandAPICommand("state")
@@ -345,6 +367,7 @@ public class Commands {
         );
     }
 
+    // uhc state set <target: players> <spectator|combatant>
     @Command
     private CommandAPICommand stateSet() {
         return new CommandAPICommand("state")
@@ -367,6 +390,7 @@ public class Commands {
         );
     }
 
+    // uhc state set <target: players> <combatant> <team: int>
     @Command
     private CommandAPICommand stateSetTeam() {
         return new CommandAPICommand("state")
@@ -392,6 +416,7 @@ public class Commands {
         );
     }
 
+    // uhc stage next
     @Command
     private CommandAPICommand stageNext() {
         return new CommandAPICommand("stage")
@@ -418,6 +443,7 @@ public class Commands {
         }).overrideSuggestions(sender -> Arrays.stream(GameStage.values()).map(GameStage::toString).toArray(String[]::new));
     }
 
+    // uhc stage set <stage: stage>
     @Command
     private CommandAPICommand stageSet() {
         return new CommandAPICommand("stage")
@@ -436,6 +462,7 @@ public class Commands {
         );
     }
 
+    // uhc hasstarted
     @Command
     private CommandAPICommand hasStarted() {
         return new CommandAPICommand("hasstarted")
@@ -450,6 +477,7 @@ public class Commands {
         );
     }
 
+    // uhc escape
     @Command
     private CommandAPICommand escape() {
         return new CommandAPICommand("escape")
@@ -463,6 +491,7 @@ public class Commands {
         );
     }
 
+    // uhc debug
     @Command
     private CommandAPICommand debug() {
         return new CommandAPICommand("debug")
@@ -477,6 +506,7 @@ public class Commands {
         );
     }
 
+    // uhc debug <true|false>
     @Command
     private CommandAPICommand debugOnOff() {
         return new CommandAPICommand("debug")
@@ -492,6 +522,7 @@ public class Commands {
         );
     }
 
+    // uhc config
     @Command
     private CommandAPICommand config() {
         return new CommandAPICommand("config")
@@ -505,6 +536,7 @@ public class Commands {
         );
     }
 
+    // uhc config wipe
     @Command
     private CommandAPICommand configWipe() {
         return new CommandAPICommand("config")
@@ -517,6 +549,7 @@ public class Commands {
         );
     }
 
+    // uhc config get <path: str>
     @Command
     private CommandAPICommand configGet() {
         return new CommandAPICommand("config")
