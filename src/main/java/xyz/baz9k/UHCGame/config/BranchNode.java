@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * {@link Node} that contains an {@link Inventory}.
@@ -26,6 +28,7 @@ public class BranchNode extends Node {
     private final int slotCount;
     private final Node[] children;
     private final @NotNull Inventory inventory;
+    private Predicate<Configuration> check = cfg -> true;
 
     /**
      * Create a root {@link BranchNode}. This node does not have a parent.
@@ -54,6 +57,17 @@ public class BranchNode extends Node {
         initInventory();
     }
 
+    /**
+     * Adds check to node that checks that the config is not in an invalid state (e.g. incompatibility),<p>
+     * and undoes an event if so
+     * @param check
+     * @return this
+     */
+    public BranchNode check(Predicate<Configuration> check) {
+        this.check = check;
+        return this;
+    }
+    
     private void initInventory() {
         // add glass to all slots
         ItemStack emptyGlass = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
@@ -107,6 +121,10 @@ public class BranchNode extends Node {
             Node node = children[slot];
             if (node != null) {
                 node.click(p);
+                
+                if (node instanceof ValuedNode vnode && !check.test(Node.cfg)) {
+                    vnode.undo(p);
+                }
                 succ = true;
             }
         }

@@ -15,6 +15,7 @@ public class ValuedNode extends Node {
     protected final Type type;
     protected UnaryOperator<Number> restrict = UnaryOperator.identity();
 
+    private Object prevValue;
     /**
      * Enum of the supported types for a {@link ValuedNode}.
      */
@@ -76,6 +77,10 @@ public class ValuedNode extends Node {
         }
     }
 
+    public void undo(Player p) {
+        set(prevValue);
+    }
+
     /**
      * Update the item stack based on the current config value for the node
      */
@@ -119,6 +124,7 @@ public class ValuedNode extends Node {
     }
 
     public void set(Object value) {
+        prevValue = cfg.get(id());
         if (value == Type.INTEGER || value == Type.DOUBLE) value = restrict.apply((Number) value);
         cfg.set(id(), value);
         updateItemStack();
