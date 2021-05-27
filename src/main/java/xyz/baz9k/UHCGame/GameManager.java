@@ -184,10 +184,10 @@ public class GameManager implements Listener {
 
     private void _endUHC() {
         setStage(GameStage.NOT_IN_GAME);
-        worldManager.escapeAll();
         for (Player p : Bukkit.getOnlinePlayers()) {
             resetStatuses(p);
             p.setGameMode(GameMode.SURVIVAL);
+            p.teleport(worldManager.lobbySpawn());
         }
         
         // update display names
