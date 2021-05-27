@@ -358,7 +358,7 @@ public class HUDManager implements Listener {
     public void updateElapsedTimeHUD(@NotNull Player p){
         String elapsed = getLongTimeString(gameManager.getElapsedTime());
 
-        World world = plugin.getWorldManager().getUHCWorld(0);
+        World world = plugin.getWorldManager().getGameWorld(0);
         long time = world.getTime();
         boolean isDay = !(13188 <= time && time <= 22812);
         TextColor dayCharColor = isDay ? TextColor.color(255, 245, 123) : TextColor.color(43, 47, 119);

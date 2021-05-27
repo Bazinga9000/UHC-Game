@@ -286,11 +286,11 @@ public class GameManager implements Listener {
         bbManager.updateBossbarStage();
 
         stage.sendMessage();
-        stage.applyWBSize(worldManager.getUHCWorlds());
+        stage.applyWBSize(worldManager.getGameWorlds());
 
         // deathmatch
         if (isDeathmatch()) {
-            World w = worldManager.getUHCWorld(0);
+            World w = worldManager.getGameWorld(0);
 
             int radius = (int) GameStage.DEATHMATCH.wbRadius();
             for (int x = -radius; x <= radius; x++) {

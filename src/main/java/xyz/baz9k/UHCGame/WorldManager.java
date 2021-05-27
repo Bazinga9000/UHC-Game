@@ -48,7 +48,7 @@ public class WorldManager {
     /**
      * @return an Array of {@link World} which the UHC uses.
      */
-    public World[] getUHCWorlds() {
+    public World[] getGameWorlds() {
         return worldNames.stream()
             .map(Bukkit::getWorld)
             .toArray(World[]::new);
@@ -59,7 +59,7 @@ public class WorldManager {
      * @param i Index of world in registration
      * @return the world
      */
-    public World getUHCWorld(int i) {
+    public World getGameWorld(int i) {
         return Bukkit.getWorld(worldNames.get(i));
     }
 
@@ -69,14 +69,14 @@ public class WorldManager {
     }
 
     public Location gameSpawn() {
-        return getUHCWorld(0).getSpawnLocation();
+        return getGameWorld(0).getSpawnLocation();
     }
     public Location lobbySpawn() {
         return getLobbyWorld().getSpawnLocation();
     }
     
     public void initializeWorlds() {
-        for (World w : getUHCWorlds()) {
+        for (World w : getGameWorlds()) {
             // set time to 0 and delete rain
             w.setTime(0);
             w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
@@ -121,7 +121,7 @@ public class WorldManager {
      */
     public void reseedWorlds(String seed) {
         var wm = plugin.getMVWorldManager();
-        for (World w : getUHCWorlds()) {
+        for (World w : getGameWorlds()) {
             wm.regenWorld(w.getName(), true, false, seed);
         }
         worldsRegened = true;
@@ -159,14 +159,14 @@ public class WorldManager {
     }
     
     public Location getCenterAtY(double y) {
-        return center.loc(getUHCWorld(0), y);
+        return center.loc(getGameWorld(0), y);
     }
 
     public Location getHighCenter() {
-        return getHighestLoc(getUHCWorld(0), center);
+        return getHighestLoc(getGameWorld(0), center);
     }
 
     public boolean inGame(Player p) {
-        return Arrays.asList(getUHCWorlds()).contains(p.getWorld());
+        return Arrays.asList(getGameWorlds()).contains(p.getWorld());
     }
 }
