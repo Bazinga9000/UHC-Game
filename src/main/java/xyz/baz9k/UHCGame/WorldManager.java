@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.World.Environment;
+import org.bukkit.entity.Player;
 
 import xyz.baz9k.UHCGame.util.Point2D;
 
@@ -118,6 +119,21 @@ public class WorldManager {
             wm.regenWorld(w.getName(), true, false, seed);
         }
         worldsRegened = true;
+    }
+
+
+    /**
+     * Sends all players back to the lobby world.
+     * <p>
+     * Accessible through /uhc escape
+     */
+    public void escapeAll() {
+        World lobby = getLobbyWorld();
+        Location spawn = lobby.getSpawnLocation();
+        
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.teleport(spawn);
+        };
     }
 
     /**

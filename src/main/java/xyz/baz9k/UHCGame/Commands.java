@@ -442,7 +442,7 @@ public class Commands {
         return new CommandAPICommand("escape")
         .executes(
             (sender, args) -> {
-                plugin.getGameManager().escapeAll();
+                plugin.getWorldManager().escapeAll();
             }
         );
     }

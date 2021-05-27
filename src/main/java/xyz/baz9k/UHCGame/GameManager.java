@@ -179,7 +179,7 @@ public class GameManager implements Listener {
 
     private void _endUHC() {
         setStage(GameStage.NOT_IN_GAME);
-        escapeAll();
+        worldManager.escapeAll();
         for (Player p : Bukkit.getOnlinePlayers()) {
             resetStatuses(p);
             p.setGameMode(GameMode.SURVIVAL);
@@ -244,26 +244,6 @@ public class GameManager implements Listener {
         for (PotionEffect effect : p.getActivePotionEffects()) {
             p.removePotionEffect(effect.getType());
         }
-    }
-
-    /**
-     * Sends all players back to the lobby world.
-     * <p>
-     * Accessible through /uhc escape
-     */
-    public void escapeAll() {
-        World lobby = worldManager.getLobbyWorld();
-        Location spawn = new Location(lobby, 0, 10, 0);
-        Material mat = spawn.getBlock().getType();
-
-        // check if 0 10 0 is valid spawn place, else teleport to highest 0,0
-        if (mat != Material.AIR && mat != Material.CAKE) {
-            spawn = lobby.getHighestBlockAt(0, 0).getLocation();
-        }
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.setBedSpawnLocation(spawn);
-            p.teleport(spawn);
-        };
     }
 
     public boolean hasUHCStarted() {
