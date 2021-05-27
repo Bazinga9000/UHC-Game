@@ -74,11 +74,11 @@ public class ConfigTree {
         BranchNode esoterics = new BranchNode(root, slotAt(1, 6), "esoteric",   new NodeItemStack.Info(Material.NETHER_STAR),             6);
 
         /* INTERVALS (in secs) */
-        new ValuedNode(intervals, slotAt(1, 2), "start",     new NodeItemStack.Info(Material.RED_CONCRETE,    i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
-        new ValuedNode(intervals, slotAt(1, 3), "movement1", new NodeItemStack.Info(Material.ORANGE_CONCRETE, i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
-        new ValuedNode(intervals, slotAt(1, 4), "stop",      new NodeItemStack.Info(Material.YELLOW_CONCRETE, i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
-        new ValuedNode(intervals, slotAt(1, 5), "movement2", new NodeItemStack.Info(Material.GREEN_CONCRETE,  i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
-        new ValuedNode(intervals, slotAt(1, 6), "dmwait",    new NodeItemStack.Info(Material.BLUE_CONCRETE,   i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 2), "start",     new NodeItemStack.Info(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.RED_CONCRETE,    i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 3), "movement1", new NodeItemStack.Info(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.ORANGE_CONCRETE, i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 4), "stop",      new NodeItemStack.Info(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.YELLOW_CONCRETE, i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 5), "movement2", new NodeItemStack.Info(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.GREEN_CONCRETE,  i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 6), "dmwait",    new NodeItemStack.Info(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.BLUE_CONCRETE,   i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
 
         /* WB SIZE (diameter) */
         new ValuedNode(wbSize, slotAt(1, 2), "initial",    new NodeItemStack.Info(Material.RED_STAINED_GLASS),    ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
@@ -101,7 +101,7 @@ public class ConfigTree {
         new ValuedNode(esoterics, i++, "always_elytra", new NodeItemStack.Info(Material.ELYTRA,                TextColor.color(0xB5B8FF)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, i++, "sardines",      new NodeItemStack.Info(Material.TROPICAL_FISH,         TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, i++, "wither_bonus",  new NodeItemStack.Info(Material.WITHER_SKELETON_SKULL, TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
-        new OptionValuedNode(esoterics, i++, "dn_cycle", new NodeItemStack.Info(null, TextColor.color(0xFFEB85)),
+        new OptionValuedNode(esoterics, i++, "dn_cycle", new NodeItemStack.Info(Material.AIR, TextColor.color(0xFFEB85)),
             new OptionData("05:00 per cycle", Material.CLOCK),
             new OptionData("10:00 per cycle", Material.COMPASS),
             new OptionData("20:00 per cycle", Material.SNOWBALL)
@@ -110,13 +110,13 @@ public class ConfigTree {
         new ValuedNode(esoterics, i++, "always_night",  new NodeItemStack.Info(Material.LIGHT_GRAY_CONCRETE, TextColor.color(0x371DA8)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, i++, "nether_spawn",  new NodeItemStack.Info(Material.NETHERRACK,          TextColor.color(0x9C4040)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, i++, "bomberman",     new NodeItemStack.Info(Material.GUNPOWDER,           TextColor.color(0x800000)), ValuedNode.Type.BOOLEAN);
-        new OptionValuedNode(esoterics, i++, "max_health", new NodeItemStack.Info(null, TextColor.color(0xFF2121)),
+        new OptionValuedNode(esoterics, i++, "max_health", new NodeItemStack.Info(Material.AIR, TextColor.color(0xFF2121)),
             new OptionData("\u2764 05", Material.SPIDER_EYE),
             new OptionData("\u2764 10", Material.APPLE),
             new OptionData("\u2764 20", Material.GOLDEN_APPLE),
             new OptionData("\u2764 30", Material.ENCHANTED_GOLDEN_APPLE)
         );
-        new OptionValuedNode(esoterics, i++, "mv_speed", new NodeItemStack.Info(null, TextColor.color(0x61A877)),
+        new OptionValuedNode(esoterics, i++, "mv_speed", new NodeItemStack.Info(Material.AIR, TextColor.color(0x61A877)),
             new OptionData("0.5x", Material.SOUL_SAND),
             new OptionData("1.0x", Material.GRASS_BLOCK),
             new OptionData("2.0x", Material.ICE),

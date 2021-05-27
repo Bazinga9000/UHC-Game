@@ -21,7 +21,7 @@ public class OptionValuedNode extends ValuedNode {
      * @param optData An array of options that this node supports 
      */
     public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.Info info, OptionData... optData) {
-        super(parent, slot, nodeName, info.withMaterial(optData[0].material()), ValuedNode.Type.OPTION);
+        super(parent, slot, nodeName, info.withMatGet(v -> optData[(int) v].material()), ValuedNode.Type.OPTION);
         this.optData = optData;
         updateItemStack();
     }

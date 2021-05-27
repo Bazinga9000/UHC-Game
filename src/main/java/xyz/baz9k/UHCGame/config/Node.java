@@ -24,7 +24,7 @@ public abstract class Node {
     public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.Info info) {
         this.parent = parent;
         this.nodeName = nodeName;
-        this.itemStack = info.mat() == null ? null : new NodeItemStack(id(), info);
+        this.itemStack = info == null ? null : new NodeItemStack(id(), info);
 
         this.parentSlot = parentSlot;
         if (parent != null) {
