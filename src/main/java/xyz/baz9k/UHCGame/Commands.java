@@ -4,6 +4,8 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.*;
+import dev.jorel.commandapi.arguments.CustomArgument.CustomArgumentException;
+import dev.jorel.commandapi.arguments.CustomArgument.MessageBuilder;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import net.kyori.adventure.text.Component;
@@ -21,6 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 
 
@@ -405,17 +408,27 @@ public class Commands {
         );
     }
 
+    private Argument gameStageArgument(String nodeName) {
+        return new CustomArgument<GameStage>(nodeName, input -> {
+            try {
+                return GameStage.valueOf(input);
+            } catch (IllegalArgumentException | NullPointerException e) {
+                throw new CustomArgumentException(new MessageBuilder("Unknown stage: ").appendArgInput());
+            }
+        }).overrideSuggestions(sender -> Arrays.stream(GameStage.values()).map(GameStage::toString).toArray(String[]::new));
+    }
+
     @Command
     private CommandAPICommand stageSet() {
         return new CommandAPICommand("stage")
         .withArguments(
             new LiteralArgument("set"),
-            new IntegerArgument("stage")
+            gameStageArgument("stage")
         )
         .executes(
             (sender, args) -> {
                 GameManager gm = plugin.getGameManager();
-                GameStage s = GameStage.fromIndex((int) args[0]);
+                GameStage s = (GameStage) args[0];
 
                 gm.setStage(s);
                 sender.sendMessage(trans("xyz.baz9k.uhc.cmd.stage_set.succ", gm.getStage()));
