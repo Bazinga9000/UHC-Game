@@ -20,8 +20,6 @@ esoteric:
   sardines: false
   wither_bonus: true
   dn_cycle: 2
-  always_day: false
-  always_night: false
   nether_spawn: false
   bomberman: false
   max_health: 1

@@ -104,10 +104,10 @@ public class ConfigTree {
         new OptionValuedNode(esoterics, i++, "dn_cycle", new NodeItemStack.Info(Material.AIR, TextColor.color(0xFFEB85)),
             new OptionData("05:00 per cycle", Material.CLOCK),
             new OptionData("10:00 per cycle", Material.COMPASS),
-            new OptionData("20:00 per cycle", Material.SNOWBALL)
+            new OptionData("20:00 per cycle", Material.SNOWBALL),
+            new OptionData("Always Day", Material.GLOWSTONE),
+            new OptionData("Always Night", Material.LIGHT_GRAY_CONCRETE)
         );
-        new ValuedNode(esoterics, i++, "always_day",    new NodeItemStack.Info(Material.GLOWSTONE,           TextColor.color(0xDFED5C)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, i++, "always_night",  new NodeItemStack.Info(Material.LIGHT_GRAY_CONCRETE, TextColor.color(0x371DA8)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, i++, "nether_spawn",  new NodeItemStack.Info(Material.NETHERRACK,          TextColor.color(0x9C4040)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, i++, "bomberman",     new NodeItemStack.Info(Material.GUNPOWDER,           TextColor.color(0x800000)), ValuedNode.Type.BOOLEAN);
         new OptionValuedNode(esoterics, i++, "max_health", new NodeItemStack.Info(Material.AIR, TextColor.color(0xFF2121)),

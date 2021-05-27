@@ -234,13 +234,7 @@ xyz:
                 the winning team gets
                 a Wither to fight.
             dn_cycle:
-              name: "Fast Day-Night Cycle"
-              desc: ""
-            always_day:
-              name: "Always Day"
-              desc: ""
-            always_night:
-              name: "Always Night"
+              name: "Day-Night Cycle"
               desc: ""
             nether_spawn:
               name: "Spawn in Nether"
