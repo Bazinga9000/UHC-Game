@@ -431,18 +431,18 @@ public class GameManager implements Listener {
                 delayedMessage(teamElimMsg, plugin, 1);
             }
 
-            // set bed spawn
-            Location newSpawn = dead.getLocation();
-            if (newSpawn.getY() < 0) {
-                dead.setBedSpawnLocation(worldManager.getUHCWorld(0).getSpawnLocation(), true);
-            } else {
-                dead.setBedSpawnLocation(newSpawn, true);
-            }
-
             // check win condition
             if (teamManager.countLivingTeams() == 1) {
                 winMessage();
             }
+        }
+        
+        // set bed spawn
+        Location newSpawn = dead.getLocation();
+        if (newSpawn.getY() < 0) {
+            dead.setBedSpawnLocation(worldManager.getUHCWorld(0).getSpawnLocation(), true);
+        } else {
+            dead.setBedSpawnLocation(newSpawn, true);
         }
 
         Player killer = dead.getKiller();
