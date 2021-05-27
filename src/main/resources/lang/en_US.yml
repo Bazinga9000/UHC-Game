@@ -64,11 +64,10 @@ xyz:
           pronoun: "It"
         warning:
           # base, "the world border", radius, duration 
-          no_warn: "{0}" # just the base message
-          wb_will_shrink: "{0} {1} will begin shrinking to ±{2} in {3}!"
-          wb_will_instant_shrink: "{0} {1} will immediately shrink to ±{2} in {3}! Watch out!"
-          wb_just_shrink: "{0} {1} will stop at ±{2} in {3}."
-          wb_just_instant_shrink: "{1} has immediately shrank to ±{2}!"
+          wb_will_shrink: "{0} will begin shrinking to ±{1} in {2}!"
+          wb_will_instant_shrink: "{0} will immediately shrink to ±{1} in {2}! Watch out!"
+          wb_just_shrink: "{0} will stop at ±{1} in {2}."
+          wb_just_instant_shrink: "{0} has immediately shrank to ±{1}!"
 
           dm_warn: "If the game does not end within {0}, I shall end it myself!" # duration
 

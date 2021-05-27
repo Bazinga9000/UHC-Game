@@ -15,7 +15,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.TextColor;
 
 import static net.kyori.adventure.text.format.TextDecoration.*;
@@ -124,6 +123,21 @@ public enum GameStage {
     }
 
     /**
+     * @return the first previous stage that has a non-zero duration
+     * <p> returns null if called on {@link #NOT_IN_GAME} or there is no previous active stage
+     */
+    @Nullable
+    private GameStage prev() {
+        GameStage[] values = values();
+
+        // iter every stage before this stage in reverse except NOT_IN_GAME
+        for (int i = ordinal() - 1; i >= 1; i--) {
+            GameStage gs = values[i];
+            if (gs.isActive()) return gs;
+        }
+        return null;
+    }
+    /**
      * @return the next stage that has a non-zero duration
      * <p> returns null if called on {@link #NOT_IN_GAME} or there is no further active stage
      */
@@ -139,22 +153,14 @@ public enum GameStage {
     }
 
     /**
-     * Last stage before DM that has a non-zero duration
-     * <p> returns null if every stage has a 0 duration (Should not be possible normally).
+     * @return true if the wb changes after this stage
      */
-    @Nullable
-    private static GameStage last() {
-        GameStage[] values = values();
-
-        // iter every stage in reverse EXCEPT NOT_IN_GAME and DEATHMATCH
-        for (int i = values.length - 2; i >= 1; i--) {
-            GameStage gs = values[i];
-            if (gs.isActive()) {
-                return gs;
-            };
-        }
-        return null;
+    private boolean wbChangesAfter() {
+        var next = next();
+        if (next == null) return false;
+        return wbDiameter() == next.wbDiameter();
     }
+
 
     /* PROPERTIES */
     public BossBar.Color getBBColor() {
@@ -211,6 +217,16 @@ public enum GameStage {
                         );
     }
 
+    private static String WB_NAME = "xyz.baz9k.uhc.chat.wb.name";
+    private static String WB_PRONOUN = "xyz.baz9k.uhc.chat.wb.pronoun";
+
+    private static String WILL_SHRINK = "xyz.baz9k.uhc.chat.warning.wb_will_shrink";
+    private static String WILL_SHRINK_INSTANT = "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink";
+    private static String JUST_SHRINK = "xyz.baz9k.uhc.chat.warning.wb_will_shrink";
+    private static String JUST_SHRINK_INSTANT = "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink";
+    
+    private static String DM_WARN = "xyz.baz9k.uhc.chat.warning.dm_warn";
+
     /**
      * Sends the linked message in chat.
      */
@@ -221,22 +237,32 @@ public enum GameStage {
             return;
         }
 
-        TranslatableComponent situation = trans("xyz.baz9k.uhc.chat.warning.no_warn").style(bodyStyle);
-        Component subject = trans(this == WB_STILL ? "xyz.baz9k.uhc.chat.wb.name" : "xyz.baz9k.uhc.chat.wb.pronoun");
-
-        GameStage nextGrad = next();
-        if (!nextGrad.isWBInstant) {
-            situation = trans(nextGrad.isActive() ? "xyz.baz9k.uhc.chat.warning.wb_will_shrink" : "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink");
-        }
-        if (!isWBInstant) {
-            situation = trans(isActive() ? "xyz.baz9k.uhc.chat.warning.wb_just_shrink" : "xyz.baz9k.uhc.chat.warning.wb_just_instant_shrink");
-        }
-        
         TextComponent.Builder s = getMessageBuilder();
+        s.append(baseChatMsg);
+
+        String situationKey = null;
+        Component subject = trans(this == WB_STILL ? WB_NAME : WB_PRONOUN);
+
+        GameStage next = next();
+
+        // at the beginning of each wb change, add a msg
+        // at the end of each wb change, add a msg
+        if (wbChangesAfter()) {
+            situationKey = next.isWBInstant ? WILL_SHRINK_INSTANT : WILL_SHRINK;
+        } else if (prev().wbChangesAfter()) {
+            situationKey = isWBInstant ? JUST_SHRINK_INSTANT : JUST_SHRINK;
+        }
         
-        s.append(situation.style(bodyStyle).args(baseChatMsg, subject, Component.text(wbDiameter() / 2), getWordTime(duration())));
-        if (this == last()) {
-            s.append(Component.space()).append(trans("xyz.baz9k.uhc.chat.warning.dm_warn", getWordTime(duration())).style(bodyStyle));
+        Component situation = trans(situationKey, subject, wbRadius(), getWordTime(duration()))
+            .style(bodyStyle);
+        
+        s.append(Component.space());
+        s.append(situation);
+        if (this == DEATHMATCH.prev()) {
+            Component dmwarn = trans(DM_WARN, getWordTime(duration())).style(bodyStyle);
+            
+            s.append(Component.space())
+             .append(dmwarn);
         }
         
         Bukkit.getServer().sendMessage(s);
