@@ -17,6 +17,8 @@ public class UHCGame extends JavaPlugin {
     private BossbarManager bbManager;
     private LangManager langManager;
     private ConfigManager configManager;
+    private WorldManager worldManager;
+    private SpreadPlayersManager spreadPlayersManager;
     private Recipes recipes;
 
     @Override
@@ -32,6 +34,8 @@ public class UHCGame extends JavaPlugin {
         hudManager = new HUDManager(this);
         bbManager = new BossbarManager(this);
         configManager = new ConfigManager(this);
+        worldManager = new WorldManager(this);
+        spreadPlayersManager = new SpreadPlayersManager(this);
         recipes = new Recipes(this);
 
         Bukkit.getPluginManager().registerEvents(gameManager, this);
@@ -62,12 +66,17 @@ public class UHCGame extends JavaPlugin {
     public BossbarManager getBossbarManager() {
         return bbManager;
     }
-    
     public LangManager getLangManager() {
         return langManager;
     }
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+    public WorldManager getWorldManager() {
+        return worldManager;
+    }
+    public SpreadPlayersManager spreadPlayers() {
+        return spreadPlayersManager;
     }
 
     public Recipes getRecipes() {

@@ -256,7 +256,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 sender.sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.start").color(NamedTextColor.YELLOW));
-                plugin.getGameManager().reseedWorlds();
+                plugin.getWorldManager().reseedWorlds();
                 sender.sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.succ").color(NamedTextColor.YELLOW));
             }
         );
@@ -272,7 +272,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 sender.sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.start").color(NamedTextColor.YELLOW));
-                plugin.getGameManager().reseedWorlds((String) args[0]);
+                plugin.getWorldManager().reseedWorlds((String) args[0]);
                 sender.sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.succ").color(NamedTextColor.YELLOW));
             }
         );
@@ -455,7 +455,7 @@ public class Commands {
         return new CommandAPICommand("escape")
         .executes(
             (sender, args) -> {
-                plugin.getGameManager().escapeAll();
+                plugin.getWorldManager().escapeAll();
             }
         );
     }

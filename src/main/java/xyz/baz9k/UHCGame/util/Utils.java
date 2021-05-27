@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -201,21 +200,6 @@ public final class Utils {
 
     public static double rand(double min, double max) {
         return min + ((max - min) * Math.random());
-    }
-
-    //random location generation
-    public static boolean isLocationSpawnable(Location l) {
-        return (!isLocationOverLava(l) && !isLocationOverWater(l));
-    }
-
-    public static boolean isLocationOverLava(Location l) {
-        Location blockLocation = l.add(0,-1,0);
-        return (blockLocation.getBlock().getType() == Material.LAVA);
-    }
-
-    public static boolean isLocationOverWater(Location l) {
-        Location blockLocation = l.add(0,-1,0);
-        return (blockLocation.getBlock().getType() == Material.WATER);
     }
 
     /**

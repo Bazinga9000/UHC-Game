@@ -6,8 +6,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.WorldType;
-import org.bukkit.World.Environment;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,14 +26,9 @@ import xyz.baz9k.UHCGame.util.*;
 import java.time.*;
 import java.util.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 import java.util.UUID;
-import java.util.function.IntFunction;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
@@ -47,16 +40,13 @@ public class GameManager implements Listener {
     private TeamManager teamManager;
     private HUDManager hudManager;
     private BossbarManager bbManager;
+    private WorldManager worldManager;
     private Recipes recipes;
     private BukkitTask tick;
 
     private Instant startTime = null;
-    
-    private boolean worldsRegened = false;
 
     private HashMap<UUID, Integer> kills = new HashMap<>();
-
-    private final Point2D center = new Point2D(0.5, 0.5);
 
     private GameStage stage = GameStage.NOT_IN_GAME;
     private Instant lastStageInstant = null;
@@ -64,10 +54,6 @@ public class GameManager implements Listener {
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
         previousDisplayNames = new HashMap<>();
-
-        // create MV worlds if missing
-        createMVWorld("game", Environment.NORMAL);
-        createMVWorld("game_nether", Environment.NETHER);
     }
 
     /**
@@ -77,6 +63,7 @@ public class GameManager implements Listener {
         teamManager = plugin.getTeamManager();
         hudManager = plugin.getHUDManager();
         bbManager = plugin.getBossbarManager();
+        worldManager = plugin.getWorldManager();
         recipes = plugin.getRecipes();
     }
 
@@ -100,7 +87,7 @@ public class GameManager implements Listener {
                     throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.team.must_assigned");
                 }
             }
-            if (!worldsRegened) {
+            if (!worldManager.worldsRegened()) {
                 throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.must_regened");
             }
         } else {
@@ -118,37 +105,12 @@ public class GameManager implements Listener {
     }
     private void _startUHC() {
         setStage(GameStage.fromIndex(0));
-        worldsRegened = false;
+        worldManager.worldsRegenedOff();
 
         startTime = lastStageInstant = Instant.now();
         kills.clear();
         
-        for (World w : getUHCWorlds()) {
-            // set time to 0 and delete rain
-            w.setTime(0);
-            w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
-            
-            w.getWorldBorder().setCenter(center.x(), center.z());
-            w.getWorldBorder().setWarningDistance(25);
-            w.getWorldBorder().setDamageBuffer(0);
-            w.getWorldBorder().setDamageAmount(1);
-
-            Gamerules.set(w);
-            purgeWorld(w);
-
-            // create beacon in worlds
-            w.getBlockAt(0, 1, 0).setType(Material.BEACON);
-            w.getBlockAt(0, 2, 0).setType(Material.BEDROCK);
-            for (int x = -1; x <= 1; x++) {
-                for (int z = -1; z <= 1; z++) {
-                    w.getBlockAt(x, 0, z).setType(Material.NETHERITE_BLOCK);
-                }
-            }
-            for (int y = 3; y <= w.getMaxHeight() - 1; y++) {
-                w.getBlockAt(0, y, 0).setType(Material.BARRIER);
-            }
-        }
-        
+        worldManager.initializeWorlds();
         for (Player p : Bukkit.getOnlinePlayers()) {
             // archive previous display name
             previousDisplayNames.put(p.getUniqueId(), p.displayName());
@@ -174,9 +136,14 @@ public class GameManager implements Listener {
 
         bbManager.enable(Bukkit.getServer());
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
-        spreadPlayersRandom(true, getCenter(), GameStage.WB_STILL.wbDiameter(), GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams()));
+
+        double max = GameStage.WB_STILL.wbDiameter(),
+               min = GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams());
+        Location defaultLoc = worldManager.getUHCWorld(0).getSpawnLocation();
+
+        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
-        Bukkit.unloadWorld(getLobbyWorld(), true);
+        Bukkit.unloadWorld(worldManager.getLobbyWorld(), true);
 
         startTick();
     }
@@ -212,7 +179,7 @@ public class GameManager implements Listener {
 
     private void _endUHC() {
         setStage(GameStage.NOT_IN_GAME);
-        escapeAll();
+        worldManager.escapeAll();
         for (Player p : Bukkit.getOnlinePlayers()) {
             resetStatuses(p);
             p.setGameMode(GameMode.SURVIVAL);
@@ -279,60 +246,8 @@ public class GameManager implements Listener {
         }
     }
 
-    /**
-     * Sends all players back to the lobby world.
-     * <p>
-     * Accessible through /uhc escape
-     */
-    public void escapeAll() {
-        World lobby = getLobbyWorld();
-        Location spawn = new Location(lobby, 0, 10, 0);
-        Material mat = spawn.getBlock().getType();
-
-        // check if 0 10 0 is valid spawn place, else teleport to highest 0,0
-        if (mat != Material.AIR && mat != Material.CAKE) {
-            spawn = lobby.getHighestBlockAt(0, 0).getLocation();
-        }
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.setBedSpawnLocation(spawn);
-            p.teleport(spawn);
-        };
-    }
-
     public boolean hasUHCStarted() {
         return stage != GameStage.NOT_IN_GAME;
-    }
-
-    /**
-     * Reseed worlds then mark worlds as reseeded.
-     * <p>
-     * Accessible through /uhc reseed
-     */
-    public void reseedWorlds() {
-        long l = new Random().nextLong();
-        reseedWorlds(String.valueOf(l));
-    }
-
-    /**
-     * Reseed worlds then mark worlds as reseeded.
-     * <p>
-     * Accessible through /uhc reseed <seed>
-     * @param seed
-     */
-    public void reseedWorlds(String seed) {
-        var wm = plugin.getMVWorldManager();
-        for (World w : getUHCWorlds()) {
-            wm.regenWorld(w.getName(), true, false, seed);
-        }
-        worldsRegened = true;
-    }
-
-    private void purgeWorld(World w) {
-        var wm = plugin.getMVWorldManager();
-        var purger = wm.getTheWorldPurger();
-        var mvWorld = wm.getMVWorld(w);
-
-        purger.purgeWorld(mvWorld, Arrays.asList("MONSTERS"), false, false); // multiverse is stupid (purges all monsters, hopefully)
     }
 
     /**
@@ -366,11 +281,11 @@ public class GameManager implements Listener {
         bbManager.updateBossbarStage();
 
         stage.sendMessage();
-        stage.applyWBSize(getUHCWorlds());
+        stage.applyWBSize(worldManager.getUHCWorlds());
 
         // deathmatch
         if (isDeathmatch()) {
-            World w = getUHCWorld(Environment.NORMAL);
+            World w = worldManager.getUHCWorld(0);
 
             int radius = (int) GameStage.DEATHMATCH.wbRadius();
             for (int x = -radius; x <= radius; x++) {
@@ -399,10 +314,11 @@ public class GameManager implements Listener {
                 ));
             }
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.teleport(getCenterAtY(255));
+                p.teleport(worldManager.getCenterAtY(255));
             }
 
-            spreadPlayersRootsOfUnity(true, center.loc(w, 0), GameStage.DEATHMATCH.wbRadius() - 1);
+            double rad = GameStage.DEATHMATCH.wbRadius() - 1;
+            plugin.spreadPlayers().rootsOfUnity(SpreadPlayersManager.BY_TEAMS(worldManager.getHighCenter()), worldManager.getCenter(), rad);
 
         }
 
@@ -444,50 +360,6 @@ public class GameManager implements Listener {
         return !end.isAfter(Instant.now());
     }
 
-    private void createMVWorld(@NotNull String world, @NotNull Environment env) {
-        var wm = plugin.getMVWorldManager();
-        if (wm.isMVWorld(world)) return;
-        wm.addWorld(world, env, String.valueOf(new Random().nextLong()), WorldType.NORMAL, true, null);
-    }
-
-    /**
-     * @return an Array of {@link World} which the UHC uses.
-     */
-    @NotNull
-    public World[] getUHCWorlds() {
-        return new World[] {
-            Bukkit.getWorld("game"),
-            Bukkit.getWorld("game_nether")
-        };
-    }
-
-    /**
-     * Get a specific game world based on its environment.
-     * @param env NORMAL|NETHER
-     * @return the world. If there is no respective game world for the environment (e.g. THE_END) return null.
-     */
-    public World getUHCWorld(@NotNull Environment env) {
-        World[] worlds = getUHCWorlds();
-        return switch (env) {
-            case NORMAL -> worlds[0];
-            case NETHER -> worlds[1];
-            default -> null;
-        };
-    }
-
-    public World getLobbyWorld() {
-        World lobby = Bukkit.getWorld("lobby");
-        if (lobby != null) return lobby;
-        return Bukkit.getWorld("world");
-    }
-
-    private Location getCenter() {
-        return getCenterAtY(0);
-    }
-    private Location getCenterAtY(double y) {
-        return center.loc(getUHCWorld(Environment.NORMAL), y);
-    }
-
     /**
      * Returns the number of kills that this combatant has dealt.
      * @param p
@@ -499,200 +371,6 @@ public class GameManager implements Listener {
         Integer k = kills.get(p.getUniqueId());
         if (k == null) return OptionalInt.empty();
         return OptionalInt.of(k);
-    }
-
-    private List<Location> getRootsOfUnityLocations(Location center, int numLocations, double distance) {
-        Point2D center2 = Point2D.fromLocation(center);
-        List<Location> locations = new ArrayList<>();
-        World w = center.getWorld();
-        for (int i = 0; i < numLocations; i++) {
-            double theta = i * 2 * Math.PI / numLocations;
-            Point2D newPt = center2.addPolar(distance, theta);
-            locations.add(getHighestLoc(w, newPt));
-        }
-        Collections.shuffle(locations);
-        return Collections.unmodifiableList(locations);
-    }
-
-    //poisson disk sampling
-    private List<Location> getRandomLocations(Location center, int numLocations, double sideLength, double minSeparation) {
-        Point2D center2 = Point2D.fromLocation(center);
-        List<Point2D> samples = new ArrayList<>();
-        List<Point2D> activeList = new ArrayList<>();
-        Random r = new Random();
-
-        final int POINTS_PER_ITER = 30;
-        
-        Point2D firstLocation = Point2D.uniformRand(center2, sideLength);
-        activeList.add(firstLocation);
-        samples.add(firstLocation);
-
-        while (!activeList.isEmpty()) {
-            int index = r.nextInt(activeList.size());
-            Point2D search = activeList.get(index);
-            Point2D toCheck = new Point2D(0,0);
-            boolean success = false;
-
-            for (int i = 0; i < POINTS_PER_ITER; i++) {
-                toCheck = Point2D.ringRand(search, minSeparation, 2 * minSeparation);
-                if (!toCheck.inSquare(center2, sideLength)) {
-                    continue;
-                }
-
-                double minDist = Double.MAX_VALUE;
-                for (Point2D point : samples) {
-                    double d = toCheck.dist(point);
-                    if (d < minDist) {
-                        minDist = d;
-                    }
-                }
-
-                if (minDist < minSeparation) {
-                    continue;
-                }
-
-                success = true;
-                break;
-
-            }
-
-            if (success) {
-                activeList.add(toCheck);
-                samples.add(toCheck);
-            } else {
-                activeList.remove(index);
-            }
-        }
-
-        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.generated", samples.size()));
-
-        List<Location> spawnableLocations = new ArrayList<>();
-        List<Location> overWaterLocations = new ArrayList<>();
-        World w = center.getWorld();
-        for (Point2D samplePoint : samples) {
-            Location sample = getHighestLoc(w, samplePoint);
-            if (isLocationSpawnable(sample)) {
-                spawnableLocations.add(sample);
-            } else if (isLocationOverWater(sample)) {
-                overWaterLocations.add(sample);
-            }
-        }
-        int totalSize = spawnableLocations.size() + overWaterLocations.size();
-        if (totalSize < numLocations) {
-            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.missing_spread_locs", totalSize);
-        }
-
-        if (spawnableLocations.size() < numLocations) {
-            int numOverWaterLocations = numLocations - spawnableLocations.size();
-            Collections.shuffle(overWaterLocations);
-            spawnableLocations.addAll(overWaterLocations.subList(0, numOverWaterLocations));
-        }
-
-        Collections.shuffle(spawnableLocations);
-        return Collections.unmodifiableList(spawnableLocations.subList(0, numLocations));
-
-    }
-
-    /*
-    private List<Location> getRandomLocations(Location center, int numLocations, double maximumRange, double minSeparation) {
-        ArrayList<Location> locations = new ArrayList<>();
-        Random r = new Random();
-        World w = getUHCWorld(Environment.NORMAL);
-
-        for (int i = 0; i < numLocations; i++) {
-            Location newLocation = null;
-            while (true) {
-                double x = center.getX() + (r.nextDouble() - 0.5) * maximumRange;
-                double z = center.getZ() + (r.nextDouble() - 0.5) * maximumRange;
-
-                if (!locations.isEmpty()) {
-                    double minDist = locations.stream()
-                                                      .map(l -> euclideanDistance(x, z, l.getX(), l.getZ()))
-                                                      .min(Double::compareTo)
-                                                      .orElseThrow();
-                    if (minDist < minSeparation) {
-                        continue;
-                    }
-                }
-                newLocation = new Location(w, x, 2 + w.getHighestBlockYAt((int) x, (int) z), z);
-
-                Material blockType = w.getBlockAt(newLocation).getType();
-
-                if (blockType == Material.LAVA) {
-                    continue;
-                }
-
-                if (blockType == Material.WATER) {
-                    continue;
-                }
-
-                break;
-            }
-
-            locations.add(newLocation);
-        }
-        return locations;
-    }
-    */
-
-    // TODO: spreadPlayers groups, for groups not aligning with teams
-    /**
-     * Spreads players to a list of locations by the given generator
-     * @param respectTeams Should teams be separated together?
-     * @param locGenerator Takes in int n, returns a list of locations of size n
-     */
-    private void spreadPlayers(boolean respectTeams, IntFunction<List<Location>> locGenerator) {
-        if (respectTeams) {
-            List<Collection<Player>> groups = new ArrayList<>();
-            for (int i : teamManager.getAliveTeams()) {
-                groups.add(teamManager.getAllCombatantsOnTeam(i));
-            }
-            
-            List<Location> loc = locGenerator.apply(groups.size());
-            teleportPlayersToLocations(groups, loc);
-        } else {
-            Collection<Player> players = teamManager.getAllCombatants();
-
-            List<Location> loc = locGenerator.apply(players.size());
-            teleportPlayersToLocations(players, loc);
-        }
-    }
-
-    /**
-     * Spreads players randomly
-     * @param respectTeams
-     * @param center
-     * @param maximumRange
-     * @param minSeparation
-     */
-    public void spreadPlayersRandom(boolean respectTeams, Location center, double maximumRange, double minSeparation) {
-        spreadPlayers(respectTeams, n -> getRandomLocations(center, n, maximumRange, minSeparation));
-    }
-
-    /**
-     * Spreads players based on the roots of unity
-     * @param respectTeams
-     * @param center
-     * @param distance
-     */
-    public void spreadPlayersRootsOfUnity(boolean respectTeams, Location center, double distance) {
-        spreadPlayers(respectTeams, n -> getRootsOfUnityLocations(center, n, distance));
-    }
-
-    private void teleportPlayersToLocations(Collection<Player> players, List<Location> locations) {
-        int index = 0;
-        for (Player p : players) {
-            p.teleport(locations.get(index));
-            index++;
-        }
-    }
-
-    private void teleportPlayersToLocations(List<Collection<Player>> groups, List<Location> locations) {
-        for (int i = 0; i < groups.size(); i++) {
-            for (Player p : groups.get(i)) {
-                p.teleport(locations.get(i));
-            }
-        }
     }
 
     private void winMessage() {
@@ -756,7 +434,7 @@ public class GameManager implements Listener {
             // set bed spawn
             Location newSpawn = dead.getLocation();
             if (newSpawn.getY() < 0) {
-                dead.setBedSpawnLocation(getUHCWorld(Environment.NORMAL).getSpawnLocation(), true);
+                dead.setBedSpawnLocation(worldManager.getUHCWorld(0).getSpawnLocation(), true);
             } else {
                 dead.setBedSpawnLocation(newSpawn, true);
             }
