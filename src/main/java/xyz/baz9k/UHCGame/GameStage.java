@@ -81,8 +81,9 @@ public enum GameStage {
 
     /**
      * @param bbClr Color of the boss bar
-     * @param dur Duration of the stage
-     * @param wbDiameter Diameter of the world border that this stage progresses to
+     * @param dur Duration of the stage (this can either be a config ID or a duration)
+     * <p> If zero, the stage will be skipped in iteration
+     * @param wbDiameter Diameter of the world border that this stage progresses to (this can either be a config ID or a double)
      * @param isWBInstant True if WB instantly jumps to this border at the start, false if progresses to WB by the end
      * @param bbTitle Title of the boss bar as a component (so, with colors and formatting)
      * @param baseChatMsg The base chat message, before color and additional warnings are added
@@ -121,14 +122,38 @@ public enum GameStage {
         if (i < 0) return null;
         return fromOrdinal(i + 1);
     }
+
     /**
-     * @return the next stage in the GameStage sequence. If NOT_IN_GAME or DEATHMATCH, it will return null.
+     * @return the next stage that has a non-zero duration
+     * <p> returns null if called on {@link #NOT_IN_GAME} or there is no further active stage
      */
     @Nullable
     public GameStage next() {
         if (this == NOT_IN_GAME) return null;
         
-        return fromOrdinal(ordinal() + 1);
+        return Arrays.stream(values())
+                     .skip(ordinal() + 1)
+                     .filter(GameStage::isActive)
+                     .findFirst()
+                     .orElse(null);
+    }
+
+    /**
+     * Last stage before DM that has a non-zero duration
+     * <p> returns null if every stage has a 0 duration (Should not be possible normally).
+     */
+    @Nullable
+    private static GameStage last() {
+        GameStage[] values = values();
+
+        // iter every stage in reverse EXCEPT NOT_IN_GAME and DEATHMATCH
+        for (int i = values.length - 2; i >= 1; i--) {
+            GameStage gs = values[i];
+            if (gs.isActive()) {
+                return gs;
+            };
+        }
+        return null;
     }
 
     /* PROPERTIES */
@@ -144,8 +169,8 @@ public enum GameStage {
         return dur.get();
     }
     
-    public boolean isInstant() {
-        return duration().isZero();
+    public boolean isActive() {
+        return !duration().isZero();
     }
 
     public double wbDiameter() {
@@ -172,38 +197,6 @@ public enum GameStage {
     }
 
     /**
-     * @return the next stage that has a non-zero duration; returns null if executed on {@link #NOT_IN_GAME} or {@link #DEATHMATCH}
-     */
-    @Nullable
-    private GameStage nextGradualStage() {
-        if (this == NOT_IN_GAME) return null;
-
-        return Arrays.stream(values())
-                     .skip(ordinal() + 1)
-                     .filter(gs -> !gs.isInstant())
-                     .findFirst()
-                     .orElse(null);
-    }
-
-    /**
-     * Last stage before DM that has a non-zero duration; returns null if every stage has a 0 duration (Should not be possible normally).
-     */
-    @Nullable
-    private static GameStage lastGradualStage() {
-        GameStage[] values = values();
-
-        // iter every stage in reverse EXCEPT NOT_IN_GAME and DEATHMATCH
-        for (int i = values.length - 2; i >= 1; i--) {
-            GameStage gs = values[i];
-            if (!gs.isInstant()) {
-                return gs;
-            };
-        }
-        return null;
-    }
-
-
-    /**
      * Gives a builder that starts a warning message by the game.
      * [warn prefix] [message]
      * <p>
@@ -227,38 +220,22 @@ public enum GameStage {
             Bukkit.getServer().sendMessage(getMessageBuilder().append(baseChatMsg));
             return;
         }
-        /**
-         * 
-         * Gradual = duration > 0
-         * Instant = duration = 0
-         * 
-         * 1. If the next gradual stage is a world border moving stage (WB_1, WB_2),
-         *   a. If it is instant, warn that WB immediately shrinks next stage
-         *   b. If it is not instant, warn that WB begins shrinking next stage 
-         * 
-         * 2. If the current stage is a world border moving stage,
-         *   a. If it is instant, display that WB just shrunk.
-         *   b. If it is not instant, display that WB is shrinking.
-         * 
-         * 3. If this is the last gradual stage, additionally display dmWarn.
-         * 
-         */
 
         TranslatableComponent situation = trans("xyz.baz9k.uhc.chat.warning.no_warn").style(bodyStyle);
         Component subject = trans(this == WB_STILL ? "xyz.baz9k.uhc.chat.wb.name" : "xyz.baz9k.uhc.chat.wb.pronoun");
 
-        GameStage nextGrad = nextGradualStage();
+        GameStage nextGrad = next();
         if (!nextGrad.isWBInstant) {
-            situation = trans(nextGrad.isInstant() ? "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink" : "xyz.baz9k.uhc.chat.warning.wb_will_shrink");
+            situation = trans(nextGrad.isActive() ? "xyz.baz9k.uhc.chat.warning.wb_will_shrink" : "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink");
         }
         if (!isWBInstant) {
-            situation = trans(isInstant() ? "xyz.baz9k.uhc.chat.warning.wb_just_instant_shrink" : "xyz.baz9k.uhc.chat.warning.wb_just_shrink");
+            situation = trans(isActive() ? "xyz.baz9k.uhc.chat.warning.wb_just_shrink" : "xyz.baz9k.uhc.chat.warning.wb_just_instant_shrink");
         }
         
         TextComponent.Builder s = getMessageBuilder();
         
         s.append(situation.style(bodyStyle).args(baseChatMsg, subject, Component.text(wbDiameter() / 2), getWordTime(duration())));
-        if (this == lastGradualStage()) {
+        if (this == last()) {
             s.append(Component.space()).append(trans("xyz.baz9k.uhc.chat.warning.dm_warn", getWordTime(duration())).style(bodyStyle));
         }
         
