@@ -67,6 +67,13 @@ public class WorldManager {
         World lobby = Bukkit.getWorld("lobby");
         return lobby != null ? lobby : Bukkit.getWorld("world");
     }
+
+    public Location gameSpawn() {
+        return getUHCWorld(0).getSpawnLocation();
+    }
+    public Location lobbySpawn() {
+        return getLobbyWorld().getSpawnLocation();
+    }
     
     public void initializeWorlds() {
         for (World w : getUHCWorlds()) {
@@ -157,5 +164,9 @@ public class WorldManager {
 
     public Location getHighCenter() {
         return getHighestLoc(getUHCWorld(0), center);
+    }
+
+    public boolean inGame(Player p) {
+        return Arrays.asList(getUHCWorlds()).contains(p.getWorld());
     }
 }

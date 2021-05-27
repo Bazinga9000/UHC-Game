@@ -103,6 +103,8 @@ public class GameManager implements Listener {
             Debug.printError(e);
         }
     }
+
+
     private void _startUHC() {
         setStage(GameStage.fromIndex(0));
         worldManager.worldsRegenedOff();
@@ -111,9 +113,22 @@ public class GameManager implements Listener {
         kills.clear();
         
         worldManager.initializeWorlds();
+
+        // do spreadplayers
+        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
+
+        double max = GameStage.WB_STILL.wbDiameter(),
+               min = GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams());
+        Location defaultLoc = worldManager.gameSpawn();
+
+        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
+        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
+
         for (Player p : Bukkit.getOnlinePlayers()) {
-            // archive previous display name
+            // handle display name
             previousDisplayNames.put(p.getUniqueId(), p.displayName());
+            p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
+
             resetStatuses(p);
             recipes.discoverFor(p);
 
@@ -127,22 +142,12 @@ public class GameManager implements Listener {
                 kills.put(p.getUniqueId(), 0);
             }
 
-            // set player display name
-            p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
-
             // activate hud things for all
             hudManager.initializePlayerHUD(p);
+            hudManager.addPlayerToTeams(p);
         }
 
         bbManager.enable(Bukkit.getServer());
-        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
-
-        double max = GameStage.WB_STILL.wbDiameter(),
-               min = GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams());
-        Location defaultLoc = worldManager.getUHCWorld(0).getSpawnLocation();
-
-        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
-        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
         Bukkit.unloadWorld(worldManager.getLobbyWorld(), true);
 
         startTick();
@@ -406,11 +411,17 @@ public class GameManager implements Listener {
         p.addAttachment(plugin, "mv.bypass.gamemode.*", true);
         p.recalculatePermissions();
 
-        if(!hasUHCStarted()) return;
-        bbManager.enable(p);
-        hudManager.initializePlayerHUD(p);
-        hudManager.addPlayerToTeams(p);
+        if (hasUHCStarted()) {
+            bbManager.enable(p);
+            hudManager.initializePlayerHUD(p);
+            hudManager.addPlayerToTeams(p);
 
+            if (!worldManager.inGame(p)) p.teleport(worldManager.gameSpawn());
+        } else {
+            if (worldManager.inGame(p)) p.teleport(worldManager.lobbySpawn());
+        }
+
+        
     }
 
     @EventHandler
@@ -440,7 +451,7 @@ public class GameManager implements Listener {
         // set bed spawn
         Location newSpawn = dead.getLocation();
         if (newSpawn.getY() < 0) {
-            dead.setBedSpawnLocation(worldManager.getUHCWorld(0).getSpawnLocation(), true);
+            dead.setBedSpawnLocation(worldManager.gameSpawn(), true);
         } else {
             dead.setBedSpawnLocation(newSpawn, true);
         }
