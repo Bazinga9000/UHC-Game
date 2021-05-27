@@ -65,8 +65,7 @@ public class WorldManager {
 
     public World getLobbyWorld() {
         World lobby = Bukkit.getWorld("lobby");
-        if (lobby != null) return lobby;
-        return Bukkit.getWorld("world");
+        return lobby != null ? lobby : Bukkit.getWorld("world");
     }
     
     public void initializeWorlds() {
@@ -130,7 +129,7 @@ public class WorldManager {
     public void escapeAll() {
         World lobby = getLobbyWorld();
         Location spawn = lobby.getSpawnLocation();
-        
+
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(spawn);
         };
