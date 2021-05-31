@@ -110,7 +110,8 @@ public final class TeamDisplay {
      * @return {@link TextComponent}
      */
     public static Component prefixed(int t, String name) {
-        return getPrefixWithSpace(t).append(Component.text(name, noDeco(WHITE)));
+        // render exists because i dunno why the chat player display doesn't work
+        return render(getPrefixWithSpace(t).append(Component.text(name, noDeco(WHITE))));
     }
 
     /**
