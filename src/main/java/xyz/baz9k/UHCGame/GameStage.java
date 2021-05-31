@@ -158,7 +158,7 @@ public enum GameStage {
     private boolean wbChangesAfter() {
         var next = next();
         if (next == null) return false;
-        return wbDiameter() == next.wbDiameter();
+        return wbDiameter() != next.wbDiameter();
     }
 
 
