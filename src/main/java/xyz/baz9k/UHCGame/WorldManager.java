@@ -151,6 +151,15 @@ public class WorldManager {
         return getHighestLoc(getGameWorld(0), center);
     }
 
+    /**
+     * Return player to lobby
+     */
+    public void escapePlayer(Player p) {
+        Location ls = lobbySpawn();
+        p.setBedSpawnLocation(ls);
+        p.teleport(ls);
+    }
+
     public boolean inGame(Player p) {
         return Arrays.asList(getGameWorlds()).contains(p.getWorld());
     }

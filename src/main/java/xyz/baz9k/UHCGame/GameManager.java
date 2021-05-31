@@ -200,7 +200,7 @@ public class GameManager implements Listener {
         for (Player p : Bukkit.getOnlinePlayers()) {
             resetStatuses(p);
             p.setGameMode(GameMode.SURVIVAL);
-            p.teleport(worldManager.lobbySpawn());
+            worldManager.escapePlayer(p);
             p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
             p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
         }
@@ -433,7 +433,7 @@ public class GameManager implements Listener {
 
             if (!worldManager.inGame(p)) p.teleport(worldManager.gameSpawn());
         } else {
-            if (worldManager.inGame(p)) p.teleport(worldManager.lobbySpawn());
+            if (worldManager.inGame(p)) worldManager.escapePlayer(p);
         }
 
         

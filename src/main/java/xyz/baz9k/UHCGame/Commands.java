@@ -463,9 +463,8 @@ public class Commands {
         return new CommandAPICommand("escape")
         .executes(
             (sender, args) -> {
-                Location lobbySpawn = plugin.getWorldManager().lobbySpawn();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.teleport(lobbySpawn);
+                    plugin.getWorldManager().escapePlayer(p);
                 }
             }
         );
