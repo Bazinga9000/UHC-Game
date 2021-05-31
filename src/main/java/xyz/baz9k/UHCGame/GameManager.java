@@ -6,6 +6,8 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -124,6 +126,11 @@ public class GameManager implements Listener {
         plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
 
+        FileConfiguration cfg = plugin.getConfig();
+        int max_health = new int[]{10, 20, 40, 60}[cfg.getInt("esoteric.max_health")];
+        double movement_speed = new double[]{0.5,1,2,3}[cfg.getInt("esoteric.mv_speed")];
+
+
         for (Player p : Bukkit.getOnlinePlayers()) {
             // handle display name
             previousDisplayNames.put(p.getUniqueId(), p.displayName());
@@ -140,7 +147,13 @@ public class GameManager implements Listener {
             } else {
                 p.setGameMode(GameMode.SURVIVAL);
                 kills.put(p.getUniqueId(), 0);
+
+                //
             }
+
+            // set maximum health and movement speed according to esoteric options
+            p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(max_health);
+            p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1 * movement_speed); // 0.1 is default value
 
             // activate hud things for all
             hudManager.initializePlayerHUD(p);
@@ -188,6 +201,8 @@ public class GameManager implements Listener {
             resetStatuses(p);
             p.setGameMode(GameMode.SURVIVAL);
             p.teleport(worldManager.lobbySpawn());
+            p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+            p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
         }
         
         // update display names
