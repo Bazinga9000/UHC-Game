@@ -71,6 +71,10 @@ xyz:
 
           dm_warn: "If the game does not end within {0}, I shall end it myself!" # duration
 
+      time:
+        hour: "{0}h"
+        minute: "{0}m"
+        second: "{0}s"
       cmd:
         clearteams: 
           succ: "All teams have been reset."
