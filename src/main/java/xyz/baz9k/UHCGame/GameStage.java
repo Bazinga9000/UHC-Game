@@ -247,10 +247,10 @@ public enum GameStage {
 
         // at the beginning of each wb change, add a msg
         // at the end of each wb change, add a msg
-        if (wbChangesAfter()) {
-            situationKey = next.isWBInstant ? WILL_SHRINK_INSTANT : WILL_SHRINK;
-        } else if (prev() != null && prev().wbChangesAfter()) {
+        if (prev() != null && prev().wbChangesAfter()) {
             situationKey = isWBInstant ? JUST_SHRINK_INSTANT : JUST_SHRINK;
+        } else if (wbChangesAfter()) {
+            situationKey = next.isWBInstant ? WILL_SHRINK_INSTANT : WILL_SHRINK;
         }
         
         s.append(Component.space());
@@ -260,7 +260,7 @@ public enum GameStage {
                 .style(bodyStyle);
             s.append(situation);
         }
-        
+
         if (this == DEATHMATCH.prev()) {
             Component dmwarn = trans(DM_WARN, getWordTime(duration())).style(bodyStyle);
             
