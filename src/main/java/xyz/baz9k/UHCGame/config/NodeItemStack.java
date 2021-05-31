@@ -5,14 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -199,16 +197,6 @@ public class NodeItemStack extends ItemStack {
         updateLore();
 
         return this;
-    }
-
-    /**
-     * Takes a function that modifies the meta and updates the item with the modified meta.
-     * @param mf
-     */
-    public void editMeta(Consumer<ItemMeta> mf) {
-        ItemMeta m = getItemMeta();
-        mf.accept(m);
-        setItemMeta(m);
     }
 
     /**
