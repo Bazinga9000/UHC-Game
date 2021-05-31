@@ -55,7 +55,8 @@ public final class TeamDisplay {
      * @return Bukkit color
      */
     public static org.bukkit.Color getBukkitColor(int t) {
-        return org.bukkit.Color.fromRGB(getColor(t).getRGB());
+        Color clr = getColor(t);
+        return org.bukkit.Color.fromRGB(clr.getRed(), clr.getGreen(), clr.getBlue());
     }
 
     /**
