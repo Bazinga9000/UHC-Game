@@ -29,8 +29,10 @@ import org.jetbrains.annotations.NotNull;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -313,7 +315,7 @@ public class HUDManager implements Listener {
             z = loc.getBlockZ();
 
         double yaw = mod(loc.getYaw() + 67.5, 360);
-        Component xc = Component.empty(), zc = Component.empty();
+        List<Component> xz = new ArrayList<>();
         /*
          * +Z =   0 -  67.5 - 135
          * -X =  90 - 157.5 - 225
@@ -330,14 +332,14 @@ public class HUDManager implements Listener {
          * 315 - 360: -X
          */
 
-        if ( 90 <= yaw && yaw < 225) xc = trans("xyz.baz9k.uhc.hud.pos_x").color(NamedTextColor.RED);
-        if (270 <= yaw || yaw <  45) xc = trans("xyz.baz9k.uhc.hud.neg_x").color(NamedTextColor.RED);
+        if ( 90 <= yaw && yaw < 225) xz.add(trans("xyz.baz9k.uhc.hud.pos_x").color(NamedTextColor.RED));
+        if (270 <= yaw || yaw <  45) xz.add(trans("xyz.baz9k.uhc.hud.neg_x").color(NamedTextColor.RED));
 
-        if (  0 <= yaw && yaw < 135) zc = trans("xyz.baz9k.uhc.hud.pos_z").color(NamedTextColor.BLUE);
-        if (180 <= yaw && yaw < 315) zc = trans("xyz.baz9k.uhc.hud.neg_z").color(NamedTextColor.BLUE);
+        if (  0 <= yaw && yaw < 135) xz.add(trans("xyz.baz9k.uhc.hud.pos_z").color(NamedTextColor.BLUE));
+        if (180 <= yaw && yaw < 315) xz.add(trans("xyz.baz9k.uhc.hud.neg_z").color(NamedTextColor.BLUE));
 
         Component pos = trans("xyz.baz9k.uhc.hud.position", x, y, z).color(NamedTextColor.GREEN);
-        Component rot = trans("xyz.baz9k.uhc.hud.rotation", Component.join(Component.space(), xc, zc))
+        Component rot = trans("xyz.baz9k.uhc.hud.rotation", Component.join(Component.space(), xz))
             .color(NamedTextColor.WHITE);
         setHUDLine(p, "posrot", Component.join(Component.space(), pos, rot));
     }
