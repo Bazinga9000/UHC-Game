@@ -214,6 +214,7 @@ public class GameManager implements Listener {
 
         teamManager.resetAllPlayers();
         hudManager.cleanup();
+        bbManager.disable(Bukkit.getServer());
         kills.clear();
         tick.cancel();
 
