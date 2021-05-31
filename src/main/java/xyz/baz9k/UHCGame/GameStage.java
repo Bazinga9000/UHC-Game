@@ -249,7 +249,7 @@ public enum GameStage {
         // at the end of each wb change, add a msg
         if (wbChangesAfter()) {
             situationKey = next.isWBInstant ? WILL_SHRINK_INSTANT : WILL_SHRINK;
-        } else if (prev().wbChangesAfter()) {
+        } else if (prev() != null && prev().wbChangesAfter()) {
             situationKey = isWBInstant ? JUST_SHRINK_INSTANT : JUST_SHRINK;
         }
         
