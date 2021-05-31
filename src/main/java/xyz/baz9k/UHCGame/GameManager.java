@@ -136,6 +136,10 @@ public class GameManager implements Listener {
             previousDisplayNames.put(p.getUniqueId(), p.displayName());
             p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
 
+            // set maximum health and movement speed according to esoteric options
+            p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(max_health);
+            p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1 * movement_speed); // 0.1 is default value
+
             resetStatuses(p);
             recipes.discoverFor(p);
 
@@ -151,9 +155,6 @@ public class GameManager implements Listener {
                 //
             }
 
-            // set maximum health and movement speed according to esoteric options
-            p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(max_health);
-            p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1 * movement_speed); // 0.1 is default value
 
             // activate hud things for all
             hudManager.initializePlayerHUD(p);
@@ -254,7 +255,7 @@ public class GameManager implements Listener {
      */
     public void resetStatuses(@NotNull Player p) {
         // fully heal, adequately saturate, remove XP
-        p.setHealth(20.0f);
+        p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
         p.setFoodLevel(20);
         p.setSaturation(5.0f);
         p.setExp(0.0f);
