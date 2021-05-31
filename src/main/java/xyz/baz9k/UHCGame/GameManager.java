@@ -190,7 +190,6 @@ public class GameManager implements Listener {
             _endUHC();
             Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.complete"));
         } catch (Exception e) {
-            setStage(GameStage.WB_STILL);
             Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.fail"));
             Debug.printError(e);
         }

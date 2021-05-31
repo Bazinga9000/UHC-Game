@@ -86,7 +86,6 @@ public class Commands {
     /uhc start
     /uhc end
     /uhc start force
-    /uhc end force
     /uhc teams assign <solos|duos|trios|quartets|quintets>
     /uhc teams assign <n: int>
     /uhc teams clear
@@ -150,25 +149,6 @@ public class Commands {
             (sender, args) -> {
                 try {
                     plugin.getGameManager().startUHC(true);
-                } catch (IllegalStateException e) {
-                    CommandAPI.fail(e.getMessage());
-                    Debug.printError(sender, e);
-                }
-            }
-        );
-    }
-
-    // uhc end force
-    @Command
-    private CommandAPICommand endForce() {
-        return new CommandAPICommand("end")
-        .withArguments(
-            new LiteralArgument("force")
-        )
-        .executes(
-            (sender, args) -> {
-                try {
-                    plugin.getGameManager().endUHC(true);
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
                     Debug.printError(sender, e);
