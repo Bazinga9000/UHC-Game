@@ -36,7 +36,7 @@ public class BranchNode extends Node {
      */
     // remove tmp when impl complete
     public BranchNode(int guiHeight) {
-        this(null, 0, null, new NodeItemStack.Info((Material) null), guiHeight);
+        this(null, 0, null, null, guiHeight);
     }
 
     /**
