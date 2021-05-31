@@ -221,9 +221,8 @@ xyz:
             always_elytra:
               name: "Always Elytra"
               desc: |-
-                Everyone is in a
-                flying state for
-                the entire game.
+                Everyone is in a flying state 
+                for the entire game.
                 Each player receives:
                     - Unbreakable Elytra w/ Curse of Binding
             sardines:
@@ -234,9 +233,8 @@ xyz:
             wither_bonus:
               name: "Wither Bonus Round"
               desc: |-
-                After the game ends,
-                the winning team gets
-                a Wither to fight.
+                After the game ends, the winning 
+                team gets a Wither to fight.
             dn_cycle:
               name: "Day-Night Cycle"
               desc: ""
