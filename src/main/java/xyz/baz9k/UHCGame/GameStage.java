@@ -253,11 +253,14 @@ public enum GameStage {
             situationKey = isWBInstant ? JUST_SHRINK_INSTANT : JUST_SHRINK;
         }
         
-        Component situation = trans(situationKey, subject, wbRadius(), getWordTime(duration()))
-            .style(bodyStyle);
-        
         s.append(Component.space());
-        s.append(situation);
+
+        if (situationKey != null) {
+            Component situation = trans(situationKey, subject, wbRadius(), getWordTime(duration()))
+                .style(bodyStyle);
+            s.append(situation);
+        }
+        
         if (this == DEATHMATCH.prev()) {
             Component dmwarn = trans(DM_WARN, getWordTime(duration())).style(bodyStyle);
             
