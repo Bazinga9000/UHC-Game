@@ -112,24 +112,33 @@ public class BranchNode extends Node {
     public void onClick(@NotNull Player p, int slot) {
         Objects.checkIndex(0, slotCount);
 
-        boolean succ = false;
+        // 0 = nothing
+        // 1 = success
+        // 2 = failure
+        int sound = 0; 
+
         // if not root, add go back trigger
         if (parent != null && slot == slotCount - 1) {
             p.openInventory(parent.inventory);
-            succ = true;
+            sound = 1;
         } else {
             Node node = children[slot];
             if (node != null) {
                 node.click(p);
+                sound = 1;
                 
                 if (node instanceof ValuedNode vnode && !check.test(Node.cfg)) {
                     vnode.undo(p);
+                    sound = 2;
                 }
-                succ = true;
             }
         }
         
-        if (succ) p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, 2);
+        switch (sound) {
+            case 1 -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, 2);
+            case 2 -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, 0.5f, 0);
+            default -> {}
+        }
     }
 
     public void click(Player p) {
