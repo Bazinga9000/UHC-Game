@@ -116,22 +116,16 @@ public class GameManager implements Listener {
         
         worldManager.initializeWorlds();
 
-        // do spreadplayers
-        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
-
-        double max = GameStage.WB_STILL.wbDiameter(),
-               min = GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams());
-        Location defaultLoc = worldManager.gameSpawn();
-
-        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
-        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
-
         FileConfiguration cfg = plugin.getConfig();
         int max_health = new int[]{10, 20, 40, 60}[cfg.getInt("esoteric.max_health")];
         double movement_speed = new double[]{0.5,1,2,3}[cfg.getInt("esoteric.mv_speed")];
 
 
         for (Player p : Bukkit.getOnlinePlayers()) {
+            // activate hud things for all
+            hudManager.initializePlayerHUD(p);
+            hudManager.addPlayerToTeams(p);
+
             // handle display name
             previousDisplayNames.put(p.getUniqueId(), p.displayName());
             p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
@@ -151,17 +145,21 @@ public class GameManager implements Listener {
             } else {
                 p.setGameMode(GameMode.SURVIVAL);
                 kills.put(p.getUniqueId(), 0);
-
-                //
             }
-
-
-            // activate hud things for all
-            hudManager.initializePlayerHUD(p);
-            hudManager.addPlayerToTeams(p);
         }
 
         bbManager.enable(Bukkit.getServer());
+
+        // do spreadplayers
+        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
+
+        double max = GameStage.WB_STILL.wbDiameter(),
+               min = GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams());
+        Location defaultLoc = worldManager.gameSpawn();
+
+        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
+        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
+
         Bukkit.unloadWorld(worldManager.getLobbyWorld(), true);
 
         startTick();
