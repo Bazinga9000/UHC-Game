@@ -80,15 +80,19 @@ public class GameManager implements Listener {
      * @param skipChecks If true, all checks are ignored.
      */
     public void startUHC(boolean skipChecks) {
+        var prevStage = stage;
+        requireNotStarted();
+
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.try"));
         if (!skipChecks) {
-            // check if game is OK to start
-            requireNotStarted();
+            // require teams assigned
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
                     throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.team.must_assigned");
                 }
             }
+
+            // require world regened
             if (!worldManager.worldsRegened()) {
                 throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.must_regened");
             }
@@ -100,7 +104,7 @@ public class GameManager implements Listener {
             _startUHC();
             Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.complete"));
         } catch (Exception e) {
-            setStage(GameStage.NOT_IN_GAME);
+            setStage(prevStage);
             Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.fail"));
             Debug.printError(e);
         }
@@ -176,18 +180,19 @@ public class GameManager implements Listener {
      * @param skipChecks If true, started game checks are ignored.
      */
     public void endUHC(boolean skipChecks) {
+        var prevStage = stage;
+        requireStarted();
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.try"));
-        if (!skipChecks) {
-            // check if game is OK to end
-            requireStarted();
-        } else {
-            Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.force"));
-        }
+        // if (!skipChecks) {
+        // } else {
+        //     Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.force"));
+        // }
         
         try {
             _endUHC();
             Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.complete"));
         } catch (Exception e) {
+            setStage(prevStage);
             Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.fail"));
             Debug.printError(e);
         }
@@ -214,7 +219,7 @@ public class GameManager implements Listener {
         hudManager.cleanup();
         bbManager.disable(Bukkit.getServer());
         kills.clear();
-        tick.cancel();
+        if (tick != null) tick.cancel();
 
     }
 
