@@ -40,6 +40,7 @@ public enum GameStage {
     private static UHCGame plugin;
     public static void setPlugin(UHCGame plugin) { GameStage.plugin = plugin; }
 
+    // union type, String | Duration
     private record ConfigDur(String id, Duration def) {
         public ConfigDur(String id)    { this(id, null);  }
         public ConfigDur(Duration def) { this(null, def); }
@@ -51,6 +52,7 @@ public enum GameStage {
         }
     }
 
+    // union type, String | double
     private record ConfigWBSize(String id, double def) {
         public ConfigWBSize(String id)    { this(id, -1);  }
         public ConfigWBSize(double def)   { this(null, def); }
@@ -102,24 +104,18 @@ public enum GameStage {
         this.bodyStyle = baseChatMsg.style();
     }
 
-    @Nullable
-    private static GameStage fromOrdinal(int i) {
-        try {
-            return values()[i];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return null;
-        }
-    }
-
     /**
-     * 0 = First in game stage
-     * @param i
-     * @return GameStage connected to index. Null if not valid
+     * Returns the nth active stage, where 0 = first active in-game stage (typically WB_STILL)
+     * @param n
+     * @return the nth active stage. null if not valid
      */
     @Nullable
-    public static GameStage fromIndex(int i) {
-        if (i < 0) return null;
-        return fromOrdinal(i + 1);
+    public static GameStage nth(int n) {
+        return Arrays.stream(values())
+            .filter(GameStage::isActive)
+            .skip(n)
+            .findFirst()
+            .orElse(null);
     }
 
     /**

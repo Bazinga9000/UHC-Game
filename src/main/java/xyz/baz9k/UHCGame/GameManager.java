@@ -112,7 +112,7 @@ public class GameManager implements Listener {
 
 
     private void _startUHC() {
-        setStage(GameStage.fromIndex(0));
+        setStage(GameStage.nth(0));
         worldManager.worldsRegenedOff();
 
         startTime = lastStageInstant = Instant.now();
