@@ -68,12 +68,18 @@ public class BranchNode extends Node {
         return this;
     }
     
-    private void initInventory() {
-        // add glass to all slots
+    private ItemStack emptyGlass() {
         ItemStack emptyGlass = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
         ItemMeta m = emptyGlass.getItemMeta();
         m.displayName(Component.space());
         emptyGlass.setItemMeta(m);
+
+        return emptyGlass;
+    }
+
+    private void initInventory() {
+        // add glass to all slots
+        ItemStack emptyGlass = emptyGlass();
         
         for (int i = 0; i < slotCount; i++) {
             inventory.setItem(i, emptyGlass);
@@ -97,7 +103,7 @@ public class BranchNode extends Node {
 
         if (child == null) {
             children[slot] = null;
-            inventory.setItem(slot, null);
+            inventory.setItem(slot, emptyGlass());
             return;
         }
         children[slot] = child;
@@ -142,7 +148,7 @@ public class BranchNode extends Node {
     }
 
     public void click(Player p) {
-        // update all slots to make sure translation goes through
+        // update all slots to make sure each item is up to date
         for (int i = 0; i < children.length; i++) {
             if (children[i] != null) updateSlot(i);
         }
