@@ -420,7 +420,8 @@ public class Commands {
             } catch (IllegalArgumentException | NullPointerException e) {
                 throw new CustomArgumentException(new MessageBuilder("Unknown stage: ").appendArgInput());
             }
-        }).overrideSuggestions(sender -> Arrays.stream(GameStage.values()).map(GameStage::toString).toArray(String[]::new));
+            // cmd requires getting the exact GS name, so use GameStage::name, not GameStage::toString
+        }).overrideSuggestions(sender -> Arrays.stream(GameStage.values()).map(GameStage::name).toArray(String[]::new));
     }
 
     // uhc stage set <stage: stage>
