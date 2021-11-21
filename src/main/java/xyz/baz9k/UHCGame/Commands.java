@@ -35,13 +35,13 @@ import org.bukkit.entity.Player;
 
 @SuppressWarnings("unchecked")
 public class Commands {
-    private final UHCGame plugin;
+    private final UHCGamePlugin plugin;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     private static @interface Command { }
 
-    public Commands(UHCGame plugin) {
+    public Commands(UHCGamePlugin plugin) {
         this.plugin = plugin;
     }
 

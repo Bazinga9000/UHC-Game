@@ -1,5 +1,5 @@
 name: UHCGame
-main: xyz.baz9k.UHCGame.UHCGame
+main: xyz.baz9k.UHCGame.UHCGamePlugin
 version: 0.0
 author: Bazinga_9000 Nefarious Dealings LLC
 api-version: 1.16

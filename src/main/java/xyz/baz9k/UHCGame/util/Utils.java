@@ -27,7 +27,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
-import xyz.baz9k.UHCGame.UHCGame;
+import xyz.baz9k.UHCGame.UHCGamePlugin;
 
 public final class Utils {
     private Utils() {}
@@ -171,7 +171,7 @@ public final class Utils {
      * @param delay
      * @return BukkitTask of the message (can be cancelled)
      */
-    public static BukkitTask delayedMessage(ComponentLike m, UHCGame plugin, long delay) {
+    public static BukkitTask delayedMessage(ComponentLike m, UHCGamePlugin plugin, long delay) {
         return Bukkit.getScheduler().runTaskLater(plugin, () -> {
             Bukkit.getServer().sendMessage(m);
         }, delay);
@@ -277,7 +277,7 @@ public final class Utils {
     }
 
     public static Component render(Component c) {
-        return GlobalTranslator.render(c, UHCGame.getLocale());
+        return GlobalTranslator.render(c, UHCGamePlugin.getLocale());
     }
 
     /**
@@ -320,7 +320,7 @@ public final class Utils {
      * @return string of the component text
      */
     public static String componentString(Component c) {
-        return componentString(UHCGame.getLocale(), c);
+        return componentString(UHCGamePlugin.getLocale(), c);
     }
 
     /**
@@ -349,7 +349,7 @@ public final class Utils {
      * @return The exception, which can be thrown.
      */
     public static <X extends Throwable> X translatableErr(Class<X> exc, Component c) {
-        return translatableErr(exc, UHCGame.getLocale(), c);
+        return translatableErr(exc, UHCGamePlugin.getLocale(), c);
     }
 
     /**

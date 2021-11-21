@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
 import net.kyori.adventure.text.format.TextColor;
-import xyz.baz9k.UHCGame.UHCGame;
+import xyz.baz9k.UHCGame.UHCGamePlugin;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
@@ -13,11 +13,11 @@ import static xyz.baz9k.UHCGame.util.Utils.*;
  */
 public class ConfigTree {
     private BranchNode root;
-    private UHCGame plugin;
+    private UHCGamePlugin plugin;
 
     private static final int ROOT_GUI_HEIGHT = 3;
 
-    public ConfigTree(UHCGame plugin) {
+    public ConfigTree(UHCGamePlugin plugin) {
         this.plugin = plugin;
         Node.setPlugin(plugin);
         root = generateTree();

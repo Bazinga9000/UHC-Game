@@ -10,7 +10,7 @@ public class BossbarManager {
     private GameManager gameManager;
     private BossBar bossbar;
 
-    public BossbarManager(UHCGame plugin) {
+    public BossbarManager(UHCGamePlugin plugin) {
         this.gameManager = plugin.getGameManager();
         this.bossbar = BossBar.bossBar(Component.empty(), 1, BossBar.Color.WHITE, BossBar.Overlay.PROGRESS);
     }

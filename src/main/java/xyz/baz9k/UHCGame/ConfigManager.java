@@ -11,7 +11,7 @@ import xyz.baz9k.UHCGame.config.*;
 public class ConfigManager implements Listener {
     private final ConfigTree configTree;
 
-    public ConfigManager(UHCGame plugin) {
+    public ConfigManager(UHCGamePlugin plugin) {
         this.configTree = new ConfigTree(plugin);
     }
 

@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import xyz.baz9k.UHCGame.util.Debug;
 
-public class UHCGame extends JavaPlugin {
+public class UHCGamePlugin extends JavaPlugin {
     private TeamManager teamManager;
     private GameManager gameManager;
     private HUDManager hudManager;

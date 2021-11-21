@@ -18,12 +18,12 @@ import org.bukkit.entity.Player;
 import xyz.baz9k.UHCGame.util.Point2D;
 
 public class WorldManager {
-    private UHCGame plugin;
+    private UHCGamePlugin plugin;
     private boolean worldsRegened = false;
     private List<String> worldNames = new ArrayList<>();
     private final Point2D center = new Point2D(0.5, 0.5);
 
-    public WorldManager(UHCGame plugin) {
+    public WorldManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
 
         // create MV worlds if missing

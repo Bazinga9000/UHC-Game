@@ -39,9 +39,9 @@ import java.util.Set;
 public class HUDManager implements Listener {
     private final GameManager gameManager;
     private final TeamManager teamManager;
-    private final UHCGame plugin;
+    private final UHCGamePlugin plugin;
 
-    public HUDManager(UHCGame plugin) {
+    public HUDManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.teamManager = plugin.getTeamManager();

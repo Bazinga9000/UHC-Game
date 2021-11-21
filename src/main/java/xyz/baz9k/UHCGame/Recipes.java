@@ -19,9 +19,9 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.jetbrains.annotations.NotNull;
 
 public final class Recipes {
-    private UHCGame plugin;
+    private UHCGamePlugin plugin;
     private Set<NamespacedKey> registered = new HashSet<>();
-    public Recipes(UHCGame plugin) {
+    public Recipes(UHCGamePlugin plugin) {
         this.plugin = plugin;
     }
 

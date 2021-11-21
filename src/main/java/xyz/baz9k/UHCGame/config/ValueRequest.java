@@ -13,14 +13,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import xyz.baz9k.UHCGame.UHCGame;
+import xyz.baz9k.UHCGame.UHCGamePlugin;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 /**
  * Used to get a value from the {@link Player} once a prompting {@link ValuedNode} asks for one.
  */
 public class ValueRequest {
-    public ValueRequest(UHCGame plugin, Player converser, ValuedNode node) {
+    public ValueRequest(UHCGamePlugin plugin, Player converser, ValuedNode node) {
         converser.closeInventory();
 
         Prompt firstPrompt = switch (node.type) {

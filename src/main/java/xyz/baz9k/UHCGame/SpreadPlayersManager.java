@@ -22,17 +22,17 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class SpreadPlayersManager {
-    private UHCGame plugin;
+    private UHCGamePlugin plugin;
 
-    public SpreadPlayersManager(UHCGame plugin) {
+    public SpreadPlayersManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
     }
 
     /**
      * Stores information for determining what groups to spread together
      */
-    private static record Grouping(Function<UHCGame, Collection<? extends Collection<Player>>> groupGen, Location def) {
-        public Collection<? extends Collection<Player>> groups(UHCGame plugin) { return groupGen.apply(plugin); }
+    private static record Grouping(Function<UHCGamePlugin, Collection<? extends Collection<Player>>> groupGen, Location def) {
+        public Collection<? extends Collection<Player>> groups(UHCGamePlugin plugin) { return groupGen.apply(plugin); }
     }
     
     /**

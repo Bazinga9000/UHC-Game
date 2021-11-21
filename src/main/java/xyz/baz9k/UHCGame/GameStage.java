@@ -37,8 +37,8 @@ public enum GameStage {
     DM_WAIT    (BossBar.Color.WHITE,  new ConfigDur("intervals.dmwait"),    new ConfigWBSize("wb_size.border2"),    true,  trans("xyz.baz9k.uhc.bossbar.dm_wait").color(NamedTextColor.WHITE),          Component.translatable("xyz.baz9k.uhc.chat.stage_base.dm_wait", NamedTextColor.DARK_AQUA)),
     DEATHMATCH (BossBar.Color.PURPLE, new ConfigDur(FOREVER.getDuration()), new ConfigWBSize("wb_size.deathmatch"), true,  trans("xyz.baz9k.uhc.bossbar.deathmatch").color(NamedTextColor.DARK_PURPLE), Component.translatable("xyz.baz9k.uhc.chat.stage_base.deathmatch", NamedTextColor.BLUE, BOLD));
     
-    private static UHCGame plugin;
-    public static void setPlugin(UHCGame plugin) { GameStage.plugin = plugin; }
+    private static UHCGamePlugin plugin;
+    public static void setPlugin(UHCGamePlugin plugin) { GameStage.plugin = plugin; }
 
     // union type, String | Duration
     private record ConfigDur(String id, Duration def) {

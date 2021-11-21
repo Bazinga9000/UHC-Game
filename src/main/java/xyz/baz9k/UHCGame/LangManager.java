@@ -19,12 +19,12 @@ public class LangManager {
     private static final Locale DEFAULT_LOCALE = Locale.US;
     private static Locale pluginLocale = DEFAULT_LOCALE;
 
-    private final UHCGame plugin;
+    private final UHCGamePlugin plugin;
     private TranslationRegistry reg;
     private final Map<Locale, Map<String, MessageFormat>> cfgCache = new HashMap<>();
 
 
-    public LangManager(UHCGame plugin) {
+    public LangManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
 
         reg = TranslationRegistry.create(new NamespacedKey(plugin, "lang"));

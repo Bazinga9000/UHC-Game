@@ -4,7 +4,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import xyz.baz9k.UHCGame.UHCGame;
+import xyz.baz9k.UHCGame.UHCGamePlugin;
 
 public abstract class Node {
     protected final BranchNode parent;
@@ -12,7 +12,7 @@ public abstract class Node {
     protected final int parentSlot;
     protected final String nodeName;
     
-    protected static UHCGame plugin;
+    protected static UHCGamePlugin plugin;
     protected static FileConfiguration cfg;
 
     /**
@@ -36,7 +36,7 @@ public abstract class Node {
      * Set the plugin for all plugins to use the config of
      * @param plugin The plugin
      */
-    public static void setPlugin(UHCGame plugin) {
+    public static void setPlugin(UHCGamePlugin plugin) {
         Node.plugin = plugin;
         Node.cfg = plugin.getConfig();
     }

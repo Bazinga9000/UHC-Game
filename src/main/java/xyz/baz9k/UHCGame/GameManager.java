@@ -35,7 +35,7 @@ import java.util.UUID;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 public class GameManager implements Listener {
-    private UHCGame plugin;
+    private UHCGamePlugin plugin;
 
     private TeamManager teamManager;
     private HUDManager hudManager;
@@ -52,7 +52,7 @@ public class GameManager implements Listener {
     private GameStage stage = GameStage.NOT_IN_GAME;
     private Instant lastStageInstant = null;
 
-    public GameManager(UHCGame plugin) {
+    public GameManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
     }
 
