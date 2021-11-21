@@ -37,25 +37,23 @@ import static xyz.baz9k.UHCGame.util.Utils.*;
 public class GameManager implements Listener {
     private UHCGame plugin;
 
-    private final HashMap<UUID, Component> previousDisplayNames;
-    
     private TeamManager teamManager;
     private HUDManager hudManager;
     private BossbarManager bbManager;
     private WorldManager worldManager;
     private Recipes recipes;
     private BukkitTask tick;
-
+    
     private Instant startTime = null;
-
-    private HashMap<UUID, Integer> kills = new HashMap<>();
+    
+    private final HashMap<UUID, Component> previousDisplayNames = new HashMap<>();
+    private final HashMap<UUID, Integer> kills = new HashMap<>();
 
     private GameStage stage = GameStage.NOT_IN_GAME;
     private Instant lastStageInstant = null;
 
     public GameManager(UHCGame plugin) {
         this.plugin = plugin;
-        previousDisplayNames = new HashMap<>();
     }
 
     /**
@@ -118,7 +116,7 @@ public class GameManager implements Listener {
         startTime = lastStageInstant = Instant.now();
         kills.clear();
         
-        worldManager.initializeWorlds();
+        worldManager.initWorlds();
 
         FileConfiguration cfg = plugin.getConfig();
         int max_health = new int[]{10, 20, 40, 60}[cfg.getInt("esoteric.max_health")];
@@ -127,7 +125,7 @@ public class GameManager implements Listener {
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             // activate hud things for all
-            hudManager.initializePlayerHUD(p);
+            hudManager.initPlayerHUD(p);
             hudManager.addPlayerToTeams(p);
 
             // handle display name
@@ -223,6 +221,10 @@ public class GameManager implements Listener {
 
     }
 
+    public boolean hasUHCStarted() {
+        return stage != GameStage.NOT_IN_GAME;
+    }
+
     public void requireStarted() {
         if (!hasUHCStarted()) {
             throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.not_started");
@@ -268,10 +270,6 @@ public class GameManager implements Listener {
         for (PotionEffect effect : p.getActivePotionEffects()) {
             p.removePotionEffect(effect.getType());
         }
-    }
-
-    public boolean hasUHCStarted() {
-        return stage != GameStage.NOT_IN_GAME;
     }
 
     /**
@@ -432,7 +430,7 @@ public class GameManager implements Listener {
 
         if (hasUHCStarted()) {
             bbManager.enable(p);
-            hudManager.initializePlayerHUD(p);
+            hudManager.initPlayerHUD(p);
             hudManager.addPlayerToTeams(p);
 
             if (!worldManager.inGame(p)) p.teleport(worldManager.gameSpawn());

@@ -223,7 +223,7 @@ public class HUDManager implements Listener {
      * Setup a player's HUD (create scoreboard, reserve all the slots, load data onto all the slots)
      * @param p
      */
-    public void initializePlayerHUD(@NotNull Player p) {
+    public void initPlayerHUD(@NotNull Player p) {
         createHUDScoreboard(p);
 
         addHUDLine(p, "state",      15);

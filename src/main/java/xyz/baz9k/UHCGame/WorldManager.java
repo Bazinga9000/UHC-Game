@@ -75,7 +75,7 @@ public class WorldManager {
         return getLobbyWorld().getSpawnLocation();
     }
     
-    public void initializeWorlds() {
+    public void initWorlds() {
         for (World w : getGameWorlds()) {
             // set time to 0 and delete rain
             w.setTime(0);
