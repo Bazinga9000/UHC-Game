@@ -133,7 +133,7 @@ public record Point2D(double x, double z) {
 
 
     /**
-     * Generate a random point with a distance between the two specified radii from the center.
+     * Generate a random point within an annulus around a given center.
      * @param center
      * @param minRadius
      * @param maxRadius
@@ -141,7 +141,7 @@ public record Point2D(double x, double z) {
      */
     public static Point2D ringRand(Point2D center, double minRadius, double maxRadius) {
         double theta = rand(0, 2 * Math.PI);
-        double radius = rand(minRadius, maxRadius);
+        double radius = Math.sqrt(rand(Math.pow(minRadius, 2), Math.pow(maxRadius, 2)));
         return center.addPolar(radius, theta);
     }
 }
