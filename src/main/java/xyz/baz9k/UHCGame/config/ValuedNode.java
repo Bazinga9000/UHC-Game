@@ -125,7 +125,7 @@ public class ValuedNode extends Node {
 
     public void set(Object value) {
         prevValue = cfg.get(id());
-        if (value == Type.INTEGER || value == Type.DOUBLE) value = restrict.apply((Number) value);
+        if (type == Type.INTEGER || type == Type.DOUBLE) value = restrict.apply((Number) value);
         cfg.set(id(), value);
         updateItemStack();
     }
