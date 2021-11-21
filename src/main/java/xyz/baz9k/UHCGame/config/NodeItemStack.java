@@ -75,12 +75,12 @@ public class NodeItemStack extends ItemStack {
         public Info(Function<Object, Material> mat) { this(mat, DEFAULT_NAME_STYLE, UnaryOperator.identity()); }
         public Info(Function<Object, Material> mat, TextColor clr) { this(mat, noDeco(clr), UnaryOperator.identity()); }
         public Info(Function<Object, Material> mat, Style nameStyle) { this(mat, nameStyle, UnaryOperator.identity()); }
-        public Info(Function<Object, Material> mat, UnaryOperator<Object> mapper) { this(mat, DEFAULT_NAME_STYLE, mapper); }
+        public Info(Function<Object, Material> mat, UnaryOperator<Object> cfgFormat) { this(mat, DEFAULT_NAME_STYLE, cfgFormat); }
 
         public Info(Material mat) { this(v -> mat, DEFAULT_NAME_STYLE, UnaryOperator.identity()); }
         public Info(Material mat, TextColor clr) { this(v -> mat, noDeco(clr), UnaryOperator.identity()); }
         public Info(Material mat, Style nameStyle) { this(v -> mat, nameStyle, UnaryOperator.identity()); }
-        public Info(Material mat, UnaryOperator<Object> mapper) { this(v -> mat, DEFAULT_NAME_STYLE, mapper); }
+        public Info(Material mat, UnaryOperator<Object> cfgFormat) { this(v -> mat, DEFAULT_NAME_STYLE, cfgFormat); }
     
         public Info withMatGet(Function<Object, Material> matGet) {
             return new Info(matGet, nameStyle(), mapper());
@@ -246,6 +246,7 @@ public class NodeItemStack extends ItemStack {
      * Gets a rendered name by translation key
      * <p> Rendered components are text components that are already translated.
      * @param id translation key
+     * @param s
      * @return rendered Component
      */
     public static Component nameOf(String id, Style s) {
@@ -266,6 +267,7 @@ public class NodeItemStack extends ItemStack {
      * Gets a rendered description by translation key
      * <p> Rendered components are text components that are already translated.
      * @param id translation key
+     * @param s
      * @return lines of rendered Component
      */
     public static List<Component> descOf(String id, Style s) {
