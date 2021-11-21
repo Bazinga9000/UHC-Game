@@ -102,25 +102,25 @@ public class ConfigTree {
         new ValuedNode(esoterics, i++, "sardines",      new NodeItemStack.Info(Material.TROPICAL_FISH,         TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, i++, "wither_bonus",  new NodeItemStack.Info(Material.WITHER_SKELETON_SKULL, TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
         new OptionValuedNode(esoterics, i++, "dn_cycle", new NodeItemStack.Info(Material.AIR, TextColor.color(0xFFEB85)),
-            new OptionData("05:00 per cycle", Material.CLOCK),
-            new OptionData("10:00 per cycle", Material.COMPASS),
-            new OptionData("20:00 per cycle", Material.SNOWBALL),
-            new OptionData("Always Day", Material.GLOWSTONE),
-            new OptionData("Always Night", Material.LIGHT_GRAY_CONCRETE)
+            Material.CLOCK,
+            Material.COMPASS,
+            Material.SNOWBALL,
+            Material.GLOWSTONE,
+            Material.LIGHT_GRAY_CONCRETE
         );
         new ValuedNode(esoterics, i++, "nether_spawn",  new NodeItemStack.Info(Material.NETHERRACK,          TextColor.color(0x9C4040)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(esoterics, i++, "bomberman",     new NodeItemStack.Info(Material.GUNPOWDER,           TextColor.color(0x800000)), ValuedNode.Type.BOOLEAN);
         new OptionValuedNode(esoterics, i++, "max_health", new NodeItemStack.Info(Material.AIR, TextColor.color(0xFF2121)),
-            new OptionData("\u2764 05", Material.SPIDER_EYE),
-            new OptionData("\u2764 10", Material.APPLE),
-            new OptionData("\u2764 20", Material.GOLDEN_APPLE),
-            new OptionData("\u2764 30", Material.ENCHANTED_GOLDEN_APPLE)
+            Material.SPIDER_EYE,
+            Material.APPLE,
+            Material.GOLDEN_APPLE,
+            Material.ENCHANTED_GOLDEN_APPLE
         );
         new OptionValuedNode(esoterics, i++, "mv_speed", new NodeItemStack.Info(Material.AIR, TextColor.color(0x61A877)),
-            new OptionData("0.5x", Material.SOUL_SAND),
-            new OptionData("1.0x", Material.GRASS_BLOCK),
-            new OptionData("2.0x", Material.ICE),
-            new OptionData("3.0x", Material.EMERALD_BLOCK)
+            Material.SOUL_SAND,
+            Material.GRASS_BLOCK,
+            Material.ICE,
+            Material.EMERALD_BLOCK
         );
         new ActionNode(esoterics, 52, "reset_to_defaults", new NodeItemStack.Info(Material.CREEPER_HEAD, TextColor.color(0x3BEBD3)), p -> { 
             var defaults = plugin.getConfig().getConfigurationSection("esoteric").getDefaultSection();

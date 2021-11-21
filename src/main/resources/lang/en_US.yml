@@ -238,6 +238,12 @@ xyz:
             dn_cycle:
               name: "Day-Night Cycle"
               desc: ""
+              options:
+                - "05:00 per cycle"
+                - "10:00 per cycle"
+                - "20:00 per cycle"
+                - "Always Day"
+                - "Always Night"
             nether_spawn:
               name: "Spawn in Nether"
               desc: ""
@@ -250,9 +256,19 @@ xyz:
             max_health:
               name: "Player Health"
               desc: ""
+              options:
+                - "\u2764 05"
+                - "\u2764 10"
+                - "\u2764 20"
+                - "\u2764 30"
             mv_speed:
               name: "Movement Speed"
               desc: ""
+              options:
+                - "0.5x"
+                - "1.0x"
+                - "2.0x"
+                - "3.0x"
             reset_to_defaults:
               name: "Reset to Defaults"
               desc: ""
