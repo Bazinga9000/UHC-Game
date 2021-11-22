@@ -149,10 +149,7 @@ public class BranchNode extends Node {
 
     public void click(Player p) {
         // update all slots to make sure each item is up to date
-        for (int i = 0; i < children.length; i++) {
-            if (children[i] != null) updateSlot(i);
-        }
-
+        for (int i = 0; i < children.length; i++) updateSlot(i);
         p.openInventory(inventory);
     }
 
@@ -161,7 +158,9 @@ public class BranchNode extends Node {
      * @param slot the slot
      */
     public void updateSlot(int slot) {
-        inventory.setItem(slot, children[slot].itemStack.updateAll());
+        if (children[slot] != null) {
+            inventory.setItem(slot, children[slot].itemStack.updateAll());
+        }
     }
 
     @NotNull
