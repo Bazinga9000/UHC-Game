@@ -234,13 +234,14 @@ public enum GameStage {
      */
     public void sendMessage() {
         if (this == NOT_IN_GAME) return;
+
+        TextComponent.Builder s = getMessageBuilder()
+            .append(baseChatMsg);
+
         if (this == DEATHMATCH) {
-            Bukkit.getServer().sendMessage(getMessageBuilder().append(baseChatMsg));
+            Bukkit.getServer().sendMessage(s);
             return;
         }
-
-        TextComponent.Builder s = getMessageBuilder();
-        s.append(baseChatMsg);
 
         String situationKey = null;
         Component subject = trans(this == WB_STILL ? WB_NAME : WB_PRONOUN);
