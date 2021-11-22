@@ -56,7 +56,7 @@ public class NodeItemStack extends ItemStack {
 
     // TEXT STYLES
     /**
-     * This text style (color & formatting) will be used in the description by default
+     * This text style (color & formatting) will be used in the name by default
      */
     public static final Style DEFAULT_NAME_STYLE = noDeco(null);
     /**
@@ -251,7 +251,7 @@ public class NodeItemStack extends ItemStack {
      */
     public static Component nameOf(String id, Style s) {
         String key = String.format(NAME_ID_FORMAT, id);
-        return render(trans(key));
+        return render(trans(key).style(s));
     }
 
     /**
