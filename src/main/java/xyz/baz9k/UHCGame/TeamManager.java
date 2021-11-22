@@ -160,8 +160,8 @@ public class TeamManager {
     
     private int countPlayersMatching(Predicate<Node> predicate) {
         return (int) playerMap.values().stream()
-                                       .filter(predicate)
-                                       .count();
+            .filter(predicate)
+            .count();
     }
     /**
      * @return the number of combatants in the team manager.
@@ -189,15 +189,15 @@ public class TeamManager {
     
     private Set<Player> getAllPlayersMatching(Predicate<Node> predicate) {
         return playerMap.values().stream()
-                                 .filter(predicate)
-                                 .map(n -> n.player)
-                                 .collect(Collectors.toSet());
+            .filter(predicate)
+            .map(n -> n.player)
+            .collect(Collectors.toSet());
     }
 
     private Set<Player> filterOnline(@NotNull Set<Player> pSet) {
         return pSet.stream()
-                    .filter(TeamManager::isOnline)
-                    .collect(Collectors.toSet());
+            .filter(TeamManager::isOnline)
+            .collect(Collectors.toSet());
     }
 
     /**
@@ -256,9 +256,9 @@ public class TeamManager {
 
     private IntStream aliveTeamsStream() {
         return playerMap.values().stream()
-                                 .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
-                                 .mapToInt(n -> n.team)
-                                 .distinct();
+            .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
+            .mapToInt(n -> n.team)
+            .distinct();
     }
 
     /**
@@ -281,9 +281,9 @@ public class TeamManager {
      */
     public boolean isTeamEliminated(int t) {
         return playerMap.values().stream()
-                                 .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
-                                 .mapToInt(n -> n.team)
-                                 .noneMatch(i -> i == t);
+            .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
+            .mapToInt(n -> n.team)
+            .noneMatch(i -> i == t);
     }
 
     /**

@@ -108,11 +108,11 @@ public class NodeItemStack extends ItemStack {
     private static record TExtraLore(String id, Object... args) {
         public List<Component> component() {
             Object[] args = Arrays.stream(this.args)
-            .map(o -> {
-                if (o instanceof Component c) return render(c);
-                return o;
-            })
-            .toArray();
+                .map(o -> {
+                    if (o instanceof Component c) return render(c);
+                    return o;
+                })
+                .toArray();
 
             return splitLines(render(trans(id, args).style(DEFAULT_DESC_STYLE)));
         }
@@ -135,13 +135,13 @@ public class NodeItemStack extends ItemStack {
      */
     public List<Component> desc() {
         return descOf(id).stream()
-        .map(c -> {
-            if (c instanceof TextComponent tc) {
-                String content = tc.content();
-                return tc.content(MessageFormat.format(content, descFmtStr));
-            } else return c;
-        })
-        .toList();
+            .map(c -> {
+                if (c instanceof TextComponent tc) {
+                    String content = tc.content();
+                    return tc.content(MessageFormat.format(content, descFmtStr));
+                } else return c;
+            })
+            .toList();
     }
     /**
      * Sets the object for the formatted description of the item. This changes the lore.

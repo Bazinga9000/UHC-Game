@@ -29,8 +29,8 @@ public final class TeamDisplay {
     };
     
     private static final Color[] teamColors = Arrays.stream(teamColorCodes)
-                                                    .mapToObj(Color::new)
-                                                    .toArray(Color[]::new);
+        .mapToObj(Color::new)
+        .toArray(Color[]::new);
     private static final int NUM_TEAM_COLORS = teamColors.length - 1;
 
     /**

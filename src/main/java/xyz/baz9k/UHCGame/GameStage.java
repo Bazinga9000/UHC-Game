@@ -148,10 +148,10 @@ public enum GameStage {
         if (this == NOT_IN_GAME) return null;
         
         return Arrays.stream(values())
-                     .skip(ordinal() + 1)
-                     .filter(GameStage::isActive)
-                     .findFirst()
-                     .orElse(null);
+            .skip(ordinal() + 1)
+            .filter(GameStage::isActive)
+            .findFirst()
+            .orElse(null);
     }
 
     /**
@@ -212,11 +212,11 @@ public enum GameStage {
      */
     private static TextComponent.Builder getMessageBuilder() {
         return Component.text()
-                        .append(
-                            Component.text("<", TextColor.color(0xCFCFFF), BOLD),
-                            Component.translatable("xyz.baz9k.uhc.chat.name", TextColor.color(0xA679FE), BOLD),
-                            Component.text("> ", TextColor.color(0xCFCFFF), BOLD)
-                        );
+            .append(
+                Component.text("<", TextColor.color(0xCFCFFF), BOLD),
+                Component.translatable("xyz.baz9k.uhc.chat.name", TextColor.color(0xA679FE), BOLD),
+                Component.text("> ", TextColor.color(0xCFCFFF), BOLD)
+            );
     }
 
     private static String WB_NAME = "xyz.baz9k.uhc.chat.wb.name";

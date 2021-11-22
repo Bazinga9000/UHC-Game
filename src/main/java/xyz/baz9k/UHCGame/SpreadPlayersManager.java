@@ -163,25 +163,26 @@ public class SpreadPlayersManager {
             Point2D search = activeList.get(index);
 
             Stream.generate(() -> Point2D.ringRand(search, minSeparation, 2 * minSeparation))
-                    .limit(POINTS_PER_ITER)
-                    .filter(p -> p.inSquare(center2, sideLength))
-                    .filter(p -> {
-                        double minDist = samples.stream()
-                                                .mapToDouble(p::dist)
-                                                .min()
-                                                .orElseThrow();
-                        return minDist >= minSeparation;
-                    })
-                    .filter(p -> !isLocationUnspawnable(getHighestLoc(w, p)))
-                    .findAny()
-                    .ifPresentOrElse(
-                        p -> {
-                            activeList.add(p);
-                            samples.add(p);
-                        }, 
-                        () -> {
-                            activeList.remove(index);
-                    });
+                .limit(POINTS_PER_ITER)
+                .filter(p -> p.inSquare(center2, sideLength))
+                .filter(p -> {
+                    double minDist = samples.stream()
+                        .mapToDouble(p::dist)
+                        .min()
+                        .orElseThrow();
+                    return minDist >= minSeparation;
+                })
+                .filter(p -> !isLocationUnspawnable(getHighestLoc(w, p)))
+                .findAny()
+                .ifPresentOrElse(
+                    p -> {
+                        activeList.add(p);
+                        samples.add(p);
+                    }, 
+                    () -> {
+                        activeList.remove(index);
+                    }
+                );
         }
 
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.generated", samples.size()));
@@ -192,8 +193,8 @@ public class SpreadPlayersManager {
 
         Map<Boolean, List<Location>> spawns =
         samples.stream()
-                .map(p -> getHighestLoc(w, p))
-                .collect(Collectors.partitioningBy(SpreadPlayersManager::isLocationAvoidSpawn));
+            .map(p -> getHighestLoc(w, p))
+            .collect(Collectors.partitioningBy(SpreadPlayersManager::isLocationAvoidSpawn));
 
 
         List<Location> spawnableLocations = spawns.get(false);

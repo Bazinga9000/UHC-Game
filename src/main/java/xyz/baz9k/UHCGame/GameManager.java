@@ -407,11 +407,11 @@ public class GameManager implements Listener {
         delayedMessage(winMsg, plugin, 1);
         
         var fwe = FireworkEffect.builder()
-                                .withColor(TeamDisplay.getBukkitColor(winner), org.bukkit.Color.WHITE)
-                                .with(FireworkEffect.Type.BURST)
-                                .withFlicker()
-                                .withTrail()
-                                .build();
+            .withColor(TeamDisplay.getBukkitColor(winner), org.bukkit.Color.WHITE)
+            .with(FireworkEffect.Type.BURST)
+            .withFlicker()
+            .withTrail()
+            .build();
         for (Player p : teamManager.getAllCombatantsOnTeam(winner)) {
             Firework fw = p.getWorld().spawn(p.getLocation(), Firework.class);
             FireworkMeta meta = fw.getFireworkMeta();

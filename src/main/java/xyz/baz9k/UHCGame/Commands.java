@@ -47,7 +47,8 @@ public class Commands {
 
     public void registerAll() {
         CommandAPICommand uhc = new CommandAPICommand("uhc")
-                                    .withPermission(CommandPermission.OP);
+            .withPermission(CommandPermission.OP);
+            
         // register each @Command method
         Class<Command> annot = Command.class;
         Class<Commands> cls = Commands.class;
@@ -177,13 +178,13 @@ public class Commands {
         if (players.size() == 0) return;
 
         var b = Component.text()
-                         .append(TeamDisplay.getName(t))
-                         .append(Component.text(": ", noDeco(NamedTextColor.WHITE)));
+            .append(TeamDisplay.getName(t))
+            .append(Component.text(": ", noDeco(NamedTextColor.WHITE)));
 
         // list of players one a team, separated by commas
         String tPlayers = players.stream()
-                                 .map(p -> p.getName())
-                                 .collect(Collectors.joining(", "));
+            .map(p -> p.getName())
+            .collect(Collectors.joining(", "));
         
         b.append(Component.text(tPlayers, noDeco(NamedTextColor.WHITE)));
         Bukkit.getServer().sendMessage(b);
