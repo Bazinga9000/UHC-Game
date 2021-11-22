@@ -251,11 +251,9 @@ public class HUDManager implements Listener {
     /**
      * Trash the player's scoreboard and return to the main scoreboard.
      */
-    public void cleanup() {
+    public void cleanup(Player p) {
         Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.setScoreboard(main);
-        }
+        p.setScoreboard(main);
     }
 
     /**

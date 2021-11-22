@@ -204,6 +204,8 @@ public class GameManager implements Listener {
             worldManager.escapePlayer(p);
             p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
             p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
+            
+            hudManager.cleanup(p);
         }
         
         // update display names
@@ -214,7 +216,6 @@ public class GameManager implements Listener {
         }
 
         teamManager.resetAllPlayers();
-        hudManager.cleanup();
         bbManager.disable(Bukkit.getServer());
         kills.clear();
         if (tick != null) tick.cancel();
@@ -435,6 +436,7 @@ public class GameManager implements Listener {
 
             if (!worldManager.inGame(p)) p.teleport(worldManager.gameSpawn());
         } else {
+            hudManager.cleanup(p);
             if (worldManager.inGame(p)) worldManager.escapePlayer(p);
         }
 
