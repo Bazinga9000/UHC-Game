@@ -471,10 +471,9 @@ public class GameManager implements Listener {
         // set bed spawn
         Location newSpawn = dead.getLocation();
         if (newSpawn.getY() < 0) {
-            dead.setBedSpawnLocation(worldManager.gameSpawn(), true);
-        } else {
-            dead.setBedSpawnLocation(newSpawn, true);
+            newSpawn = worldManager.gameSpawn();
         }
+        dead.setBedSpawnLocation(newSpawn, true);
 
         Player killer = dead.getKiller();
         if (killer != null) {
