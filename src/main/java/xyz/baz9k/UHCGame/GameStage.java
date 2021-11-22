@@ -8,7 +8,6 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.kyori.adventure.bossbar.BossBar;
@@ -30,13 +29,14 @@ import static java.time.temporal.ChronoUnit.FOREVER;
  * {@link #DEATHMATCH} should always be the last game stage
  */
 public enum GameStage {
-    NOT_IN_GAME,
-    WB_STILL   (BossBar.Color.RED,    new ConfigDur("intervals.start"),     new ConfigWBSize("wb_size.initial"),    true,  trans("xyz.baz9k.uhc.bossbar.wb_still").color(NamedTextColor.RED),           Component.translatable("xyz.baz9k.uhc.chat.stage_base.wb_still", NamedTextColor.GREEN, BOLD)),
-    WB_1       (BossBar.Color.BLUE,   new ConfigDur("intervals.movement1"), new ConfigWBSize("wb_size.border1"),    false, trans("xyz.baz9k.uhc.bossbar.wb_1").color(NamedTextColor.BLUE),              Component.translatable("xyz.baz9k.uhc.chat.stage_base.wb_1", NamedTextColor.RED, BOLD)),
-    WB_STOP    (BossBar.Color.RED,    new ConfigDur("intervals.stop"),      new ConfigWBSize("wb_size.border1"),    true,  trans("xyz.baz9k.uhc.bossbar.wb_stop").color(NamedTextColor.RED),            Component.translatable("xyz.baz9k.uhc.chat.stage_base.wb_stop", NamedTextColor.AQUA)),
-    WB_2       (BossBar.Color.BLUE,   new ConfigDur("intervals.movement2"), new ConfigWBSize("wb_size.border2"),    false, trans("xyz.baz9k.uhc.bossbar.wb_2").color(NamedTextColor.BLUE),              Component.translatable("xyz.baz9k.uhc.chat.stage_base.wb_2", NamedTextColor.RED)),
-    DM_WAIT    (BossBar.Color.WHITE,  new ConfigDur("intervals.dmwait"),    new ConfigWBSize("wb_size.border2"),    true,  trans("xyz.baz9k.uhc.bossbar.dm_wait").color(NamedTextColor.WHITE),          Component.translatable("xyz.baz9k.uhc.chat.stage_base.dm_wait", NamedTextColor.DARK_AQUA)),
-    DEATHMATCH (BossBar.Color.PURPLE, new ConfigDur(FOREVER.getDuration()), new ConfigWBSize("wb_size.deathmatch"), true,  trans("xyz.baz9k.uhc.bossbar.deathmatch").color(NamedTextColor.DARK_PURPLE), Component.translatable("xyz.baz9k.uhc.chat.stage_base.deathmatch", NamedTextColor.BLUE, BOLD));
+    NOT_IN_GAME (null, BossBar.Color.WHITE, new ConfigDur(Duration.ZERO), new ConfigWBSize(-1), false, null, null),
+
+    WB_STILL    ("wb_still",   BossBar.Color.RED,    new ConfigDur("intervals.start"),     new ConfigWBSize("wb_size.initial"),    true,  Style.style(NamedTextColor.RED),         Style.style(NamedTextColor.GREEN, BOLD)),
+    WB_1        ("wb_1",       BossBar.Color.BLUE,   new ConfigDur("intervals.movement1"), new ConfigWBSize("wb_size.border1"),    false, Style.style(NamedTextColor.BLUE),        Style.style(NamedTextColor.RED, BOLD)),
+    WB_STOP     ("wb_stop",    BossBar.Color.RED,    new ConfigDur("intervals.stop"),      new ConfigWBSize("wb_size.border1"),    true,  Style.style(NamedTextColor.RED),         Style.style(NamedTextColor.AQUA)),
+    WB_2        ("wb_2",       BossBar.Color.BLUE,   new ConfigDur("intervals.movement2"), new ConfigWBSize("wb_size.border2"),    false, Style.style(NamedTextColor.BLUE),        Style.style(NamedTextColor.RED)),
+    DM_WAIT     ("dm_wait",    BossBar.Color.WHITE,  new ConfigDur("intervals.dmwait"),    new ConfigWBSize("wb_size.border2"),    true,  Style.style(NamedTextColor.WHITE),       Style.style(NamedTextColor.DARK_AQUA)),
+    DEATHMATCH  ("deathmatch", BossBar.Color.PURPLE, new ConfigDur(FOREVER.getDuration()), new ConfigWBSize("wb_size.deathmatch"), true,  Style.style(NamedTextColor.DARK_PURPLE), Style.style(NamedTextColor.BLUE, BOLD));
     
     private static UHCGamePlugin plugin;
     public static void setPlugin(UHCGamePlugin plugin) { GameStage.plugin = plugin; }
@@ -65,6 +65,9 @@ public enum GameStage {
         }
     }
 
+    private static final String BB_TITLE_KEY = "xyz.baz9k.uhc.bossbar.%s";
+    private static final String BASE_CHAT_MSG_KEY = "xyz.baz9k.uhc.chat.stage_base.%s";
+
     private final BossBar.Color bbClr;
     private final ConfigDur dur;
     private final ConfigWBSize wbSize;
@@ -74,26 +77,19 @@ public enum GameStage {
 
     private final boolean isWBInstant;
     /**
-     * NOT_IN_GAME
+     * 
+     * @param transID      Identifier in the translatable key that differentiates each stage
+     * @param bbClr        Color of boss bar
+     * @param dur          Duration of the stage (either a config ID or duration)
+     * <p> If zero, the stage is skipped in iteration
+     * @param wbDiameter   Diameter of world border that this stage progresses to (either a config ID or double)
+     * @param isWBInstant  If true, WB instantly jumps to the wbDiameter at the start. If false, WB progresses to the wbDiameter by the end of the stage.
+     * @param bbTitleStyle Style (color, text decoration, etc.) of the boss bar title
+     * @param bodyStyle    Style of the base chat message
      */
-    private GameStage() { 
-        this(BossBar.Color.WHITE, new ConfigDur(Duration.ZERO), new ConfigWBSize(-1), false, Component.empty(), Component.empty());
-    }
-    
-
-    /**
-     * @param bbClr Color of the boss bar
-     * @param dur Duration of the stage (this can either be a config ID or a duration)
-     * <p> If zero, the stage will be skipped in iteration
-     * @param wbDiameter Diameter of the world border that this stage progresses to (this can either be a config ID or a double)
-     * @param isWBInstant True if WB instantly jumps to this border at the start, false if progresses to WB by the end
-     * @param bbTitle Title of the boss bar as a component (so, with colors and formatting)
-     * @param baseChatMsg The base chat message, before color and additional warnings are added
-     */
-    private GameStage(@NotNull BossBar.Color bbClr, @NotNull ConfigDur dur, ConfigWBSize wbDiameter, boolean isWBInstant, @NotNull Component bbTitle, @NotNull Component baseChatMsg) {
+    private GameStage(String transID, BossBar.Color bbClr, ConfigDur dur, ConfigWBSize wbDiameter, boolean isWBInstant, Style bbTitleStyle, Style bodyStyle) {
         // bossbar
         this.bbClr = bbClr;
-        this.bbTitle = bbTitle;
 
         // stage specific
         this.dur = dur;
@@ -101,8 +97,17 @@ public enum GameStage {
         this.isWBInstant = isWBInstant;
 
         // message body
-        this.baseChatMsg = baseChatMsg;
-        this.bodyStyle = baseChatMsg.style();
+        this.bodyStyle = bodyStyle;
+
+        // translatable components
+        if (transID != null) {
+            this.bbTitle     = trans(String.format(BB_TITLE_KEY,      transID)).style(bbTitleStyle);
+            this.baseChatMsg = trans(String.format(BASE_CHAT_MSG_KEY, transID)).style(bodyStyle);
+        } else {
+            this.bbTitle     = Component.empty();
+            this.baseChatMsg = Component.empty();
+    
+        }
     }
 
     /**
