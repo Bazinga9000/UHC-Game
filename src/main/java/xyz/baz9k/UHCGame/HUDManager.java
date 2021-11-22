@@ -91,11 +91,14 @@ public class HUDManager implements Listener {
         // name and health
         if (teamManager.getPlayerState(teammate) == PlayerState.COMBATANT_DEAD) {
             s.append(Component.text(teammate.getName(), NamedTextColor.GRAY, STRIKETHROUGH))
-             .append(Component.text(" 0♥", NamedTextColor.GRAY, STRIKETHROUGH));
+             .append(Component.space())
+             .append(Component.text("0♥", NamedTextColor.GRAY, STRIKETHROUGH));
             return s.asComponent();
         } else {
-            s.append(Component.text(teammate.getName(), tcGradient));
-            s.append(Component.text(" " + (int) Math.ceil(teammateHP) + "♥ ", tcGradient));
+            s.append(Component.text(teammate.getName(), tcGradient))
+             .append(Component.space())
+             .append(Component.text((int) Math.ceil(teammateHP) + "♥", tcGradient))
+             .append(Component.space());
         }
         // direction
         Location youLoc = you.getLocation();
