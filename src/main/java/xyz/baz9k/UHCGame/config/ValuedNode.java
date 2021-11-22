@@ -118,9 +118,6 @@ public class ValuedNode extends Node {
             default:
                 throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.needs_impl", type);
         }
-
-        // since updating the item does not update it in the inventory, parent has to
-        parent.updateSlot(parentSlot);
     }
 
     public void set(Object value) {

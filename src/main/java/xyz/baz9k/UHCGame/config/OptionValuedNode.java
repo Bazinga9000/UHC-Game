@@ -78,9 +78,6 @@ public class OptionValuedNode extends ValuedNode {
 
         }
         itemStack.extraLore(extraLore);
-
-        // since updating the item does not update it in the inventory, parent has to
-        parent.updateSlot(parentSlot);
     }
     
 }

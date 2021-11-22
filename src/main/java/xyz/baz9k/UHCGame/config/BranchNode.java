@@ -138,7 +138,10 @@ public class BranchNode extends Node {
                     sound = 2;
                 }
             }
+
+            updateSlot(slot);
         }
+
         
         switch (sound) {
             case 1 -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, 2);
@@ -157,7 +160,7 @@ public class BranchNode extends Node {
      * Updates the {@link ItemStack} of the specified child of the inventory.
      * @param slot the slot
      */
-    public void updateSlot(int slot) {
+    private void updateSlot(int slot) {
         if (children[slot] != null) {
             inventory.setItem(slot, children[slot].itemStack.updateAll());
         }
