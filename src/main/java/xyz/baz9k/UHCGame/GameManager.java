@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 public class GameManager implements Listener {
     private UHCGamePlugin plugin;

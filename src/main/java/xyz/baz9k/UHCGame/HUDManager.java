@@ -27,6 +27,7 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.awt.Color;
 import java.util.ArrayList;

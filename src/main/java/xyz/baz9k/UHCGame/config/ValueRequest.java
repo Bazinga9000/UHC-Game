@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import xyz.baz9k.UHCGame.UHCGamePlugin;
-import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 /**
  * Used to get a value from the {@link Player} once a prompting {@link ValuedNode} asks for one.
@@ -49,7 +49,7 @@ public class ValueRequest {
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
             Object id = context.getSessionData("id");
-            return componentString(trans("xyz.baz9k.uhc.config.prompt.ask", id));
+            return renderString(trans("xyz.baz9k.uhc.config.prompt.ask", id));
         }
         
         @Override
@@ -65,7 +65,7 @@ public class ValueRequest {
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
             Object id = context.getSessionData("id");
-            return componentString(trans("xyz.baz9k.uhc.config.prompt.ask", id));
+            return renderString(trans("xyz.baz9k.uhc.config.prompt.ask", id));
         }
 
         @Override
@@ -86,7 +86,7 @@ public class ValueRequest {
 
             node.set(newValue);
             node.parent.click((Player) context.getForWhom());
-            return componentString(trans("xyz.baz9k.uhc.config.prompt.succ", id, newValue));
+            return renderString(trans("xyz.baz9k.uhc.config.prompt.succ", id, newValue));
         }
 
         @Override

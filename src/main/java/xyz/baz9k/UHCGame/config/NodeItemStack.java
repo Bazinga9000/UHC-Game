@@ -17,7 +17,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 
-import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 /**
  * {@link ItemStack} modified to be more simple for {@link Node} use.
@@ -286,7 +286,7 @@ public class NodeItemStack extends ItemStack {
         String key = String.format(DESC_ID_FORMAT, id);
 
         Component rendered = render(trans(key).style(s));
-        if (componentString(rendered).equals("")) return List.of();
+        if (renderString(rendered).equals("")) return List.of();
 
         return splitLines(rendered);
     }

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.function.UnaryOperator;
 

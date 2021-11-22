@@ -1,17 +1,13 @@
 package xyz.baz9k.UHCGame.util;
 
-import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,13 +17,10 @@ import org.bukkit.scheduler.BukkitTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.translation.GlobalTranslator;
 import xyz.baz9k.UHCGame.UHCGamePlugin;
+
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 public final class Utils {
     private Utils() {}
@@ -240,21 +233,6 @@ public final class Utils {
     }
 
     /**
-     * Style with color, but no formatting, no italic, bold, etc.
-     * @param clr
-     * @return
-     */
-    public static Style noDeco(TextColor clr) {
-        Style.Builder st = Style.style().color(clr);
-
-        for (TextDecoration deco : TextDecoration.values()) {
-            st.decoration(deco, false);
-        }
-
-        return st.build();
-    }
-
-    /**
      * Clamps x to the bound min and max. If it exceeds min or max, the respective value is returned.
      * @param min
      * @param x
@@ -274,109 +252,5 @@ public final class Utils {
      */
     public static double clamp(double min, double x, double max) {
         return Math.max(min, Math.min(x, max));
-    }
-
-    public static Component render(Component c) {
-        return GlobalTranslator.render(c, UHCGamePlugin.getLocale());
-    }
-
-    /**
-     * Converts a component to text (for TextComponent & TranslatableComponent)
-     * @param l locale to use
-     * @param c component
-     * @return string of the component text
-     */
-    public static String componentString(Locale l, Component c) {
-        if (c instanceof TextComponent tc && c.children().size() == 0) return tc.content();
-
-        List<Component> components = new ArrayList<>();
-        components.add(c);
-        components.addAll(c.children());
-
-        return components.stream()
-            .map(cpt -> {
-                Component rendered = GlobalTranslator.render(cpt, l);
-                if (rendered instanceof TextComponent renderedText) {
-                    String buf = "";
-                    buf += renderedText.content();
-                    for (Component child : renderedText.children()) buf += componentString(l, child);
-                    return buf;
-                } else if (rendered instanceof TranslatableComponent renderedTrans) {
-                    String buf = "";
-                    buf += renderedTrans.key();
-                    for (Component child : renderedTrans.children()) buf += componentString(l, child);
-                    return buf;
-
-                };
-                return rendered.toString(); // if not text, then can't really do anything
-            })
-            .collect(Collectors.joining());
-    }
-    
-    /**
-     * Converts a component to text (for TextComponent & TranslatableComponent). 
-     * This uses the plugin's locale.
-     * @param c component
-     * @return string of the component text
-     */
-    public static String componentString(Component c) {
-        return componentString(UHCGamePlugin.getLocale(), c);
-    }
-
-    /**
-     * Returns an exception of type X, with a translatable component message
-     * @param <X> 
-     * @param exc Exception type
-     * @param l Locale
-     * @param msg Component message
-     * @return The exception, which can be thrown.
-     */
-    public static <X extends Throwable> X translatableErr(Class<X> exc, Locale l, Component msg) {
-        try {
-            return exc.getConstructor(String.class).newInstance(componentString(l, msg));
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    /**
-     * Returns an exception of type X, with a translatable component message.
-     * This uses the plugin's locale.
-     * @param <X> 
-     * @param exc Exception type
-     * @param msg Component message
-     * @return The exception, which can be thrown.
-     */
-    public static <X extends Throwable> X translatableErr(Class<X> exc, Component c) {
-        return translatableErr(exc, UHCGamePlugin.getLocale(), c);
-    }
-
-    /**
-     * Shorthand for {@link Component#translatable}. 
-     * @param key Translation key
-     * @param args Objects which are passed as strings to the translatable component. (Components stay as components)
-     * @return component
-     */
-    public static TranslatableComponent trans(String key, Object... args) {
-        Component[] cargs = Arrays.stream(args)
-            .map(o -> {
-                if (o instanceof ComponentLike cl) return cl.asComponent();
-                return Component.text(String.valueOf(o));
-            })
-            .toArray(Component[]::new);
-        return Component.translatable(key).args(cargs);
-    }
-
-    /**
-     * Returns an exception of type X, with a translatable component message.
-     * This uses the plugin's locale.
-     * @param <X> 
-     * @param key Translation key
-     * @param args Objects which are passed as strings to the translatable component. (Components stay as components)
-     * @return The exception, which can be thrown.
-     */
-    public static <X extends Throwable> X translatableErr(Class<X> exc, String key, Object... args) {
-        return translatableErr(exc, trans(key, args));
     }
 }

@@ -2,6 +2,7 @@ package xyz.baz9k.UHCGame;
 
 import xyz.baz9k.UHCGame.util.*;
 import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

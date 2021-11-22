@@ -1,6 +1,6 @@
 package xyz.baz9k.UHCGame;
 
-import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.io.InputStreamReader;
 import java.text.MessageFormat;

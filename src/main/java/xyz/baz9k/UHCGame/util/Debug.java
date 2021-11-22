@@ -4,7 +4,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,7 +72,7 @@ public final class Debug {
     public static void printDebug(Component msg) {
         if (isDebugging()) {
             Component dmsg = fmtDebug(msg);
-            logger.info(componentString(dmsg));
+            logger.info(renderString(dmsg));
             onlinePlayers().sendMessage(dmsg);
         }
     }

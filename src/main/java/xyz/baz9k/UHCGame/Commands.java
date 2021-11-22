@@ -12,7 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
-import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;

@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Arrays;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
