@@ -436,6 +436,7 @@ public class GameManager implements Listener {
 
             if (!worldManager.inGame(p)) p.teleport(worldManager.gameSpawn());
         } else {
+            bbManager.disable(p);
             hudManager.cleanup(p);
             if (worldManager.inGame(p)) worldManager.escapePlayer(p);
         }
