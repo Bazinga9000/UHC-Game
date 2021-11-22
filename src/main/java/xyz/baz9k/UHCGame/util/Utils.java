@@ -2,12 +2,7 @@ package xyz.baz9k.UHCGame.util;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -145,19 +140,6 @@ public final class Utils {
     }
 
     /**
-     * Takes the euclidean distance between points (x1, y1) and (x2, y2).
-     * @param x1
-     * @param x2
-     * @param y1
-     * @param y2
-     * @return distance calculation
-     * @see Point2D#dist(Point2D)
-     */
-    public static double euclideanDistance(double x1, double x2, double y1, double y2) {
-        return Math.hypot(x1 - x2, y1 - y2);
-    }
-
-    /**
      * Send a message after some delay.
      * @param m
      * @param plugin
@@ -193,43 +175,6 @@ public final class Utils {
 
     public static double rand(double min, double max) {
         return min + ((max - min) * Math.random());
-    }
-
-    /**
-     * Takes two iterables, apply a function with the iterator elements as arguments.
-     * @param <T>
-     * @param <U>
-     * @param i1
-     * @param i2
-     * @param fn
-     */
-    public static <T, U> void zip(Iterable<T> i1, Iterable<U> i2, BiConsumer<? super T, ? super U> fn) {
-        Iterator<T> it1 = i1.iterator();
-        Iterator<U> it2 = i2.iterator();
-
-        while (it1.hasNext() && it2.hasNext()) fn.accept(it1.next(), it2.next());
-    }
-
-    /**
-     * Takes two iterables, apply a function with iterator elements as arguments.
-     * @param <T>
-     * @param <U>
-     * @param <R>
-     * @param i1
-     * @param i2
-     * @param fn
-     * @return a collection with the results of fn as elements
-     */
-    public static <T, U, R> Collection<R> zip(Iterable<T> i1, Iterable<U> i2, BiFunction<? super T, ? super U, ? extends R> fn) {
-        Collection<R> c = new ArrayList<>();
-        Iterator<T> it1 = i1.iterator();
-        Iterator<U> it2 = i2.iterator();
-
-        while (it1.hasNext() && it2.hasNext()) {
-            c.add(fn.apply(it1.next(), it2.next()));
-        }
-
-        return Collections.unmodifiableCollection(c);
     }
 
     /**
