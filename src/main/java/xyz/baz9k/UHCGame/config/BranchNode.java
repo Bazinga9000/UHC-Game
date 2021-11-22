@@ -14,8 +14,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static xyz.baz9k.UHCGame.util.Utils.*;
-
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -43,11 +41,11 @@ public class BranchNode extends Node {
      * @param parent Parent node
      * @param slot lot of this node in parent's inventory
      * @param nodeName Node name, which is used to determine the ID
-     * @param info {@link NodeItemStack#Info}
+     * @param props {@link NodeItemStack#ItemProperties}
      * @param guiHeight Number of rows in this node's inventory
      */
-    public BranchNode(@Nullable BranchNode parent, int slot, String nodeName, NodeItemStack.Info info, int guiHeight) {
-        super(parent, slot, nodeName, info);
+    public BranchNode(@Nullable BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, int guiHeight) {
+        super(parent, slot, nodeName, props);
         slotCount = 9 * guiHeight;
 
         int arrLen = parent == null ? slotCount : slotCount - 1;
@@ -87,7 +85,7 @@ public class BranchNode extends Node {
 
         // If we aren't root, add a slot for the "Go Back" button
         if (parent != null) {
-            ItemStack goBack = new NodeItemStack("go_back", new NodeItemStack.Info(Material.ARROW, noDeco(NamedTextColor.RED)));
+            ItemStack goBack = new NodeItemStack("go_back", new NodeItemStack.ItemProperties(Material.ARROW).style(NamedTextColor.RED));
 
             inventory.setItem(slotCount - 1, goBack);
         }

@@ -19,12 +19,12 @@ public abstract class Node {
      * @param parent Parent node
      * @param parentSlot lot of this node in parent's inventory
      * @param nodeName Node name, which is used to determine the ID
-     * @param info {@link NodeItemStack#Info}
+     * @param props {@link NodeItemStack#ItemProperties}
      */
-    public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.Info info) {
+    public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.ItemProperties props) {
         this.parent = parent;
         this.nodeName = nodeName;
-        this.itemStack = info == null ? null : new NodeItemStack(id(), info);
+        this.itemStack = props == null ? null : new NodeItemStack(id(), props);
 
         this.parentSlot = parentSlot;
         if (parent != null) {

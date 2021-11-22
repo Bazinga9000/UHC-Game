@@ -27,7 +27,7 @@ public class ValuedNode extends Node {
      * @param parent Parent node
      * @param slot lot of this node in parent's inventory
      * @param nodeName Node name, which is used to determine the ID
-     * @param info {@link NodeItemStack#Info}
+     * @param props {@link NodeItemStack#ItemProperties}
      * <p>
      * If format strings are included in the item's description (%s, %.1f, etc.), 
      * those will be substituted with the config value.
@@ -38,8 +38,8 @@ public class ValuedNode extends Node {
      * @implNote Inheriting classes should cancel the updateItemStack and recall it after
      * all its properties are set.
      */
-    public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.Info info, Type type, UnaryOperator<Number> restrict) {
-        this(parent, slot, nodeName, info, switch (type) {
+    public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Type type, UnaryOperator<Number> restrict) {
+        this(parent, slot, nodeName, props, switch (type) {
             case INTEGER, DOUBLE -> type;
             default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.not_numeric_type", type);
         });
@@ -51,7 +51,7 @@ public class ValuedNode extends Node {
      * @param parent Parent node
      * @param slot lot of this node in parent's inventory
      * @param nodeName Node name, which is used to determine the ID
-     * @param info {@link NodeItemStack#Info}
+     * @param props {@link NodeItemStack#ItemProperties}
      * <p>
      * If format strings are included in the item's description (%s, %.1f, etc.), 
      * those will be substituted with the config value.
@@ -59,8 +59,8 @@ public class ValuedNode extends Node {
      * @implNote Inheriting classes should cancel the updateItemStack and recall it after
      * all its properties are set.
      */
-    public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.Info info, Type type) {
-        super(parent, slot, nodeName, info);
+    public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Type type) {
+        super(parent, slot, nodeName, props);
         this.type = type;
         
         updateItemStack();

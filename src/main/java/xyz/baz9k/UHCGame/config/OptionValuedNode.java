@@ -25,8 +25,8 @@ public class OptionValuedNode extends ValuedNode {
      * @param nodeName Node name, which is used to determine the ID
      * @param optMaterials Materials for the options supported
      */
-    public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.Info info, Material... optMaterials) {
-        super(parent, slot, nodeName, info.withMatGet(v -> optMaterials[(int) v]), ValuedNode.Type.OPTION);
+    public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Material... optMaterials) {
+        super(parent, slot, nodeName, props.mat(v -> optMaterials[(int) v]), ValuedNode.Type.OPTION);
         this.optMaterials = optMaterials;
         this.optDescs = cfg.getStringList(String.format(OPT_DESC_ID_FORMAT, id()));
         updateItemStack();
