@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -119,39 +118,9 @@ public class GameManager implements Listener {
         
         worldManager.initWorlds();
 
-        FileConfiguration cfg = plugin.getConfig();
-        int max_health = new int[]{10, 20, 40, 60}[cfg.getInt("esoteric.max_health")];
-        double movement_speed = new double[]{0.5,1,2,3}[cfg.getInt("esoteric.mv_speed")];
-
-
         for (Player p : Bukkit.getOnlinePlayers()) {
-            // activate hud things for all
-            hudManager.initPlayerHUD(p);
-            hudManager.addPlayerToTeams(p);
-
-            // handle display name
-            previousDisplayNames.put(p.getUniqueId(), p.displayName());
-            p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
-
-            // set maximum health and movement speed according to esoteric options
-            p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(max_health);
-            p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1 * movement_speed); // 0.1 is default value
-
-            resetStatuses(p);
-            recipes.discoverFor(p);
-
-            // 60s grace period
-            PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
-
-            if (teamManager.isSpectator(p)) {
-                p.setGameMode(GameMode.SPECTATOR);
-            } else {
-                p.setGameMode(GameMode.SURVIVAL);
-                kills.put(p.getUniqueId(), 0);
-            }
+            prepareToGame(p, true);
         }
-
-        bbManager.enable(Bukkit.getServer());
 
         // do spreadplayers
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
@@ -163,8 +132,10 @@ public class GameManager implements Listener {
         plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
 
+        // unload world
         Bukkit.unloadWorld(worldManager.getLobbyWorld(), true);
 
+        // start ticking
         startTick();
     }
 
@@ -200,22 +171,10 @@ public class GameManager implements Listener {
     private void _endUHC() {
         setStage(GameStage.NOT_IN_GAME);
         for (Player p : Bukkit.getOnlinePlayers()) {
-            resetStatuses(p);
-            p.setGameMode(GameMode.SURVIVAL);
-            worldManager.escapePlayer(p);
-            p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
-            p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
-            
-            hudManager.cleanup(p);
-        }
-        
-        // update display names
-        for (UUID uuid : previousDisplayNames.keySet()) {
-            Player p = Bukkit.getPlayer(uuid);
-            if (p == null) continue;
-            p.displayName(previousDisplayNames.get(uuid));
+            prepareToLobby(p, true);
         }
 
+        // global stuff, affects all players incl offline ones
         teamManager.resetAllPlayers();
         bbManager.disable(Bukkit.getServer());
         kills.clear();
@@ -431,15 +390,9 @@ public class GameManager implements Listener {
         p.recalculatePermissions();
 
         if (hasUHCStarted()) {
-            bbManager.enable(p);
-            hudManager.initPlayerHUD(p);
-            hudManager.addPlayerToTeams(p);
-
-            if (!worldManager.inGame(p)) p.teleport(worldManager.gameSpawn());
+            prepareToGame(p, false);
         } else {
-            bbManager.disable(p);
-            hudManager.cleanup(p);
-            if (worldManager.inGame(p)) worldManager.escapePlayer(p);
+            prepareToLobby(p, false);
         }
 
         
@@ -500,6 +453,67 @@ public class GameManager implements Listener {
                 if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
                     e.setCancelled(true);
                 }
+            }
+        }
+    }
+
+    private void prepareToGame(Player p, boolean onGameStart) {
+        bbManager.enable(p);
+        hudManager.initPlayerHUD(p);
+        hudManager.addPlayerToTeams(p);
+
+        
+        recipes.discoverFor(p);
+        
+        if (onGameStart || !worldManager.inGame(p)) {
+            // if the player joins midgame and are in the lobby, then idk where to put them! put in spawn
+            if (!onGameStart && !worldManager.inGame(p)) {
+                p.teleport(worldManager.gameSpawn());
+            }
+
+            // handle display name
+            previousDisplayNames.put(p.getUniqueId(), p.displayName());
+            p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
+    
+            if (teamManager.isSpectator(p)) {
+                p.setGameMode(GameMode.SPECTATOR);
+            } else {
+                p.setGameMode(GameMode.SURVIVAL);
+                kills.put(p.getUniqueId(), 0);
+
+                // set maximum health and movement speed according to esoteric options
+                var cfg = plugin.getConfig();
+                int max_health = new int[]{10, 20, 40, 60}[cfg.getInt("esoteric.max_health")];
+                double movement_speed = new double[]{0.5,1,2,3}[cfg.getInt("esoteric.mv_speed")];
+    
+                p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(max_health);
+                p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1 * movement_speed); // 0.1 is default value
+            }
+
+            resetStatuses(p);
+
+            // 60s grace period
+            PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
+        }
+    }
+
+    private void prepareToLobby(Player p, boolean onGameEnd) {
+        bbManager.disable(p);
+        hudManager.cleanup(p);
+        if (onGameEnd || worldManager.inGame(p)) {
+            worldManager.escapePlayer(p);
+
+            p.setGameMode(GameMode.SURVIVAL);
+            resetStatuses(p);
+            p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+            p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
+            
+            // update display names
+            UUID uuid = p.getUniqueId();
+            if (previousDisplayNames.containsKey(uuid)) {
+                p.displayName(previousDisplayNames.get(uuid));
+            } else {
+                p.displayName(Component.text(p.getName()));
             }
         }
     }
