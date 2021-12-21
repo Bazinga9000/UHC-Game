@@ -176,6 +176,28 @@ public class BranchNode extends Node {
         return children;
     }
 
+    /**
+     * Traverses the tree of a node to find the node that has a specified inventory
+     * @param inventory The inventory
+     * @param node The node tree to traverse
+     * @return The node (or null if absent)
+     */
+    public BranchNode getNodeFromInventory(Inventory inventory) {
+        if (this.inventory == inventory) {
+            return this;
+        }
+
+        for (Node child : this.children) {
+            if (child instanceof BranchNode bChild) {
+                BranchNode check = bChild.getNodeFromInventory(inventory);
+                if (check != null) {
+                    return check;
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public String id() {
         String nid = super.id();

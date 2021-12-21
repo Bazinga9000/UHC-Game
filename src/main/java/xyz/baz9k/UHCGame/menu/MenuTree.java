@@ -16,63 +16,44 @@ public class MenuTree {
     private BranchNode root;
     private UHCGamePlugin plugin;
 
-    private static final int ROOT_GUI_HEIGHT = 3;
-
     public MenuTree(UHCGamePlugin plugin) {
         this.plugin = plugin;
         Node.setPlugin(plugin);
-        root = generateTree();
+
+        root = new BranchNode(3);
+        createCtrlPanelBranch(root);
+        createConfigBranch(root);
+    }
+
+    public BranchNode root() {
+        return root;
     }
 
     private static int slotAt(int row, int col) {
         return row * 9 + col;
     }
 
-    public BranchNode getRoot() {
-        return root;
-    }
-
+    
     /**
      * Returns the node in the tree that has the specified inventory
      * @param inventory The inventory
      * @return The node (or null if absent)
      */
     public BranchNode getNodeFromInventory(Inventory inventory) {
-        return scanAllChildrenForInventory(inventory, root);
+        return root.getNodeFromInventory(inventory);
     }
 
-    /**
-     * Traverses the tree of a node to find the node that has a specified inventory
-     * @param inventory The inventory
-     * @param node The node tree to traverse
-     * @return The node (or null if absent)
-     */
-    private static BranchNode scanAllChildrenForInventory(Inventory inventory, BranchNode node) {
-        if (node.getInventory() == inventory) {
-            return node;
-        }
-
-        for (Node child : node.getChildren()) {
-            if (child instanceof BranchNode bChild) {
-                BranchNode check = scanAllChildrenForInventory(inventory, bChild);
-                if (check != null) {
-                    return check;
-                }
-            }
-        }
-        return null;
+    private void createCtrlPanelBranch(BranchNode root) {
+        BranchNode ctrlRoot = new BranchNode(root, slotAt(1, 3), "ctrlpanel", new ItemProperties(Material.DIAMOND_SWORD), 6);
     }
 
-    /**
-     * @return the root of the tree, once built
-     */
-    private BranchNode generateTree() {
-        BranchNode root = new BranchNode(ROOT_GUI_HEIGHT);
+    private void createConfigBranch(BranchNode root) {
+        BranchNode cfgRoot = new BranchNode(root, slotAt(1, 5), "config", new ItemProperties(Material.IRON_PICKAXE), 3);
 
-        BranchNode intervals = new BranchNode(root, slotAt(1, 2), "intervals",  new ItemProperties(Material.CLOCK),                   3);
-        BranchNode wbSize    = new BranchNode(root, slotAt(1, 3), "wb_size",    new ItemProperties(Material.BLUE_STAINED_GLASS_PANE), 3);
-        BranchNode teamCount = new BranchNode(root, slotAt(1, 5), "team_count", new ItemProperties(Material.PLAYER_HEAD),             3);
-        BranchNode esoterics = new BranchNode(root, slotAt(1, 6), "esoteric",   new ItemProperties(Material.NETHER_STAR),             6);
+        BranchNode intervals = new BranchNode(cfgRoot, slotAt(1, 2), "intervals",  new ItemProperties(Material.CLOCK),                   3);
+        BranchNode wbSize    = new BranchNode(cfgRoot, slotAt(1, 3), "wb_size",    new ItemProperties(Material.BLUE_STAINED_GLASS_PANE), 3);
+        BranchNode teamCount = new BranchNode(cfgRoot, slotAt(1, 5), "team_count", new ItemProperties(Material.PLAYER_HEAD),             3);
+        BranchNode esoterics = new BranchNode(cfgRoot, slotAt(1, 6), "esoteric",   new ItemProperties(Material.NETHER_STAR),             6);
 
         /* INTERVALS (in secs) */
         new ValuedNode(intervals, slotAt(1, 2), "start",     new ItemProperties(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.RED_CONCRETE)   .formatter(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
@@ -132,7 +113,5 @@ public class MenuTree {
             }
             esoterics.updateAllSlots();
          });
-    
-        return root;
     }
 }
