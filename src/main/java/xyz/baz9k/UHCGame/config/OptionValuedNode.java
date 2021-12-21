@@ -1,7 +1,6 @@
 package xyz.baz9k.UHCGame.config;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,7 +14,6 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 public class OptionValuedNode extends ValuedNode {
 
     private Material[] optMaterials;
-    private List<String> optDescs;
 
     private static final String OPT_DESC_ID_FORMAT = "xyz.baz9k.uhc.config.inv.%s.options";
 
@@ -28,7 +26,6 @@ public class OptionValuedNode extends ValuedNode {
     public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Material... optMaterials) {
         super(parent, slot, nodeName, props.mat(v -> optMaterials[(int) v]), ValuedNode.Type.OPTION);
         this.optMaterials = optMaterials;
-        this.optDescs = cfg.getStringList(String.format(OPT_DESC_ID_FORMAT, id()));
         updateItemStack();
     }
 
@@ -58,6 +55,7 @@ public class OptionValuedNode extends ValuedNode {
      * @return the description for option i
      */
     public String optDesc(int i) {
+        var optDescs = cfg.getStringList(String.format(OPT_DESC_ID_FORMAT, id()));
         if (optDescs.size() == 0) {
             return String.format(OPT_DESC_ID_FORMAT + "[%s]", id(), i);
         } else {
