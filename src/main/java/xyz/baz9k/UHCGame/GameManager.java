@@ -133,7 +133,7 @@ public class GameManager implements Listener {
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
 
         // unload world
-        Bukkit.unloadWorld(worldManager.getLobbyWorld(), true);
+        plugin.getMVWorldManager().unloadWorld("lobby", true);
 
         // start ticking
         startTick();

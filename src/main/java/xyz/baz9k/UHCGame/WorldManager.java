@@ -155,6 +155,7 @@ public class WorldManager {
      * Return player to lobby
      */
     public void escapePlayer(Player p) {
+        plugin.getMVWorldManager().loadWorld("lobby");
         Location ls = lobbySpawn();
         p.setBedSpawnLocation(ls);
         p.teleport(ls);
