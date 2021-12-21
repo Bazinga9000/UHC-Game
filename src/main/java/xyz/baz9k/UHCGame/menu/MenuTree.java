@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.config;
+package xyz.baz9k.UHCGame.menu;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -6,19 +6,19 @@ import org.bukkit.inventory.Inventory;
 import net.kyori.adventure.text.format.TextColor;
 import xyz.baz9k.UHCGame.UHCGamePlugin;
 
+import static xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
 import static xyz.baz9k.UHCGame.util.Utils.*;
-import static xyz.baz9k.UHCGame.config.NodeItemStack.ItemProperties;
 
 /**
  * Setup for the config GUI tree
  */
-public class ConfigTree {
+public class MenuTree {
     private BranchNode root;
     private UHCGamePlugin plugin;
 
     private static final int ROOT_GUI_HEIGHT = 3;
 
-    public ConfigTree(UHCGamePlugin plugin) {
+    public MenuTree(UHCGamePlugin plugin) {
         this.plugin = plugin;
         Node.setPlugin(plugin);
         root = generateTree();

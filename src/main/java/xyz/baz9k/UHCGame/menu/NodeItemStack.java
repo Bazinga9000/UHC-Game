@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.config;
+package xyz.baz9k.UHCGame.menu;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;

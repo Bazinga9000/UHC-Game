@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.config;
+package xyz.baz9k.UHCGame.menu;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;

@@ -1,5 +1,5 @@
 
-package xyz.baz9k.UHCGame.config;
+package xyz.baz9k.UHCGame.menu;
 
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.entity.Player;

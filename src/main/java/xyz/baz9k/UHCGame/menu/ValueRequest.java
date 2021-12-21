@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.config;
+package xyz.baz9k.UHCGame.menu;
 
 import java.util.HashMap;
 import java.util.Map;

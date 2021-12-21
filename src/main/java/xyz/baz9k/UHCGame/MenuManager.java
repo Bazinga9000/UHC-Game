@@ -2,17 +2,18 @@ package xyz.baz9k.UHCGame;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import xyz.baz9k.UHCGame.menu.*;
+
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import xyz.baz9k.UHCGame.config.*;
+public class MenuManager implements Listener {
+    private final MenuTree configTree;
 
-public class ConfigManager implements Listener {
-    private final ConfigTree configTree;
-
-    public ConfigManager(UHCGamePlugin plugin) {
-        this.configTree = new ConfigTree(plugin);
+    public MenuManager(UHCGamePlugin plugin) {
+        this.configTree = new MenuTree(plugin);
     }
 
     public void openMenu(@NotNull Player p) {

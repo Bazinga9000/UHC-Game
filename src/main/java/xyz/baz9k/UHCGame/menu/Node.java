@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.config;
+package xyz.baz9k.UHCGame.menu;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;

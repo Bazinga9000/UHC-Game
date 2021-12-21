@@ -511,8 +511,8 @@ public class Commands {
                 (sender, args) -> {
                     requireNotStarted();
                     
-                    ConfigManager cfgManager = plugin.getConfigManager();
-                    cfgManager.openMenu(sender);
+                    MenuManager menuManager = plugin.getMenuManager();
+                    menuManager.openMenu(sender);
                 }
         );
     }
