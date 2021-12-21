@@ -415,14 +415,14 @@ public class Commands {
     }
 
     private Argument gameStageArgument(String nodeName) {
-        return new CustomArgument<GameStage>(nodeName, input -> {
+        return new CustomArgument<GameStage>(nodeName, info -> {
             try {
-                return GameStage.valueOf(input);
+                return GameStage.valueOf(info.input());
             } catch (IllegalArgumentException | NullPointerException e) {
                 throw new CustomArgumentException(new MessageBuilder("Unknown stage: ").appendArgInput());
             }
             // cmd requires getting the exact GS name, so use GameStage::name, not GameStage::toString
-        }).overrideSuggestions(sender -> Arrays.stream(GameStage.values()).map(GameStage::name).toArray(String[]::new));
+        }).replaceSuggestions(info -> Arrays.stream(GameStage.values()).map(GameStage::name).toArray(String[]::new));
     }
 
     // uhc stage set <stage: stage>

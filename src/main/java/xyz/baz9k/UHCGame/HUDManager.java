@@ -2,6 +2,7 @@ package xyz.baz9k.UHCGame;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -341,9 +342,9 @@ public class HUDManager implements Listener {
         if (180 <= yaw && yaw < 315) xz.add(trans("xyz.baz9k.uhc.hud.neg_z").color(NamedTextColor.BLUE));
 
         Component pos = trans("xyz.baz9k.uhc.hud.position", x, y, z).color(NamedTextColor.GREEN);
-        Component rot = trans("xyz.baz9k.uhc.hud.rotation", Component.join(Component.space(), xz))
+        Component rot = trans("xyz.baz9k.uhc.hud.rotation", Component.join(JoinConfiguration.separator(Component.space()), xz))
             .color(NamedTextColor.WHITE);
-        setHUDLine(p, "posrot", Component.join(Component.space(), pos, rot));
+        setHUDLine(p, "posrot", Component.join(JoinConfiguration.separator(Component.space()), pos, rot));
     }
 
     public void updateWBHUD(@NotNull Player p) {
@@ -356,7 +357,7 @@ public class HUDManager implements Listener {
         double distance = r - Math.max(Math.abs(loc.getX()), Math.abs(loc.getZ()));
         Component wbdist = trans("xyz.baz9k.uhc.hud.wbdistance", (int) distance).color(NamedTextColor.WHITE)
 ;
-        setHUDLine(p, "wbpos", Component.join(Component.space(), wbrad, wbdist));
+        setHUDLine(p, "wbpos", Component.join(JoinConfiguration.separator(Component.space()), wbrad, wbdist));
     }
 
     public void updateElapsedTimeHUD(@NotNull Player p){
