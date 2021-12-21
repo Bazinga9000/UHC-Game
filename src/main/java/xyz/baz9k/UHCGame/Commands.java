@@ -133,7 +133,7 @@ public class Commands {
                     plugin.getGameManager().endUHC(false);
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    Debug.printError(sender, e);
+                    Debug.printError(e);
                 }
             }
         );
@@ -152,7 +152,7 @@ public class Commands {
                     plugin.getGameManager().startUHC(true);
                 } catch (IllegalStateException e) {
                     CommandAPI.fail(e.getMessage());
-                    Debug.printError(sender, e);
+                    Debug.printError(e);
                 }
             }
         );
