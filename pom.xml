@@ -18,8 +18,8 @@
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
-            <id>commandapi</id>
-            <url>https://raw.githubusercontent.com/JorelAli/CommandAPI/mvn-repo/</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
         <repository>
             <id>OnARandomBox</id>
@@ -39,9 +39,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>dev.jorel</groupId>
+            <groupId>dev.jorel.CommandAPI</groupId>
             <artifactId>commandapi-core</artifactId>
-            <version>5.11</version>
+            <version>6.5.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-api</artifactId>
-            <version>4.7.0</version>
+            <version>4.9.3</version>
         </dependency>
     </dependencies>
 </project>
