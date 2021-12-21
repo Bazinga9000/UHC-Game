@@ -63,7 +63,27 @@ public class ValuedNode extends Node {
         super(parent, slot, nodeName, props);
         this.type = type;
         
-        updateItemStack();
+        if (type == Type.BOOLEAN) {
+            props.metaChanges((o, m) -> {
+                var active = (boolean) o;
+                if (active) {
+                    m.addEnchant(Enchantment.SILK_TOUCH, 1, true);
+                } else {
+                    m.removeEnchant(Enchantment.SILK_TOUCH);
+                }
+            }).extraLore(o -> {
+                var active = (boolean) o;
+
+                // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
+                TranslatableComponent status;
+                if (active) {
+                    status = trans("xyz.baz9k.uhc.config.bool_valued.on").style(noDeco(NamedTextColor.GREEN));
+                } else {
+                    status = trans("xyz.baz9k.uhc.config.bool_valued.off").style(noDeco(NamedTextColor.RED));
+                }
+                return new NodeItemStack.ExtraLore("xyz.baz9k.uhc.config.bool_valued.status", status);
+            });
+        }
     }
 
     @Override
@@ -73,7 +93,6 @@ public class ValuedNode extends Node {
             case BOOLEAN -> this.set(!cfg.getBoolean(id()));
             // case OPTION -> see OptionValuedNode#click
             default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.needs_impl", type);
-
         }
     }
 
@@ -81,49 +100,9 @@ public class ValuedNode extends Node {
         set(prevValue);
     }
 
-    /**
-     * Update the item stack based on the current config value for the node
-     */
-    public void updateItemStack() {
-        itemStack.desc(cfg.get(id()));
-        
-        // perform updates based on data type
-        switch (type) {
-            case INTEGER:
-            case DOUBLE:
-            case STRING:
-                break;
-            case BOOLEAN:
-                boolean active = cfg.getBoolean(id());
-                // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
-                TranslatableComponent status;
-                if (active) {
-                    status = trans("xyz.baz9k.uhc.config.bool_valued.on").style(noDeco(NamedTextColor.GREEN));
-                } else {
-                    status = trans("xyz.baz9k.uhc.config.bool_valued.off").style(noDeco(NamedTextColor.RED));
-                }
-                itemStack.extraLore("xyz.baz9k.uhc.config.bool_valued.status", status);
-                
-                itemStack.editMeta(m -> {
-                    if (active) {
-                        m.addEnchant(Enchantment.SILK_TOUCH, 1, true);
-                    } else {
-                        m.removeEnchant(Enchantment.SILK_TOUCH);
-                    }
-                });
-                break;
-                
-                // OPTION impl in OptionValuedNode
-                
-            default:
-                throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.needs_impl", type);
-        }
-    }
-
     public void set(Object value) {
         prevValue = cfg.get(id());
         if (type == Type.INTEGER || type == Type.DOUBLE) value = restrict.apply((Number) value);
         cfg.set(id(), value);
-        updateItemStack();
     }
 }

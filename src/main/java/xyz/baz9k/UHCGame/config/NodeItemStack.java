@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Objects;
+import java.util.function.*;
 
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -32,24 +33,12 @@ public class NodeItemStack extends ItemStack {
     private final String id;
 
     /**
-     * String that fills in {0}s in item stack descriptions in the .yaml.
-     */
-    private String descFmtStr;
-
-    /**
-     * Additional lore below the description, which can be translated with a key.
-     */
-    private TExtraLore extraLoreInfo;
-    /**
-     * Additional lore below the description, which is a component and does not use a key.
-     */
-    private List<Component> extraLore = List.of();
-
-    /**
-     * Record that provides additional properties about the ItemStack, particularly:
-     * <p> - fn to get material
+     * Class that provides additional properties about the ItemStack, particularly:
+     * <p> - fn to map current config value to material
      * <p> - name style
-     * <p> - object mapping in format string
+     * <p> - fn to map current config value to object that can be substituted in the main desc
+     * <p> - fn to do miscellaneous meta edits (ench hide flags, ench glint)
+     * <p> - fn to map current config value to extra lore
      */
     private final ItemProperties props;
 
@@ -71,55 +60,85 @@ public class NodeItemStack extends ItemStack {
         private Function<Object, Material> matGet = v -> Material.AIR;
         private Style nameStyle = DEFAULT_NAME_STYLE;
         private Function<Object, String> formatter = String::valueOf;
+        private BiConsumer<Object, ItemMeta> miscMetaChanges = (v, m) -> {};
+        private Function<Object, ExtraLore> elGet = v -> new ExtraLore();
 
         public ItemProperties() {}
         public ItemProperties(Function<Object, Material> mat) { mat(mat); }
         public ItemProperties(Material mat) { mat(mat); }
 
-        private ItemProperties set(Function<Object, Material> matGet, Style nameStyle, Function<Object, String> formatter) {
-            this.matGet = matGet;
-            this.nameStyle = nameStyle;
+        public ItemProperties mat(Function<Object, Material> mat) {
+            this.matGet = mat;
+            return this;
+        }
+        public ItemProperties style(Style s) {
+            this.nameStyle = s;
+            return this;
+        }
+        public ItemProperties formatter(Function<Object, String> formatter) {
             this.formatter = formatter;
             return this;
         }
-
-        public ItemProperties mat(Function<Object, Material> mat) { return set(mat, nameStyle, formatter); }
-        public ItemProperties mat(Material mat) { return mat(v -> mat); }
-
-        public ItemProperties style(Style s) { return set(matGet, nameStyle, formatter); }
-        public ItemProperties style(TextColor clr) { return set(matGet, noDeco(clr), formatter); }
-        
-        public ItemProperties formatter(Function<Object, String> formatter) { return set(matGet, nameStyle, formatter); }
-
-        private Material mat(String id) {
-            return matGet.apply(Node.cfg.get(id));
+        public ItemProperties metaChanges(BiConsumer<Object, ItemMeta> mc) {
+            this.miscMetaChanges = mc;
+            return this;
         }
-        private Style style() {
+        public ItemProperties extraLore(Function<Object, ExtraLore> el) {
+            this.elGet = el;
+            return this;
+        }
+        
+        public ItemProperties mat(Material mat) { return mat(v -> mat); }
+        public ItemProperties style(TextColor clr) { return style(noDeco(clr)); }
+        
+
+        private Material getMat(Object o) {
+            return matGet.apply(o);
+        }
+        private Style getStyle() {
             return nameStyle;
         }
         private String format(Object o) {
             return formatter.apply(o);
         }
+        private void editMeta(Object o, ItemMeta m) {
+            miscMetaChanges.accept(o, m);
+        }
+        private ExtraLore getExtraLore(Object o) {
+            return elGet.apply(o);
+        }
     }
 
-    /**
-     * Extra lore based off key + arguments
-     */
-    private static record TExtraLore(String id, Object... args) {
+    public static class ExtraLore { // extra lore can either be a translatable key or a list of components
+        private List<Component> lore = null;
+
+        private String tKey = null;
+        private Object[] tArgs = null;
+
+        public ExtraLore(Component... lore) { this.lore = List.of(Objects.requireNonNull(lore)); }
+        public ExtraLore(List<Component> lore) { this.lore = List.copyOf(Objects.requireNonNull(lore)); }
+
+        public ExtraLore(String key, Object... args) {
+            this.tKey = Objects.requireNonNull(key);
+            this.tArgs = Objects.requireNonNull(args);
+        }
+
         public List<Component> component() {
-            Object[] args = Arrays.stream(this.args)
+            if (lore != null) return Collections.unmodifiableList(lore);
+
+            Object[] args = Arrays.stream(tArgs)
                 .map(o -> {
                     if (o instanceof Component c) return render(c);
                     return o;
                 })
                 .toArray();
 
-            return splitLines(render(trans(id, args).style(DEFAULT_DESC_STYLE)));
+            return splitLines(render(trans(tKey, args).style(DEFAULT_DESC_STYLE)));
         }
     }
 
     public NodeItemStack(String id, ItemProperties props) {
-        super(props.mat(id));
+        super(props.getMat(Node.cfg.get(id)));
 
         this.id = id;
         this.props = props;
@@ -134,22 +153,15 @@ public class NodeItemStack extends ItemStack {
      * @return the description
      */
     public List<Component> desc() {
-        return descOf(id).stream()
+        return descFromID(id).stream()
             .map(c -> {
                 if (c instanceof TextComponent tc) {
                     String content = tc.content();
-                    return tc.content(MessageFormat.format(content, descFmtStr));
+                    String fmtObj = props.format(Node.cfg.get(id));
+                    return tc.content(MessageFormat.format(content, fmtObj));
                 } else return c;
             })
             .toList();
-    }
-    /**
-     * Sets the object for the formatted description of the item. This changes the lore.
-     * @param o Object to use for formatting the description
-     */
-    public void desc(Object o) {
-        descFmtStr = props.format(o);
-        updateAll();
     }
 
     /**
@@ -157,55 +169,32 @@ public class NodeItemStack extends ItemStack {
      * @return the extra lore
      */
     public List<Component> extraLore() {
-        if (extraLoreInfo != null) return extraLoreInfo.component();
-        return Collections.unmodifiableList(extraLore);
-    }
-
-    /**
-     * Sets the extra lore of the item
-     * @param loreKey the extra lore
-     * @param args arguments
-     */
-    public void extraLore(String key, Object... args) {
-        extraLoreInfo = new TExtraLore(key, args);
-        updateAll();
-    }
-    /**
-     * Sets the extra lore of the item
-     * @param lore the extra lore
-     */
-    public void extraLore(Component lore) {
-        extraLore = List.of(lore);
-        updateAll();
-    }
-    /**
-     * Sets the extra lore of the item
-     * @param lore the extra lore
-     */
-    public void extraLore(List<Component> lore) {
-        extraLore = List.copyOf(lore);
-        updateAll();
+        return props.getExtraLore(Node.cfg.get(id)).component();
     }
 
     private void updateLore() {
         List<Component> lore = new ArrayList<>(desc());
         
-        extraLore = extraLore();
-        if (extraLore == null) extraLore = List.of();
-        if (extraLore.size() > 0) {
+        var el = extraLore();
+        if (el.size() > 0) {
             lore.add(Component.empty());
-            lore.addAll(extraLore);
+            lore.addAll(el);
         }
 
         lore(lore);
     }
 
     /**
-     * Updates all description data to current locale.
+     * Updates the ItemStack to be up to date with all properties.
      */
     public NodeItemStack updateAll() {
-        setType(props.mat(id));
-        editMeta(m -> { m.displayName(nameOf(id).style(props.style())); });
+        var o = Node.cfg.get(id);
+
+        setType(props.getMat(o));
+        editMeta(m -> {
+            m.displayName(nameFromID(id, props.getStyle()));
+            props.editMeta(o, m);
+        });
         updateLore();
 
         return this;
@@ -251,8 +240,8 @@ public class NodeItemStack extends ItemStack {
      * @param id translation key
      * @return rendered Component
      */
-    public static Component nameOf(String id) {
-        return nameOf(id, DEFAULT_NAME_STYLE);
+    public static Component nameFromID(String id) {
+        return nameFromID(id, DEFAULT_NAME_STYLE);
     }
     /**
      * Gets a rendered name by translation key
@@ -261,7 +250,7 @@ public class NodeItemStack extends ItemStack {
      * @param s
      * @return rendered Component
      */
-    public static Component nameOf(String id, Style s) {
+    public static Component nameFromID(String id, Style s) {
         String key = String.format(NAME_ID_FORMAT, id);
         return render(trans(key).style(s));
     }
@@ -272,8 +261,8 @@ public class NodeItemStack extends ItemStack {
      * @param id translation key
      * @return lines of rendered Component
      */
-    public static List<Component> descOf(String id) {
-        return descOf(id, DEFAULT_DESC_STYLE);
+    public static List<Component> descFromID(String id) {
+        return descFromID(id, DEFAULT_DESC_STYLE);
     }
     /**
      * Gets a rendered description by translation key
@@ -282,7 +271,7 @@ public class NodeItemStack extends ItemStack {
      * @param s
      * @return lines of rendered Component
      */
-    public static List<Component> descOf(String id, Style s) {
+    public static List<Component> descFromID(String id, Style s) {
         String key = String.format(DESC_ID_FORMAT, id);
 
         Component rendered = render(trans(key).style(s));

@@ -51,7 +51,7 @@ public class BranchNode extends Node {
         int arrLen = parent == null ? slotCount : slotCount - 1;
         children = new Node[arrLen];
 
-        inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameOf(id()));
+        inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameFromID(id()));
         initInventory();
     }
 
@@ -105,7 +105,7 @@ public class BranchNode extends Node {
             return;
         }
         children[slot] = child;
-        inventory.setItem(slot, child.itemStack);
+        inventory.setItem(slot, child.itemStack());
     }
 
     /**
@@ -150,7 +150,7 @@ public class BranchNode extends Node {
 
     public void click(Player p) {
         // update all slots to make sure each item is up to date
-        for (int i = 0; i < children.length; i++) updateSlot(i);
+        updateAllSlots();
         p.openInventory(inventory);
     }
 
@@ -158,10 +158,13 @@ public class BranchNode extends Node {
      * Updates the {@link ItemStack} of the specified child of the inventory.
      * @param slot the slot
      */
-    private void updateSlot(int slot) {
+    protected void updateSlot(int slot) {
         if (children[slot] != null) {
-            inventory.setItem(slot, children[slot].itemStack.updateAll());
+            inventory.setItem(slot, children[slot].itemStack());
         }
+    }
+    public void updateAllSlots() {
+        for (int i = 0; i < children.length; i++) updateSlot(i);
     }
 
     @NotNull

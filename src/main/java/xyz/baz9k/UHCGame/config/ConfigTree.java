@@ -130,6 +130,7 @@ public class ConfigTree {
                     vn.set(defaults.get(vn.id()));
                 }
             }
+            esoterics.updateAllSlots();
          });
     
         return root;

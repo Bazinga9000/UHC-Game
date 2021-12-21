@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
@@ -25,8 +24,19 @@ public class OptionValuedNode extends ValuedNode {
      */
     public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Material... optMaterials) {
         super(parent, slot, nodeName, props.mat(v -> optMaterials[(int) v]), ValuedNode.Type.OPTION);
+        props.formatter(v -> this.optDesc((int) v))
+            .extraLore(v -> {
+                int current = (int) v % optMaterials.length;
+
+                var extraLore = new ArrayList<Component>();
+                for (int i = 0; i < optMaterials.length; i++) {
+                    var clr = i == current ? NamedTextColor.GREEN : NamedTextColor.RED;
+                    extraLore.add(Component.text(optDesc(i), noDeco(clr)));
+
+                }
+                return new NodeItemStack.ExtraLore(extraLore);
+            });
         this.optMaterials = optMaterials;
-        updateItemStack();
     }
 
     @Override
@@ -36,25 +46,10 @@ public class OptionValuedNode extends ValuedNode {
     }
 
     /**
-     * @return the currently selected option index
-     */
-    public int selectedIndex() {
-        return cfg.getInt(id()) % optMaterials.length;
-    }
-
-    /**
-     * @param i
-     * @return the material for option i
-     */
-    public Material optMaterial(int i) {
-        return optMaterials[i];
-    }
-
-    /**
      * @param i
      * @return the description for option i
      */
-    public String optDesc(int i) {
+    private String optDesc(int i) {
         var optDescs = cfg.getStringList(String.format(OPT_DESC_ID_FORMAT, id()));
         if (optDescs.size() == 0) {
             return String.format(OPT_DESC_ID_FORMAT + "[%s]", id(), i);
@@ -62,20 +57,4 @@ public class OptionValuedNode extends ValuedNode {
             return optDescs.get(i);
         }
     }
-
-    public void updateItemStack() {
-        if (optMaterials == null) return;
-        int current = selectedIndex();
-        itemStack.desc(optDesc(current));
-        itemStack.setType(optMaterial(current));
-
-        var extraLore = new ArrayList<Component>();
-        for (int i = 0; i < optMaterials.length; i++) {
-            TextColor clr = i == current ? NamedTextColor.GREEN : NamedTextColor.RED;
-            extraLore.add(Component.text(optDesc(i), noDeco(clr)));
-
-        }
-        itemStack.extraLore(extraLore);
-    }
-    
 }

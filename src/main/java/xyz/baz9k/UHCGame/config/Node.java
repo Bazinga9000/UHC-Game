@@ -2,13 +2,14 @@ package xyz.baz9k.UHCGame.config;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import xyz.baz9k.UHCGame.UHCGamePlugin;
 
 public abstract class Node {
     protected final BranchNode parent;
-    protected final NodeItemStack itemStack;
+    private final NodeItemStack itemStack;
     protected final int parentSlot;
     protected final String nodeName;
     
@@ -58,5 +59,9 @@ public abstract class Node {
         String pid = parent.id().replaceFirst("\\.?root", "");
         if (pid.equals("")) return nodeName;
         return pid + "." + nodeName;
+    }
+
+    public ItemStack itemStack() {
+        return itemStack.updateAll();
     }
 }
