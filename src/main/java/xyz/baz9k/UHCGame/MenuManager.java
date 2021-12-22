@@ -20,6 +20,10 @@ public class MenuManager implements Listener {
         menuTree.root().click(p);
     }
 
+    public void openSubMenu(String name, @NotNull Player p) {
+        menuTree.root().findChild(name).click(p);
+    }
+
     @EventHandler
     public void onInvClick(InventoryClickEvent e) {
         BranchNode b = menuTree.getNodeFromInventory(e.getInventory());

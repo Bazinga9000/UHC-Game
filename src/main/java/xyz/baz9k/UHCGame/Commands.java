@@ -47,7 +47,10 @@ public class Commands {
 
     public void registerAll() {
         CommandAPICommand uhc = new CommandAPICommand("uhc")
-            .withPermission(CommandPermission.OP);
+            .withPermission(CommandPermission.OP)
+            .executesPlayer((sender, args) -> {
+                plugin.getMenuManager().openMenu(sender);
+            });
             
         // register each @Command method
         Class<Command> annot = Command.class;
@@ -503,6 +506,17 @@ public class Commands {
         );
     }
 
+    // uhc panel
+    @Command
+    private CommandAPICommand panel() {
+        return new CommandAPICommand("panel")
+        .executesPlayer(
+                (sender, args) -> {
+                    plugin.getMenuManager().openSubMenu("ctrlpanel", sender);
+                }
+        );
+    }
+
     // uhc config
     @Command
     private CommandAPICommand config() {
@@ -511,8 +525,7 @@ public class Commands {
                 (sender, args) -> {
                     requireNotStarted();
                     
-                    MenuManager menuManager = plugin.getMenuManager();
-                    menuManager.openMenu(sender);
+                    plugin.getMenuManager().openSubMenu("config", sender);
                 }
         );
     }

@@ -176,6 +176,14 @@ public class BranchNode extends Node {
         return children;
     }
 
+    public Node findChild(String name) {
+        for (Node n : children) {
+            if (n == null) continue;
+            if (n.nodeName == name) return n;
+        }
+        return null;
+    }
+
     /**
      * Traverses the tree of a node to find the node that has a specified inventory
      * @param inventory The inventory
