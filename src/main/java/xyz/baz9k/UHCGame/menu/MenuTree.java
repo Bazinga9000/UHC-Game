@@ -5,6 +5,7 @@ import org.bukkit.inventory.Inventory;
 
 import net.kyori.adventure.text.format.TextColor;
 import xyz.baz9k.UHCGame.UHCGamePlugin;
+import xyz.baz9k.UHCGame.util.Debug;
 
 import static xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
 import static xyz.baz9k.UHCGame.util.Utils.*;
@@ -44,11 +45,65 @@ public class MenuTree {
     }
 
     private void createCtrlPanelBranch(BranchNode root) {
-        BranchNode ctrlRoot = new BranchNode(root, slotAt(1, 3), "ctrlpanel", new ItemProperties(Material.DIAMOND_SWORD), 6);
+        BranchNode ctrlRoot = new BranchNode(root, slotAt(1, 3), "ctrlpanel", new ItemProperties(Material.GOLDEN_SWORD), 6);
+        
+        new ActionNode(ctrlRoot, slotAt(1, 2), "start_game", new ItemProperties(o -> {
+            boolean succ = plugin.getGameManager().checkStart().size() == 0;
+            return succ ? Material.IRON_SWORD : Material.NETHERITE_SWORD;
+        }), p -> {
+            p.closeInventory();
+            plugin.getGameManager().startUHC(false);
+        });
+        new ActionNode(ctrlRoot, slotAt(1, 6), "end_game", new ItemProperties(o -> {
+            boolean succ = plugin.getGameManager().checkEnd().size() == 0;
+            return succ ? Material.IRON_SHOVEL : Material.NETHERITE_SHOVEL;
+        }), p -> {
+            p.closeInventory();
+            plugin.getGameManager().endUHC(false);
+        });
+
+        new ActionNode(ctrlRoot, slotAt(3, 1), "reseed_worlds", new ItemProperties(Material.APPLE), p -> {
+            p.closeInventory();
+            plugin.getWorldManager().reseedWorlds();
+        });
+        new ActionNode(ctrlRoot, slotAt(3, 2), "debug_toggle", new ItemProperties(o -> {
+            boolean d = Debug.isDebugging();
+            return d ? Material.GLOWSTONE : Material.BLACKSTONE;
+        }), p -> {
+            Debug.setDebug(!Debug.isDebugging());
+        });
+        new ActionNode(ctrlRoot, slotAt(3, 2), "stage_next", new ItemProperties(Material.SUNFLOWER), p -> {
+            plugin.getGameManager().incrementStage();
+        });
+
+        new ActionNode(ctrlRoot, slotAt(4, 1), "assign_teams_x", new ItemProperties(Material.BLACK_DYE), p -> {
+            p.closeInventory();
+            //TODO
+        });
+        new ActionNode(ctrlRoot, slotAt(4, 2), "assign_teams_1", new ItemProperties(Material.RED_DYE), p -> {
+            p.closeInventory();
+            //TODO
+        });
+        new ActionNode(ctrlRoot, slotAt(4, 3), "assign_teams_2", new ItemProperties(Material.ORANGE_DYE), p -> {
+            p.closeInventory();
+            //TODO
+        });
+        new ActionNode(ctrlRoot, slotAt(4, 4), "assign_teams_3", new ItemProperties(Material.YELLOW_DYE), p -> {
+            p.closeInventory();
+            //TODO
+        });
+        new ActionNode(ctrlRoot, slotAt(4, 5), "assign_teams_4", new ItemProperties(Material.GREEN_DYE), p -> {
+            p.closeInventory();
+            //TODO
+        });
+        new ActionNode(ctrlRoot, slotAt(4, 6), "assign_teams_5", new ItemProperties(Material.BLUE_DYE), p -> {
+            p.closeInventory();
+            //TODO
+        });
     }
 
     private void createConfigBranch(BranchNode root) {
-        BranchNode cfgRoot = new BranchNode(root, slotAt(1, 5), "config", new ItemProperties(Material.IRON_PICKAXE), 3);
+        BranchNode cfgRoot = new BranchNode(root, slotAt(1, 5), "config", new ItemProperties(Material.GOLDEN_PICKAXE), 3);
 
         BranchNode intervals = new BranchNode(cfgRoot, slotAt(1, 2), "intervals",  new ItemProperties(Material.CLOCK),                   3);
         BranchNode wbSize    = new BranchNode(cfgRoot, slotAt(1, 3), "wb_size",    new ItemProperties(Material.BLUE_STAINED_GLASS_PANE), 3);

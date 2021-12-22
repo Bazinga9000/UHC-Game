@@ -67,6 +67,48 @@ public class GameManager implements Listener {
         recipes = plugin.getRecipes();
     }
 
+    private static enum GameInitFailure {
+        TEAM_UNASSIGNED      ("xyz.baz9k.uhc.err.team.must_assigned"),
+        WORLDS_NOT_REGENED   ("xyz.baz9k.uhc.err.world.must_regened"),
+        GAME_NOT_STARTED     ("xyz.baz9k.uhc.err.not_started"       ),
+        GAME_ALREADY_STARTED ("xyz.baz9k.uhc.err.already_started"   );
+
+        private String errKey;
+        private GameInitFailure(String errKey) {
+            this.errKey = errKey;
+        }
+
+        public IllegalStateException exception() {
+            return translatableErr(IllegalStateException.class, errKey);
+        }
+    }
+
+    public List<GameInitFailure> checkStart() {
+        var fails = new ArrayList<GameInitFailure>();
+
+        if (hasUHCStarted()) fails.add(GameInitFailure.GAME_ALREADY_STARTED);
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
+                fails.add(GameInitFailure.TEAM_UNASSIGNED);
+                break;
+            }
+        }
+
+        if (!worldManager.worldsRegened()) {
+            fails.add(GameInitFailure.WORLDS_NOT_REGENED);
+        }
+
+        return Collections.unmodifiableList(fails);
+    }
+
+    public List<GameInitFailure> checkEnd() {
+        var fails = new ArrayList<GameInitFailure>();
+
+        if (!hasUHCStarted()) fails.add(GameInitFailure.GAME_NOT_STARTED);
+
+        return Collections.unmodifiableList(fails);
+    }
     /**
      * Starts UHC.
      * <p>
@@ -83,16 +125,9 @@ public class GameManager implements Listener {
 
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.try"));
         if (!skipChecks) {
-            // require teams assigned
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
-                    throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.team.must_assigned");
-                }
-            }
-
-            // require world regened
-            if (!worldManager.worldsRegened()) {
-                throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.must_regened");
+            var fails = checkStart();
+            if (fails.size() != 0) {
+                throw fails.get(0).exception();
             }
         } else {
             Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.force"));

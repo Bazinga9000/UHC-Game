@@ -105,6 +105,7 @@ public class Commands {
     /uhc escape
     /uhc debug
     /uhc debug <true|false>
+    /uhc panel
     /uhc config
     /uhc config wipe
     /uhc config get <path: str>

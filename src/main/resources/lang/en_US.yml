@@ -143,6 +143,39 @@ xyz:
             root:
               name: "Control Panel"
               desc: ""
+            start_game:
+              name: "Start Game"
+              desc: ""
+            end_game:
+              name: "End Game"
+              desc: ""
+            reseed_worlds:
+              name: "Reseed Worlds"
+              desc: ""
+            debug_toggle:
+              name: "Debug Messages"
+              desc: "Enable/disable debug messages in chat."
+            stage_next:
+              name: "Skip Stage"
+              desc: "Skip to the next stage of the game."
+            assign_teams_x:
+              name: "Assign Teams"
+              desc: ""
+            assign_teams_1:
+              name: "Assign Solos"
+              desc: "Teams of 1"
+            assign_teams_2:
+              name: "Assign Duos"
+              desc: "Teams of 2"
+            assign_teams_3:
+              name: "Assign Trios"
+              desc: "Teams of 3"
+            assign_teams_4:
+              name: "Assign Quartets"
+              desc: "Teams of 4"
+            assign_teams_5:
+              name: "Assign Quintets"
+              desc: "Teams of 5"
           config:
             root:
               name: "Config"
