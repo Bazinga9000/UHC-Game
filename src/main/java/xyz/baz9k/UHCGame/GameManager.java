@@ -113,7 +113,6 @@ public class GameManager implements Listener {
         setStage(GameStage.nth(0));
         worldManager.worldsRegenedOff();
 
-        startTime = lastStageInstant = Instant.now();
         kills.clear();
         
         worldManager.initWorlds();
@@ -136,6 +135,7 @@ public class GameManager implements Listener {
         plugin.getMVWorldManager().unloadWorld("lobby", true);
 
         // start ticking
+        startTime = lastStageInstant = Instant.now();
         startTick();
     }
 
