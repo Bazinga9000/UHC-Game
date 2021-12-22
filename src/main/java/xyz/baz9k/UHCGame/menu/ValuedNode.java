@@ -14,7 +14,7 @@ import java.util.function.UnaryOperator;
 public class ValuedNode extends Node {
     protected final Type type;
     protected UnaryOperator<Number> restrict = UnaryOperator.identity();
-
+    protected String cfgID;
     private Object prevValue;
     /**
      * Enum of the supported types for a {@link ValuedNode}.
@@ -45,7 +45,9 @@ public class ValuedNode extends Node {
         });
         
         this.restrict = restrict;
-        set(cfg.get(id()));
+        var s = id().split("\\.", 1);
+        this.cfgID = s[s.length - 1];
+        set(cfg.get(cfgID));
     }
     /**
      * @param parent Parent node
@@ -90,7 +92,7 @@ public class ValuedNode extends Node {
     public void click(@NotNull Player p) {
         switch (type) {
             case INTEGER, DOUBLE, STRING -> new ValueRequest(plugin, p, this);
-            case BOOLEAN -> this.set(!cfg.getBoolean(id()));
+            case BOOLEAN -> this.set(!cfg.getBoolean(cfgID));
             // case OPTION -> see OptionValuedNode#click
             default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.needs_impl", type);
         }
@@ -101,8 +103,8 @@ public class ValuedNode extends Node {
     }
 
     public void set(Object value) {
-        prevValue = cfg.get(id());
+        prevValue = cfg.get(cfgID);
         if (type == Type.INTEGER || type == Type.DOUBLE) value = restrict.apply((Number) value);
-        cfg.set(id(), value);
+        cfg.set(cfgID, value);
     }
 }

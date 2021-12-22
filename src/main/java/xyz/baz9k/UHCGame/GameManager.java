@@ -84,6 +84,9 @@ public class GameManager implements Listener {
     }
 
     public List<GameInitFailure> checkStart() {
+        worldManager = plugin.getWorldManager();
+        teamManager = plugin.getTeamManager();
+        
         var fails = new ArrayList<GameInitFailure>();
 
         if (hasUHCStarted()) fails.add(GameInitFailure.GAME_ALREADY_STARTED);

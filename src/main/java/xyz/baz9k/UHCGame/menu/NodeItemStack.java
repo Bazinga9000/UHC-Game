@@ -138,7 +138,7 @@ public class NodeItemStack extends ItemStack {
     }
 
     public NodeItemStack(String id, ItemProperties props) {
-        super(props.getMat(Node.cfg.get(id)));
+        super(props.getMat(getPropsObject(id)));
 
         this.id = id;
         this.props = props;
@@ -157,7 +157,7 @@ public class NodeItemStack extends ItemStack {
             .map(c -> {
                 if (c instanceof TextComponent tc) {
                     String content = tc.content();
-                    String fmtObj = props.format(Node.cfg.get(id));
+                    String fmtObj = props.format(getPropsObject(id));
                     return tc.content(MessageFormat.format(content, fmtObj));
                 } else return c;
             })
@@ -169,7 +169,7 @@ public class NodeItemStack extends ItemStack {
      * @return the extra lore
      */
     public List<Component> extraLore() {
-        return props.getExtraLore(Node.cfg.get(id)).component();
+        return props.getExtraLore(getPropsObject(id)).component();
     }
 
     private void updateLore() {
@@ -188,7 +188,7 @@ public class NodeItemStack extends ItemStack {
      * Updates the ItemStack to be up to date with all properties.
      */
     public NodeItemStack updateAll() {
-        var o = Node.cfg.get(id);
+        var o = getPropsObject(id);
 
         setType(props.getMat(o));
         editMeta(m -> {
@@ -278,5 +278,11 @@ public class NodeItemStack extends ItemStack {
         if (renderString(rendered).equals("")) return List.of();
 
         return splitLines(rendered);
+    }
+
+    private static Object getPropsObject(String id) {
+        var s = id.split("\\.", 2);
+        var cfgID = s[s.length - 1];
+        return Node.cfg.get(cfgID);
     }
 }

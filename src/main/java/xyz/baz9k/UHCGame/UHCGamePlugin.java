@@ -33,8 +33,8 @@ public class UHCGamePlugin extends JavaPlugin {
         gameManager = new GameManager(this);
         hudManager = new HUDManager(this);
         bbManager = new BossbarManager(this);
-        menuManager = new MenuManager(this);
         worldManager = new WorldManager(this);
+        menuManager = new MenuManager(this);
         spreadPlayersManager = new SpreadPlayersManager(this);
         recipes = new Recipes(this);
 

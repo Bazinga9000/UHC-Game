@@ -41,7 +41,7 @@ public class OptionValuedNode extends ValuedNode {
 
     @Override
     public void click(Player p) {
-        int currIndex = cfg.getInt(id());
+        int currIndex = cfg.getInt(cfgID);
         this.set((currIndex + 1) % optMaterials.length);
     }
 
@@ -50,9 +50,9 @@ public class OptionValuedNode extends ValuedNode {
      * @return the description for option i
      */
     private String optDesc(int i) {
-        var optDescs = cfg.getStringList(String.format(OPT_DESC_ID_FORMAT, id()));
+        var optDescs = cfg.getStringList(String.format(OPT_DESC_ID_FORMAT, cfgID));
         if (optDescs.size() == 0) {
-            return String.format(OPT_DESC_ID_FORMAT + "[%s]", id(), i);
+            return String.format(OPT_DESC_ID_FORMAT + "[%s]", cfgID, i);
         } else {
             return optDescs.get(i);
         }
