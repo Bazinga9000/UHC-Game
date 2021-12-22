@@ -164,8 +164,8 @@ public class WorldManager {
     );
 
     public boolean isGoodWorld(@NotNull World w) {
-        var loc = getHighestLoc(w, 0, 0);
-        Biome b = w.getBiome(0, (int) loc.getY(), 0);
+        var loc = getHighestLoc(w, 1, 1);
+        Biome b = w.getBiome(1, (int) loc.getY() - 1, 1);
         
         return !rejectedBiomes.contains(b);
     }
