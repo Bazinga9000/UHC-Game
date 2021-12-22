@@ -110,7 +110,7 @@ public class WorldManager {
             w.getBlockAt(0, w.getMinHeight() + 1, 0).setType(Material.BEACON);
             w.getBlockAt(0, w.getMinHeight() + 2, 0).setType(Material.BEDROCK);
 
-            for (int y = 3; y < w.getMaxHeight(); y++) {
+            for (int y = w.getMinHeight() + 3; y < w.getMaxHeight(); y++) {
                 w.getBlockAt(0, y, 0).setType(Material.BARRIER);
             }
         }
