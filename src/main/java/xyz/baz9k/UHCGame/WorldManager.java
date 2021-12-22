@@ -127,6 +127,7 @@ public class WorldManager {
             .seed(seed);
         
         Bukkit.unloadWorld(w, false);
+        plugin.getMVWorldManager().deleteWorld(wc.name(), false, true);
         Bukkit.createWorld(wc);
     }
 
