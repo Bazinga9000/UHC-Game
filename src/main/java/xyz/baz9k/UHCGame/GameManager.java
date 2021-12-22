@@ -502,8 +502,6 @@ public class GameManager implements Listener {
         hudManager.cleanup(p);
         if (onGameEnd || worldManager.inGame(p)) {
             worldManager.escapePlayer(p);
-
-            p.setGameMode(GameMode.SURVIVAL);
             resetStatuses(p);
             p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
             p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -202,6 +203,7 @@ public class WorldManager {
         Location ls = lobbySpawn();
         p.setBedSpawnLocation(ls);
         p.teleport(ls);
+        p.setGameMode(GameMode.ADVENTURE);
     }
 
     public boolean inGame(Player p) {
