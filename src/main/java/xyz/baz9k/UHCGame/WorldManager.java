@@ -13,8 +13,11 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.World.Environment;
+import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
+import org.jetbrains.annotations.NotNull;
+import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.Point2D;
 
 public class WorldManager {
@@ -121,10 +124,34 @@ public class WorldManager {
      */
     public void reseedWorlds(String seed) {
         var wm = plugin.getMVWorldManager();
+        // regenerate overworld
+        wm.regenWorld(getGameWorld(0).getName(), true, false, seed);
+        if (!isGoodWorld(getGameWorld(0))) {
+            Debug.printDebug("Rejected Seed " + seed + ", Regenerating...");
+            reseedWorlds();
+            return;
+        }
         for (World w : getGameWorlds()) {
+            if (w == getGameWorld(0)) {continue;}
             wm.regenWorld(w.getName(), true, false, seed);
         }
         worldsRegened = true;
+    }
+
+
+    public boolean isGoodWorld(@NotNull World w) {
+        Biome b = w.getBiome(0, 64, 0);
+        if (b == Biome.OCEAN) {return false;}
+        if (b == Biome.COLD_OCEAN) {return false;}
+        if (b == Biome.DEEP_COLD_OCEAN) {return false;}
+        if (b == Biome.DEEP_FROZEN_OCEAN) {return false;}
+        if (b == Biome.DEEP_LUKEWARM_OCEAN) {return false;}
+        if (b == Biome.DEEP_OCEAN) {return false;}
+        if (b == Biome.FROZEN_OCEAN) {return false;}
+        if (b == Biome.LUKEWARM_OCEAN) {return false;}
+        if (b == Biome.WARM_OCEAN) {return false;}
+
+        return true;
     }
 
     /**
