@@ -12,6 +12,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
@@ -112,9 +113,13 @@ public class WorldManager {
      * <p>
      * Accessible through /uhc reseed
      */
-    private void reseedWorld(World w, String seed) {
-        var wm = plugin.getMVWorldManager();
-        wm.regenWorld(w.getName(), true, false, seed);
+    private void reseedWorld(World w, long seed) {
+        var wc = new WorldCreator(w.getName())
+            .environment(w.getEnvironment())
+            .seed(seed);
+        
+        Bukkit.unloadWorld(w, false);
+        Bukkit.createWorld(wc);
     }
 
     /**
@@ -129,12 +134,11 @@ public class WorldManager {
         do {
             l = r.nextLong();
             Debug.printDebug(String.format("Checking seed %s", l));
-            reseedWorld(w, String.valueOf(l));
-            Debug.printDebug(String.format("Reseeded w/ seed %s", l));
+            reseedWorld(w, l);
         } while(!isGoodWorld(w));
         
         Debug.printDebug(String.format("Using seed %s", l));
-        reseedWorlds(String.valueOf(l), true);
+        reseedWorlds(l, true);
     }
 
     /**
@@ -143,7 +147,7 @@ public class WorldManager {
      * Accessible through /uhc reseed <seed>
      * @param seed
      */
-    public void reseedWorlds(String seed, boolean ignoreOverworld) {
+    public void reseedWorlds(long seed, boolean ignoreOverworld) {
         World[] worlds = getGameWorlds();
 
         int init = ignoreOverworld ? 1 : 0;
@@ -166,8 +170,6 @@ public class WorldManager {
     );
 
     public boolean isGoodWorld(@NotNull World w) {
-        Debug.printDebug(String.format("Checking if %s is good world", w.getSeed()));
-        
         var loc = getHighestLoc(w, 1, 1);
         Debug.printDebug(String.format("Checking %s's biome", w.getSeed()));
         Biome b = w.getBiome(1, (int) loc.getY() - 1, 1);

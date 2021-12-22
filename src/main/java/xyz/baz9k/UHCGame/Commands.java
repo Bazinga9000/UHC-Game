@@ -267,12 +267,12 @@ public class Commands {
         // reseeds worlds
         return new CommandAPICommand("reseed")
         .withArguments(
-            new TextArgument("seed")
+            new LongArgument("seed")
         )
         .executes(
             (sender, args) -> {
                 Bukkit.getServer().sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.start").color(NamedTextColor.YELLOW));
-                plugin.getWorldManager().reseedWorlds((String) args[0], false);
+                plugin.getWorldManager().reseedWorlds((long) args[0], false);
                 Bukkit.getServer().sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.succ").color(NamedTextColor.YELLOW));
             }
         );
