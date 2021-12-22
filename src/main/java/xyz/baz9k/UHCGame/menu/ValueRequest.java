@@ -26,7 +26,7 @@ public class ValueRequest {
         Prompt firstPrompt = switch (node.type) {
             case INTEGER, DOUBLE -> new NumberRequestPrompt();
             case STRING -> new StringRequestPrompt();
-            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.prompt.wrong_type", node.type);
+            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.prompt.wrong_type", node.type);
         };
 
         new ConversationFactory(plugin)
@@ -37,7 +37,7 @@ public class ValueRequest {
             .addConversationAbandonedListener(e -> {
                 if (!e.gracefulExit()) {
                     Player p = (Player) e.getContext().getForWhom();
-                    p.sendMessage(trans("xyz.baz9k.uhc.config.prompt.cancel"));
+                    p.sendMessage(trans("xyz.baz9k.uhc.menu.prompt.cancel"));
                 }
             })
             .buildConversation(converser)
@@ -49,7 +49,7 @@ public class ValueRequest {
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
             Object id = context.getSessionData("id");
-            return renderString(trans("xyz.baz9k.uhc.config.prompt.ask", id));
+            return renderString(trans("xyz.baz9k.uhc.menu.prompt.ask", id));
         }
         
         @Override
@@ -65,7 +65,7 @@ public class ValueRequest {
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
             Object id = context.getSessionData("id");
-            return renderString(trans("xyz.baz9k.uhc.config.prompt.ask", id));
+            return renderString(trans("xyz.baz9k.uhc.menu.prompt.ask", id));
         }
 
         @Override
@@ -86,7 +86,7 @@ public class ValueRequest {
 
             node.set(newValue);
             node.parent.click((Player) context.getForWhom());
-            return renderString(trans("xyz.baz9k.uhc.config.prompt.succ", id, newValue));
+            return renderString(trans("xyz.baz9k.uhc.menu.prompt.succ", id, newValue));
         }
 
         @Override

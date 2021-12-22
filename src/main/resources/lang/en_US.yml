@@ -116,7 +116,7 @@ xyz:
           must_fit: "Position needs to be between 1 and 15."
         lang:
           missing_file: "Missing file {0}"
-        config:
+        menu:
           prompt:
             wrong_type: "Value request on unsupported type {0}"
           needs_impl: "Type {0} is missing implementation for this method call"
@@ -125,7 +125,7 @@ xyz:
             invalid_slot_set: "Cannot set child at slot {0}. Slot must be a positive integer less than {1}."
             invalid_slot_clicked: "Invalid slot clicked (Slot cannot be negative or greater than {0}.)"
       
-      config:
+      menu:
         prompt:
           ask: "Enter new value for \"{0}\" (type 'cancel' to cancel): "
           cancel: "Prompt cancelled."
@@ -138,139 +138,140 @@ xyz:
           go_back:
             name: "Go Back"
             desc: ""
-          root:
-            name: "Config"
-          intervals:
+          config:
             root:
-              name: "Stage Durations"
-              desc: |-
-                Set the various timings between game events.
-            start:
-              name: "Still Border"
-              desc: "Duration: {0}"
-            movement1:
-              name: "Border 1"
-              desc: "Duration: {0}"
-            stop:
-              name: "Border Stops"
-              desc: "Duration: {0}"
-            movement2:
-              name: "Border 2"
-              desc: "Duration: {0}"
-            dmwait:
-              name: "Time Until Deathmatch"
-              desc: "Duration: {0}"
-          wb_size:
-            root:
-              name: "Worldborder Sizes"
-              desc: |-
-                Change the widths of the worldborders at 
-                various stages.
-            initial:
-              name: "Initial World Border"
-              desc: "Diameter: {0}"
-            border1:
-              name: "First Movement"
-              desc: "Diameter: {0}"
-            border2:
-              name: "Second Movement"
-              desc: "Diameter: {0}"
-            deathmatch:
-              name: "Deathmatch"
-              desc: "Diameter: {0}"
-          team_count:
-            root:
-              name: "Team Counts"
-              desc: "Set the number of teams."
+              name: "Config"
+            intervals:
+              root:
+                name: "Stage Durations"
+                desc: |-
+                  Set the various timings between game events.
+              start:
+                name: "Still Border"
+                desc: "Duration: {0}"
+              movement1:
+                name: "Border 1"
+                desc: "Duration: {0}"
+              stop:
+                name: "Border Stops"
+                desc: "Duration: {0}"
+              movement2:
+                name: "Border 2"
+                desc: "Duration: {0}"
+              dmwait:
+                name: "Time Until Deathmatch"
+                desc: "Duration: {0}"
+            wb_size:
+              root:
+                name: "Worldborder Sizes"
+                desc: |-
+                  Change the widths of the worldborders at 
+                  various stages.
+              initial:
+                name: "Initial World Border"
+                desc: "Diameter: {0}"
+              border1:
+                name: "First Movement"
+                desc: "Diameter: {0}"
+              border2:
+                name: "Second Movement"
+                desc: "Diameter: {0}"
+              deathmatch:
+                name: "Deathmatch"
+                desc: "Diameter: {0}"
             team_count:
-              name: "Set Team Count"
-              desc: "Number of teams: {0}"
-            solos:
-              name: "Solos"
-              desc: "Teams of 1"
-            duos:
-              name: "Duos"
-              desc: "Teams of 2"
-            trios:
-              name: "Trios"
-              desc: "Teams of 3"
-            quartets:
-              name: "Quartets"
-              desc: "Teams of 4"
-            quintets:
-              name: "Quintets"
-              desc: "Teams of 5"
-          esoteric:
-            root:
-              name: "Esoterics"
-              desc: |-
-                Toggle various additional settings for 
-                untraditional gameplay.
-            gone_fishing:
-              name: "Gone Fishing"
-              desc: |-
-                Each player receives:
-                   - An unbreakable maxed Fishing Rod
-                   - 64 Anvils
-                   - 1000 Levels
-            boss_team:
-              name: "Boss Team"
-              desc: |-
-                Team 1 gets double health,
-                but has fewer people.
-            always_elytra:
-              name: "Always Elytra"
-              desc: |-
-                Everyone is in a flying state 
-                for the entire game.
-                Each player receives:
-                    - Unbreakable Elytra w/ Curse of Binding
-            sardines:
-              name: "Sardines"
-              desc: |-
-                Players that find each other
-                in game join into teams.
-            wither_bonus:
-              name: "Wither Bonus Round"
-              desc: |-
-                After the game ends, the winning 
-                team gets a Wither to fight.
-            dn_cycle:
-              name: "Day-Night Cycle"
-              desc: ""
-              options:
-                - "05:00 per cycle"
-                - "10:00 per cycle"
-                - "20:00 per cycle"
-                - "Always Day"
-                - "Always Night"
-            nether_spawn:
-              name: "Spawn in Nether"
-              desc: ""
-            bomberman:
-              name:  "Bomberman"
-              desc: |-
-                Direct combat is disabled.
-                Each player receives:
-                    - 128 TNT
-            max_health:
-              name: "Player Health"
-              desc: ""
-              options:
-                - "\u2764 05"
-                - "\u2764 10"
-                - "\u2764 20"
-                - "\u2764 30"
-            mv_speed:
-              name: "Movement Speed"
-              desc: ""
-              options:
-                - "0.5x"
-                - "1.0x"
-                - "2.0x"
-                - "3.0x"
-            reset_to_defaults:
-              name: "Reset to Defaults"
-              desc: ""
+              root:
+                name: "Team Counts"
+                desc: "Set the number of teams."
+              team_count:
+                name: "Set Team Count"
+                desc: "Number of teams: {0}"
+              solos:
+                name: "Solos"
+                desc: "Teams of 1"
+              duos:
+                name: "Duos"
+                desc: "Teams of 2"
+              trios:
+                name: "Trios"
+                desc: "Teams of 3"
+              quartets:
+                name: "Quartets"
+                desc: "Teams of 4"
+              quintets:
+                name: "Quintets"
+                desc: "Teams of 5"
+            esoteric:
+              root:
+                name: "Esoterics"
+                desc: |-
+                  Toggle various additional settings for 
+                  untraditional gameplay.
+              gone_fishing:
+                name: "Gone Fishing"
+                desc: |-
+                  Each player receives:
+                    - An unbreakable maxed Fishing Rod
+                    - 64 Anvils
+                    - 1000 Levels
+              boss_team:
+                name: "Boss Team"
+                desc: |-
+                  Team 1 gets double health,
+                  but has fewer people.
+              always_elytra:
+                name: "Always Elytra"
+                desc: |-
+                  Everyone is in a flying state 
+                  for the entire game.
+                  Each player receives:
+                      - Unbreakable Elytra w/ Curse of Binding
+              sardines:
+                name: "Sardines"
+                desc: |-
+                  Players that find each other
+                  in game join into teams.
+              wither_bonus:
+                name: "Wither Bonus Round"
+                desc: |-
+                  After the game ends, the winning 
+                  team gets a Wither to fight.
+              dn_cycle:
+                name: "Day-Night Cycle"
+                desc: ""
+                options:
+                  - "05:00 per cycle"
+                  - "10:00 per cycle"
+                  - "20:00 per cycle"
+                  - "Always Day"
+                  - "Always Night"
+              nether_spawn:
+                name: "Spawn in Nether"
+                desc: ""
+              bomberman:
+                name:  "Bomberman"
+                desc: |-
+                  Direct combat is disabled.
+                  Each player receives:
+                      - 128 TNT
+              max_health:
+                name: "Player Health"
+                desc: ""
+                options:
+                  - "\u2764 05"
+                  - "\u2764 10"
+                  - "\u2764 20"
+                  - "\u2764 30"
+              mv_speed:
+                name: "Movement Speed"
+                desc: ""
+                options:
+                  - "0.5x"
+                  - "1.0x"
+                  - "2.0x"
+                  - "3.0x"
+              reset_to_defaults:
+                name: "Reset to Defaults"
+                desc: ""
 
 

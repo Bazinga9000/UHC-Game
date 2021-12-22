@@ -41,7 +41,7 @@ public class ValuedNode extends Node {
     public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Type type, UnaryOperator<Number> restrict) {
         this(parent, slot, nodeName, props, switch (type) {
             case INTEGER, DOUBLE -> type;
-            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.not_numeric_type", type);
+            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.not_numeric_type", type);
         });
         
         this.restrict = restrict;
@@ -77,11 +77,11 @@ public class ValuedNode extends Node {
                 // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
                 TranslatableComponent status;
                 if (active) {
-                    status = trans("xyz.baz9k.uhc.config.bool_valued.on").style(noDeco(NamedTextColor.GREEN));
+                    status = trans("xyz.baz9k.uhc.menu.bool_valued.on").style(noDeco(NamedTextColor.GREEN));
                 } else {
-                    status = trans("xyz.baz9k.uhc.config.bool_valued.off").style(noDeco(NamedTextColor.RED));
+                    status = trans("xyz.baz9k.uhc.menu.bool_valued.off").style(noDeco(NamedTextColor.RED));
                 }
-                return new NodeItemStack.ExtraLore("xyz.baz9k.uhc.config.bool_valued.status", status);
+                return new NodeItemStack.ExtraLore("xyz.baz9k.uhc.menu.bool_valued.status", status);
             });
         }
     }
@@ -92,7 +92,7 @@ public class ValuedNode extends Node {
             case INTEGER, DOUBLE, STRING -> new ValueRequest(plugin, p, this);
             case BOOLEAN -> this.set(!cfg.getBoolean(id()));
             // case OPTION -> see OptionValuedNode#click
-            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.config.needs_impl", type);
+            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.needs_impl", type);
         }
     }
 

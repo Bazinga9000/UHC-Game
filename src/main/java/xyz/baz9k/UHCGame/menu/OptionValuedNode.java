@@ -14,7 +14,7 @@ public class OptionValuedNode extends ValuedNode {
 
     private Material[] optMaterials;
 
-    private static final String OPT_DESC_ID_FORMAT = "xyz.baz9k.uhc.config.inv.%s.options";
+    private static final String OPT_DESC_ID_FORMAT = "xyz.baz9k.uhc.menu.inv.%s.options";
 
     /**
      * @param parent Parent node
