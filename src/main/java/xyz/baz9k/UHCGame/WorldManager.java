@@ -128,8 +128,9 @@ public class WorldManager {
         long l;
         do {
             l = r.nextLong();
-            reseedWorld(w, String.valueOf(l));
             Debug.printDebug(String.format("Checking seed %s", l));
+            reseedWorld(w, String.valueOf(l));
+            Debug.printDebug(String.format("Reseeded w/ seed %s", l));
         } while(!isGoodWorld(w));
         
         Debug.printDebug(String.format("Using seed %s", l));
@@ -165,8 +166,12 @@ public class WorldManager {
     );
 
     public boolean isGoodWorld(@NotNull World w) {
+        Debug.printDebug(String.format("Checking if %s is good world", w.getSeed()));
+        
         var loc = getHighestLoc(w, 1, 1);
+        Debug.printDebug(String.format("Checking %s's biome", w.getSeed()));
         Biome b = w.getBiome(1, (int) loc.getY() - 1, 1);
+        Debug.printDebug(String.format("Checked %s's biome, it's %s", w.getSeed(), b.toString()));
         
         return !rejectedBiomes.contains(b);
     }
