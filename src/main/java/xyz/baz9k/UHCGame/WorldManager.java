@@ -129,13 +129,12 @@ public class WorldManager {
      */
     public void reseedWorlds() {
         Random r = new Random();
-        World w = getGameWorld(0);
         long l;
         do {
             l = r.nextLong();
             Debug.printDebug(String.format("Checking seed %s", l));
-            reseedWorld(w, l);
-        } while(!isGoodWorld(w));
+            reseedWorld(getGameWorld(0), l);
+        } while(!isGoodWorld(getGameWorld(0)));
         
         Debug.printDebug(String.format("Using seed %s", l));
         reseedWorlds(l, true);
