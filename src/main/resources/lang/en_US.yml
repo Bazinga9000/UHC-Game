@@ -138,9 +138,15 @@ xyz:
           go_back:
             name: "Go Back"
             desc: ""
+          
+          ctrlpanel:
+            root:
+              name: "Control Panel"
+              desc: ""
           config:
             root:
               name: "Config"
+              desc: ""
             intervals:
               root:
                 name: "Stage Durations"
