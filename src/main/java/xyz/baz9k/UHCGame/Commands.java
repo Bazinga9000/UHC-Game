@@ -1,13 +1,12 @@
 package xyz.baz9k.UHCGame;
 
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.*;
 import dev.jorel.commandapi.arguments.*;
-import dev.jorel.commandapi.arguments.CustomArgument.CustomArgumentException;
-import dev.jorel.commandapi.arguments.CustomArgument.MessageBuilder;
+import dev.jorel.commandapi.arguments.ScoreHolderArgument.*;
+import dev.jorel.commandapi.arguments.CustomArgument.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
-import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import dev.jorel.commandapi.exceptions.*;
+import dev.jorel.commandapi.wrappers.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.util.Debug;
@@ -26,12 +25,12 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.*;
 
 @SuppressWarnings("unchecked")
 public class Commands {
@@ -62,6 +61,7 @@ public class Commands {
         }
 
         uhc.register();
+        funcTools();
     }
 
     private void requireNotStarted() throws WrapperCommandSyntaxException {
@@ -543,4 +543,211 @@ public class Commands {
         );
     }
 
+    private void funcTools() {
+        ConsoleCommandSender console = Bukkit.getConsoleSender();
+
+        // /dispatch, /cmd: runs a command, used to run any plugin command in /execute and functions
+        new CommandAPICommand("dispatch")
+            .withArguments(new GreedyStringArgument("command"))
+            .withPermission(CommandPermission.OP)
+            .withAliases("cmd")
+            .executes((sender, args) -> {
+                String cmd = (String) args[0];
+                Bukkit.dispatchCommand(sender, cmd);
+            })
+            .register();
+
+        // /for <var> in m..n run <cmd>
+        // /for <var> in m..n step s run <cmd>
+
+        // examples:
+        // /for i in 0..10 run say $i         # (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        // /for i in 0..10 step 2 run say $i  # (0, 2, 4, 6, 8, 10)
+        new CommandAPICommand("for")
+            .withArguments(
+                new StringArgument("var"),
+                new LiteralArgument("in"),
+                new IntegerRangeArgument("range"),
+                new LiteralArgument("run"),
+                new GreedyStringArgument("cmd")
+            )
+            .withPermission(CommandPermission.OP)
+            .executes((sender, args) -> {
+                String vname = (String) args[0];
+                IntegerRange vrange = (IntegerRange) args[1];
+                String cmd = (String) args[2];
+
+                try {
+                    for (int i = vrange.getLowerBound(); i <= vrange.getUpperBound(); i++) {
+                        String itercmd = cmd;
+                        itercmd = itercmd.replaceAll("(?<!\\\\)\\$" + vname, Integer.toString(i));
+                        itercmd = itercmd.replaceAll("\\\\\\$", "\\$");
+                        Bukkit.dispatchCommand(console, itercmd);
+                    }
+                } catch (CommandException e) {
+                    CommandAPI.fail("An error occurred while running the commands: " + e.getMessage());
+                }
+            })
+            .register();
+
+            new CommandAPICommand("for")
+            .withArguments(
+                new StringArgument("var"),
+                new LiteralArgument("in"),
+                new IntegerRangeArgument("range"),
+                new LiteralArgument("step"),
+                new IntegerArgument("stepamt", 1),
+                new LiteralArgument("run"),
+                new GreedyStringArgument("cmd")
+            )
+            .withPermission(CommandPermission.OP)
+            .executes((sender, args) -> {
+                String vname = (String) args[0];
+                IntegerRange vrange = (IntegerRange) args[1];
+                int step = (int) args[2];
+                String cmd = (String) args[3];
+
+                try {
+                    for (int i = vrange.getLowerBound(); i <= vrange.getUpperBound(); i += step) {
+                        String itercmd = cmd;
+                        itercmd = itercmd.replaceAll("(?<!\\\\)\\$" + vname, Integer.toString(i));
+                        itercmd = itercmd.replaceAll("\\\\\\$", "\\$");
+                        Bukkit.dispatchCommand(console, itercmd);
+                    }
+                } catch (CommandException e) {
+                    CommandAPI.fail("An error occurred while running the commands: " + e.getMessage());
+                }
+            })
+            .register();
+
+            // /runfn <fn> with <player> <objective> as <value> || /runfn <fn> with <player> <objective> as <player> <objective>
+            // this fn sets scoreboard entry to <value> / <player> <objective>, runs the function, and returns the value on said scoreboard entry.
+            // this simplifies syntax for functions with args and allows them to be used with /for
+            // uhhhh, if you want to use multiple arguments just curry I guess
+
+            new CommandAPICommand("runfunction")
+            .withArguments(
+                new FunctionArgument("function"),
+                new LiteralArgument("with"),
+                new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+                new ObjectiveArgument("objective"),
+                new LiteralArgument("as"),
+                new IntegerArgument("value")
+            )
+            .withPermission(CommandPermission.OP)
+            .withAliases("runfn")
+            .executes((sender, args) -> {
+                FunctionWrapper[] fns = (FunctionWrapper[]) args[0];
+                String inputPl = (String) args[1];
+                String inputOb = (String) args[2];
+                int inputVal = (int) args[3];
+                Score inputScore = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(inputOb).getScore(inputPl);
+                inputScore.setScore(inputVal);
+                // run fns after arg has been set
+                for (FunctionWrapper fn : fns) {
+                    fn.run();
+                }
+                // return score for use w/ execute store
+                try {
+                    int retVal = inputScore.getScore();
+                    if (sender instanceof Player && !(sender instanceof ProxiedCommandSender)) sender.sendMessage("Function returned " + Integer.toString(retVal));
+                    return retVal; 
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    CommandAPI.fail("Entry no longer exists");
+                }
+                return 0;
+            })
+            .register();
+
+            new CommandAPICommand("runfunction")
+            .withArguments(
+                new FunctionArgument("function"),
+                new LiteralArgument("with"),
+                new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+                new ObjectiveArgument("objective"),
+                new LiteralArgument("as"),
+                new ScoreHolderArgument("player value", ScoreHolderType.SINGLE),
+                new ObjectiveArgument("objective value")
+            )
+            .withPermission(CommandPermission.OP)
+            .withAliases("runfn")
+            .executes((sender, args) -> {
+                FunctionWrapper[] fns = (FunctionWrapper[]) args[0];
+                String inputPl = (String) args[1];
+                String inputOb = (String) args[2];
+                String valuePl = (String) args[3];
+                String valueOb = (String) args[4];
+                
+                // get (pl obj) slot and set it to val, effectively acting as the arg
+                Score inputScore = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(inputOb).getScore(inputPl);
+                int inputVal = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(valueOb).getScore(valuePl).getScore();
+                
+                inputScore.setScore(inputVal);
+                // run fns after arg has been set
+                for (FunctionWrapper fn : fns) {
+                    fn.run();
+                }
+                // return score for use w/ execute store
+                try {
+                    int retVal = inputScore.getScore();
+                    if (sender instanceof Player && !(sender instanceof ProxiedCommandSender)) sender.sendMessage("Function returned " + Integer.toString(retVal));
+                    return retVal; 
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    CommandAPI.fail("Entry no longer exists");
+                }
+                return 0;
+            })
+            .register();
+        
+            // /let <var> = <player> <objective> run <cmd>: substs var with entry in cmd, same syntax as /for
+            // /let <var> = <player> <objective> <scale: double> run <cmd>: multiplies by scale
+            new CommandAPICommand("let")
+            .withArguments(
+                new StringArgument("var"),
+                new LiteralArgument("="),
+                new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+                new ObjectiveArgument("objective"),
+                new LiteralArgument("run"),
+                new GreedyStringArgument("cmd")
+            )
+            .withPermission(CommandPermission.OP)
+            .executes((sender, args) -> {
+                String vname = (String) args[0];
+                String valPl = (String) args[1];
+                String valOb = (String) args[2];
+                String cmd = (String) args[3];
+
+                int v = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(valOb).getScore(valPl).getScore();
+                cmd = cmd.replaceAll("(?<!\\\\)\\$" + vname, Integer.toString(v));
+                cmd = cmd.replaceAll("\\\\\\$", "\\$");
+                Bukkit.dispatchCommand(sender, cmd);
+            })
+            .register();
+
+            new CommandAPICommand("let")
+            .withArguments(
+                new StringArgument("var"),
+                new LiteralArgument("="),
+                new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+                new ObjectiveArgument("objective"),
+                new DoubleArgument("scale"),
+                new LiteralArgument("run"),
+                new GreedyStringArgument("cmd")
+            )
+            .withPermission(CommandPermission.OP)
+            .executes((sender, args) -> {
+                String vname = (String) args[0];
+                String valPl = (String) args[1];
+                String valOb = (String) args[2];
+                double scale = (Double) args[3];
+                String cmd = (String) args[4];
+
+                int u = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(valOb).getScore(valPl).getScore();
+                double v = (double) u * scale;
+                cmd = cmd.replaceAll("(?<!\\\\)\\$" + vname, Double.toString(v));
+                cmd = cmd.replaceAll("\\\\\\$", "\\$");
+                Bukkit.dispatchCommand(sender, cmd);
+            })
+            .register();
+    }
 }
