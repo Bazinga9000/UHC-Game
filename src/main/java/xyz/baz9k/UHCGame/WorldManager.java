@@ -111,9 +111,28 @@ public class WorldManager {
      * <p>
      * Accessible through /uhc reseed
      */
+    private void reseedWorld(World w, String seed) {
+        var wm = plugin.getMVWorldManager();
+        wm.regenWorld(w.getName(), true, false, seed);
+    }
+
+    /**
+     * Reseed worlds then mark worlds as reseeded.
+     * <p>
+     * Accessible through /uhc reseed
+     */
     public void reseedWorlds() {
-        long l = new Random().nextLong();
-        reseedWorlds(String.valueOf(l));
+        Random r = new Random();
+        World w = getGameWorld(0);
+        long l;
+        do {
+            l = r.nextLong();
+            reseedWorld(w, String.valueOf(l));
+            Debug.printDebug(String.format("Checking seed %s", l));
+        } while(!isGoodWorld(w));
+        
+        Debug.printDebug(String.format("Using seed %s", l));
+        reseedWorlds(String.valueOf(l), true);
     }
 
     /**
@@ -122,36 +141,33 @@ public class WorldManager {
      * Accessible through /uhc reseed <seed>
      * @param seed
      */
-    public void reseedWorlds(String seed) {
-        var wm = plugin.getMVWorldManager();
-        // regenerate overworld
-        wm.regenWorld(getGameWorld(0).getName(), true, false, seed);
-        if (!isGoodWorld(getGameWorld(0))) {
-            Debug.printDebug("Rejected Seed " + seed + ", Regenerating...");
-            reseedWorlds();
-            return;
-        }
-        for (World w : getGameWorlds()) {
-            if (w == getGameWorld(0)) {continue;}
-            wm.regenWorld(w.getName(), true, false, seed);
+    public void reseedWorlds(String seed, boolean ignoreOverworld) {
+        World[] worlds = getGameWorlds();
+
+        int init = ignoreOverworld ? 1 : 0;
+        for (int i = init; i < worlds.length; i++) {
+            reseedWorld(worlds[i], seed);
         }
         worldsRegened = true;
     }
 
+    private static final List<Biome> rejectedBiomes = List.of(
+        Biome.OCEAN,
+        Biome.COLD_OCEAN,
+        Biome.DEEP_COLD_OCEAN,
+        Biome.DEEP_FROZEN_OCEAN,
+        Biome.DEEP_LUKEWARM_OCEAN,
+        Biome.DEEP_OCEAN,
+        Biome.FROZEN_OCEAN,
+        Biome.LUKEWARM_OCEAN,
+        Biome.WARM_OCEAN
+    );
 
     public boolean isGoodWorld(@NotNull World w) {
-        Biome b = w.getBiome(0, 64, 0);
-        if (b == Biome.OCEAN) {return false;}
-        if (b == Biome.COLD_OCEAN) {return false;}
-        if (b == Biome.DEEP_COLD_OCEAN) {return false;}
-        if (b == Biome.DEEP_FROZEN_OCEAN) {return false;}
-        if (b == Biome.DEEP_LUKEWARM_OCEAN) {return false;}
-        if (b == Biome.DEEP_OCEAN) {return false;}
-        if (b == Biome.FROZEN_OCEAN) {return false;}
-        if (b == Biome.LUKEWARM_OCEAN) {return false;}
-        if (b == Biome.WARM_OCEAN) {return false;}
-
-        return true;
+        var loc = getHighestLoc(w, 0, 0);
+        Biome b = w.getBiome(0, (int) loc.getY(), 0);
+        
+        return !rejectedBiomes.contains(b);
     }
 
     /**

@@ -272,7 +272,7 @@ public class Commands {
         .executes(
             (sender, args) -> {
                 Bukkit.getServer().sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.start").color(NamedTextColor.YELLOW));
-                plugin.getWorldManager().reseedWorlds((String) args[0]);
+                plugin.getWorldManager().reseedWorlds((String) args[0], false);
                 Bukkit.getServer().sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.succ").color(NamedTextColor.YELLOW));
             }
         );
