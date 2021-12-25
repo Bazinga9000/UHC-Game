@@ -507,17 +507,6 @@ public class Commands {
         );
     }
 
-    // uhc panel
-    @Command
-    private CommandAPICommand panel() {
-        return new CommandAPICommand("panel")
-        .executesPlayer(
-                (sender, args) -> {
-                    plugin.getMenuManager().openSubMenu("ctrlpanel", sender);
-                }
-        );
-    }
-
     // uhc config
     @Command
     private CommandAPICommand config() {

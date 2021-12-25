@@ -21,8 +21,7 @@ public class MenuTree {
         this.plugin = plugin;
         Node.setPlugin(plugin);
 
-        root = new BranchNode(3);
-        createCtrlPanelBranch(root);
+        root = createCtrlPanelBranch();
         createConfigBranch(root);
     }
 
@@ -44,8 +43,8 @@ public class MenuTree {
         return root.getNodeFromInventory(inventory);
     }
 
-    private void createCtrlPanelBranch(BranchNode root) {
-        BranchNode ctrlRoot = new BranchNode(root, slotAt(1, 3), "ctrlpanel", new ItemProperties(Material.GOLDEN_SWORD), 6);
+    private BranchNode createCtrlPanelBranch() {
+        BranchNode ctrlRoot = new BranchNode(6);
         
         new ActionNode(ctrlRoot, slotAt(1, 2), "start_game", new ItemProperties(o -> {
             boolean succ = plugin.getGameManager().checkStart().size() == 0;
@@ -102,10 +101,16 @@ public class MenuTree {
             p.closeInventory();
             //TODO
         });
+        new ActionNode(ctrlRoot, slotAt(4, 7), "assign_teams_6", new ItemProperties(Material.PURPLE_DYE), p -> {
+            p.closeInventory();
+            //TODO
+        });
+
+        return ctrlRoot;
     }
 
-    private void createConfigBranch(BranchNode root) {
-        BranchNode cfgRoot = new BranchNode(root, slotAt(1, 5), "config", new ItemProperties(Material.GOLDEN_PICKAXE), 3);
+    private BranchNode createConfigBranch(BranchNode root) {
+        BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties(Material.GOLDEN_PICKAXE), 3);
         ValuedNode.cfgRoot = cfgRoot;
 
         BranchNode intervals = new BranchNode(cfgRoot, slotAt(1, 2), "intervals",  new ItemProperties(Material.CLOCK),                   3);
@@ -171,5 +176,7 @@ public class MenuTree {
             }
             esoterics.updateAllSlots();
          });
+    
+         return cfgRoot;
     }
 }
