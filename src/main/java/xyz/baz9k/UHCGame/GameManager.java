@@ -351,9 +351,10 @@ public class GameManager implements Listener {
      * If the player is not registered in the kills map (i.e. they're a spec), return empty OptionalInt.
      */
     public OptionalInt getKills(@NotNull Player p) {
-        Integer k = kills.get(p.getUniqueId());
-        if (k == null) return OptionalInt.empty();
-        return OptionalInt.of(k);
+        if (!teamManager.isSpectator(p)) {
+            return OptionalInt.of(kills.computeIfAbsent(p.getUniqueId(), uuid -> 0));
+        }
+        return OptionalInt.empty();
     }
 
     private void winMessage() {
@@ -461,7 +462,6 @@ public class GameManager implements Listener {
         bbManager.enable(p);
         hudManager.initPlayerHUD(p);
         hudManager.addPlayerToTeams(p);
-
         
         recipes.discoverFor(p);
         
@@ -479,7 +479,6 @@ public class GameManager implements Listener {
                 p.setGameMode(GameMode.SPECTATOR);
             } else {
                 p.setGameMode(GameMode.SURVIVAL);
-                kills.put(p.getUniqueId(), 0);
 
                 // set maximum health and movement speed according to esoteric options
                 var cfg = plugin.getConfig();
