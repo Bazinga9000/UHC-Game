@@ -50,7 +50,8 @@ public class OptionValuedNode extends ValuedNode {
      * @return the description for option i
      */
     private String optDesc(int i) {
-        var optDescs = cfg.getStringList(String.format(OPT_DESC_ID_FORMAT, langKey()));
+        var langYaml = plugin.getLangManager().langYaml();
+        var optDescs = langYaml.getStringList(String.format(OPT_DESC_ID_FORMAT, langKey()));
         if (optDescs.size() == 0) {
             return String.format(OPT_DESC_ID_FORMAT + "[%s]", langKey(), i);
         } else {
