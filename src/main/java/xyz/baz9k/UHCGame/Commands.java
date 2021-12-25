@@ -550,6 +550,9 @@ public class Commands {
         );
     }
 
+    ////// BEGIN FUNCTOOLS //////
+    // delete as soon as possible //
+
     @RegisterCommand
     private CommandAPICommand dispatch() {
         // /dispatch, /cmd: runs a command, used to run any plugin command in /execute and functions
@@ -768,4 +771,6 @@ public class Commands {
             Bukkit.dispatchCommand(sender, cmd);
         });
     }
+
+    ////// END FUNCTOOLS //////
 }
