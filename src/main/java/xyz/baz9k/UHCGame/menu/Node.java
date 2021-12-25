@@ -9,7 +9,8 @@ import xyz.baz9k.UHCGame.UHCGamePlugin;
 
 public abstract class Node {
     protected final BranchNode parent;
-    private final NodeItemStack itemStack;
+    private NodeItemStack itemStack;
+    private final NodeItemStack.ItemProperties itemProperties;
     protected final int parentSlot;
     protected final String nodeName;
     
@@ -25,16 +26,7 @@ public abstract class Node {
     public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.ItemProperties props) {
         this.parent = parent;
         this.nodeName = nodeName;
-
-        if (props == null) {
-            this.itemStack = null;
-        } else {
-            if (this instanceof ValuedNode vn) { // sigh
-                this.itemStack = new NodeItemStack(langKey(), props, () -> cfg.get(vn.cfgKey()));
-            } else {
-                this.itemStack = new NodeItemStack(langKey(), props);
-            }
-        }
+        this.itemProperties = props;
 
         this.parentSlot = parentSlot;
         if (parent != null) {
@@ -58,6 +50,11 @@ public abstract class Node {
     public abstract void click(@NotNull Player p);
 
     public ItemStack itemStack() {
+        if (itemStack == null) {
+            // item stack is accessed for first time. make it
+            itemStack = itemProperties != null ? new NodeItemStack(langKey(), itemProperties) : null;
+            return itemStack;
+        }
         return itemStack.updateAll();
     }
 

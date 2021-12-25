@@ -14,7 +14,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -26,6 +28,7 @@ public class BranchNode extends Node {
     private final int slotCount;
     private final Node[] children;
     private final @NotNull Inventory inventory;
+    private boolean hasInventoryViewed = false;
     private Predicate<Configuration> check = cfg -> true;
 
     /**
@@ -52,7 +55,6 @@ public class BranchNode extends Node {
         children = new Node[arrLen];
 
         inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameFromID(langKey()));
-        initInventory();
     }
 
     /**
@@ -76,12 +78,17 @@ public class BranchNode extends Node {
     }
 
     private void initInventory() {
-        // add glass to all slots
-        ItemStack emptyGlass = emptyGlass();
+        hasInventoryViewed = true;
         
-        for (int i = 0; i < slotCount; i++) {
-            inventory.setItem(i, emptyGlass);
-        }
+        ItemStack emptyGlass = emptyGlass();
+
+        // fill the inventory with all the items
+        ItemStack[] items = Arrays.stream(children)
+            .map(Optional::ofNullable)
+            .map(o -> o.map(Node::itemStack))
+            .map(o -> o.orElse(emptyGlass))
+            .toArray(ItemStack[]::new);
+            inventory.setContents(items);
 
         // If we aren't root, add a slot for the "Go Back" button
         if (parent != null) {
@@ -99,13 +106,11 @@ public class BranchNode extends Node {
     public void setChild(int slot, @Nullable Node child) {
         Objects.checkIndex(slot, children.length);
 
-        if (child == null) {
-            children[slot] = null;
-            inventory.setItem(slot, emptyGlass());
-            return;
-        }
         children[slot] = child;
-        inventory.setItem(slot, child.itemStack());
+        if (hasInventoryViewed) {
+            ItemStack item = child != null ? child.itemStack() : emptyGlass();
+            inventory.setItem(slot, item);
+        }
     }
 
     /**
@@ -149,8 +154,13 @@ public class BranchNode extends Node {
     }
 
     public void click(Player p) {
-        // update all slots to make sure each item is up to date
-        updateAllSlots();
+        // update (or create inv)
+        if (hasInventoryViewed) {
+            updateAllSlots();
+        } else {
+            initInventory();
+        }
+
         p.openInventory(inventory);
     }
 
