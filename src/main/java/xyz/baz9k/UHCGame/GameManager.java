@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
@@ -68,22 +69,27 @@ public class GameManager implements Listener {
     }
 
     private static enum GameInitFailure {
-        TEAM_UNASSIGNED      ("xyz.baz9k.uhc.err.team.must_assigned"),
-        WORLDS_NOT_REGENED   ("xyz.baz9k.uhc.err.world.must_regened"),
-        GAME_NOT_STARTED     ("xyz.baz9k.uhc.err.not_started"       ),
-        GAME_ALREADY_STARTED ("xyz.baz9k.uhc.err.already_started"   );
+        TEAM_UNASSIGNED      ("xyz.baz9k.uhc.err.team.must_assigned", "xyz.baz9k.uhc.err.team.must_assigned"),
+        WORLDS_NOT_REGENED   ("xyz.baz9k.uhc.err.world.must_regened", "xyz.baz9k.uhc.err.world.must_regened_short"),
+        GAME_NOT_STARTED     ("xyz.baz9k.uhc.err.not_started"       , "xyz.baz9k.uhc.err.not_started"       ),
+        GAME_ALREADY_STARTED ("xyz.baz9k.uhc.err.already_started"   , "xyz.baz9k.uhc.err.already_started"   );
 
         private String errKey;
-        private GameInitFailure(String errKey) {
+        private String panelErrKey;
+        private GameInitFailure(String errKey, String panelErrKey) {
             this.errKey = errKey;
+            this.panelErrKey = panelErrKey;
         }
 
         public IllegalStateException exception() {
             return translatableErr(IllegalStateException.class, errKey);
         }
+        public String panelErr() {
+            return renderString(trans(panelErrKey));
+        }
     }
 
-    public List<GameInitFailure> checkStart() {
+    private List<GameInitFailure> checkStart() {
         worldManager = plugin.getWorldManager();
         teamManager = plugin.getTeamManager();
         
@@ -105,12 +111,23 @@ public class GameManager implements Listener {
         return Collections.unmodifiableList(fails);
     }
 
-    public List<GameInitFailure> checkEnd() {
+    private List<GameInitFailure> checkEnd() {
         var fails = new ArrayList<GameInitFailure>();
 
         if (!hasUHCStarted()) fails.add(GameInitFailure.GAME_NOT_STARTED);
 
         return Collections.unmodifiableList(fails);
+    }
+
+    public List<String> checkStartPanel() {
+        return checkStart().stream()
+            .map(GameInitFailure::panelErr)
+            .collect(Collectors.toList());
+    }
+    public List<String> checkEndPanel() {
+        return checkEnd().stream()
+            .map(GameInitFailure::panelErr)
+            .collect(Collectors.toList());
     }
     /**
      * Starts UHC.

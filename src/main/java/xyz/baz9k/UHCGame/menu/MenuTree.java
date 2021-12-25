@@ -3,12 +3,16 @@ package xyz.baz9k.UHCGame.menu;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
+import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.format.TextColor;
 import xyz.baz9k.UHCGame.UHCGamePlugin;
 import xyz.baz9k.UHCGame.util.Debug;
 
 import static xyz.baz9k.UHCGame.menu.NodeItemStack.*;
 import static xyz.baz9k.UHCGame.util.Utils.*;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
+
+import java.util.*;
 
 /**
  * Setup for the config GUI tree
@@ -42,21 +46,44 @@ public class MenuTree {
     public BranchNode getNodeFromInventory(Inventory inventory) {
         return root.getNodeFromInventory(inventory);
     }
-
+    
+    @SuppressWarnings("unchecked")
     private BranchNode createCtrlPanelBranch() {
         BranchNode ctrlRoot = new BranchNode(6);
         
         new ActionNode(ctrlRoot, slotAt(1, 2), "start_game", new ItemProperties(o -> {
-            boolean succ = plugin.getGameManager().checkStart().size() == 0;
+            boolean succ = ((List<?>) o).size() == 0;
             return succ ? Material.IRON_SWORD : Material.NETHERITE_SWORD;
-        }), p -> {
+        })
+            .useObject(plugin.getGameManager()::checkStartPanel)
+            .extraLore(o -> {
+                var lines = new ArrayList<Component>();
+                lines.add(render(trans("xyz.baz9k.err.menu.panel.check_start_failed")));
+               
+                for (var l : (List<String>) o) {
+                    lines.add(Component.text(l));
+                }
+                return new ExtraLore(lines);
+            }),
+            p -> {
             p.closeInventory();
             plugin.getGameManager().startUHC(false);
         });
         new ActionNode(ctrlRoot, slotAt(1, 6), "end_game", new ItemProperties(o -> {
-            boolean succ = plugin.getGameManager().checkEnd().size() == 0;
+            boolean succ = ((List<?>) o).size() == 0;
             return succ ? Material.IRON_SHOVEL : Material.NETHERITE_SHOVEL;
-        }), p -> {
+        })
+            .useObject(plugin.getGameManager()::checkEndPanel)
+            .extraLore(o -> {
+                var lines = new ArrayList<Component>();
+                lines.add(render(trans("xyz.baz9k.err.menu.panel.check_end_failed")));
+               
+                for (var l : (List<String>) o) {
+                    lines.add(Component.text(l));
+                }
+                return new ExtraLore(lines);
+            }),
+            p -> {
             p.closeInventory();
             plugin.getGameManager().endUHC(false);
         });

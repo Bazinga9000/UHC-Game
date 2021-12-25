@@ -109,6 +109,7 @@ xyz:
           count_must_pos: "Team count must be positive."
         world:
           must_regened: "UHC worlds have not been regenerated. Run /uhc reseed to regenerate."
+          must_regened_short: "Worlds have not been regenerated."
           missing_spread_locs: "Not enough locations ({0}, {1} required) were generated."
         not_started: "UHC has not started"
         already_started: "UHC has already started"
@@ -124,6 +125,9 @@ xyz:
           inventory:
             invalid_slot_set: "Cannot set child at slot {0}. Slot must be a positive integer less than {1}."
             invalid_slot_clicked: "Invalid slot clicked (Slot cannot be negative or greater than {0}.)"
+          panel:
+            check_start_failed: "These issues need to be resolved before starting:"
+            check_end_failed: "These issues need to be resolved before ending:"
       
       menu:
         prompt:
