@@ -19,7 +19,21 @@ public class ValuedNode extends Node {
      * Enum of the supported types for a {@link ValuedNode}.
      */
     public static enum Type {
-        INTEGER, DOUBLE, STRING, BOOLEAN, OPTION
+        INTEGER (true), 
+        DOUBLE  (true), 
+        STRING  (false), 
+        BOOLEAN (false), 
+        OPTION  (true);
+
+        private boolean isNumeric;
+        private Type(boolean isNumeric) {
+            this.isNumeric = isNumeric;
+        }
+
+        private Type requireNumeric() {
+            if (isNumeric) return this;
+            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.not_numeric_type", this);
+        }
     }
 
     /**
@@ -34,14 +48,9 @@ public class ValuedNode extends Node {
      * <p>
      * WITH A RESTRICTING FUNCTION, THE TYPE MUST BE NUMERIC.
      * @param restrict This function maps invalid numeric values to the correct values.
-     * @implNote Inheriting classes should cancel the updateItemStack and recall it after
-     * all its properties are set.
      */
     public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Type type, UnaryOperator<Number> restrict) {
-        this(parent, slot, nodeName, props, switch (type) {
-            case INTEGER, DOUBLE -> type;
-            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.not_numeric_type", type);
-        });
+        this(parent, slot, nodeName, props, type.requireNumeric());
         
         this.restrict = restrict;
     }
@@ -54,8 +63,6 @@ public class ValuedNode extends Node {
      * If format strings are included in the item's description (%s, %.1f, etc.), 
      * those will be substituted with the config value.
      * @param type Type of data this value stores
-     * @implNote Inheriting classes should cancel the updateItemStack and recall it after
-     * all its properties are set.
      */
     public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Type type) {
         super(parent, slot, nodeName, props);
@@ -99,7 +106,7 @@ public class ValuedNode extends Node {
      */
     public void set(Object value) {
         prevValue = cfg.get(cfgKey());
-        if (type == Type.INTEGER || type == Type.DOUBLE) value = restrict.apply((Number) value);
+        if (type.isNumeric) value = restrict.apply((Number) value);
         cfg.set(cfgKey(), value);
     }
 }

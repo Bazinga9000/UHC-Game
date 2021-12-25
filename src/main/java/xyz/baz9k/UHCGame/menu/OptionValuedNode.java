@@ -12,8 +12,6 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 public class OptionValuedNode extends ValuedNode {
 
-    private Material[] optMaterials;
-
     private static final String OPT_DESC_ID_FORMAT = "xyz.baz9k.uhc.menu.inv.%s.options";
 
     /**
@@ -23,10 +21,10 @@ public class OptionValuedNode extends ValuedNode {
      * @param optMaterials Materials for the options supported
      */
     public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Material... optMaterials) {
-        super(parent, slot, nodeName, props.mat(v -> optMaterials[(int) v]), ValuedNode.Type.OPTION);
+        super(parent, slot, nodeName, props.mat(v -> optMaterials[(int) v]), ValuedNode.Type.OPTION, i -> (int) i % optMaterials.length);
         props.formatter(v -> this.optDesc((int) v))
             .extraLore(v -> {
-                int current = (int) v % optMaterials.length;
+                int current = (int) v;
 
                 var extraLore = new ArrayList<Component>();
                 for (int i = 0; i < optMaterials.length; i++) {
@@ -36,13 +34,12 @@ public class OptionValuedNode extends ValuedNode {
                 }
                 return new NodeItemStack.ExtraLore(extraLore);
             });
-        this.optMaterials = optMaterials;
     }
 
     @Override
     public void click(Player p) {
         int currIndex = cfg.getInt(cfgKey());
-        this.set((currIndex + 1) % optMaterials.length);
+        this.set(currIndex + 1);
     }
 
     /**
