@@ -69,13 +69,16 @@ public class GameManager implements Listener {
     }
 
     private static enum GameInitFailure {
-        TEAM_UNASSIGNED      ("xyz.baz9k.uhc.err.team.must_assigned", "xyz.baz9k.uhc.err.team.must_assigned"),
+        TEAM_UNASSIGNED      ("xyz.baz9k.uhc.err.team.must_assigned"),
         WORLDS_NOT_REGENED   ("xyz.baz9k.uhc.err.world.must_regened", "xyz.baz9k.uhc.err.world.must_regened_short"),
-        GAME_NOT_STARTED     ("xyz.baz9k.uhc.err.not_started"       , "xyz.baz9k.uhc.err.not_started"       ),
-        GAME_ALREADY_STARTED ("xyz.baz9k.uhc.err.already_started"   , "xyz.baz9k.uhc.err.already_started"   );
+        GAME_NOT_STARTED     ("xyz.baz9k.uhc.err.not_started"       ),
+        GAME_ALREADY_STARTED ("xyz.baz9k.uhc.err.already_started"   );
 
         private String errKey;
         private String panelErrKey;
+        private GameInitFailure(String errKey) {
+            this(errKey, errKey);
+        }
         private GameInitFailure(String errKey, String panelErrKey) {
             this.errKey = errKey;
             this.panelErrKey = panelErrKey;
