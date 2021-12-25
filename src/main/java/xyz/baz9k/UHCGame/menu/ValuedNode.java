@@ -76,7 +76,7 @@ public class ValuedNode extends Node {
 
     public String cfgKey() {
         Objects.requireNonNull(cfgRoot, "Config root not yet declared, cannot initialize valued nodes");
-        return pathRelativeTo(cfgRoot);
+        return Objects.requireNonNull(pathRelativeTo(cfgRoot));
     }
 
     @Override
