@@ -38,7 +38,11 @@ public class Commands {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    private static @interface Command { }
+    private static @interface RegisterUHCSubCommand { }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    private static @interface RegisterCommand { }
 
     public Commands(UHCGamePlugin plugin) {
         this.plugin = plugin;
@@ -48,20 +52,23 @@ public class Commands {
         CommandAPICommand uhc = new CommandAPICommand("uhc")
             .withPermission(CommandPermission.OP);
             
-        // register each @Command method
-        Class<Command> annot = Command.class;
-        Class<Commands> cls = Commands.class;
+        // register each @RegisterUHCSubCommand method
+        var subAnnot = RegisterUHCSubCommand.class;
+        var cmdAnnot = RegisterCommand.class;
+        var cls      = Commands.class;
         try {
             for (Method m : cls.getDeclaredMethods()) {
-                if (!m.isAnnotationPresent(annot)) continue;
-                uhc.withSubcommand((CommandAPICommand) m.invoke(this));
+                if (m.isAnnotationPresent(subAnnot)) {
+                    uhc.withSubcommand((CommandAPICommand) m.invoke(this));
+                } else if (m.isAnnotationPresent(cmdAnnot)) {
+                    ((CommandAPICommand) m.invoke(this)).register();
+                }
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
 
         uhc.register();
-        funcTools();
     }
 
     private void requireNotStarted() throws WrapperCommandSyntaxException {
@@ -108,7 +115,7 @@ public class Commands {
      */
 
     // uhc start
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand start() {
         return new CommandAPICommand("start")
         .executes(
@@ -124,7 +131,7 @@ public class Commands {
     }
 
     // uhc end
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand end() {
         return new CommandAPICommand("end")
         .executes(
@@ -140,7 +147,7 @@ public class Commands {
     }
 
     // uhc start force
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand startForce() {
         return new CommandAPICommand("start")
         .withArguments(
@@ -191,7 +198,7 @@ public class Commands {
     }
 
     // uhc teams assign <solos|duos|trios|quartets|quintets>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand assignTeamsLiteral() {
         return new CommandAPICommand("teams")
         .withArguments(
@@ -212,7 +219,7 @@ public class Commands {
     }
 
     // uhc teams assign <n: int>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand assignTeamsNTeams() {
         return new CommandAPICommand("teams")
         .withArguments(
@@ -232,7 +239,7 @@ public class Commands {
     }
 
     // uhc teams clear
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand clearTeams() {
         return new CommandAPICommand("teams")
         .withArguments(
@@ -248,7 +255,7 @@ public class Commands {
     }
 
     // uhc reseed
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand reseed() {
         // reseeds worlds
         return new CommandAPICommand("reseed")
@@ -262,7 +269,7 @@ public class Commands {
     }
 
     // uhc reseed <seed: str>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand reseedSpecified() {
         // reseeds worlds
         return new CommandAPICommand("reseed")
@@ -292,7 +299,7 @@ public class Commands {
     }
 
     // uhc respawn <target: players>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand respawn() {
         return new CommandAPICommand("respawn")
         .withArguments(
@@ -310,7 +317,7 @@ public class Commands {
     }
 
     // uhc respawn <target: players> <loc: location>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand respawnLoc() {
         return new CommandAPICommand("respawn")
         .withArguments(
@@ -329,7 +336,7 @@ public class Commands {
     }
 
     // uhc state get <target: players>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand stateGet() {
         return new CommandAPICommand("state")
         .withArguments(
@@ -349,7 +356,7 @@ public class Commands {
     }
 
     // uhc state set <target: players> <spectator|combatant>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand stateSet() {
         return new CommandAPICommand("state")
         .withArguments(
@@ -372,7 +379,7 @@ public class Commands {
     }
 
     // uhc state set <target: players> <combatant> <team: int>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand stateSetTeam() {
         return new CommandAPICommand("state")
         .withArguments(
@@ -398,7 +405,7 @@ public class Commands {
     }
 
     // uhc stage next
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand stageNext() {
         return new CommandAPICommand("stage")
         .withArguments(
@@ -426,7 +433,7 @@ public class Commands {
     }
 
     // uhc stage set <stage: stage>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand stageSet() {
         return new CommandAPICommand("stage")
         .withArguments(
@@ -445,7 +452,7 @@ public class Commands {
     }
 
     // uhc hasstarted
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand hasStarted() {
         return new CommandAPICommand("hasstarted")
         .executes(
@@ -460,7 +467,7 @@ public class Commands {
     }
 
     // uhc escape
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand escape() {
         return new CommandAPICommand("escape")
         .executes(
@@ -473,7 +480,7 @@ public class Commands {
     }
 
     // uhc debug
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand debug() {
         return new CommandAPICommand("debug")
         .withAliases("verbose")
@@ -488,7 +495,7 @@ public class Commands {
     }
 
     // uhc debug <true|false>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand debugOnOff() {
         return new CommandAPICommand("debug")
         .withAliases("verbose")
@@ -504,7 +511,7 @@ public class Commands {
     }
 
     // uhc config
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand config() {
         return new CommandAPICommand("config")
         .executesPlayer(
@@ -518,7 +525,7 @@ public class Commands {
     }
 
     // uhc config wipe
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand configWipe() {
         return new CommandAPICommand("config")
         .withArguments(new LiteralArgument("wipe"))
@@ -531,7 +538,7 @@ public class Commands {
     }
 
     // uhc config get <path: str>
-    @Command
+    @RegisterUHCSubCommand
     private CommandAPICommand configGet() {
         return new CommandAPICommand("config")
         .withArguments(new LiteralArgument("get"))
@@ -543,54 +550,57 @@ public class Commands {
         );
     }
 
-    private void funcTools() {
-        ConsoleCommandSender console = Bukkit.getConsoleSender();
-
+    @RegisterCommand
+    private CommandAPICommand dispatch() {
         // /dispatch, /cmd: runs a command, used to run any plugin command in /execute and functions
-        new CommandAPICommand("dispatch")
-            .withArguments(new GreedyStringArgument("command"))
-            .withPermission(CommandPermission.OP)
-            .withAliases("cmd")
-            .executes((sender, args) -> {
-                String cmd = (String) args[0];
-                Bukkit.dispatchCommand(sender, cmd);
-            })
-            .register();
+        return new CommandAPICommand("dispatch")
+        .withArguments(new GreedyStringArgument("command"))
+        .withPermission(CommandPermission.OP)
+        .withAliases("cmd")
+        .executes((sender, args) -> {
+            String cmd = (String) args[0];
+            Bukkit.dispatchCommand(sender, cmd);
+        });
+    }
 
+    @RegisterCommand
+    private CommandAPICommand forCmd() {
         // /for <var> in m..n run <cmd>
-        // /for <var> in m..n step s run <cmd>
-
-        // examples:
         // /for i in 0..10 run say $i         # (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-        // /for i in 0..10 step 2 run say $i  # (0, 2, 4, 6, 8, 10)
-        new CommandAPICommand("for")
-            .withArguments(
-                new StringArgument("var"),
-                new LiteralArgument("in"),
-                new IntegerRangeArgument("range"),
-                new LiteralArgument("run"),
-                new GreedyStringArgument("cmd")
-            )
-            .withPermission(CommandPermission.OP)
-            .executes((sender, args) -> {
-                String vname = (String) args[0];
-                IntegerRange vrange = (IntegerRange) args[1];
-                String cmd = (String) args[2];
 
-                try {
-                    for (int i = vrange.getLowerBound(); i <= vrange.getUpperBound(); i++) {
-                        String itercmd = cmd;
-                        itercmd = itercmd.replaceAll("(?<!\\\\)\\$" + vname, Integer.toString(i));
-                        itercmd = itercmd.replaceAll("\\\\\\$", "\\$");
-                        Bukkit.dispatchCommand(console, itercmd);
-                    }
-                } catch (CommandException e) {
-                    CommandAPI.fail("An error occurred while running the commands: " + e.getMessage());
+        return new CommandAPICommand("for")
+        .withArguments(
+            new StringArgument("var"),
+            new LiteralArgument("in"),
+            new IntegerRangeArgument("range"),
+            new LiteralArgument("run"),
+            new GreedyStringArgument("cmd")
+        )
+        .withPermission(CommandPermission.OP)
+        .executes((sender, args) -> {
+            String vname = (String) args[0];
+            IntegerRange vrange = (IntegerRange) args[1];
+            String cmd = (String) args[2];
+
+            try {
+                for (int i = vrange.getLowerBound(); i <= vrange.getUpperBound(); i++) {
+                    String itercmd = cmd;
+                    itercmd = itercmd.replaceAll("(?<!\\\\)\\$" + vname, Integer.toString(i));
+                    itercmd = itercmd.replaceAll("\\\\\\$", "\\$");
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), itercmd);
                 }
-            })
-            .register();
+            } catch (CommandException e) {
+                CommandAPI.fail("An error occurred while running the commands: " + e.getMessage());
+            }
+        });
+    }
 
-            new CommandAPICommand("for")
+    @RegisterCommand
+    private CommandAPICommand forStepCmd() {
+        // /for <var> in m..n step s run <cmd>
+        // /for i in 0..10 step 2 run say $i  # (0, 2, 4, 6, 8, 10)
+
+        return new CommandAPICommand("for")
             .withArguments(
                 new StringArgument("var"),
                 new LiteralArgument("in"),
@@ -612,142 +622,150 @@ public class Commands {
                         String itercmd = cmd;
                         itercmd = itercmd.replaceAll("(?<!\\\\)\\$" + vname, Integer.toString(i));
                         itercmd = itercmd.replaceAll("\\\\\\$", "\\$");
-                        Bukkit.dispatchCommand(console, itercmd);
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), itercmd);
                     }
                 } catch (CommandException e) {
                     CommandAPI.fail("An error occurred while running the commands: " + e.getMessage());
                 }
-            })
-            .register();
+            });
+    }
 
-            // /runfn <fn> with <player> <objective> as <value> || /runfn <fn> with <player> <objective> as <player> <objective>
-            // this fn sets scoreboard entry to <value> / <player> <objective>, runs the function, and returns the value on said scoreboard entry.
-            // this simplifies syntax for functions with args and allows them to be used with /for
-            // uhhhh, if you want to use multiple arguments just curry I guess
+    @RegisterCommand
+    private CommandAPICommand runFnValue() {
+        // /runfn <fn> with <player> <objective> as <value> || /runfn <fn> with <player> <objective> as <player> <objective>
+        // this fn sets scoreboard entry to <value> / <player> <objective>, runs the function, and returns the value on said scoreboard entry.
+        // this simplifies syntax for functions with args and allows them to be used with /for
+        // uhhhh, if you want to use multiple arguments just curry I guess
 
-            new CommandAPICommand("runfunction")
-            .withArguments(
-                new FunctionArgument("function"),
-                new LiteralArgument("with"),
-                new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
-                new ObjectiveArgument("objective"),
-                new LiteralArgument("as"),
-                new IntegerArgument("value")
-            )
-            .withPermission(CommandPermission.OP)
-            .withAliases("runfn")
-            .executes((sender, args) -> {
-                FunctionWrapper[] fns = (FunctionWrapper[]) args[0];
-                String inputPl = (String) args[1];
-                String inputOb = (String) args[2];
-                int inputVal = (int) args[3];
-                Score inputScore = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(inputOb).getScore(inputPl);
-                inputScore.setScore(inputVal);
-                // run fns after arg has been set
-                for (FunctionWrapper fn : fns) {
-                    fn.run();
-                }
-                // return score for use w/ execute store
-                try {
-                    int retVal = inputScore.getScore();
-                    if (sender instanceof Player && !(sender instanceof ProxiedCommandSender)) sender.sendMessage("Function returned " + Integer.toString(retVal));
-                    return retVal; 
-                } catch (IllegalArgumentException | IllegalStateException e) {
-                    CommandAPI.fail("Entry no longer exists");
-                }
-                return 0;
-            })
-            .register();
+        return new CommandAPICommand("runfunction")
+        .withArguments(
+            new FunctionArgument("function"),
+            new LiteralArgument("with"),
+            new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+            new ObjectiveArgument("objective"),
+            new LiteralArgument("as"),
+            new IntegerArgument("value")
+        )
+        .withPermission(CommandPermission.OP)
+        .withAliases("runfn")
+        .executes((sender, args) -> {
+            FunctionWrapper[] fns = (FunctionWrapper[]) args[0];
+            String inputPl = (String) args[1];
+            String inputOb = (String) args[2];
+            int inputVal = (int) args[3];
+            Score inputScore = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(inputOb).getScore(inputPl);
+            inputScore.setScore(inputVal);
+            // run fns after arg has been set
+            for (FunctionWrapper fn : fns) {
+                fn.run();
+            }
+            // return score for use w/ execute store
+            try {
+                int retVal = inputScore.getScore();
+                if (sender instanceof Player && !(sender instanceof ProxiedCommandSender)) sender.sendMessage("Function returned " + Integer.toString(retVal));
+                return retVal; 
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                CommandAPI.fail("Entry no longer exists");
+            }
+            return 0;
+        });
+    }
 
-            new CommandAPICommand("runfunction")
-            .withArguments(
-                new FunctionArgument("function"),
-                new LiteralArgument("with"),
-                new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
-                new ObjectiveArgument("objective"),
-                new LiteralArgument("as"),
-                new ScoreHolderArgument("player value", ScoreHolderType.SINGLE),
-                new ObjectiveArgument("objective value")
-            )
-            .withPermission(CommandPermission.OP)
-            .withAliases("runfn")
-            .executes((sender, args) -> {
-                FunctionWrapper[] fns = (FunctionWrapper[]) args[0];
-                String inputPl = (String) args[1];
-                String inputOb = (String) args[2];
-                String valuePl = (String) args[3];
-                String valueOb = (String) args[4];
-                
-                // get (pl obj) slot and set it to val, effectively acting as the arg
-                Score inputScore = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(inputOb).getScore(inputPl);
-                int inputVal = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(valueOb).getScore(valuePl).getScore();
-                
-                inputScore.setScore(inputVal);
-                // run fns after arg has been set
-                for (FunctionWrapper fn : fns) {
-                    fn.run();
-                }
-                // return score for use w/ execute store
-                try {
-                    int retVal = inputScore.getScore();
-                    if (sender instanceof Player && !(sender instanceof ProxiedCommandSender)) sender.sendMessage("Function returned " + Integer.toString(retVal));
-                    return retVal; 
-                } catch (IllegalArgumentException | IllegalStateException e) {
-                    CommandAPI.fail("Entry no longer exists");
-                }
-                return 0;
-            })
-            .register();
-        
-            // /let <var> = <player> <objective> run <cmd>: substs var with entry in cmd, same syntax as /for
-            // /let <var> = <player> <objective> <scale: double> run <cmd>: multiplies by scale
-            new CommandAPICommand("let")
-            .withArguments(
-                new StringArgument("var"),
-                new LiteralArgument("="),
-                new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
-                new ObjectiveArgument("objective"),
-                new LiteralArgument("run"),
-                new GreedyStringArgument("cmd")
-            )
-            .withPermission(CommandPermission.OP)
-            .executes((sender, args) -> {
-                String vname = (String) args[0];
-                String valPl = (String) args[1];
-                String valOb = (String) args[2];
-                String cmd = (String) args[3];
+    @RegisterCommand
+    private CommandAPICommand runFnScore() {
+        return new CommandAPICommand("runfunction")
+        .withArguments(
+            new FunctionArgument("function"),
+            new LiteralArgument("with"),
+            new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+            new ObjectiveArgument("objective"),
+            new LiteralArgument("as"),
+            new ScoreHolderArgument("player value", ScoreHolderType.SINGLE),
+            new ObjectiveArgument("objective value")
+        )
+        .withPermission(CommandPermission.OP)
+        .withAliases("runfn")
+        .executes((sender, args) -> {
+            FunctionWrapper[] fns = (FunctionWrapper[]) args[0];
+            String inputPl = (String) args[1];
+            String inputOb = (String) args[2];
+            String valuePl = (String) args[3];
+            String valueOb = (String) args[4];
+            
+            // get (pl obj) slot and set it to val, effectively acting as the arg
+            Score inputScore = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(inputOb).getScore(inputPl);
+            int inputVal = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(valueOb).getScore(valuePl).getScore();
+            
+            inputScore.setScore(inputVal);
+            // run fns after arg has been set
+            for (FunctionWrapper fn : fns) {
+                fn.run();
+            }
+            // return score for use w/ execute store
+            try {
+                int retVal = inputScore.getScore();
+                if (sender instanceof Player && !(sender instanceof ProxiedCommandSender)) sender.sendMessage("Function returned " + Integer.toString(retVal));
+                return retVal; 
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                CommandAPI.fail("Entry no longer exists");
+            }
+            return 0;
+        });
+    }
 
-                int v = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(valOb).getScore(valPl).getScore();
-                cmd = cmd.replaceAll("(?<!\\\\)\\$" + vname, Integer.toString(v));
-                cmd = cmd.replaceAll("\\\\\\$", "\\$");
-                Bukkit.dispatchCommand(sender, cmd);
-            })
-            .register();
+    @RegisterCommand
+    private CommandAPICommand let() {
+        // /let <var> = <player> <objective> run <cmd>: substs var with entry in cmd, same syntax as /for
+        return new CommandAPICommand("let")
+        .withArguments(
+            new StringArgument("var"),
+            new LiteralArgument("="),
+            new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+            new ObjectiveArgument("objective"),
+            new LiteralArgument("run"),
+            new GreedyStringArgument("cmd")
+        )
+        .withPermission(CommandPermission.OP)
+        .executes((sender, args) -> {
+            String vname = (String) args[0];
+            String valPl = (String) args[1];
+            String valOb = (String) args[2];
+            String cmd = (String) args[3];
 
-            new CommandAPICommand("let")
-            .withArguments(
-                new StringArgument("var"),
-                new LiteralArgument("="),
-                new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
-                new ObjectiveArgument("objective"),
-                new DoubleArgument("scale"),
-                new LiteralArgument("run"),
-                new GreedyStringArgument("cmd")
-            )
-            .withPermission(CommandPermission.OP)
-            .executes((sender, args) -> {
-                String vname = (String) args[0];
-                String valPl = (String) args[1];
-                String valOb = (String) args[2];
-                double scale = (Double) args[3];
-                String cmd = (String) args[4];
+            int v = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(valOb).getScore(valPl).getScore();
+            cmd = cmd.replaceAll("(?<!\\\\)\\$" + vname, Integer.toString(v));
+            cmd = cmd.replaceAll("\\\\\\$", "\\$");
+            Bukkit.dispatchCommand(sender, cmd);
+        });
+    }
 
-                int u = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(valOb).getScore(valPl).getScore();
-                double v = (double) u * scale;
-                cmd = cmd.replaceAll("(?<!\\\\)\\$" + vname, Double.toString(v));
-                cmd = cmd.replaceAll("\\\\\\$", "\\$");
-                Bukkit.dispatchCommand(sender, cmd);
-            })
-            .register();
+    @RegisterCommand
+    private CommandAPICommand letScaled() {
+        // /let <var> = <player> <objective> <scale: double> run <cmd>: multiplies by scale
+
+        return new CommandAPICommand("let")
+        .withArguments(
+            new StringArgument("var"),
+            new LiteralArgument("="),
+            new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+            new ObjectiveArgument("objective"),
+            new DoubleArgument("scale"),
+            new LiteralArgument("run"),
+            new GreedyStringArgument("cmd")
+        )
+        .withPermission(CommandPermission.OP)
+        .executes((sender, args) -> {
+            String vname = (String) args[0];
+            String valPl = (String) args[1];
+            String valOb = (String) args[2];
+            double scale = (Double) args[3];
+            String cmd = (String) args[4];
+
+            int u = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(valOb).getScore(valPl).getScore();
+            double v = (double) u * scale;
+            cmd = cmd.replaceAll("(?<!\\\\)\\$" + vname, Double.toString(v));
+            cmd = cmd.replaceAll("\\\\\\$", "\\$");
+            Bukkit.dispatchCommand(sender, cmd);
+        });
     }
 }
