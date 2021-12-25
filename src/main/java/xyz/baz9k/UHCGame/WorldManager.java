@@ -8,13 +8,18 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.World.Environment;
+import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
+import org.jetbrains.annotations.NotNull;
+import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.Point2D;
 
 public class WorldManager {
@@ -90,14 +95,22 @@ public class WorldManager {
             purgeWorld(w);
 
             // create beacon in worlds
-            w.getBlockAt(0, 1, 0).setType(Material.BEACON);
-            w.getBlockAt(0, 2, 0).setType(Material.BEDROCK);
-            for (int x = -1; x <= 1; x++) {
-                for (int z = -1; z <= 1; z++) {
-                    w.getBlockAt(x, 0, z).setType(Material.NETHERITE_BLOCK);
+
+            for (int x = -2; x <= 2; x++) {
+                for (int z = -2; z <= 2; z++) {
+                    w.getBlockAt(x, w.getMinHeight(), z).setType(Material.BEDROCK);
                 }
             }
-            for (int y = 3; y <= w.getMaxHeight() - 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    w.getBlockAt(x, w.getMinHeight(), z).setType(Material.NETHERITE_BLOCK);
+                    w.getBlockAt(x, w.getMinHeight() + 1, z).setType(Material.BEDROCK);
+                }
+            }
+            w.getBlockAt(0, w.getMinHeight() + 1, 0).setType(Material.BEACON);
+            w.getBlockAt(0, w.getMinHeight() + 2, 0).setType(Material.BEDROCK);
+
+            for (int y = w.getMinHeight() + 3; y < w.getMaxHeight(); y++) {
                 w.getBlockAt(0, y, 0).setType(Material.BARRIER);
             }
         }
@@ -108,9 +121,32 @@ public class WorldManager {
      * <p>
      * Accessible through /uhc reseed
      */
+    private void reseedWorld(World w, long seed) {
+        var wc = new WorldCreator(w.getName())
+            .environment(w.getEnvironment())
+            .seed(seed);
+        
+        Bukkit.unloadWorld(w, false);
+        plugin.getMVWorldManager().deleteWorld(wc.name(), false, true);
+        Bukkit.createWorld(wc);
+    }
+
+    /**
+     * Reseed worlds then mark worlds as reseeded.
+     * <p>
+     * Accessible through /uhc reseed
+     */
     public void reseedWorlds() {
-        long l = new Random().nextLong();
-        reseedWorlds(String.valueOf(l));
+        Random r = new Random();
+        long l;
+        do {
+            l = r.nextLong();
+            Debug.printDebug(String.format("Checking seed %s", l));
+            reseedWorld(getGameWorld(0), l);
+        } while(!isGoodWorld(getGameWorld(0)));
+        
+        Debug.printDebug(String.format("Using seed %s", l));
+        reseedWorlds(l, true);
     }
 
     /**
@@ -119,12 +155,35 @@ public class WorldManager {
      * Accessible through /uhc reseed <seed>
      * @param seed
      */
-    public void reseedWorlds(String seed) {
-        var wm = plugin.getMVWorldManager();
-        for (World w : getGameWorlds()) {
-            wm.regenWorld(w.getName(), true, false, seed);
+    public void reseedWorlds(long seed, boolean ignoreOverworld) {
+        World[] worlds = getGameWorlds();
+
+        int init = ignoreOverworld ? 1 : 0;
+        for (int i = init; i < worlds.length; i++) {
+            reseedWorld(worlds[i], seed);
         }
         worldsRegened = true;
+    }
+
+    private static final List<Biome> rejectedBiomes = List.of(
+        Biome.OCEAN,
+        Biome.COLD_OCEAN,
+        Biome.DEEP_COLD_OCEAN,
+        Biome.DEEP_FROZEN_OCEAN,
+        Biome.DEEP_LUKEWARM_OCEAN,
+        Biome.DEEP_OCEAN,
+        Biome.FROZEN_OCEAN,
+        Biome.LUKEWARM_OCEAN,
+        Biome.WARM_OCEAN
+    );
+
+    public boolean isGoodWorld(@NotNull World w) {
+        var loc = getHighestLoc(w, 1, 1);
+        Debug.printDebug(String.format("Checking %s's biome", w.getSeed()));
+        Biome b = w.getBiome(1, (int) loc.getY() - 1, 1);
+        Debug.printDebug(String.format("Checked %s's biome, it's %s", w.getSeed(), b.toString()));
+        
+        return !rejectedBiomes.contains(b);
     }
 
     /**
@@ -159,6 +218,7 @@ public class WorldManager {
         Location ls = lobbySpawn();
         p.setBedSpawnLocation(ls);
         p.teleport(ls);
+        p.setGameMode(GameMode.ADVENTURE);
     }
 
     public boolean inGame(Player p) {

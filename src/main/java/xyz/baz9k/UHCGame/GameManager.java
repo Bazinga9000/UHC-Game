@@ -171,7 +171,6 @@ public class GameManager implements Listener {
         setStage(GameStage.nth(0));
         worldManager.worldsRegenedOff();
 
-        startTime = lastStageInstant = Instant.now();
         kills.clear();
         
         worldManager.initWorlds();
@@ -194,6 +193,7 @@ public class GameManager implements Listener {
         plugin.getMVWorldManager().unloadWorld("lobby", true);
 
         // start ticking
+        startTime = lastStageInstant = Instant.now();
         startTick();
     }
 
@@ -560,8 +560,6 @@ public class GameManager implements Listener {
         hudManager.cleanup(p);
         if (onGameEnd || worldManager.inGame(p)) {
             worldManager.escapePlayer(p);
-
-            p.setGameMode(GameMode.SURVIVAL);
             resetStatuses(p);
             p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
             p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
