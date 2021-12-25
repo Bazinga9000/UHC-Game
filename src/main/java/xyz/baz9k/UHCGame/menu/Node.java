@@ -25,7 +25,7 @@ public abstract class Node {
     public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.ItemProperties props) {
         this.parent = parent;
         this.nodeName = nodeName;
-        this.itemStack = props == null ? null : new NodeItemStack(id(), props);
+        this.itemStack = props == null ? null : new NodeItemStack(langKey(), props);
 
         this.parentSlot = parentSlot;
         if (parent != null) {
@@ -48,20 +48,38 @@ public abstract class Node {
      */
     public abstract void click(@NotNull Player p);
 
-    /**
-     * Gets the ID of this node, created from the names of the node.
-     * <p> This is used for storing config values ({@link ValuedNode}) and names and descriptions in the inventory.
-     * @return the ID
-     */
-    public String id() {
-        if (parent == null) return "";
-
-        String pid = parent.id().replaceFirst("\\.?root", "");
-        if (pid.equals("")) return nodeName;
-        return pid + "." + nodeName;
-    }
-
     public ItemStack itemStack() {
         return itemStack.updateAll();
     }
+
+    private static String appendNodeName(String parentName, String nodeName) {
+        if (parentName == null) return null;
+        if (parentName.equals("")) return nodeName;
+        return parentName + "." + nodeName;
+    }
+
+    public String path() {
+        if (parent == null) return "";
+        return appendNodeName(parent.path(), nodeName);
+    }
+
+    public String pathRelativeTo(BranchNode b) {
+        if (parent.equals(b)) return "";
+        if (parent == null) return null;
+        return appendNodeName(parent.pathRelativeTo(b), nodeName);
+    }
+
+    /**
+     * Gets the lang key of this node, which is an identifier used in the lang files to give this node a name and description.
+     * (Also it looks cleaner to have all the langKey code in one place so BranchNode isn't overriding this method)
+     * 
+     * The lang key is just the path (the names of the nodes dotted together) + .root if the node is a BranchNode.
+     */
+    public String langKey() {
+        if (this instanceof BranchNode) {
+            return appendNodeName(path(), "root");
+        }
+        return path();
+    }
+
 }

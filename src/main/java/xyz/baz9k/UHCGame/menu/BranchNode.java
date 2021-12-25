@@ -51,7 +51,7 @@ public class BranchNode extends Node {
         int arrLen = parent == null ? slotCount : slotCount - 1;
         children = new Node[arrLen];
 
-        inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameFromID(id()));
+        inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameFromID(langKey()));
         initInventory();
     }
 
@@ -204,12 +204,5 @@ public class BranchNode extends Node {
             }
         }
         return null;
-    }
-
-    @Override
-    public String id() {
-        String nid = super.id();
-        if (nid.equals("")) return "root";
-        return nid + ".root";
     }
 }

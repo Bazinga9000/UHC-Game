@@ -163,7 +163,7 @@ public class MenuTree {
             var defaults = plugin.getConfig().getConfigurationSection("esoteric").getDefaultSection();
             for (Node n : esoterics.getChildren()) {
                 if (n instanceof ValuedNode vn) {
-                    vn.set(defaults.get(vn.id()));
+                    vn.set(defaults.get(vn.langKey())); // TODO wrong method
                 }
             }
             esoterics.updateAllSlots();

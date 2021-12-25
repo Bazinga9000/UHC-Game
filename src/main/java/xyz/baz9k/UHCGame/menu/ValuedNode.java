@@ -45,9 +45,6 @@ public class ValuedNode extends Node {
         });
         
         this.restrict = restrict;
-        var s = id().split("\\.", 1);
-        this.cfgID = s[s.length - 1];
-        set(cfg.get(cfgID));
     }
     /**
      * @param parent Parent node
