@@ -14,6 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
@@ -139,6 +140,21 @@ public class NodeItemStack extends ItemStack {
                 .toArray();
 
             return splitLines(render(trans(tKey, args).style(DEFAULT_DESC_STYLE)));
+        }
+
+        public static Function<Object, ExtraLore> fromBool() {
+            return o -> {
+                var active = (boolean) o;
+
+                // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
+                TranslatableComponent status;
+                if (active) {
+                    status = trans("xyz.baz9k.uhc.menu.bool_valued.on").style(noDeco(NamedTextColor.GREEN));
+                } else {
+                    status = trans("xyz.baz9k.uhc.menu.bool_valued.off").style(noDeco(NamedTextColor.RED));
+                }
+                return new NodeItemStack.ExtraLore("xyz.baz9k.uhc.menu.bool_valued.status", status);
+            };
         }
     }
 

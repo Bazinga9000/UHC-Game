@@ -7,7 +7,7 @@ import net.kyori.adventure.text.format.TextColor;
 import xyz.baz9k.UHCGame.UHCGamePlugin;
 import xyz.baz9k.UHCGame.util.Debug;
 
-import static xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
+import static xyz.baz9k.UHCGame.menu.NodeItemStack.*;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 /**
@@ -67,12 +67,14 @@ public class MenuTree {
             plugin.getWorldManager().reseedWorlds();
         });
         new ActionNode(ctrlRoot, slotAt(3, 2), "debug_toggle", new ItemProperties(o -> {
-            boolean d = Debug.isDebugging();
-            return d ? Material.GLOWSTONE : Material.BLACKSTONE;
-        }), p -> {
+            return (boolean) o ? Material.GLOWSTONE : Material.BLACKSTONE;
+        })
+            .useObject(Debug::isDebugging)
+            .extraLore(ExtraLore.fromBool()), 
+            p -> {
             Debug.setDebug(!Debug.isDebugging());
         });
-        new ActionNode(ctrlRoot, slotAt(3, 2), "stage_next", new ItemProperties(Material.SUNFLOWER), p -> {
+        new ActionNode(ctrlRoot, slotAt(3, 3), "stage_next", new ItemProperties(Material.SUNFLOWER), p -> {
             plugin.getGameManager().incrementStage();
         });
 

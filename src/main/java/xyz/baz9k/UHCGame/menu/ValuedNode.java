@@ -4,9 +4,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.Objects;
@@ -73,18 +70,7 @@ public class ValuedNode extends Node {
                 } else {
                     m.removeEnchant(Enchantment.SILK_TOUCH);
                 }
-            }).extraLore(o -> {
-                var active = (boolean) o;
-
-                // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
-                TranslatableComponent status;
-                if (active) {
-                    status = trans("xyz.baz9k.uhc.menu.bool_valued.on").style(noDeco(NamedTextColor.GREEN));
-                } else {
-                    status = trans("xyz.baz9k.uhc.menu.bool_valued.off").style(noDeco(NamedTextColor.RED));
-                }
-                return new NodeItemStack.ExtraLore("xyz.baz9k.uhc.menu.bool_valued.status", status);
-            });
+            }).extraLore(NodeItemStack.ExtraLore.fromBool());
         }
     }
 
