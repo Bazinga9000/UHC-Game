@@ -30,7 +30,9 @@ public class NodeItemStack extends ItemStack {
     /**
      * ID used for name & desc
      */
-    private final String id;
+    private final String langKey;
+
+    private final Supplier<Object> propsObjSupplier;
 
     /**
      * Class that provides additional properties about the ItemStack, particularly:
@@ -137,11 +139,16 @@ public class NodeItemStack extends ItemStack {
         }
     }
 
-    public NodeItemStack(String id, ItemProperties props) {
-        super(props.getMat(getPropsObject(id)));
+    public NodeItemStack(String langKey, ItemProperties props) {
+        this(langKey, props, () -> null);
 
-        this.id = id;
+    }
+    public NodeItemStack(String langKey, ItemProperties props, Supplier<Object> propsObjSupplier) {
+        super(props.getMat(propsObjSupplier.get()));
+
+        this.langKey = langKey;
         this.props = props;
+        this.propsObjSupplier = propsObjSupplier;
 
         editMeta(m -> { m.addItemFlags(ItemFlag.HIDE_ENCHANTS); });
         updateAll();
@@ -153,11 +160,11 @@ public class NodeItemStack extends ItemStack {
      * @return the description
      */
     public List<Component> desc() {
-        return descFromID(id).stream()
+        return descFromID(langKey).stream()
             .map(c -> {
                 if (c instanceof TextComponent tc) {
                     String content = tc.content();
-                    String fmtObj = props.format(getPropsObject(id));
+                    String fmtObj = props.format(propsObjSupplier.get());
                     return tc.content(MessageFormat.format(content, fmtObj));
                 } else return c;
             })
@@ -169,7 +176,7 @@ public class NodeItemStack extends ItemStack {
      * @return the extra lore
      */
     public List<Component> extraLore() {
-        return props.getExtraLore(getPropsObject(id)).component();
+        return props.getExtraLore(propsObjSupplier.get()).component();
     }
 
     private void updateLore() {
@@ -188,11 +195,11 @@ public class NodeItemStack extends ItemStack {
      * Updates the ItemStack to be up to date with all properties.
      */
     public NodeItemStack updateAll() {
-        var o = getPropsObject(id);
+        var o = propsObjSupplier.get();
 
         setType(props.getMat(o));
         editMeta(m -> {
-            m.displayName(nameFromID(id, props.getStyle()));
+            m.displayName(nameFromID(langKey, props.getStyle()));
             props.editMeta(o, m);
         });
         updateLore();
@@ -240,8 +247,8 @@ public class NodeItemStack extends ItemStack {
      * @param id translation key
      * @return rendered Component
      */
-    public static Component nameFromID(String id) {
-        return nameFromID(id, DEFAULT_NAME_STYLE);
+    public static Component nameFromID(String langKey) {
+        return nameFromID(langKey, DEFAULT_NAME_STYLE);
     }
     /**
      * Gets a rendered name by translation key
@@ -250,8 +257,8 @@ public class NodeItemStack extends ItemStack {
      * @param s
      * @return rendered Component
      */
-    public static Component nameFromID(String id, Style s) {
-        String key = String.format(NAME_ID_FORMAT, id);
+    public static Component nameFromID(String langKey, Style s) {
+        String key = String.format(NAME_ID_FORMAT, langKey);
         return render(trans(key).style(s));
     }
 
@@ -261,8 +268,8 @@ public class NodeItemStack extends ItemStack {
      * @param id translation key
      * @return lines of rendered Component
      */
-    public static List<Component> descFromID(String id) {
-        return descFromID(id, DEFAULT_DESC_STYLE);
+    public static List<Component> descFromID(String langKey) {
+        return descFromID(langKey, DEFAULT_DESC_STYLE);
     }
     /**
      * Gets a rendered description by translation key
@@ -271,18 +278,12 @@ public class NodeItemStack extends ItemStack {
      * @param s
      * @return lines of rendered Component
      */
-    public static List<Component> descFromID(String id, Style s) {
-        String key = String.format(DESC_ID_FORMAT, id);
+    public static List<Component> descFromID(String langKey, Style s) {
+        String fullLangKey = String.format(DESC_ID_FORMAT, langKey);
 
-        Component rendered = render(trans(key).style(s));
+        Component rendered = render(trans(fullLangKey).style(s));
         if (renderString(rendered).equals("")) return List.of();
 
         return splitLines(rendered);
-    }
-
-    private static Object getPropsObject(String id) {
-        var s = id.split("\\.", 2);
-        var cfgID = s[s.length - 1];
-        return Node.cfg.get(cfgID);
     }
 }

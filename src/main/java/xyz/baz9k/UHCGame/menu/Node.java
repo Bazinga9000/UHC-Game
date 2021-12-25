@@ -25,7 +25,16 @@ public abstract class Node {
     public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.ItemProperties props) {
         this.parent = parent;
         this.nodeName = nodeName;
-        this.itemStack = props == null ? null : new NodeItemStack(langKey(), props);
+
+        if (props == null) {
+            this.itemStack = null;
+        } else {
+            if (this instanceof ValuedNode vn) { // sigh
+                this.itemStack = new NodeItemStack(langKey(), props, () -> cfg.get(vn.cfgKey()));
+            } else {
+                this.itemStack = new NodeItemStack(langKey(), props);
+            }
+        }
 
         this.parentSlot = parentSlot;
         if (parent != null) {
