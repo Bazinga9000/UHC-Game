@@ -57,7 +57,7 @@ public class NodeItemStack extends ItemStack {
     private static final String DESC_ID_FORMAT = "xyz.baz9k.uhc.menu.inv.%s.desc";
 
     public static class ItemProperties {
-        private Supplier<Object> propsObjSupplier;
+        private Supplier<Object> propsObjSupplier = () -> null;
         private Function<Object, Material> matGet = v -> Material.AIR;
         private Style nameStyle = DEFAULT_NAME_STYLE;
         private Function<Object, String> formatter = String::valueOf;

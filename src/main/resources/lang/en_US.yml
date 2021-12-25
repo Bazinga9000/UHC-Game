@@ -135,6 +135,9 @@ xyz:
           "on": "ACTIVE"
           "off": "INACTIVE"
         inv:
+          root:
+            name: "UHC"
+            desc: ""
           go_back:
             name: "Go Back"
             desc: ""

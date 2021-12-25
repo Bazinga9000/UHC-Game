@@ -70,7 +70,7 @@ public abstract class Node {
     }
 
     public String pathRelativeTo(BranchNode b) {
-        if (parent.equals(b)) return "";
+        if (this.equals(b)) return "";
         if (parent == null) return null;
         return appendNodeName(parent.pathRelativeTo(b), nodeName);
     }
