@@ -30,7 +30,7 @@ public class ValueRequest {
         };
 
         new ConversationFactory(plugin)
-            .withInitialSessionData(new HashMap<>(Map.of("id", node.langKey(), "node", node))) // TODO wrong method
+            .withInitialSessionData(new HashMap<>(Map.of("id", node.cfgKey(), "node", node)))
             .withTimeout(60)
             .withFirstPrompt(firstPrompt)
             .withEscapeSequence("cancel")

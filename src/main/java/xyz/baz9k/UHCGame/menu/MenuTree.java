@@ -104,6 +104,7 @@ public class MenuTree {
 
     private void createConfigBranch(BranchNode root) {
         BranchNode cfgRoot = new BranchNode(root, slotAt(1, 5), "config", new ItemProperties(Material.GOLDEN_PICKAXE), 3);
+        ValuedNode.cfgRoot = cfgRoot;
 
         BranchNode intervals = new BranchNode(cfgRoot, slotAt(1, 2), "intervals",  new ItemProperties(Material.CLOCK),                   3);
         BranchNode wbSize    = new BranchNode(cfgRoot, slotAt(1, 3), "wb_size",    new ItemProperties(Material.BLUE_STAINED_GLASS_PANE), 3);
@@ -163,7 +164,7 @@ public class MenuTree {
             var defaults = plugin.getConfig().getConfigurationSection("esoteric").getDefaultSection();
             for (Node n : esoterics.getChildren()) {
                 if (n instanceof ValuedNode vn) {
-                    vn.set(defaults.get(vn.langKey())); // TODO wrong method
+                    vn.set(defaults.get(vn.cfgKey()));
                 }
             }
             esoterics.updateAllSlots();

@@ -9,13 +9,15 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 public class ValuedNode extends Node {
     protected final Type type;
     protected UnaryOperator<Number> restrict = UnaryOperator.identity();
-    protected String cfgID;
     private Object prevValue;
+    public static BranchNode cfgRoot;
+
     /**
      * Enum of the supported types for a {@link ValuedNode}.
      */
@@ -85,11 +87,16 @@ public class ValuedNode extends Node {
         }
     }
 
+    public String cfgKey() {
+        Objects.requireNonNull(cfgRoot, "Config root not yet declared, cannot initialize valued nodes");
+        return pathRelativeTo(cfgRoot);
+    }
+
     @Override
     public void click(@NotNull Player p) {
         switch (type) {
             case INTEGER, DOUBLE, STRING -> new ValueRequest(plugin, p, this);
-            case BOOLEAN -> this.set(!cfg.getBoolean(cfgID));
+            case BOOLEAN -> this.set(!cfg.getBoolean(cfgKey()));
             // case OPTION -> see OptionValuedNode#click
             default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.needs_impl", type);
         }
@@ -99,9 +106,13 @@ public class ValuedNode extends Node {
         set(prevValue);
     }
 
+    /**
+     * Sets the current object for the config key corresponding to this node.
+     * @param value value to set key to
+     */
     public void set(Object value) {
-        prevValue = cfg.get(cfgID);
+        prevValue = cfg.get(cfgKey());
         if (type == Type.INTEGER || type == Type.DOUBLE) value = restrict.apply((Number) value);
-        cfg.set(cfgID, value);
+        cfg.set(cfgKey(), value);
     }
 }
