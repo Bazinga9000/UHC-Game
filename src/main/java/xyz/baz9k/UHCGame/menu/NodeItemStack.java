@@ -32,8 +32,6 @@ public class NodeItemStack extends ItemStack {
      */
     private final String langKey;
 
-    private final Supplier<Object> propsObjSupplier;
-
     /**
      * Class that provides additional properties about the ItemStack, particularly:
      * <p> - fn to map current config value to material
@@ -59,6 +57,7 @@ public class NodeItemStack extends ItemStack {
     private static final String DESC_ID_FORMAT = "xyz.baz9k.uhc.menu.inv.%s.desc";
 
     public static class ItemProperties {
+        private Supplier<Object> propsObjSupplier;
         private Function<Object, Material> matGet = v -> Material.AIR;
         private Style nameStyle = DEFAULT_NAME_STYLE;
         private Function<Object, String> formatter = String::valueOf;
@@ -69,6 +68,10 @@ public class NodeItemStack extends ItemStack {
         public ItemProperties(Function<Object, Material> mat) { mat(mat); }
         public ItemProperties(Material mat) { mat(mat); }
 
+        public ItemProperties useObject(Supplier<Object> uo) {
+            this.propsObjSupplier = uo;
+            return this;
+        }
         public ItemProperties mat(Function<Object, Material> mat) {
             this.matGet = mat;
             return this;
@@ -94,20 +97,20 @@ public class NodeItemStack extends ItemStack {
         public ItemProperties style(TextColor clr) { return style(noDeco(clr)); }
         
 
-        private Material getMat(Object o) {
-            return matGet.apply(o);
+        private Material getMat() {
+            return matGet.apply(propsObjSupplier.get());
         }
         private Style getStyle() {
             return nameStyle;
         }
-        private String format(Object o) {
-            return formatter.apply(o);
+        private String getFormattedDescObj() {
+            return formatter.apply(propsObjSupplier.get());
         }
-        private void editMeta(Object o, ItemMeta m) {
-            miscMetaChanges.accept(o, m);
+        private void editMeta(ItemMeta m) {
+            miscMetaChanges.accept(propsObjSupplier.get(), m);
         }
-        private ExtraLore getExtraLore(Object o) {
-            return elGet.apply(o);
+        private ExtraLore getExtraLore() {
+            return elGet.apply(propsObjSupplier.get());
         }
     }
 
@@ -140,15 +143,10 @@ public class NodeItemStack extends ItemStack {
     }
 
     public NodeItemStack(String langKey, ItemProperties props) {
-        this(langKey, props, () -> null);
-
-    }
-    public NodeItemStack(String langKey, ItemProperties props, Supplier<Object> propsObjSupplier) {
-        super(props.getMat(propsObjSupplier.get()));
+        super(props.getMat());
 
         this.langKey = langKey;
         this.props = props;
-        this.propsObjSupplier = propsObjSupplier;
 
         editMeta(m -> { m.addItemFlags(ItemFlag.HIDE_ENCHANTS); });
         updateAll();
@@ -164,7 +162,7 @@ public class NodeItemStack extends ItemStack {
             .map(c -> {
                 if (c instanceof TextComponent tc) {
                     String content = tc.content();
-                    String fmtObj = props.format(propsObjSupplier.get());
+                    String fmtObj = props.getFormattedDescObj();
                     return tc.content(MessageFormat.format(content, fmtObj));
                 } else return c;
             })
@@ -176,7 +174,7 @@ public class NodeItemStack extends ItemStack {
      * @return the extra lore
      */
     public List<Component> extraLore() {
-        return props.getExtraLore(propsObjSupplier.get()).component();
+        return props.getExtraLore().component();
     }
 
     private void updateLore() {
@@ -195,12 +193,10 @@ public class NodeItemStack extends ItemStack {
      * Updates the ItemStack to be up to date with all properties.
      */
     public NodeItemStack updateAll() {
-        var o = propsObjSupplier.get();
-
-        setType(props.getMat(o));
+        setType(props.getMat());
         editMeta(m -> {
             m.displayName(nameFromID(langKey, props.getStyle()));
-            props.editMeta(o, m);
+            props.editMeta(m);
         });
         updateLore();
 

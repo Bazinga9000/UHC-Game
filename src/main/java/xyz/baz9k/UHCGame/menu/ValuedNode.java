@@ -64,6 +64,7 @@ public class ValuedNode extends Node {
         super(parent, slot, nodeName, props);
         this.type = type;
         
+        props.useObject(() -> cfg.get(cfgKey()));
         if (type == Type.BOOLEAN) {
             props.metaChanges((o, m) -> {
                 var active = (boolean) o;
