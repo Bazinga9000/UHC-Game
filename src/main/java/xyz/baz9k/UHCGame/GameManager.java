@@ -376,6 +376,7 @@ public class GameManager implements Listener {
         int winner = teamManager.getAliveTeams()[0];
         Component winMsg = trans("xyz.baz9k.uhc.win", TeamDisplay.getName(winner))
             .style(noDeco(NamedTextColor.WHITE));
+        winMsg = includeGameTimestamp(winMsg);
 
         // this msg should be displayed after player death
         delayedMessage(winMsg, plugin, 1);
@@ -428,6 +429,7 @@ public class GameManager implements Listener {
             if (teamManager.isTeamEliminated(t)) {
                 Component teamElimMsg = trans("xyz.baz9k.uhc.eliminated", TeamDisplay.getName(t))
                     .style(noDeco(NamedTextColor.WHITE));
+                teamElimMsg = includeGameTimestamp(teamElimMsg);
                 // this msg should be displayed after player death
                 delayedMessage(teamElimMsg, plugin, 1);
             }
