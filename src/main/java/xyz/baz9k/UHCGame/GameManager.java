@@ -357,6 +357,12 @@ public class GameManager implements Listener {
         return OptionalInt.empty();
     }
 
+    private Component includeGameTimestamp(Component c) {
+        return Component.text(String.format("[%s]", getLongTimeString(getElapsedTime())))
+               .append(Component.space())
+               .append(c);
+    }
+
     private void winMessage() {
         if (teamManager.countLivingTeams() > 1) return;
         int winner = teamManager.getAliveTeams()[0];
@@ -404,6 +410,7 @@ public class GameManager implements Listener {
         if (!hasUHCStarted()) return;
         Player dead = e.getEntity();
         
+        e.deathMessage(includeGameTimestamp(e.deathMessage()));
         dead.setGameMode(GameMode.SPECTATOR);
         if (teamManager.getPlayerState(dead) == PlayerState.COMBATANT_ALIVE) {
             teamManager.setCombatantAliveStatus(dead, false);
