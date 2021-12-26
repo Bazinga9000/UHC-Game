@@ -452,7 +452,7 @@ public class Commands {
     }
 
     // uhc hasstarted
-    @RegisterUHCSubCommand
+    @RegisterCommand
     private CommandAPICommand hasStarted() {
         return new CommandAPICommand("hasstarted")
         .executes(
