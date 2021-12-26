@@ -2,6 +2,9 @@
 package xyz.baz9k.UHCGame.menu;
 
 import org.jetbrains.annotations.NotNull;
+
+import xyz.baz9k.UHCGame.util.Debug;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
@@ -28,7 +31,11 @@ public class ActionNode extends Node {
     }
 
     public void click(Player p) {
-        fn.accept(p);
+        try {
+            fn.accept(p);
+        } catch (Exception e) {
+            Debug.printError(e);
+        }
     }
 
 }
