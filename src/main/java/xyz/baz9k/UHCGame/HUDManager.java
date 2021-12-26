@@ -35,6 +35,7 @@ public class HUDManager implements Listener {
         this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.teamManager = plugin.getTeamManager();
+        cleanup(); // remove any extra uhc prefix teams in case
     }
 
     private static String createEmptyName(char c){

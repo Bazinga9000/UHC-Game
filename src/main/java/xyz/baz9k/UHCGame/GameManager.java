@@ -524,7 +524,7 @@ public class GameManager implements Listener {
             if (previousDisplayNames.containsKey(uuid)) {
                 setDisplayName(p, previousDisplayNames.get(uuid));
             } else {
-                setDisplayName(p, Component.text(p.getName()));
+                setDisplayName(p, null);
             }
         }
     }
