@@ -3,6 +3,7 @@ package xyz.baz9k.UHCGame.util;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -48,6 +49,23 @@ public final class Utils {
     }
 
     /**
+     * Get a time string of the provided {@link Duration}'s duration.
+     * <p>
+     * Minutes and seconds are provided by default, and hours are provided if the amount of time provided exceeds an hour.
+     * <p>
+     * If d is empty, then the fallback string is used instead.
+     * @param d
+     * @param fallback
+     * @return the time stiring
+     * 
+     * @see #getLongTimeString(Optional)
+     */
+    public static String getTimeString(Optional<Duration> d, String fallback) {
+        return d.map(Utils::getTimeString)
+            .orElse(fallback);
+    }
+
+    /**
      * Get a long time string of the provided number of seconds.
      * <p>
      * Hours, minutes, and seconds are all provided in the string.
@@ -67,6 +85,21 @@ public final class Utils {
      */
     public static String getLongTimeString(Duration d) {
         return getLongTimeString(d.toSeconds());
+    }
+
+    /**
+     * Get a long time string of the provided {@link Duration}'s duration.
+     * <p>
+     * Hours, minutes, and seconds are all provided in the string.
+     * <p>
+     * If d is empty, then the fallback string is used instead.
+     * @param d
+     * @param fallback
+     * @return the time string
+     */
+    public static String getLongTimeString(Optional<Duration> d, String fallback) {
+        return d.map(Utils::getLongTimeString)
+            .orElse(fallback);
     }
 
     /**

@@ -344,7 +344,7 @@ public class HUDManager implements Listener {
     }
 
     public void updateElapsedTimeHUD(@NotNull Player p){
-        String elapsed = getLongTimeString(gameManager.getElapsedTime());
+        String elapsed = getLongTimeString(gameManager.getElapsedTime(), "?");
 
         World world = plugin.getWorldManager().getGameWorld(0);
         long time = world.getTime();

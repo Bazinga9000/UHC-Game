@@ -44,13 +44,14 @@ public class GameManager implements Listener {
     private Recipes recipes;
     private BukkitTask tick;
     
-    private Instant startTime = null;
     
     private final HashMap<UUID, Component> previousDisplayNames = new HashMap<>();
     private final HashMap<UUID, Integer> kills = new HashMap<>();
-
+    
     private GameStage stage = GameStage.NOT_IN_GAME;
-    private Instant lastStageInstant = null;
+    
+    private Optional<Instant> startTime = Optional.empty();
+    private Optional<Instant> lastStageInstant = Optional.empty();
 
     public GameManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
@@ -114,7 +115,6 @@ public class GameManager implements Listener {
         worldManager.worldsRegenedOff();
 
         kills.clear();
-        startTime = lastStageInstant = Instant.now();
         
         worldManager.initWorlds();
 
@@ -136,7 +136,7 @@ public class GameManager implements Listener {
         plugin.getMVWorldManager().unloadWorld("lobby", true);
 
         // start ticking
-        startTime = lastStageInstant = Instant.now();
+        startTime = lastStageInstant = Optional.of(Instant.now());
         startTick();
     }
 
@@ -238,9 +238,10 @@ public class GameManager implements Listener {
     /**
      * @return the {@link Duration} since the game has started.
      */
-    @NotNull
-    public Duration getElapsedTime() {
-        return Duration.between(startTime, Instant.now());
+    public Optional<Duration> getElapsedTime() {
+        return startTime.map(start ->
+            Duration.between(start, Instant.now())
+        );
     }
 
     /**
@@ -262,7 +263,7 @@ public class GameManager implements Listener {
 
     private void updateStage() {
         if (!hasUHCStarted()) return;
-        lastStageInstant = Instant.now();
+        lastStageInstant = Optional.of(Instant.now());
         bbManager.updateBossbarStage();
 
         stage.sendMessage();
@@ -321,12 +322,13 @@ public class GameManager implements Listener {
     /**
      * @return the {@link Duration} until the current stage ends.
      */
-    @NotNull
-    public Duration getRemainingStageDuration() {
+    public Optional<Duration> getRemainingStageDuration() {
         requireStarted();
         Duration stageDur = getStageDuration();
-        if (isDeathmatch()) return stageDur; // if deathmatch, just return ∞
-        return Duration.between(Instant.now(), lastStageInstant.plus(stageDur));
+        if (isDeathmatch()) return Optional.of(stageDur); // if deathmatch, just return ∞
+        return lastStageInstant.map(instant -> 
+            Duration.between(Instant.now(), instant.plus(stageDur))
+        );
     }
 
     /**
@@ -341,8 +343,11 @@ public class GameManager implements Listener {
      */
     public boolean isStageComplete() {
         if (isDeathmatch()) return false;
-        Instant end = lastStageInstant.plus(stage.duration());
-        return !end.isAfter(Instant.now());
+        return lastStageInstant.map(instant -> {
+                var end = instant.plus(stage.duration());
+                return !end.isAfter(Instant.now());
+            })
+            .orElse(false);
     }
 
     /**
@@ -360,7 +365,8 @@ public class GameManager implements Listener {
     }
 
     private Component includeGameTimestamp(Component c) {
-        return Component.text(String.format("[%s]", getLongTimeString(getElapsedTime())))
+        String timeStr = getLongTimeString(getElapsedTime(), "?");
+        return Component.text(String.format("[%s]", timeStr))
                .append(Component.space())
                .append(c);
     }
