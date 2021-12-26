@@ -11,9 +11,8 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -365,6 +364,7 @@ public class GameManager implements Listener {
     }
 
     private Component includeGameTimestamp(Component c) {
+        if (c == null) return null;
         String timeStr = getLongTimeString(getElapsedTime(), "?");
         return Component.text(String.format("[%s]", timeStr))
                .append(Component.space())
@@ -471,6 +471,12 @@ public class GameManager implements Listener {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerAdvancement(PlayerAdvancementDoneEvent e) {
+        if (!hasUHCStarted()) return;
+        e.message(includeGameTimestamp(e.message()));
     }
 
     private void prepareToGame(Player p, boolean onGameStart) {
