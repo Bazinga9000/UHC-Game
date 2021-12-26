@@ -178,6 +178,7 @@ public class GameManager implements Listener {
         // global stuff, affects all players incl offline ones
         teamManager.resetAllPlayers();
         bbManager.disable(Bukkit.getServer());
+        hudManager.cleanup();
         kills.clear();
         if (tick != null) tick.cancel();
 
@@ -469,7 +470,6 @@ public class GameManager implements Listener {
     private void prepareToGame(Player p, boolean onGameStart) {
         bbManager.enable(p);
         hudManager.initPlayerHUD(p);
-        hudManager.addPlayerToTeams(p);
         
         recipes.discoverFor(p);
         
