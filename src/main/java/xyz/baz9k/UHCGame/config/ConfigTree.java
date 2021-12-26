@@ -88,7 +88,7 @@ public class ConfigTree {
         new ValuedNode(wbSize, slotAt(1, 6), "deathmatch", new ItemProperties(Material.PURPLE_STAINED_GLASS), ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
 
         /* TEAM COUNT */
-        new ValuedNode(teamCount, 0,            "team_count", new ItemProperties(Material.DIAMOND),    ValuedNode.Type.INTEGER, i -> Math.min(i.intValue(), 1));
+        new ValuedNode(teamCount, 0,            "team_count", new ItemProperties(Material.DIAMOND),    ValuedNode.Type.INTEGER, i -> Math.max(i.intValue(), 1));
         new ActionNode(teamCount, slotAt(2, 0), "solos",      new ItemProperties(Material.RED_DYE),    p -> { plugin.getTeamManager().setTeamSize("solos");    });
         new ActionNode(teamCount, slotAt(2, 1), "duos",       new ItemProperties(Material.ORANGE_DYE), p -> { plugin.getTeamManager().setTeamSize("duos");     });
         new ActionNode(teamCount, slotAt(2, 2), "trios",      new ItemProperties(Material.YELLOW_DYE), p -> { plugin.getTeamManager().setTeamSize("trios");    });
