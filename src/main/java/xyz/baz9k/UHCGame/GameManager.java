@@ -114,6 +114,7 @@ public class GameManager implements Listener {
         worldManager.worldsRegenedOff();
 
         kills.clear();
+        startTime = lastStageInstant = Instant.now();
         
         worldManager.initWorlds();
 
