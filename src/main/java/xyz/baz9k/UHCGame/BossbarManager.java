@@ -42,8 +42,10 @@ public class BossbarManager {
             return;
         }
         // update progress bar
-        long remainingSecs = gameManager.getRemainingStageDuration().toSeconds(),
-                 totalSecs = gameManager.getStageDuration().toSeconds();
+        long remainingSecs = gameManager.getRemainingStageDuration()
+            .map(d -> d.toSeconds())
+            .orElse(0L);
+        long totalSecs = gameManager.getStageDuration().toSeconds();
 
         bossbar.progress((float) clamp(0, (double) remainingSecs / totalSecs, 1));
         // change display title

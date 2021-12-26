@@ -90,8 +90,9 @@ public final class TeamDisplay {
      * @return {@link TextComponent} of the prefix
      */
     public static Component getPrefix(int t) {
-        return trans("xyz.baz9k.uhc.team.prefix", t == 0 ? trans("xyz.baz9k.uhc.team.spectator_abbr") : t)
+        var prefix = trans("xyz.baz9k.uhc.team.prefix", t == 0 ? trans("xyz.baz9k.uhc.team.spectator_abbr") : t)
             .style(getStyle(t));
+        return render(prefix);
     }
 
     /**
@@ -110,8 +111,7 @@ public final class TeamDisplay {
      * @return {@link TextComponent}
      */
     public static Component prefixed(int t, String name) {
-        // render exists because i dunno why the chat player display doesn't work
-        return render(getPrefixWithSpace(t).append(Component.text(name, noDeco(WHITE))));
+        return getPrefixWithSpace(t).append(Component.text(name, noDeco(WHITE)));
     }
 
     /**

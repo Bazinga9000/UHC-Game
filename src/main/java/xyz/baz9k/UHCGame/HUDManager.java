@@ -1,11 +1,7 @@
 package xyz.baz9k.UHCGame;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.JoinConfiguration;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.*;
+import net.kyori.adventure.text.format.*;
 import static net.kyori.adventure.text.format.TextDecoration.*;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -20,23 +16,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.RenderType;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.*;
 import org.jetbrains.annotations.NotNull;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.OptionalInt;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HUDManager implements Listener {
     private final GameManager gameManager;
@@ -47,6 +35,7 @@ public class HUDManager implements Listener {
         this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.teamManager = plugin.getTeamManager();
+        cleanup(); // remove any extra uhc prefix teams in case
     }
 
     private static String createEmptyName(char c){
@@ -130,44 +119,32 @@ public class HUDManager implements Listener {
     }
 
     /* HANDLE SCOREBOARD PARITY */
-    
+
     /**
-     * Adds a player onto a {@link TeamManager} team on a scoreboard
-     * @param s the scoreboard
-     * @param p the player
-     * @param team the TeamManager team (not Minecraft {@link Team})
+     * Prefix of the scoreboard team names that give each team their chat prefix
      */
-    private void addPlayerToScoreboardTeam(@NotNull Scoreboard s, @NotNull Player p, int team){
-        Team t = s.getTeam(String.valueOf(team));
-        if(t == null){
-            t = s.registerNewTeam(String.valueOf(team));
+    private static final String PREFIXING_TEAM_FORMAT = "uhc_prefix_";
+
+    private void applyPrefix(Player p) {
+        Scoreboard s = Bukkit.getScoreboardManager().getMainScoreboard();
+        int team = teamManager.getTeam(p);
+
+        String teamName = PREFIXING_TEAM_FORMAT + team;
+        Team t = s.getTeam(teamName);
+        if (t == null) {
+            t = s.registerNewTeam(teamName);
             t.prefix(TeamDisplay.getPrefixWithSpace(team));
         }
-        t.addEntry(p.getName());
-    }
 
-    /**
-     * Registers all online users' teams to a player's scoreboard
-     * @param player the player to register to
-     */
-    private void setTeams(@NotNull Player player){
-        Scoreboard s = player.getScoreboard();
-        for(Player p : Bukkit.getOnlinePlayers()){
-            int team = teamManager.getTeam(p);
-            addPlayerToScoreboardTeam(s, p, team);
-        }
+        t.addPlayer(p);
     }
+    private void removeAllPrefixes() {
+        Scoreboard s = Bukkit.getScoreboardManager().getMainScoreboard();
 
-    /**
-     * Registers a player's team to all online users' scoreboards
-     * @param player the player to register
-     */
-    public void addPlayerToTeams(@NotNull Player player){
-        int team = teamManager.getTeam(player);
-        for(Player p : Bukkit.getOnlinePlayers()){
-            Scoreboard s = p.getScoreboard();
-            addPlayerToScoreboardTeam(s, player, team);
-        }
+        var teamsToRemove = s.getTeams().stream()
+            .filter(t -> t.getName().startsWith(PREFIXING_TEAM_FORMAT))
+            .collect(Collectors.toSet());
+        teamsToRemove.forEach(Team::unregister);
     }
 
     /**
@@ -187,9 +164,6 @@ public class HUDManager implements Listener {
         Objective hearts2 = newBoard.registerNewObjective("hearts2", "health", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
         hearts1.setDisplaySlot(DisplaySlot.PLAYER_LIST);
         hearts2.setDisplaySlot(DisplaySlot.BELOW_NAME);
-        
-        setTeams(p);
-
     }
 
     /* INITIALIZING HUD */
@@ -230,6 +204,7 @@ public class HUDManager implements Listener {
      */
     public void initPlayerHUD(@NotNull Player p) {
         createHUDScoreboard(p);
+        applyPrefix(p);
 
         addHUDLine(p, "state",      15);
         // 14 - 10 are tmate
@@ -251,6 +226,15 @@ public class HUDManager implements Listener {
         updateTeamsAliveHUD(p);
         updateKillsHUD(p);
         updateElapsedTimeHUD(p);
+    }
+
+    public void cleanup() {
+        Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.setScoreboard(main);
+        }
+        removeAllPrefixes();
     }
 
     /**
@@ -361,7 +345,7 @@ public class HUDManager implements Listener {
     }
 
     public void updateElapsedTimeHUD(@NotNull Player p){
-        String elapsed = getLongTimeString(gameManager.getElapsedTime());
+        String elapsed = getLongTimeString(gameManager.getElapsedTime(), "?");
 
         World world = plugin.getWorldManager().getGameWorld(0);
         long time = world.getTime();

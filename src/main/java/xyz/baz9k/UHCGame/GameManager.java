@@ -11,9 +11,8 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -45,13 +44,14 @@ public class GameManager implements Listener {
     private Recipes recipes;
     private BukkitTask tick;
     
-    private Instant startTime = null;
     
     private final HashMap<UUID, Component> previousDisplayNames = new HashMap<>();
     private final HashMap<UUID, Integer> kills = new HashMap<>();
-
+    
     private GameStage stage = GameStage.NOT_IN_GAME;
-    private Instant lastStageInstant = null;
+    
+    private Optional<Instant> startTime = Optional.empty();
+    private Optional<Instant> lastStageInstant = Optional.empty();
 
     public GameManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
@@ -107,9 +107,9 @@ public class GameManager implements Listener {
             }
         }
 
-        if (!worldManager.worldsRegened()) {
-            fails.add(GameInitFailure.WORLDS_NOT_REGENED);
-        }
+        // if (!worldManager.worldsRegened()) {
+        //     fails.add(GameInitFailure.WORLDS_NOT_REGENED);
+        // }
 
         return Collections.unmodifiableList(fails);
     }
@@ -193,7 +193,7 @@ public class GameManager implements Listener {
         plugin.getMVWorldManager().unloadWorld("lobby", true);
 
         // start ticking
-        startTime = lastStageInstant = Instant.now();
+        startTime = lastStageInstant = Optional.of(Instant.now());
         startTick();
     }
 
@@ -235,6 +235,7 @@ public class GameManager implements Listener {
         // global stuff, affects all players incl offline ones
         teamManager.resetAllPlayers();
         bbManager.disable(Bukkit.getServer());
+        hudManager.cleanup();
         kills.clear();
         if (tick != null) tick.cancel();
 
@@ -294,9 +295,10 @@ public class GameManager implements Listener {
     /**
      * @return the {@link Duration} since the game has started.
      */
-    @NotNull
-    public Duration getElapsedTime() {
-        return Duration.between(startTime, Instant.now());
+    public Optional<Duration> getElapsedTime() {
+        return startTime.map(start ->
+            Duration.between(start, Instant.now())
+        );
     }
 
     /**
@@ -318,7 +320,7 @@ public class GameManager implements Listener {
 
     private void updateStage() {
         if (!hasUHCStarted()) return;
-        lastStageInstant = Instant.now();
+        lastStageInstant = Optional.of(Instant.now());
         bbManager.updateBossbarStage();
 
         stage.sendMessage();
@@ -377,12 +379,13 @@ public class GameManager implements Listener {
     /**
      * @return the {@link Duration} until the current stage ends.
      */
-    @NotNull
-    public Duration getRemainingStageDuration() {
+    public Optional<Duration> getRemainingStageDuration() {
         requireStarted();
         Duration stageDur = getStageDuration();
-        if (isDeathmatch()) return stageDur; // if deathmatch, just return ∞
-        return Duration.between(Instant.now(), lastStageInstant.plus(stageDur));
+        if (isDeathmatch()) return Optional.of(stageDur); // if deathmatch, just return ∞
+        return lastStageInstant.map(instant -> 
+            Duration.between(Instant.now(), instant.plus(stageDur))
+        );
     }
 
     /**
@@ -397,8 +400,11 @@ public class GameManager implements Listener {
      */
     public boolean isStageComplete() {
         if (isDeathmatch()) return false;
-        Instant end = lastStageInstant.plus(stage.duration());
-        return !end.isAfter(Instant.now());
+        return lastStageInstant.map(instant -> {
+                var end = instant.plus(stage.duration());
+                return !end.isAfter(Instant.now());
+            })
+            .orElse(false);
     }
 
     /**
@@ -413,6 +419,14 @@ public class GameManager implements Listener {
             return OptionalInt.of(kills.computeIfAbsent(p.getUniqueId(), uuid -> 0));
         }
         return OptionalInt.empty();
+    }
+
+    private Component includeGameTimestamp(Component c) {
+        if (c == null) return null;
+        String timeStr = getLongTimeString(getElapsedTime(), "?");
+        return Component.text(String.format("[%s]", timeStr))
+               .append(Component.space())
+               .append(c);
     }
 
     private void winMessage() {
@@ -462,6 +476,7 @@ public class GameManager implements Listener {
         if (!hasUHCStarted()) return;
         Player dead = e.getEntity();
         
+        e.deathMessage(includeGameTimestamp(e.deathMessage()));
         dead.setGameMode(GameMode.SPECTATOR);
         if (teamManager.getPlayerState(dead) == PlayerState.COMBATANT_ALIVE) {
             teamManager.setCombatantAliveStatus(dead, false);
@@ -516,10 +531,15 @@ public class GameManager implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerAdvancement(PlayerAdvancementDoneEvent e) {
+        if (!hasUHCStarted()) return;
+        e.message(includeGameTimestamp(e.message()));
+    }
+
     private void prepareToGame(Player p, boolean onGameStart) {
         bbManager.enable(p);
         hudManager.initPlayerHUD(p);
-        hudManager.addPlayerToTeams(p);
         
         recipes.discoverFor(p);
         
@@ -531,7 +551,7 @@ public class GameManager implements Listener {
 
             // handle display name
             previousDisplayNames.put(p.getUniqueId(), p.displayName());
-            p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
+            setDisplayName(p, TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
     
             if (teamManager.isSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
@@ -566,9 +586,9 @@ public class GameManager implements Listener {
             // update display names
             UUID uuid = p.getUniqueId();
             if (previousDisplayNames.containsKey(uuid)) {
-                p.displayName(previousDisplayNames.get(uuid));
+                setDisplayName(p, previousDisplayNames.get(uuid));
             } else {
-                p.displayName(Component.text(p.getName()));
+                setDisplayName(p, null);
             }
         }
     }
