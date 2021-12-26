@@ -1,19 +1,13 @@
 package xyz.baz9k.UHCGame.util;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentBuilder;
-import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.*;
 import xyz.baz9k.UHCGame.UHCGamePlugin;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
@@ -231,4 +225,15 @@ public final class Utils {
     public static double clamp(double min, double x, double max) {
         return Math.max(min, Math.min(x, max));
     }
+
+    /**
+     * Sets chat name & player list name. Death message name and name tag are handled by Minecraft scoreboard teams.
+     * 
+     * @see HUDManager#applyPrefix
+     */
+    public static void setDisplayName(Player p, Component c) {
+        p.displayName(c);
+        p.playerListName(c);
+    }
+
 }
