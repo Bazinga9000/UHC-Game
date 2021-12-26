@@ -90,10 +90,10 @@ public class GameManager implements Listener {
                 }
             }
 
-            // require world regened
-            if (!worldManager.worldsRegened()) {
-                throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.must_regened");
-            }
+            // // require world regened
+            // if (!worldManager.worldsRegened()) {
+            //     throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.must_regened");
+            // }
         } else {
             Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.force"));
         }
