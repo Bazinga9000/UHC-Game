@@ -141,7 +141,7 @@ public class HUDManager implements Listener {
         Team t = s.getTeam(String.valueOf(team));
         if(t == null){
             t = s.registerNewTeam(String.valueOf(team));
-            t.prefix(TeamDisplay.getPrefixWithSpace(team));
+            // t.prefix(TeamDisplay.getPrefixWithSpace(team));
         }
         t.addEntry(p.getName());
     }

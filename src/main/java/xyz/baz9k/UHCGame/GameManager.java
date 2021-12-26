@@ -482,6 +482,7 @@ public class GameManager implements Listener {
             // handle display name
             previousDisplayNames.put(p.getUniqueId(), p.displayName());
             p.displayName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
+            p.playerListName(TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
     
             if (teamManager.isSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
@@ -517,8 +518,10 @@ public class GameManager implements Listener {
             UUID uuid = p.getUniqueId();
             if (previousDisplayNames.containsKey(uuid)) {
                 p.displayName(previousDisplayNames.get(uuid));
+                p.playerListName(previousDisplayNames.get(uuid));
             } else {
                 p.displayName(Component.text(p.getName()));
+                p.playerListName(Component.text(p.getName()));
             }
         }
     }
