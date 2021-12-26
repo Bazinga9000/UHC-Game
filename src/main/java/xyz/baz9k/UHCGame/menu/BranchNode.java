@@ -186,12 +186,30 @@ public class BranchNode extends Node {
         return children;
     }
 
-    public Node findChild(String name) {
-        for (Node n : children) {
-            if (n == null) continue;
-            if (n.nodeName == name) return n;
+    private Optional<Node> findChild(String name) {
+        return Arrays.stream(children)
+            .filter(c -> c != null)
+            .filter(c -> c.nodeName == name)
+            .findAny();
+    }
+
+    public Optional<Node> findDescendant(String path) {
+        if (path.isBlank()) return Optional.of(this);
+
+        String[] nodeNames = path.split("\\.");
+        BranchNode n = this;
+
+        for (int i = 0; i < nodeNames.length - 1; i++) {
+            String nodeName = nodeNames[i];
+            var match = n.findChild(nodeName);
+            if (match.isPresent() && match.get() instanceof BranchNode b) {
+                    n = b;
+                    continue;
+            }
+            return Optional.empty();
         }
-        return null;
+
+        return n.findChild(nodeNames[nodeNames.length - 1]);
     }
 
     /**

@@ -21,7 +21,7 @@ public class MenuManager implements Listener {
     }
 
     public void openSubMenu(String name, @NotNull Player p) {
-        menuTree.root().findChild(name).click(p);
+        menuTree.root().findDescendant(name).ifPresent(n -> n.click(p));
     }
 
     @EventHandler
