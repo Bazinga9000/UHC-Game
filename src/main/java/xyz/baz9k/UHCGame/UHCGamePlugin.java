@@ -22,12 +22,6 @@ public class UHCGamePlugin extends JavaPlugin {
     private Recipes recipes;
 
     @Override
-    public void onLoad() {
-        Commands commands = new Commands(this);
-        commands.registerAll();
-    }
-    
-    @Override
     public void onEnable() {
         this.saveDefaultConfig();
         
@@ -48,6 +42,8 @@ public class UHCGamePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(hudManager, this);
         Bukkit.getPluginManager().registerEvents(configManager, this);
 
+        Commands commands = new Commands(this);
+        commands.registerAll();
         recipes.registerAll();
 
         gameManager.loadManagerRefs();
