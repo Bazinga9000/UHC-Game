@@ -539,6 +539,7 @@ public class GameManager implements Listener {
         hudManager.initPlayerHUD(p);
         
         recipes.discoverFor(p);
+        setDisplayName(p, TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
         
         if (onGameStart || !worldManager.inGame(p)) {
             // if the player joins midgame and are in the lobby, then idk where to put them! put in spawn
@@ -547,9 +548,8 @@ public class GameManager implements Listener {
             }
 
             // handle display name
-            previousDisplayNames.put(p.getUniqueId(), p.displayName());
-            setDisplayName(p, TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
-    
+            // previousDisplayNames.put(p.getUniqueId(), p.displayName());
+            
             if (teamManager.isSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
             } else {
