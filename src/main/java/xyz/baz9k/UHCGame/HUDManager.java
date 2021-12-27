@@ -319,8 +319,8 @@ public class HUDManager implements Listener {
          * 315 - 360: -X
          */
 
-        if ( 90 <= yaw && yaw < 225) xz.add(trans("xyz.baz9k.uhc.hud.pos_x").color(NamedTextColor.RED));
-        if (270 <= yaw || yaw <  45) xz.add(trans("xyz.baz9k.uhc.hud.neg_x").color(NamedTextColor.RED));
+        if ( 90 <= yaw && yaw < 225) xz.add(trans("xyz.baz9k.uhc.hud.neg_x").color(NamedTextColor.RED));
+        if (270 <= yaw || yaw <  45) xz.add(trans("xyz.baz9k.uhc.hud.pos_x").color(NamedTextColor.RED));
 
         if (  0 <= yaw && yaw < 135) xz.add(trans("xyz.baz9k.uhc.hud.pos_z").color(NamedTextColor.BLUE));
         if (180 <= yaw && yaw < 315) xz.add(trans("xyz.baz9k.uhc.hud.neg_z").color(NamedTextColor.BLUE));
