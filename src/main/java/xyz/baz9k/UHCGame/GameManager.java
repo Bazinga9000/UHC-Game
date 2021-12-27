@@ -195,7 +195,6 @@ public class GameManager implements Listener {
 
         // do spreadplayers
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
-        
         double initialDiameter = GameStage.WB_STILL.wbDiameter();
         double max = initialDiameter,
                min = initialDiameter / (1 + teamManager.getNumTeams());
