@@ -110,11 +110,12 @@ public class MenuTree {
             tm.resetAllPlayers();
         });
         new ActionNode(ctrlRoot, slotAt(4, 1), "assign_teams_x", new ItemProperties(Material.DIAMOND), p -> {
-            p.closeInventory();
             var tm = plugin.getTeamManager();
-            //TODO
-            tm.assignTeams();
-            tm.announceTeams();
+            new ValueRequest(plugin, p, ValueRequest.Type.NUMBER_REQUEST, "team_count", t -> {
+                tm.setNumTeams((int) t);
+                tm.assignTeams();
+                tm.announceTeams();
+            }, false);
         });
         new ActionNode(ctrlRoot, slotAt(4, 2), "assign_teams_1", new ItemProperties(Material.RED_DYE), p -> {
             p.closeInventory();
