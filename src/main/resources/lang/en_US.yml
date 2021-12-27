@@ -224,28 +224,6 @@ xyz:
             deathmatch:
               name: "Deathmatch"
               desc: "Diameter: {0}"
-          team_count:
-            root:
-              name: "Team Counts"
-              desc: "Set the number of teams."
-            team_count:
-              name: "Set Team Count"
-              desc: "Number of teams: {0}"
-            solos:
-              name: "Solos"
-              desc: "Teams of 1"
-            duos:
-              name: "Duos"
-              desc: "Teams of 2"
-            trios:
-              name: "Trios"
-              desc: "Teams of 3"
-            quartets:
-              name: "Quartets"
-              desc: "Teams of 4"
-            quintets:
-              name: "Quintets"
-              desc: "Teams of 5"
           esoteric:
             root:
               name: "Esoterics"

@@ -165,10 +165,9 @@ public class MenuTree {
         BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties(Material.GOLDEN_PICKAXE), 3);
         ValuedNode.cfgRoot = cfgRoot;
 
-        BranchNode intervals = new BranchNode(cfgRoot, slotAt(1, 2), "intervals",  new ItemProperties(Material.CLOCK),                   3);
-        BranchNode wbSize    = new BranchNode(cfgRoot, slotAt(1, 3), "wb_size",    new ItemProperties(Material.BLUE_STAINED_GLASS_PANE), 3);
-        BranchNode teamCount = new BranchNode(cfgRoot, slotAt(1, 5), "team_count", new ItemProperties(Material.PLAYER_HEAD),             3);
-        BranchNode esoterics = new BranchNode(cfgRoot, slotAt(1, 6), "esoteric",   new ItemProperties(Material.NETHER_STAR),             6);
+        BranchNode intervals = new BranchNode(cfgRoot, slotAt(1, 3), "intervals",  new ItemProperties(Material.CLOCK),                   3);
+        BranchNode wbSize    = new BranchNode(cfgRoot, slotAt(1, 4), "wb_size",    new ItemProperties(Material.BLUE_STAINED_GLASS_PANE), 3);
+        BranchNode esoterics = new BranchNode(cfgRoot, slotAt(1, 5), "esoteric",   new ItemProperties(Material.NETHER_STAR),             6);
 
         /* INTERVALS (in secs) */
         new ValuedNode(intervals, slotAt(1, 2), "start",     new ItemProperties(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.RED_CONCRETE)   .formatter(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
@@ -182,14 +181,6 @@ public class MenuTree {
         new ValuedNode(wbSize, slotAt(1, 3), "border1",    new ItemProperties(Material.ORANGE_STAINED_GLASS), ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
         new ValuedNode(wbSize, slotAt(1, 5), "border2",    new ItemProperties(Material.GREEN_STAINED_GLASS),  ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
         new ValuedNode(wbSize, slotAt(1, 6), "deathmatch", new ItemProperties(Material.PURPLE_STAINED_GLASS), ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
-
-        /* TEAM COUNT */
-        new ValuedNode(teamCount, 0,            "team_count", new ItemProperties(Material.DIAMOND),    ValuedNode.Type.INTEGER, i -> Math.max(i.intValue(), 1));
-        new ActionNode(teamCount, slotAt(2, 0), "solos",      new ItemProperties(Material.RED_DYE),    p -> { plugin.getTeamManager().setTeamSize("solos");    });
-        new ActionNode(teamCount, slotAt(2, 1), "duos",       new ItemProperties(Material.ORANGE_DYE), p -> { plugin.getTeamManager().setTeamSize("duos");     });
-        new ActionNode(teamCount, slotAt(2, 2), "trios",      new ItemProperties(Material.YELLOW_DYE), p -> { plugin.getTeamManager().setTeamSize("trios");    });
-        new ActionNode(teamCount, slotAt(2, 3), "quartets",   new ItemProperties(Material.GREEN_DYE),  p -> { plugin.getTeamManager().setTeamSize("quartets"); });
-        new ActionNode(teamCount, slotAt(2, 4), "quintets",   new ItemProperties(Material.BLUE_DYE),   p -> { plugin.getTeamManager().setTeamSize("quintets"); });
 
         /* ESOTERICS */
         int i = 0;
