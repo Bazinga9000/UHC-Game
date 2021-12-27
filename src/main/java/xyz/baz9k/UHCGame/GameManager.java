@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
@@ -132,6 +133,34 @@ public class GameManager implements Listener {
             .map(GameInitFailure::panelErr)
             .collect(Collectors.toList());
     }
+
+    private void runEventWithChecks(String eventKey, Runnable event, Supplier<List<GameInitFailure>> checks, boolean skipChecks) {
+        String EVENT_TRY       = String.format("xyz.baz9k.uhc.debug.%s.try", eventKey),
+               EVENT_FORCE_TRY = String.format("xyz.baz9k.uhc.debug.%s.force", eventKey),
+               EVENT_COMPLETE  = String.format("xyz.baz9k.uhc.debug.%s.complete", eventKey),
+               EVENT_FAIL      = String.format("xyz.baz9k.uhc.debug.%s.fail", eventKey);
+        
+        var prevStage = stage;
+
+        Debug.printDebug(trans(EVENT_TRY));
+        if (!skipChecks) {
+            var fails = checks.get();
+            if (fails.size() != 0) {
+                throw fails.get(0).exception();
+            }
+        } else {
+            Debug.printDebug(trans(EVENT_FORCE_TRY));
+        }
+
+        try {
+            event.run();
+            Debug.printDebug(trans(EVENT_COMPLETE));
+        } catch (Exception e) {
+            setStage(prevStage);
+            Debug.printDebug(trans(EVENT_FAIL));
+            Debug.printError(e);
+        }
+    }
     /**
      * Starts UHC.
      * <p>
@@ -143,29 +172,22 @@ public class GameManager implements Listener {
      * @param skipChecks If true, all checks are ignored.
      */
     public void startUHC(boolean skipChecks) {
-        var prevStage = stage;
-        requireNotStarted();
-
-        Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.try"));
-        if (!skipChecks) {
-            var fails = checkStart();
-            if (fails.size() != 0) {
-                throw fails.get(0).exception();
-            }
-        } else {
-            Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.force"));
-        }
-
-        try {
-            _startUHC();
-            Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.complete"));
-        } catch (Exception e) {
-            setStage(prevStage);
-            Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.fail"));
-            Debug.printError(e);
-        }
+        runEventWithChecks("start", this::_startUHC, this::checkStart, skipChecks);
     }
 
+    /**
+     * Ends UHC.
+     * <p>
+     * Accessible through /uhc end or /uhc end force.
+     * <p>
+     * /uhc end: Checks that the game has started
+     * <p>
+     * /uhc end force: Forcibly starts game
+     * @param skipChecks If true, started game checks are ignored.
+     */
+    public void endUHC(boolean skipChecks) {
+        runEventWithChecks("end", this::_endUHC, this::checkEnd, skipChecks);
+    }
 
     private void _startUHC() {
         // do spreadplayers
@@ -196,35 +218,6 @@ public class GameManager implements Listener {
 
         // start ticking
         startTick();
-    }
-
-    /**
-     * Ends UHC.
-     * <p>
-     * Accessible through /uhc end or /uhc end force.
-     * <p>
-     * /uhc end: Checks that the game has started
-     * <p>
-     * /uhc end force: Forcibly starts game
-     * @param skipChecks If true, started game checks are ignored.
-     */
-    public void endUHC(boolean skipChecks) {
-        var prevStage = stage;
-        requireStarted();
-        Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.try"));
-        // if (!skipChecks) {
-        // } else {
-        //     Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.force"));
-        // }
-        
-        try {
-            _endUHC();
-            Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.complete"));
-        } catch (Exception e) {
-            setStage(prevStage);
-            Debug.printDebug(trans("xyz.baz9k.uhc.debug.end.fail"));
-            Debug.printError(e);
-        }
     }
 
     private void _endUHC() {
