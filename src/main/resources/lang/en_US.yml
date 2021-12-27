@@ -161,6 +161,9 @@ xyz:
           stage_next:
             name: "Skip Stage"
             desc: "Skip to the next stage of the game."
+          clear_teams:
+            name: "Clear Teams"
+            desc: ""
           assign_teams_x:
             name: "Assign Teams"
             desc: ""

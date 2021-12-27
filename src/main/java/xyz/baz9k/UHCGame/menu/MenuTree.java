@@ -104,33 +104,57 @@ public class MenuTree {
             plugin.getGameManager().incrementStage();
         });
 
-        new ActionNode(ctrlRoot, slotAt(4, 1), "assign_teams_x", new ItemProperties(Material.BLACK_DYE), p -> {
+        new ActionNode(ctrlRoot, slotAt(4, 7), "clear_teams", new ItemProperties(Material.BLACK_DYE), p -> {
             p.closeInventory();
+            var tm = plugin.getTeamManager();
+            tm.resetAllPlayers();
+        });
+        new ActionNode(ctrlRoot, slotAt(4, 1), "assign_teams_x", new ItemProperties(Material.DIAMOND), p -> {
+            p.closeInventory();
+            var tm = plugin.getTeamManager();
             //TODO
+            tm.assignTeams();
+            tm.announceTeams();
         });
         new ActionNode(ctrlRoot, slotAt(4, 2), "assign_teams_1", new ItemProperties(Material.RED_DYE), p -> {
             p.closeInventory();
-            //TODO
+            var tm = plugin.getTeamManager();
+            tm.setTeamSize("solos");
+            tm.assignTeams();
+            tm.announceTeams();
+            
         });
         new ActionNode(ctrlRoot, slotAt(4, 3), "assign_teams_2", new ItemProperties(Material.ORANGE_DYE), p -> {
             p.closeInventory();
-            //TODO
+            var tm = plugin.getTeamManager();
+            tm.setTeamSize("duos");
+            tm.assignTeams();
+            tm.announceTeams();
+            
         });
         new ActionNode(ctrlRoot, slotAt(4, 4), "assign_teams_3", new ItemProperties(Material.YELLOW_DYE), p -> {
             p.closeInventory();
-            //TODO
+            var tm = plugin.getTeamManager();
+            tm.setTeamSize("trios");
+            tm.assignTeams();
+            tm.announceTeams();
+            
         });
         new ActionNode(ctrlRoot, slotAt(4, 5), "assign_teams_4", new ItemProperties(Material.GREEN_DYE), p -> {
             p.closeInventory();
-            //TODO
+            var tm = plugin.getTeamManager();
+            tm.setTeamSize("quartets");
+            tm.assignTeams();
+            tm.announceTeams();
+            
         });
         new ActionNode(ctrlRoot, slotAt(4, 6), "assign_teams_5", new ItemProperties(Material.BLUE_DYE), p -> {
             p.closeInventory();
-            //TODO
-        });
-        new ActionNode(ctrlRoot, slotAt(4, 7), "assign_teams_6", new ItemProperties(Material.PURPLE_DYE), p -> {
-            p.closeInventory();
-            //TODO
+            var tm = plugin.getTeamManager();
+            tm.setTeamSize("quintets");
+            tm.assignTeams();
+            tm.announceTeams();
+            
         });
 
         return ctrlRoot;
