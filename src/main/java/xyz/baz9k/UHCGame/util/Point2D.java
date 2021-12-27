@@ -30,8 +30,8 @@ public record Point2D(double x, double z) {
      * @param q
      * @return a new Point2D, which is a vector sum of this point and the specified point.
      */
-    public Point2D plus(Point2D q) {
-        return plus(q.x, q.z);
+    public Point2D add(Point2D q) {
+        return add(q.x, q.z);
     }
 
     /**
@@ -40,31 +40,12 @@ public record Point2D(double x, double z) {
      * @param Z
      * @return a new Point2D, which has the specified coordinates added.
      */
-    public Point2D plus(double X, double Z) {
+    public Point2D add(double X, double Z) {
         return new Point2D(x + X, z + Z);
     }
 
-    /**
-     * Subtract two points like vectors.
-     * @param q
-     * @return a new Point2D, which is a vector sum of this point and the specified point.
-     */
-    public Point2D minus(Point2D q) {
-        return minus(q.x, q.z);
-    }
-
-    /**
-     * Translate a point.
-     * @param X
-     * @param Z
-     * @return a new Point2D, which has the specified coordinates added.
-     */
-    public Point2D minus(double X, double Z) {
-        return new Point2D(x - X, z - Z);
-    }
-
     public Point2D addPolar(double r, double theta) {
-        return plus(fromPolar(r, theta));
+        return add(fromPolar(r, theta));
     }
 
     /**
