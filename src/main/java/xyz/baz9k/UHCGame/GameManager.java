@@ -190,11 +190,14 @@ public class GameManager implements Listener {
     }
 
     private void _startUHC() {
+        worldManager.initWorlds();
+        worldManager.worldsRegenedOff();
         // do spreadplayers
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
-
-        double max = GameStage.WB_STILL.wbDiameter(),
-               min = GameStage.WB_STILL.wbDiameter() / (1 + teamManager.getNumTeams());
+        
+        double initialDiameter = GameStage.WB_STILL.wbDiameter();
+        double max = initialDiameter,
+               min = initialDiameter / (1 + teamManager.getNumTeams());
         Location defaultLoc = worldManager.gameSpawn();
 
         plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
@@ -206,11 +209,9 @@ public class GameManager implements Listener {
         setStage(GameStage.nth(0));
         startTime = lastStageInstant = Optional.of(Instant.now());
 
-        worldManager.worldsRegenedOff();
 
         kills.clear();
         
-        worldManager.initWorlds();
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             prepareToGame(p, true);
