@@ -11,8 +11,6 @@ intervals:
   movement2: 600
   dmwait: 300
 
-team_count: 
-  team_count: 17
 esoteric:
   gone_fishing: false
   boss_team: false

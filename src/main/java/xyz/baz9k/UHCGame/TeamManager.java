@@ -4,6 +4,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import xyz.baz9k.UHCGame.util.TeamDisplay;
+
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -117,6 +121,36 @@ public class TeamManager {
             assignPlayerToTeam(p, i);
             i = i % numTeams + 1;
         }
+    }
+
+    public void announceTeams() {
+        for (int i = 1; i <= getNumTeams(); i++) {
+            announceTeamsLine(i);
+        }
+        announceTeamsLine(0);
+
+    }
+
+    private void announceTeamsLine(int t) {
+        Set<Player> players;
+        if (t == 0) {
+            players = getOnlineSpectators();
+        } else {
+            players = getAllCombatantsOnTeam(t);
+        }
+        if (players.size() == 0) return;
+
+        var b = Component.text()
+            .append(TeamDisplay.getName(t))
+            .append(Component.text(": ", noDeco(NamedTextColor.WHITE)));
+
+        // list of players one a team, separated by commas
+        String tPlayers = players.stream()
+            .map(p -> p.getName())
+            .collect(Collectors.joining(", "));
+        
+        b.append(Component.text(tPlayers, noDeco(NamedTextColor.WHITE)));
+        Bukkit.getServer().sendMessage(b);
     }
 
     /**

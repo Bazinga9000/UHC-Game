@@ -109,6 +109,7 @@ xyz:
           count_must_pos: "Team count must be positive."
         world:
           must_regened: "UHC worlds have not been regenerated. Run /uhc reseed to regenerate."
+          must_regened_short: "Worlds have not been regenerated."
           missing_spread_locs: "Not enough locations ({0}, {1} required) were generated."
         not_started: "UHC has not started"
         already_started: "UHC has already started"
@@ -116,7 +117,7 @@ xyz:
           must_fit: "Position needs to be between 1 and 15."
         lang:
           missing_file: "Missing file {0}"
-        config:
+        menu:
           prompt:
             wrong_type: "Value request on unsupported type {0}"
           needs_impl: "Type {0} is missing implementation for this method call"
@@ -124,8 +125,11 @@ xyz:
           inventory:
             invalid_slot_set: "Cannot set child at slot {0}. Slot must be a positive integer less than {1}."
             invalid_slot_clicked: "Invalid slot clicked (Slot cannot be negative or greater than {0}.)"
+          panel:
+            check_start_failed: "These issues need to be resolved before starting:"
+            check_end_failed: "These issues need to be resolved before ending:"
       
-      config:
+      menu:
         prompt:
           ask: "Enter new value for \"{0}\" (type 'cancel' to cancel): "
           cancel: "Prompt cancelled."
@@ -138,8 +142,50 @@ xyz:
           go_back:
             name: "Go Back"
             desc: ""
+
+          root:
+            name: "Control Panel"
+            desc: ""
+          start_game:
+            name: "Start Game"
+            desc: ""
+          end_game:
+            name: "End Game"
+            desc: ""
+          reseed_worlds:
+            name: "Reseed Worlds"
+            desc: ""
+          debug_toggle:
+            name: "Debug Messages"
+            desc: "Enable/disable debug messages in chat."
+          stage_next:
+            name: "Skip Stage"
+            desc: "Skip to the next stage of the game."
+          clear_teams:
+            name: "Clear Teams"
+            desc: ""
+          assign_teams_x:
+            name: "Assign Teams"
+            desc: ""
+          assign_teams_1:
+            name: "Assign Solos"
+            desc: "Teams of 1"
+          assign_teams_2:
+            name: "Assign Duos"
+            desc: "Teams of 2"
+          assign_teams_3:
+            name: "Assign Trios"
+            desc: "Teams of 3"
+          assign_teams_4:
+            name: "Assign Quartets"
+            desc: "Teams of 4"
+          assign_teams_5:
+            name: "Assign Quintets"
+            desc: "Teams of 5"
+        config:
           root:
             name: "Config"
+            desc: ""
           intervals:
             root:
               name: "Stage Durations"
@@ -178,28 +224,6 @@ xyz:
             deathmatch:
               name: "Deathmatch"
               desc: "Diameter: {0}"
-          team_count:
-            root:
-              name: "Team Counts"
-              desc: "Set the number of teams."
-            team_count:
-              name: "Set Team Count"
-              desc: "Number of teams: {0}"
-            solos:
-              name: "Solos"
-              desc: "Teams of 1"
-            duos:
-              name: "Duos"
-              desc: "Teams of 2"
-            trios:
-              name: "Trios"
-              desc: "Teams of 3"
-            quartets:
-              name: "Quartets"
-              desc: "Teams of 4"
-            quintets:
-              name: "Quintets"
-              desc: "Teams of 5"
           esoteric:
             root:
               name: "Esoterics"
@@ -210,9 +234,9 @@ xyz:
               name: "Gone Fishing"
               desc: |-
                 Each player receives:
-                   - An unbreakable maxed Fishing Rod
-                   - 64 Anvils
-                   - 1000 Levels
+                  - An unbreakable maxed Fishing Rod
+                  - 64 Anvils
+                  - 1000 Levels
             boss_team:
               name: "Boss Team"
               desc: |-

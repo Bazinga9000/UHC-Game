@@ -9,8 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.file.*;
 
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
@@ -21,8 +20,8 @@ public class LangManager {
 
     private final UHCGamePlugin plugin;
     private TranslationRegistry reg;
+    private final HashMap<Locale, YamlConfiguration> yamlFileCache = new HashMap<>();
     private final Map<Locale, Map<String, MessageFormat>> cfgCache = new HashMap<>();
-
 
     public LangManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
@@ -42,6 +41,26 @@ public class LangManager {
         pluginLocale = l;
     }
 
+    private YamlConfiguration langYaml(Locale l) {
+        if (yamlFileCache.containsKey(l)) return yamlFileCache.get(l);
+
+        InputStreamReader langResource;
+        String filename = String.format("lang/%s.yml", l);
+        try {
+            langResource = new InputStreamReader(plugin.getResource(filename));
+        } catch (NullPointerException e) {
+            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.lang.missing_file", filename);
+        }
+
+        var yaml = YamlConfiguration.loadConfiguration(langResource);
+        yamlFileCache.put(l, yaml);
+        return yaml;
+    }
+
+    public YamlConfiguration langYaml() {
+        return langYaml(getLocale());
+    }
+
     private void loadLang(Locale l) {
         if (cfgCache.containsKey(l)) return; // already loaded
         reg.registerAll(pluginLocale, langEntries(pluginLocale));
@@ -51,15 +70,7 @@ public class LangManager {
         if (cfgCache.containsKey(l)) return cfgCache.get(l);
         
         // get file in yml form
-        InputStreamReader langResource;
-        String filename = String.format("lang/%s.yml", l);
-        try {
-            langResource = new InputStreamReader(plugin.getResource(filename));
-        } catch (NullPointerException e) {
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.lang.missing_file", filename);
-        }
-
-        Configuration langCfg = YamlConfiguration.loadConfiguration(langResource);
+        var langCfg = langYaml(l);
 
         Map<String, MessageFormat> langEnts = new HashMap<>();
         for (var e : langCfg.getValues(true).entrySet()) {

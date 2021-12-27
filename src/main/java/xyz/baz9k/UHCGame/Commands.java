@@ -10,11 +10,7 @@ import dev.jorel.commandapi.wrappers.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.util.Debug;
-import xyz.baz9k.UHCGame.util.TeamDisplay;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -50,7 +46,10 @@ public class Commands {
 
     public void registerAll() {
         CommandAPICommand uhc = new CommandAPICommand("uhc")
-            .withPermission(CommandPermission.OP);
+            .withPermission(CommandPermission.OP)
+            .executesPlayer((sender, args) -> {
+                plugin.getMenuManager().openMenu(sender);
+            });
             
         // register each @RegisterUHCSubCommand method
         var subAnnot = RegisterUHCSubCommand.class;
@@ -165,38 +164,6 @@ public class Commands {
         );
     }
 
-    private void _announceTeams() {
-        TeamManager tm = plugin.getTeamManager();
-        for (int i = 1; i <= tm.getNumTeams(); i++) {
-            _announceTeamsLine(i);
-        }
-        _announceTeamsLine(0);
-
-    }
-
-    private void _announceTeamsLine(int t) {
-        TeamManager tm = plugin.getTeamManager();
-        Set<Player> players;
-        if (t == 0) {
-            players = tm.getOnlineSpectators();
-        } else {
-            players = tm.getAllCombatantsOnTeam(t);
-        }
-        if (players.size() == 0) return;
-
-        var b = Component.text()
-            .append(TeamDisplay.getName(t))
-            .append(Component.text(": ", noDeco(NamedTextColor.WHITE)));
-
-        // list of players one a team, separated by commas
-        String tPlayers = players.stream()
-            .map(p -> p.getName())
-            .collect(Collectors.joining(", "));
-        
-        b.append(Component.text(tPlayers, noDeco(NamedTextColor.WHITE)));
-        Bukkit.getServer().sendMessage(b);
-    }
-
     // uhc teams assign <solos|duos|trios|quartets|quintets>
     @RegisterUHCSubCommand
     private CommandAPICommand assignTeamsLiteral() {
@@ -212,7 +179,7 @@ public class Commands {
 
                 tm.setTeamSize(s);
                 tm.assignTeams();
-                _announceTeams();
+                tm.announceTeams();
 
             }
         );
@@ -233,7 +200,7 @@ public class Commands {
 
                 tm.setNumTeams(n);
                 tm.assignTeams();
-                _announceTeams();
+                tm.announceTeams();
             }
         );
     }
@@ -518,8 +485,7 @@ public class Commands {
                 (sender, args) -> {
                     requireNotStarted();
                     
-                    ConfigManager cfgManager = plugin.getConfigManager();
-                    cfgManager.openMenu(sender);
+                    plugin.getMenuManager().openSubMenu("config", sender);
                 }
         );
     }

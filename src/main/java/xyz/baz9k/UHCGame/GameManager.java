@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
@@ -67,6 +68,70 @@ public class GameManager implements Listener {
         recipes = plugin.getRecipes();
     }
 
+    private static enum GameInitFailure {
+        TEAM_UNASSIGNED      ("xyz.baz9k.uhc.err.team.must_assigned"),
+        WORLDS_NOT_REGENED   ("xyz.baz9k.uhc.err.world.must_regened", "xyz.baz9k.uhc.err.world.must_regened_short"),
+        GAME_NOT_STARTED     ("xyz.baz9k.uhc.err.not_started"       ),
+        GAME_ALREADY_STARTED ("xyz.baz9k.uhc.err.already_started"   );
+
+        private String errKey;
+        private String panelErrKey;
+        private GameInitFailure(String errKey) {
+            this(errKey, errKey);
+        }
+        private GameInitFailure(String errKey, String panelErrKey) {
+            this.errKey = errKey;
+            this.panelErrKey = panelErrKey;
+        }
+
+        public IllegalStateException exception() {
+            return translatableErr(IllegalStateException.class, errKey);
+        }
+        public String panelErr() {
+            return renderString(trans(panelErrKey));
+        }
+    }
+
+    private List<GameInitFailure> checkStart() {
+        worldManager = plugin.getWorldManager();
+        teamManager = plugin.getTeamManager();
+        
+        var fails = new ArrayList<GameInitFailure>();
+
+        if (hasUHCStarted()) fails.add(GameInitFailure.GAME_ALREADY_STARTED);
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
+                fails.add(GameInitFailure.TEAM_UNASSIGNED);
+                break;
+            }
+        }
+
+        // if (!worldManager.worldsRegened()) {
+        //     fails.add(GameInitFailure.WORLDS_NOT_REGENED);
+        // }
+
+        return Collections.unmodifiableList(fails);
+    }
+
+    private List<GameInitFailure> checkEnd() {
+        var fails = new ArrayList<GameInitFailure>();
+
+        if (!hasUHCStarted()) fails.add(GameInitFailure.GAME_NOT_STARTED);
+
+        return Collections.unmodifiableList(fails);
+    }
+
+    public List<String> checkStartPanel() {
+        return checkStart().stream()
+            .map(GameInitFailure::panelErr)
+            .collect(Collectors.toList());
+    }
+    public List<String> checkEndPanel() {
+        return checkEnd().stream()
+            .map(GameInitFailure::panelErr)
+            .collect(Collectors.toList());
+    }
     /**
      * Starts UHC.
      * <p>
@@ -83,17 +148,10 @@ public class GameManager implements Listener {
 
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.try"));
         if (!skipChecks) {
-            // require teams assigned
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_UNASSIGNED) {
-                    throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.team.must_assigned");
-                }
+            var fails = checkStart();
+            if (fails.size() != 0) {
+                throw fails.get(0).exception();
             }
-
-            // // require world regened
-            // if (!worldManager.worldsRegened()) {
-            //     throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.must_regened");
-            // }
         } else {
             Debug.printDebug(trans("xyz.baz9k.uhc.debug.start.force"));
         }

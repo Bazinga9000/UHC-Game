@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.config;
+package xyz.baz9k.UHCGame.menu;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -14,7 +14,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -26,6 +28,7 @@ public class BranchNode extends Node {
     private final int slotCount;
     private final Node[] children;
     private final @NotNull Inventory inventory;
+    private boolean hasInventoryViewed = false;
     private Predicate<Configuration> check = cfg -> true;
 
     /**
@@ -51,8 +54,7 @@ public class BranchNode extends Node {
         int arrLen = parent == null ? slotCount : slotCount - 1;
         children = new Node[arrLen];
 
-        inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameFromID(id()));
-        initInventory();
+        inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameFromID(langKey()));
     }
 
     /**
@@ -76,12 +78,17 @@ public class BranchNode extends Node {
     }
 
     private void initInventory() {
-        // add glass to all slots
-        ItemStack emptyGlass = emptyGlass();
+        hasInventoryViewed = true;
         
-        for (int i = 0; i < slotCount; i++) {
-            inventory.setItem(i, emptyGlass);
-        }
+        ItemStack emptyGlass = emptyGlass();
+
+        // fill the inventory with all the items
+        ItemStack[] items = Arrays.stream(children)
+            .map(Optional::ofNullable)
+            .map(o -> o.map(Node::itemStack))
+            .map(o -> o.orElse(emptyGlass))
+            .toArray(ItemStack[]::new);
+            inventory.setContents(items);
 
         // If we aren't root, add a slot for the "Go Back" button
         if (parent != null) {
@@ -99,13 +106,11 @@ public class BranchNode extends Node {
     public void setChild(int slot, @Nullable Node child) {
         Objects.checkIndex(slot, children.length);
 
-        if (child == null) {
-            children[slot] = null;
-            inventory.setItem(slot, emptyGlass());
-            return;
-        }
         children[slot] = child;
-        inventory.setItem(slot, child.itemStack());
+        if (hasInventoryViewed) {
+            ItemStack item = child != null ? child.itemStack() : emptyGlass();
+            inventory.setItem(slot, item);
+        }
     }
 
     /**
@@ -149,8 +154,13 @@ public class BranchNode extends Node {
     }
 
     public void click(Player p) {
-        // update all slots to make sure each item is up to date
-        updateAllSlots();
+        // update (or create inv)
+        if (hasInventoryViewed) {
+            updateAllSlots();
+        } else {
+            initInventory();
+        }
+
         p.openInventory(inventory);
     }
 
@@ -176,10 +186,51 @@ public class BranchNode extends Node {
         return children;
     }
 
-    @Override
-    public String id() {
-        String nid = super.id();
-        if (nid.equals("")) return "root";
-        return nid + ".root";
+    private Optional<Node> findChild(String name) {
+        return Arrays.stream(children)
+            .filter(c -> c != null)
+            .filter(c -> c.nodeName == name)
+            .findAny();
+    }
+
+    public Optional<Node> findDescendant(String path) {
+        if (path.isBlank()) return Optional.of(this);
+
+        String[] nodeNames = path.split("\\.");
+        BranchNode n = this;
+
+        for (int i = 0; i < nodeNames.length - 1; i++) {
+            String nodeName = nodeNames[i];
+            var match = n.findChild(nodeName);
+            if (match.isPresent() && match.get() instanceof BranchNode b) {
+                    n = b;
+                    continue;
+            }
+            return Optional.empty();
+        }
+
+        return n.findChild(nodeNames[nodeNames.length - 1]);
+    }
+
+    /**
+     * Traverses the tree of a node to find the node that has a specified inventory
+     * @param inventory The inventory
+     * @param node The node tree to traverse
+     * @return The node (or null if absent)
+     */
+    public BranchNode getNodeFromInventory(Inventory inventory) {
+        if (this.inventory == inventory) {
+            return this;
+        }
+
+        for (Node child : this.children) {
+            if (child instanceof BranchNode bChild) {
+                BranchNode check = bChild.getNodeFromInventory(inventory);
+                if (check != null) {
+                    return check;
+                }
+            }
+        }
+        return null;
     }
 }

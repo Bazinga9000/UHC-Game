@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.config;
+package xyz.baz9k.UHCGame.menu;
 
 import java.util.ArrayList;
 
@@ -12,9 +12,7 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 public class OptionValuedNode extends ValuedNode {
 
-    private Material[] optMaterials;
-
-    private static final String OPT_DESC_ID_FORMAT = "xyz.baz9k.uhc.config.inv.%s.options";
+    private static final String OPT_DESC_ID_FORMAT = "xyz.baz9k.uhc.menu.inv.%s.options";
 
     /**
      * @param parent Parent node
@@ -23,10 +21,10 @@ public class OptionValuedNode extends ValuedNode {
      * @param optMaterials Materials for the options supported
      */
     public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Material... optMaterials) {
-        super(parent, slot, nodeName, props.mat(v -> optMaterials[(int) v]), ValuedNode.Type.OPTION);
+        super(parent, slot, nodeName, props.mat(v -> optMaterials[(int) v]), ValuedNode.Type.OPTION, i -> (int) i % optMaterials.length);
         props.formatter(v -> this.optDesc((int) v))
             .extraLore(v -> {
-                int current = (int) v % optMaterials.length;
+                int current = (int) v;
 
                 var extraLore = new ArrayList<Component>();
                 for (int i = 0; i < optMaterials.length; i++) {
@@ -36,13 +34,12 @@ public class OptionValuedNode extends ValuedNode {
                 }
                 return new NodeItemStack.ExtraLore(extraLore);
             });
-        this.optMaterials = optMaterials;
     }
 
     @Override
     public void click(Player p) {
-        int currIndex = cfg.getInt(id());
-        this.set((currIndex + 1) % optMaterials.length);
+        int currIndex = cfg.getInt(cfgKey());
+        this.set(currIndex + 1);
     }
 
     /**
@@ -50,9 +47,10 @@ public class OptionValuedNode extends ValuedNode {
      * @return the description for option i
      */
     private String optDesc(int i) {
-        var optDescs = cfg.getStringList(String.format(OPT_DESC_ID_FORMAT, id()));
+        var langYaml = plugin.getLangManager().langYaml();
+        var optDescs = langYaml.getStringList(String.format(OPT_DESC_ID_FORMAT, langKey()));
         if (optDescs.size() == 0) {
-            return String.format(OPT_DESC_ID_FORMAT + "[%s]", id(), i);
+            return String.format(OPT_DESC_ID_FORMAT + "[%s]", langKey(), i);
         } else {
             return optDescs.get(i);
         }
