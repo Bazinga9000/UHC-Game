@@ -11,7 +11,7 @@ public final class Gamerules {
         w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
         w.setGameRule(GameRule.DO_ENTITY_DROPS, true);
         w.setGameRule(GameRule.DO_FIRE_TICK, true);
-        w.setGameRule(GameRule.DO_INSOMNIA, true);
+        w.setGameRule(GameRule.DO_INSOMNIA, false);
         w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
         w.setGameRule(GameRule.DO_LIMITED_CRAFTING, false);
         w.setGameRule(GameRule.DO_MOB_LOOT, true);
