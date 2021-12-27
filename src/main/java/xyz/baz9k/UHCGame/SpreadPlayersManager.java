@@ -219,15 +219,16 @@ public class SpreadPlayersManager {
      */
     private void spreadPlayers(Grouping grouping, IntFunction<List<Location>> locGenerator) {
         var def = grouping.def();
-        if (def != null) {
-            teleportGroup(Bukkit.getOnlinePlayers(), def);
-        }
-
+        
         var groups = grouping.groups(plugin);
         var locs = locGenerator.apply(groups.size());
         
         var groupIter = groups.iterator();
         var locsIter = locs.iterator();
+        
+        if (def != null) {
+            teleportGroup(Bukkit.getOnlinePlayers(), def);
+        }
 
         while (groupIter.hasNext() && locsIter.hasNext()) teleportGroup(groupIter.next(), locsIter.next());
     }
