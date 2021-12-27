@@ -110,17 +110,6 @@ public class GameManager implements Listener {
 
 
     private void _startUHC() {
-        setStage(GameStage.nth(0));
-        worldManager.worldsRegenedOff();
-
-        kills.clear();
-        
-        worldManager.initWorlds();
-
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            prepareToGame(p, true);
-        }
-
         // do spreadplayers
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
 
@@ -134,8 +123,20 @@ public class GameManager implements Listener {
         // unload world
         plugin.getMVWorldManager().unloadWorld("lobby", true);
 
-        // start ticking
+        setStage(GameStage.nth(0));
         startTime = lastStageInstant = Optional.of(Instant.now());
+
+        worldManager.worldsRegenedOff();
+
+        kills.clear();
+        
+        worldManager.initWorlds();
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            prepareToGame(p, true);
+        }
+
+        // start ticking
         startTick();
     }
 
