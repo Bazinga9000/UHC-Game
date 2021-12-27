@@ -168,8 +168,6 @@ public class SpreadPlayersManager {
         Set<Integer> s = new HashSet<>();
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                if (x == 0 && y == 0) continue;
-
                 var neighborIndex = gridPoint.translate(x, y);
                 if (!isOnGrid(bgGrid, neighborIndex)) continue;
                 
