@@ -2,6 +2,7 @@ package xyz.baz9k.UHCGame.menu;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.ConversationFactory;
@@ -10,6 +11,7 @@ import org.bukkit.conversations.NumericPrompt;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,17 +22,30 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
  * Used to get a value from the {@link Player} once a prompting {@link ValuedNode} asks for one.
  */
 public class ValueRequest {
+    public static enum Type {
+        NUMBER_REQUEST,
+        STRING_REQUEST
+    }
+
     public ValueRequest(UHCGamePlugin plugin, Player converser, ValuedNode node) {
+        this(plugin, converser, switch (node.type) {
+            case INTEGER, DOUBLE -> Type.NUMBER_REQUEST;
+            case STRING -> Type.STRING_REQUEST;
+            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.prompt.wrong_type", node.type);
+        }, node.cfgKey(), node::set, true);
+    }
+
+    public ValueRequest(UHCGamePlugin plugin, Player converser, Type requestType, String requestKey, Consumer<Object> consumer, boolean reopenInventory) {
+        var lastInventory = converser.getInventory();
         converser.closeInventory();
 
-        Prompt firstPrompt = switch (node.type) {
-            case INTEGER, DOUBLE -> new NumberRequestPrompt();
-            case STRING -> new StringRequestPrompt();
-            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.prompt.wrong_type", node.type);
+        Prompt firstPrompt = switch (requestType) {
+            case NUMBER_REQUEST -> new NumberRequestPrompt();
+            case STRING_REQUEST -> new StringRequestPrompt();
         };
 
         new ConversationFactory(plugin)
-            .withInitialSessionData(new HashMap<>(Map.of("id", node.cfgKey(), "node", node)))
+            .withInitialSessionData(new HashMap<>(Map.of("requestKey", requestKey, "consumer", consumer, "reopenInventory", reopenInventory, "lastInventory", lastInventory)))
             .withTimeout(60)
             .withFirstPrompt(firstPrompt)
             .withEscapeSequence("cancel")
@@ -48,14 +63,13 @@ public class ValueRequest {
 
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
-            Object id = context.getSessionData("id");
+            Object id = context.getSessionData("requestKey");
             return renderString(trans("xyz.baz9k.uhc.menu.prompt.ask", id));
         }
         
         @Override
         protected @Nullable Prompt acceptValidatedInput(@NotNull ConversationContext context, @NotNull Number input) {
-            ValuedNode node = (ValuedNode) context.getSessionData("node");
-            context.setSessionData("newValue", node.restrict.apply(input));
+            context.setSessionData("newValue", input);
             return new SuccessMessagePrompt();
         }
 
@@ -64,7 +78,7 @@ public class ValueRequest {
 
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
-            Object id = context.getSessionData("id");
+            Object id = context.getSessionData("requestKey");
             return renderString(trans("xyz.baz9k.uhc.menu.prompt.ask", id));
         }
 
@@ -79,14 +93,17 @@ public class ValueRequest {
     private static class SuccessMessagePrompt extends MessagePrompt {
 
         @Override
+        @SuppressWarnings("unchecked")
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
-            String id = (String) context.getSessionData("id");
-            ValuedNode node = (ValuedNode) context.getSessionData("node");
+            String requestKey = (String) context.getSessionData("requestKey");
+            Consumer<Object> consumer = (Consumer<Object>) context.getSessionData("consumer");
             Object newValue = context.getSessionData("newValue");
+            boolean reopenInventory = (boolean) context.getSessionData("reopenInventory");
+            var lastInventory = (Inventory) context.getSessionData("lastInventory");
 
-            node.set(newValue);
-            node.parent.click((Player) context.getForWhom());
-            return renderString(trans("xyz.baz9k.uhc.menu.prompt.succ", id, newValue));
+            consumer.accept(newValue);
+            if (reopenInventory) ((Player) context.getForWhom()).openInventory(lastInventory);
+            return renderString(trans("xyz.baz9k.uhc.menu.prompt.succ", requestKey, newValue));
         }
 
         @Override
