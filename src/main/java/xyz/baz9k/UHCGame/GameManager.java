@@ -339,11 +339,7 @@ public class GameManager implements Listener {
         stage.applyWBSize(worldManager.getGameWorlds());
 
         if (stage == GameStage.WB_STOP) {
-            List.of(worldManager.getGameWorlds())
-                .forEach(w -> {
-                    w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-                    worldManager.purgeWorld(w);
-            });
+            worldManager.setGamerule(GameRule.DO_MOB_SPAWNING, false);
         }
 
         // deathmatch
