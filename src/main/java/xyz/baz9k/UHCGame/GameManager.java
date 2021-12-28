@@ -3,6 +3,7 @@ package xyz.baz9k.UHCGame;
 import org.bukkit.Bukkit;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
+import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -329,6 +330,14 @@ public class GameManager implements Listener {
 
         stage.sendMessage();
         stage.applyWBSize(worldManager.getGameWorlds());
+
+        if (stage == GameStage.WB_STOP) {
+            List.of(worldManager.getGameWorlds())
+                .forEach(w -> {
+                    w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+                    worldManager.purgeWorld(w);
+            });
+        }
 
         // deathmatch
         if (isDeathmatch()) {
