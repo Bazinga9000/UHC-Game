@@ -126,6 +126,19 @@ public class HUDManager implements Listener {
      */
     private static final String PREFIXING_TEAM_FORMAT = "uhc_prefix_";
 
+    private Set<Scoreboard> scoreboardsInUse() {
+        return scoreboardsInUse(true);
+    }
+    private Set<Scoreboard> scoreboardsInUse(boolean includeMain) {
+        Set<Scoreboard> scoreboards = new HashSet<>();
+        if (includeMain) scoreboards.add(Bukkit.getScoreboardManager().getMainScoreboard());
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            scoreboards.add(p.getScoreboard());
+        }
+        return scoreboards;
+    }
+
     private void applyPrefix(Player p) {
         Scoreboard s = Bukkit.getScoreboardManager().getMainScoreboard();
         int team = teamManager.getTeam(p);
@@ -161,8 +174,8 @@ public class HUDManager implements Listener {
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         // bukkit et al apparently do not allow one obj in multiple display slots even though vanilla is 100% okay with that. no clue.
-        Objective hearts1 = newBoard.registerNewObjective("hearts1", "health", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
-        Objective hearts2 = newBoard.registerNewObjective("hearts2", "health", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
+        Objective hearts1 = newBoard.registerNewObjective("hearts1", "dummy", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
+        Objective hearts2 = newBoard.registerNewObjective("hearts2", "dummy", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
         hearts1.setDisplaySlot(DisplaySlot.PLAYER_LIST);
         hearts2.setDisplaySlot(DisplaySlot.BELOW_NAME);
     }
@@ -227,6 +240,7 @@ public class HUDManager implements Listener {
         updateTeamsAliveHUD(p);
         updateKillsHUD(p);
         updateElapsedTimeHUD(p);
+        updateHealthHUD(p);
     }
 
     public void cleanup() {
@@ -405,10 +419,39 @@ public class HUDManager implements Listener {
     }
 
     /**
+     * Updates the player's health on specified heart scoreboard
+     * @param s
+     * @param p
+     */
+    private void updateHealthOnScoreboard(Scoreboard s, Player p) {
+        int health;
+        if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_ALIVE) {
+            health = (int) Math.ceil(p.getHealth());
+        } else {
+            health = 0;
+        }
+
+        List.of("hearts1", "hearts2")
+            .forEach(objName -> {
+                    Objective obj = s.getObjective(objName);
+                    Score score = obj.getScore(p);
+                    score.setScore(health);
+            });
+    }
+
+    public void updateHealthHUD(Player p) {
+        Scoreboard s = p.getScoreboard();
+
+        for (Player pl : teamManager.getAllCombatants()) {
+            updateHealthOnScoreboard(s, pl);
+        }
+    }
+
+    /**
      * Updates the teammate hud for everyone who could see this player's health / position
      * @param p
      */
-    public void updateTeammateHUDForViewers(@NotNull Player p) {
+    public void dispatchTeammateHUDUpdate(@NotNull Player p) {
         Set<Player> viewers = new HashSet<>();
 
         int t = teamManager.getTeam(p);
@@ -419,21 +462,36 @@ public class HUDManager implements Listener {
             updateTeammateHUD(viewer);
         }
     }
+
+    /**
+     * Updates the player's health on everyone's heart scoreboard
+     * @param p
+     */
+    public void dispatchHealthHUDUpdate(Player p) {
+        for (var s : scoreboardsInUse(false)) {
+            updateHealthOnScoreboard(s, p);
+        }
+    }
+
     /* HANDLERS */
     @EventHandler
     public void onMove(PlayerMoveEvent e){
         if (!gameManager.hasUHCStarted()) return;
-        updateMovementHUD(e.getPlayer());
-        updateTeammateHUDForViewers(e.getPlayer());
+        Player p = e.getPlayer();
+
+        updateMovementHUD(p);
+        dispatchTeammateHUDUpdate(p);
     }
 
     @EventHandler
     public void onPlayerDamaged(EntityDamageEvent e) {
         if (!gameManager.hasUHCStarted()) return;
 
-        if (e.getEntity() instanceof Player damaged) {
+        if (e.getEntity() instanceof Player p) {
+            if (!teamManager.isSpectator(p)) return;
             // update hud if dmg taken
-            updateTeammateHUDForViewers((Player) e.getEntity());
+            dispatchHealthHUDUpdate(p);
+            dispatchTeammateHUDUpdate(p);
         }
     }
 }
