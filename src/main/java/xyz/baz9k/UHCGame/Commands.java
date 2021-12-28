@@ -18,8 +18,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -40,6 +39,10 @@ public class Commands {
     @Target(ElementType.METHOD)
     private static @interface RegisterCommand { }
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    private static @interface RegisterBrigadierCommand { }
+
     public Commands(UHCGamePlugin plugin) {
         this.plugin = plugin;
     }
@@ -52,8 +55,9 @@ public class Commands {
             });
             
         // register each @RegisterUHCSubCommand method
-        var subAnnot = RegisterUHCSubCommand.class;
-        var cmdAnnot = RegisterCommand.class;
+        var subAnnot  = RegisterUHCSubCommand.class;
+        var cmdAnnot  = RegisterCommand.class;
+        var bCmdAnnot = RegisterBrigadierCommand.class;
         var cls      = Commands.class;
         try {
             for (Method m : cls.getDeclaredMethods()) {
@@ -61,6 +65,8 @@ public class Commands {
                     uhc.withSubcommand((CommandAPICommand) m.invoke(this));
                 } else if (m.isAnnotationPresent(cmdAnnot)) {
                     ((CommandAPICommand) m.invoke(this)).register();
+                } else if (m.isAnnotationPresent(bCmdAnnot)) {
+                    m.invoke(this);
                 }
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -736,6 +742,48 @@ public class Commands {
             cmd = cmd.replaceAll("\\\\\\$", "\\$");
             Bukkit.dispatchCommand(sender, cmd);
         });
+    }
+
+    @RegisterBrigadierCommand
+    private void ifPlayerState() {
+        var playerState = Brigadier.fromLiteralArgument(new LiteralArgument("playerstate")).build();
+        for (PlayerState state : PlayerState.values()) {
+            List<Argument> arguments = List.of(
+                new EntitySelectorArgument("target", EntitySelector.ONE_PLAYER)
+            );
+            var playerNode = Brigadier.fromArgument(arguments, "target");
+            var stateNode = Brigadier.fromLiteralArgument(new LiteralArgument(state.name()))
+            //Fork redirecting to "execute" and state our predicate
+            .fork(Brigadier.getRootNode().getChild("execute"), Brigadier.fromPredicate((sender, args) -> {
+                Player p = (Player) args[0];
+                return plugin.getTeamManager().getPlayerState(p) == state;
+            }, arguments));
+
+            playerState.addChild(playerNode.then(stateNode).build());
+        }
+        Brigadier.getRootNode().getChild("execute").getChild("if").addChild(playerState);
+        
+    }
+
+    @RegisterBrigadierCommand
+    private void ifPlayerTeam() {
+        var playerState = Brigadier.fromLiteralArgument(new LiteralArgument("playerteam")).build();
+        List<Argument> arguments = List.of(
+            new EntitySelectorArgument("target", EntitySelector.ONE_PLAYER),
+            new IntegerArgument("team")
+        );
+        var playerNode = Brigadier.fromArgument(arguments, "target");
+        var teamNode = Brigadier.fromArgument(arguments, "team")
+        //Fork redirecting to "execute" and state our predicate
+        .fork(Brigadier.getRootNode().getChild("execute"), Brigadier.fromPredicate((sender, args) -> {
+            Player p = (Player) args[0];
+            int t = (int) args[1];
+            return plugin.getTeamManager().getTeam(p) == t;
+        }, arguments));
+
+        playerState.addChild(playerNode.then(teamNode).build());
+        Brigadier.getRootNode().getChild("execute").getChild("if").addChild(playerState);
+        
     }
 
     ////// END FUNCTOOLS //////
