@@ -233,7 +233,7 @@ public class GameManager implements Listener {
         bbManager.disable(Bukkit.getServer());
         hudManager.cleanup();
         kills.clear();
-        if (tick != null) tick.cancel();
+        endTick();
 
     }
 
@@ -272,6 +272,10 @@ public class GameManager implements Listener {
                 }
             }
         }, 0L, 1L);
+    }
+
+    private void endTick() {
+        if (tick != null) tick.cancel();
     }
 
     /**
@@ -448,6 +452,7 @@ public class GameManager implements Listener {
 
     private void winMessage() {
         if (teamManager.countLivingTeams() > 1) return;
+        endTick();
         int winner = teamManager.getAliveTeams()[0];
         Component winMsg = trans("xyz.baz9k.uhc.win", TeamDisplay.getName(winner))
             .style(noDeco(NamedTextColor.WHITE));
