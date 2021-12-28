@@ -31,8 +31,6 @@ public class WorldManager {
     }
 
     public boolean worldsRegened() { return worldsRegened; }
-    public void worldsRegenedOff() { worldsRegened = false; }
-
 
     private void registerWorld(String world, Environment env) {
         boolean succ = true;
@@ -74,7 +72,12 @@ public class WorldManager {
         return getLobbyWorld().getSpawnLocation();
     }
     
+    /**
+     * On start, this function is called to prepare the worlds for play.
+     */
     public void initWorlds() {
+        worldsRegened = false;
+
         for (World w : getGameWorlds()) {
             // set time to 0 and delete rain
             w.setTime(0);
@@ -90,22 +93,24 @@ public class WorldManager {
             purgeWorld(w);
 
             // create beacon in worlds
-
+            int min = w.getMinHeight(),
+                max = w.getMaxHeight();
+                
             for (int x = -2; x <= 2; x++) {
                 for (int z = -2; z <= 2; z++) {
-                    w.getBlockAt(x, w.getMinHeight(), z).setType(Material.BEDROCK);
+                    w.getBlockAt(x, min, z).setType(Material.BEDROCK);
                 }
             }
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
-                    w.getBlockAt(x, w.getMinHeight(), z).setType(Material.NETHERITE_BLOCK);
-                    w.getBlockAt(x, w.getMinHeight() + 1, z).setType(Material.BEDROCK);
+                    w.getBlockAt(x, min, z).setType(Material.NETHERITE_BLOCK);
+                    w.getBlockAt(x, min + 1, z).setType(Material.BEDROCK);
                 }
             }
-            w.getBlockAt(0, w.getMinHeight() + 1, 0).setType(Material.BEACON);
-            w.getBlockAt(0, w.getMinHeight() + 2, 0).setType(Material.BEDROCK);
+            w.getBlockAt(0, min + 1, 0).setType(Material.BEACON);
+            w.getBlockAt(0, min + 2, 0).setType(Material.BEDROCK);
 
-            for (int y = w.getMinHeight() + 3; y < w.getMaxHeight(); y++) {
+            for (int y = min + 3; y < max; y++) {
                 w.getBlockAt(0, y, 0).setType(Material.BARRIER);
             }
         }

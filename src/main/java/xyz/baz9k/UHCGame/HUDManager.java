@@ -138,7 +138,6 @@ public class HUDManager implements Listener {
         return scoreboards;
     }
 
-    // TODO name these functions well
     private void applyPrefixOnScoreboard(Scoreboard s, Player p) {
         int team = teamManager.getTeam(p);
         
@@ -154,14 +153,14 @@ public class HUDManager implements Listener {
         t.addPlayer(p);
     }
 
-    public void createPrefixesOnHUD(Player p) {
+    public void updatePrefixesOnHUD(Player p) {
         Scoreboard s = p.getScoreboard();
         for (Player pl : Bukkit.getOnlinePlayers()) {
             applyPrefixOnScoreboard(s, pl);
         }
     }
 
-    public void applyPrefixOnAll(Player p) {
+    public void dispatchPrefixUpdate(Player p) {
         for (Scoreboard s : scoreboardsInUse()) {
             applyPrefixOnScoreboard(s, p);
         }
@@ -246,7 +245,7 @@ public class HUDManager implements Listener {
         updateKillsHUD(p);
         updateElapsedTimeHUD(p);
         updateHealthHUD(p);
-        createPrefixesOnHUD(p);
+        updatePrefixesOnHUD(p);
     }
 
     public void cleanup() {
@@ -292,9 +291,9 @@ public class HUDManager implements Listener {
             PlayerState t1s = teamManager.getPlayerState(t1),
                         t2s = teamManager.getPlayerState(t2);
             
-            return Double.compare(
-                t1s == PlayerState.COMBATANT_ALIVE ? 0 : 1, 
-                t2s == PlayerState.COMBATANT_ALIVE ? 0 : 1);
+            return Boolean.compare(
+                t1s == PlayerState.COMBATANT_ALIVE, 
+                t2s == PlayerState.COMBATANT_ALIVE);
         };
         Comparator<Player> compareByHealth = (t1, t2) -> Double.compare(t1.getHealth(), t2.getHealth());
         Comparator<Player> compareByProximity = (t1, t2) -> {

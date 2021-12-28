@@ -192,7 +192,7 @@ public class GameManager implements Listener {
 
     private void _startUHC() {
         worldManager.initWorlds();
-        worldManager.worldsRegenedOff();
+
         // do spreadplayers
         Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
         
@@ -505,7 +505,7 @@ public class GameManager implements Listener {
         
         // set bed spawn
         Location newSpawn = dead.getLocation();
-        if (newSpawn.getY() < 0) {
+        if (newSpawn.getY() < newSpawn.getWorld().getMinHeight()) {
             newSpawn = worldManager.gameSpawn();
         }
         dead.setBedSpawnLocation(newSpawn, true);
@@ -528,7 +528,7 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerFight(EntityDamageByEntityEvent e) {
         if (!hasUHCStarted()) return;
-        // friendly fire
+        // cancel friendly fire
         if (e.getEntity() instanceof Player target) {
             if (e.getDamager() instanceof Player damager) {
                 if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
@@ -550,7 +550,7 @@ public class GameManager implements Listener {
         
         recipes.discoverFor(p);
         setDisplayName(p, TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
-        hudManager.applyPrefixOnAll(p);
+        hudManager.dispatchPrefixUpdate(p);
         
         if (onGameStart || !worldManager.inGame(p)) {
             // if the player joins midgame and are in the lobby, then idk where to put them! put in spawn
