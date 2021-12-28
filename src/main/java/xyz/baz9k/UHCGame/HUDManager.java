@@ -24,7 +24,6 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.awt.Color;
 import java.util.*;
-import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class HUDManager implements Listener {
@@ -139,11 +138,13 @@ public class HUDManager implements Listener {
         return scoreboards;
     }
 
-    private void applyPrefix(Player p) {
-        Scoreboard s = Bukkit.getScoreboardManager().getMainScoreboard();
+    // TODO name these functions well
+    private void applyPrefixOnScoreboard(Scoreboard s, Player p) {
         int team = teamManager.getTeam(p);
+        
+        String teamName = PREFIXING_TEAM_FORMAT;
+        teamName += team == 0 ? "s" : team;
 
-        String teamName = PREFIXING_TEAM_FORMAT + team;
         Team t = s.getTeam(teamName);
         if (t == null) {
             t = s.registerNewTeam(teamName);
@@ -152,13 +153,18 @@ public class HUDManager implements Listener {
 
         t.addPlayer(p);
     }
-    private void removeAllPrefixes() {
-        Scoreboard s = Bukkit.getScoreboardManager().getMainScoreboard();
 
-        var teamsToRemove = s.getTeams().stream()
-            .filter(t -> t.getName().startsWith(PREFIXING_TEAM_FORMAT))
-            .collect(Collectors.toSet());
-        teamsToRemove.forEach(Team::unregister);
+    public void createPrefixesOnHUD(Player p) {
+        Scoreboard s = p.getScoreboard();
+        for (Player pl : Bukkit.getOnlinePlayers()) {
+            applyPrefixOnScoreboard(s, pl);
+        }
+    }
+
+    public void applyPrefixOnAll(Player p) {
+        for (Scoreboard s : scoreboardsInUse()) {
+            applyPrefixOnScoreboard(s, p);
+        }
     }
 
     /**
@@ -218,7 +224,6 @@ public class HUDManager implements Listener {
      */
     public void initPlayerHUD(@NotNull Player p) {
         createHUDScoreboard(p);
-        applyPrefix(p);
 
         addHUDLine(p, "state",      15);
         // 14 - 10 are tmate
@@ -241,6 +246,7 @@ public class HUDManager implements Listener {
         updateKillsHUD(p);
         updateElapsedTimeHUD(p);
         updateHealthHUD(p);
+        createPrefixesOnHUD(p);
     }
 
     public void cleanup() {
@@ -249,7 +255,12 @@ public class HUDManager implements Listener {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.setScoreboard(main);
         }
-        removeAllPrefixes();
+        
+        // remove all prefix teams from main
+        var teamsToRemove = main.getTeams().stream()
+            .filter(t -> t.getName().startsWith(PREFIXING_TEAM_FORMAT))
+            .collect(Collectors.toSet());
+        teamsToRemove.forEach(Team::unregister);
     }
 
     /**
@@ -321,6 +332,7 @@ public class HUDManager implements Listener {
             i++;
         }
     }
+    
     public void updateMovementHUD(@NotNull Player p){
         Location loc = p.getLocation();
 
