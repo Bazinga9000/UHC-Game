@@ -45,7 +45,7 @@ public class SpreadPlayersManager {
      */
     public static Grouping BY_PLAYERS(Location def) {
         return new Grouping(pl -> {
-            return pl.getTeamManager().getAllCombatants()
+            return pl.getTeamManager().getCombatants()
                 .stream()
                 .map(Collections::singleton)
                 .toList();
@@ -71,7 +71,7 @@ public class SpreadPlayersManager {
         return new Grouping(pl -> {
             var tm = pl.getTeamManager();
             return Arrays.stream(tm.getAliveTeams())
-                .mapToObj(tm::getAllCombatantsOnTeam)
+                .mapToObj(tm::getCombatantsOnTeam)
                 .toList();
         }, def);
     }
@@ -98,7 +98,7 @@ public class SpreadPlayersManager {
      */
     public static <K> Grouping BY(Function<Player, K> key, Location def) {
         return new Grouping(pl -> {
-            Map<K, List<Player>> g = pl.getTeamManager().getAllCombatants()
+            Map<K, List<Player>> g = pl.getTeamManager().getCombatants()
                 .stream()
                 .collect(Collectors.groupingBy(key));
             g.remove(null);

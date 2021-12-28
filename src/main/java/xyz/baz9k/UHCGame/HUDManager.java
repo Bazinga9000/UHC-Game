@@ -304,10 +304,10 @@ public class HUDManager implements Listener {
 
         Comparator<Player> sorter;
         if (teamManager.isAssignedCombatant(p)) {
-            teammateSet = teamManager.getAllCombatantsOnTeam(team);
+            teammateSet = teamManager.getCombatantsOnTeam(team);
             sorter = compareByAliveness.thenComparing(compareByHealth);
         } else {
-            teammateSet = teamManager.getAllCombatants();
+            teammateSet = teamManager.getCombatants();
             sorter = compareByAliveness.thenComparing(compareByProximity);
         }
 
@@ -401,15 +401,15 @@ public class HUDManager implements Listener {
 
     public void updateCombatantsAliveHUD(@NotNull Player p) {
         var s = trans("xyz.baz9k.uhc.hud.combcount",
-            Component.text(teamManager.countLivingCombatants(), NamedTextColor.WHITE),
-            Component.text(teamManager.countCombatants(), NamedTextColor.WHITE)
+            Component.text(teamManager.getAliveCombatants().size(), NamedTextColor.WHITE),
+            Component.text(teamManager.getCombatants().size(), NamedTextColor.WHITE)
         ).color(NamedTextColor.WHITE);
         setHUDLine(p, "combsalive", s);
     }
 
     public void updateTeamsAliveHUD(@NotNull Player p) {
         var s = trans("xyz.baz9k.uhc.hud.teamcount",
-            Component.text(teamManager.countLivingTeams(), NamedTextColor.WHITE),
+            Component.text(teamManager.getAliveTeams().length, NamedTextColor.WHITE),
             Component.text(teamManager.getNumTeams(), NamedTextColor.WHITE)
         ).color(NamedTextColor.WHITE);
 
@@ -452,7 +452,7 @@ public class HUDManager implements Listener {
     public void updateHealthHUD(Player p) {
         Scoreboard s = p.getScoreboard();
 
-        for (Player pl : teamManager.getAllCombatants()) {
+        for (Player pl : teamManager.getCombatants()) {
             updateHealthOnScoreboard(s, pl);
         }
     }

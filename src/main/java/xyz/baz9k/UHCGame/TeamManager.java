@@ -17,7 +17,6 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.stream.IntStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -136,7 +135,7 @@ public class TeamManager {
         if (t == 0) {
             players = getOnlineSpectators();
         } else {
-            players = getAllCombatantsOnTeam(t);
+            players = getCombatantsOnTeam(t);
         }
         if (players.size() == 0) return;
 
@@ -190,35 +189,6 @@ public class TeamManager {
         n.state = aliveStatus ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
     }
 
-    /* COUNTING */
-    
-    private int countPlayersMatching(Predicate<Node> predicate) {
-        return (int) playerMap.values().stream()
-            .filter(predicate)
-            .count();
-    }
-    /**
-     * @return the number of combatants in the team manager.
-     */
-    public int countCombatants() {
-        return countPlayersMatching(n -> n.state != PlayerState.SPECTATOR);
-    }
-
-    /**
-     * @return the number of living combatants in the team manager.
-     */
-    public int countLivingCombatants() {
-        return countPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE);
-    }
-
-    /**
-     * @param team
-     * @return the number of living combatants on the specified team.
-     */
-    public int countLivingCombatantsInTeam(int t) {
-        return countPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE && n.team == t);
-    }
-
     /* LIST OF PLAYERS */
     
     private Set<Player> getAllPlayersMatching(Predicate<Node> predicate) {
@@ -238,7 +208,7 @@ public class TeamManager {
      * @return a {@link Set} of all spectators
      */
     @NotNull
-    public Set<Player> getAllSpectators() {
+    public Set<Player> getSpectators() {
         return getAllPlayersMatching(n -> n.state == PlayerState.SPECTATOR);
     }
 
@@ -246,8 +216,16 @@ public class TeamManager {
      * @return a {@link Set} of all combatants
      */
     @NotNull
-    public Set<Player> getAllCombatants() {
+    public Set<Player> getCombatants() {
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR);
+    }
+
+    /**
+     * @return a {@link Set} of all combatants
+     */
+    @NotNull
+    public Set<Player> getAliveCombatants() {
+        return getAllPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE);
     }
 
     /**
@@ -255,7 +233,7 @@ public class TeamManager {
      * @return a {@link Set} of all combatants on a specific team
      */
     @NotNull
-    public Set<Player> getAllCombatantsOnTeam(int team) {
+    public Set<Player> getCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
             throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.invalid", team, numTeams);
         }
@@ -268,7 +246,7 @@ public class TeamManager {
      */
     @NotNull
     public Set<Player> getOnlineSpectators() {
-        return filterOnline(getAllSpectators());
+        return filterOnline(getSpectators());
     }
 
     /**
@@ -276,7 +254,7 @@ public class TeamManager {
      */
     @NotNull
     public Set<Player> getOnlineCombatants() {
-        return filterOnline(getAllCombatants());
+        return filterOnline(getCombatants());
     }
 
     /**
@@ -285,28 +263,18 @@ public class TeamManager {
      */
     @NotNull
     public Set<Player> getOnlineCombatantsOnTeam(int t) {
-        return filterOnline(getAllCombatantsOnTeam(t));
-    }
-
-    private IntStream aliveTeamsStream() {
-        return playerMap.values().stream()
-            .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
-            .mapToInt(n -> n.team)
-            .distinct();
-    }
-
-    /**
-     * @return the number of living teams in the team manager.
-     */
-    public int countLivingTeams() {
-        return (int) aliveTeamsStream().count();
+        return filterOnline(getCombatantsOnTeam(t));
     }
     
     /**
      * @return an array of the alive teams by int
      */
     public int[] getAliveTeams() {
-        return aliveTeamsStream().toArray();
+        return playerMap.values().stream()
+            .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
+            .mapToInt(n -> n.team)
+            .distinct()
+            .toArray();
     }
 
     /**
@@ -365,7 +333,7 @@ public class TeamManager {
      * @param n
      */
     public void setTeamSize(int n) {
-        setNumTeams((int) Math.round(countCombatants() / (double) n));
+        setNumTeams((int) Math.round(getCombatants().size() / (double) n));
     }
 
     public void setNumTeams(int n) {

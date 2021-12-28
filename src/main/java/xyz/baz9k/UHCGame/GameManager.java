@@ -364,7 +364,7 @@ public class GameManager implements Listener {
                 w.getBlockAt(radius + 1, w.getMaxHeight() - 1, z).setType(Material.BARRIER);
             }
 
-            for (Player p : teamManager.getAllCombatants()) {
+            for (Player p : teamManager.getCombatants()) {
                 p.addPotionEffects(Arrays.asList(
                     PotionEffectType.DAMAGE_RESISTANCE.createEffect(10 * 20, 10),
                     PotionEffectType.SLOW.createEffect(10 * 20, 10),
@@ -446,7 +446,7 @@ public class GameManager implements Listener {
     }
 
     private void winMessage() {
-        if (teamManager.countLivingTeams() > 1) return;
+        if (teamManager.getAliveTeams().length > 1) return;
         endTick();
         int winner = teamManager.getAliveTeams()[0];
         Component winMsg = trans("xyz.baz9k.uhc.win", TeamDisplay.getName(winner))
@@ -462,7 +462,7 @@ public class GameManager implements Listener {
             .withFlicker()
             .withTrail()
             .build();
-        for (Player p : teamManager.getAllCombatantsOnTeam(winner)) {
+        for (Player p : teamManager.getCombatantsOnTeam(winner)) {
             Firework fw = p.getWorld().spawn(p.getLocation(), Firework.class);
             FireworkMeta meta = fw.getFireworkMeta();
             meta.addEffect(fwe);
@@ -510,7 +510,7 @@ public class GameManager implements Listener {
             }
 
             // check win condition
-            if (teamManager.countLivingTeams() == 1) {
+            if (teamManager.getAliveTeams().length == 1) {
                 winMessage();
             }
         }
