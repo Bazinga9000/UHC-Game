@@ -24,6 +24,7 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.awt.Color;
 import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class HUDManager implements Listener {
@@ -254,25 +255,37 @@ public class HUDManager implements Listener {
                 q = Point2D.fromLocation(ql);
         return p.dist(q);
     }
-
+    
     /* UPDATING SECTIONS OF HUD */
     private void updateTeammateHUD(@NotNull Player p) {
         Scoreboard b = p.getScoreboard();
 
         int team = teamManager.getTeam(p);
         Set<Player> teammateSet;
-        Comparator<? super Player> sorter;
+
+        Comparator<Player> compareByAliveness = (t1, t2) -> {
+            PlayerState t1s = teamManager.getPlayerState(t1),
+                        t2s = teamManager.getPlayerState(t2);
+            
+            return Double.compare(
+                t1s == PlayerState.COMBATANT_ALIVE ? 0 : 1, 
+                t2s == PlayerState.COMBATANT_ALIVE ? 0 : 1);
+        };
+        Comparator<Player> compareByHealth = (t1, t2) -> Double.compare(t1.getHealth(), t2.getHealth());
+        Comparator<Player> compareByProximity = (t1, t2) -> {
+            Location pl = p.getLocation(),
+                    t1l = t1.getLocation(),
+                    t2l = t2.getLocation();
+            return Comparator.nullsLast(Double::compare).compare(dist2d(pl, t1l), dist2d(pl, t2l));
+        };
+
+        Comparator<Player> sorter;
         if (teamManager.isAssignedCombatant(p)) {
             teammateSet = teamManager.getAllCombatantsOnTeam(team);
-            sorter = (t1, t2) -> Double.compare(t1.getHealth(), t2.getHealth());
+            sorter = compareByAliveness.thenComparing(compareByHealth);
         } else {
             teammateSet = teamManager.getAllCombatants();
-            sorter = (t1, t2) -> {
-                Location pl = p.getLocation(),
-                        t1l = t1.getLocation(),
-                        t2l = t2.getLocation();
-                return Comparator.nullsLast(Double::compare).compare(dist2d(pl, t1l), dist2d(pl, t2l));
-            };
+            sorter = compareByAliveness.thenComparing(compareByProximity);
         }
 
         Iterable<Player> tmates = teammateSet.stream()
