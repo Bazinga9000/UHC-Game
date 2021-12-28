@@ -7,13 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
+import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
@@ -85,7 +79,8 @@ public class WorldManager {
             // set time to 0 and delete rain
             w.setTime(0);
             w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
-            
+            w.setDifficulty(Difficulty.HARD);
+
             w.getWorldBorder().setCenter(center.x(), center.z());
             w.getWorldBorder().setWarningDistance(25);
             w.getWorldBorder().setDamageBuffer(0);
