@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.advancement.Advancement;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -284,6 +285,15 @@ public class GameManager implements Listener {
         // clear all potion effects
         for (PotionEffect effect : p.getActivePotionEffects()) {
             p.removePotionEffect(effect.getType());
+        }
+
+        // clear all advancements
+        Iterable<Advancement> advancements = Bukkit::advancementIterator;
+        for (var a : advancements) {
+            var progress = p.getAdvancementProgress(a);
+            for (String criterion : progress.getAwardedCriteria()) {
+                progress.revokeCriteria(criterion);
+            }
         }
     }
 
