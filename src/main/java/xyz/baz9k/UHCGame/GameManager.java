@@ -266,6 +266,10 @@ public class GameManager implements Listener {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 hudManager.updateElapsedTimeHUD(p);
                 hudManager.updateWBHUD(p);
+
+                if (p.getGameMode() == GameMode.SPECTATOR && !p.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
+                    PotionEffectType.NIGHT_VISION.createEffect(20000000, 1);
+                }
             }
         }, 0L, 1L);
     }
