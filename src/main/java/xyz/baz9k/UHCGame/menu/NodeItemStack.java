@@ -3,7 +3,6 @@ package xyz.baz9k.UHCGame.menu;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.*;
@@ -127,7 +126,7 @@ public class NodeItemStack extends ItemStack {
                 return List.copyOf(lore)
                     .stream()
                     .map(c -> c.hasStyling() ? c : c.style(DEFAULT_DESC_STYLE))
-                    .collect(Collectors.toUnmodifiableList());
+                    .toList();
             }
 
             Object[] args = Arrays.stream(tArgs)

@@ -24,7 +24,6 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.awt.Color;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class HUDManager implements Listener {
     private final GameManager gameManager;
@@ -256,10 +255,9 @@ public class HUDManager implements Listener {
         }
         
         // remove all prefix teams from main
-        var teamsToRemove = main.getTeams().stream()
+        main.getTeams().stream()
             .filter(t -> t.getName().startsWith(PREFIXING_TEAM_FORMAT))
-            .collect(Collectors.toSet());
-        teamsToRemove.forEach(Team::unregister);
+            .forEach(Team::unregister);
     }
 
     /**

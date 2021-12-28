@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
@@ -128,12 +127,12 @@ public class GameManager implements Listener {
     public List<String> checkStartPanel() {
         return checkStart().stream()
             .map(GameInitFailure::panelErr)
-            .collect(Collectors.toList());
+            .toList();
     }
     public List<String> checkEndPanel() {
         return checkEnd().stream()
             .map(GameInitFailure::panelErr)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private void runEventWithChecks(String eventKey, Runnable event, Supplier<List<GameInitFailure>> checks, boolean skipChecks) {
