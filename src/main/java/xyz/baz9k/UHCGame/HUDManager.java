@@ -245,6 +245,7 @@ public class HUDManager implements Listener {
         updateElapsedTimeHUD(p);
         updateHealthHUD(p);
         updatePrefixesOnHUD(p);
+        dispatchPrefixUpdate(p);
     }
 
     public void cleanup() {

@@ -566,7 +566,6 @@ public class GameManager implements Listener {
         
         recipes.discoverFor(p);
         setDisplayName(p, TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
-        hudManager.dispatchPrefixUpdate(p);
         
         if (onGameStart || !worldManager.inGame(p)) {
             // if the player joins midgame and are in the lobby, then idk where to put them! put in spawn
