@@ -57,11 +57,15 @@ public class MenuTree {
         })
             .useObject(plugin.getGameManager()::checkStartPanel)
             .extraLore(o -> {
+                var checks = (List<String>) o;
+
                 var lines = new ArrayList<Component>();
-                lines.add(render(trans("xyz.baz9k.err.menu.panel.check_start_failed")));
-               
-                for (var l : (List<String>) o) {
-                    lines.add(Component.text(l));
+                if (checks.size() > 0) {
+                    lines.add(render(trans("xyz.baz9k.uhc.err.menu.panel.check_end_failed")));
+                   
+                    for (var l : checks) {
+                        lines.add(Component.text(l));
+                    }
                 }
                 return new ExtraLore(lines);
             }),
@@ -75,11 +79,15 @@ public class MenuTree {
         })
             .useObject(plugin.getGameManager()::checkEndPanel)
             .extraLore(o -> {
+                var checks = (List<String>) o;
+
                 var lines = new ArrayList<Component>();
-                lines.add(render(trans("xyz.baz9k.err.menu.panel.check_end_failed")));
-               
-                for (var l : (List<String>) o) {
-                    lines.add(Component.text(l));
+                if (checks.size() > 0) {
+                    lines.add(render(trans("xyz.baz9k.uhc.err.menu.panel.check_end_failed")));
+                   
+                    for (var l : checks) {
+                        lines.add(Component.text(l));
+                    }
                 }
                 return new ExtraLore(lines);
             }),

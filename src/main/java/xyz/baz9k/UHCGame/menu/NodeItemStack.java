@@ -1,23 +1,16 @@
 package xyz.baz9k.UHCGame.menu;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.*;
+import net.kyori.adventure.text.format.*;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
@@ -130,7 +123,12 @@ public class NodeItemStack extends ItemStack {
         }
 
         public List<Component> component() {
-            if (lore != null) return Collections.unmodifiableList(lore);
+            if (lore != null) {
+                return List.copyOf(lore)
+                    .stream()
+                    .map(c -> c.hasStyling() ? c : c.style(DEFAULT_DESC_STYLE))
+                    .collect(Collectors.toUnmodifiableList());
+            }
 
             Object[] args = Arrays.stream(tArgs)
                 .map(o -> {
