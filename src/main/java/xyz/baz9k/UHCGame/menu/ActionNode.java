@@ -25,7 +25,7 @@ public class ActionNode extends Node {
      * @param props {@link NodeItemStack.ItemProperties}
      * @param fn Function to run when this node is clicked
      */
-    public ActionNode(@NotNull BranchNode parent, int slot, @NotNull String nodeName, @NotNull NodeItemStack.ItemProperties props, @NotNull Consumer<Player> fn) {
+    public ActionNode(@NotNull BranchNode parent, int slot, @NotNull String nodeName, @NotNull NodeItemStack.ItemProperties<?> props, @NotNull Consumer<Player> fn) {
         super(parent, slot, nodeName, props);
         this.fn = fn;
     }

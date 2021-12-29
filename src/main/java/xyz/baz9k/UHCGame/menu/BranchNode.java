@@ -46,7 +46,7 @@ public class BranchNode extends Node {
      * @param props {@link NodeItemStack.ItemProperties}
      * @param guiHeight Number of rows in this node's inventory
      */
-    public BranchNode(@Nullable BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, int guiHeight) {
+    public BranchNode(@Nullable BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties<?> props, int guiHeight) {
         super(parent, slot, nodeName, props);
         slotCount = 9 * guiHeight;
 
@@ -91,7 +91,7 @@ public class BranchNode extends Node {
 
         // If we aren't root, add a slot for the "Go Back" button
         if (parent != null) {
-            ItemStack goBack = new NodeItemStack("go_back", new NodeItemStack.ItemProperties(Material.ARROW).style(NamedTextColor.RED));
+            ItemStack goBack = new NodeItemStack("go_back", new NodeItemStack.ItemProperties<>(Material.ARROW).style(NamedTextColor.RED));
 
             inventory.setItem(slotCount - 1, goBack);
         }

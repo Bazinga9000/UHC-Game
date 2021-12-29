@@ -10,7 +10,7 @@ import xyz.baz9k.UHCGame.UHCGamePlugin;
 public abstract class Node {
     protected final BranchNode parent;
     private NodeItemStack itemStack;
-    private final NodeItemStack.ItemProperties itemProperties;
+    private final NodeItemStack.ItemProperties<?> itemProperties;
     protected final int parentSlot;
     protected final String nodeName;
     
@@ -23,7 +23,7 @@ public abstract class Node {
      * @param nodeName Name of the node
      * @param props {@link NodeItemStack.ItemProperties}
      */
-    public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.ItemProperties props) {
+    public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.ItemProperties<?> props) {
         this.parent = parent;
         this.nodeName = nodeName;
         this.itemProperties = props;

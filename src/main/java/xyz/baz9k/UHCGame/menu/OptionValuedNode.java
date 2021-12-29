@@ -21,7 +21,7 @@ public class OptionValuedNode extends ValuedNode {
      * @param nodeName Name of the node
      * @param optMaterials Materials for the options supported
      */
-    public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Material... optMaterials) {
+    public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties<Object> props, Material... optMaterials) {
         super(parent, slot, nodeName, props.mat(v -> optMaterials[(int) v]), ValuedNode.Type.OPTION, i -> (int) i % optMaterials.length);
         props.formatter(v -> this.optDesc((int) v))
             .extraLore(v -> {

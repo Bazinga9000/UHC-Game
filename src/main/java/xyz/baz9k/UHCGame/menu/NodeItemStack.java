@@ -28,7 +28,7 @@ public class NodeItemStack extends ItemStack {
     /**
      * Properties to generate the item stack
      */
-    private final ItemProperties props;
+    private final ItemProperties<?> props;
 
     // TEXT STYLES
     /**
@@ -58,52 +58,53 @@ public class NodeItemStack extends ItemStack {
      * <p> - Function to perform miscellaneous ItemMeta edits (ench hide flags, ench glint)
      * <p> - extra lore, which provides information other than the description of the node
      */
-    public static class ItemProperties {
-        private Supplier<Object> propsObjSupplier = () -> null;
-        private Function<Object, Material> matGet = v -> Material.AIR;
-        private Style nameStyle = DEFAULT_NAME_STYLE;
-        private Function<Object, String> formatter = String::valueOf;
-        private BiConsumer<Object, ItemMeta> miscMetaChanges = (v, m) -> {};
-        private Function<Object, ExtraLore> elGet = v -> new ExtraLore();
+    public static class ItemProperties<T> {
+        private Supplier<T> propsObjSupplier = () -> null;
+        private Function<T, Material> matGet = v -> Material.AIR;
+        private Function<T, Style> nameStyle = v -> DEFAULT_NAME_STYLE;
+        private Function<T, String> formatter = String::valueOf;
+        private BiConsumer<T, ItemMeta> miscMetaChanges = (v, m) -> {};
+        private Function<T, ExtraLore> elGet = v -> new ExtraLore();
 
         public ItemProperties() {}
-        public ItemProperties(Function<Object, Material> mat) { mat(mat); }
+        public ItemProperties(Function<T, Material> mat) { mat(mat); }
         public ItemProperties(Material mat) { mat(mat); }
 
-        public ItemProperties useObject(Supplier<Object> uo) {
+        public ItemProperties<T> useObject(Supplier<T> uo) {
             this.propsObjSupplier = uo;
             return this;
         }
-        public ItemProperties mat(Function<Object, Material> mat) {
+        public ItemProperties<T> mat(Function<T, Material> mat) {
             this.matGet = mat;
             return this;
         }
-        public ItemProperties style(Style s) {
-            this.nameStyle = s;
+        public ItemProperties<T> style(Function<T, Style> style) {
+            this.nameStyle = style;
             return this;
         }
-        public ItemProperties formatter(Function<Object, String> formatter) {
+        public ItemProperties<T> formatter(Function<T, String> formatter) {
             this.formatter = formatter;
             return this;
         }
-        public ItemProperties metaChanges(BiConsumer<Object, ItemMeta> mc) {
+        public ItemProperties<T> metaChanges(BiConsumer<T, ItemMeta> mc) {
             this.miscMetaChanges = mc;
             return this;
         }
-        public ItemProperties extraLore(Function<Object, ExtraLore> el) {
+        public ItemProperties<T> extraLore(Function<T, ExtraLore> el) {
             this.elGet = el;
             return this;
         }
         
-        public ItemProperties mat(Material mat) { return mat(v -> mat); }
-        public ItemProperties style(TextColor clr) { return style(noDeco(clr)); }
+        public ItemProperties<T> mat(Material mat) { return mat(v -> mat); }
+        public ItemProperties<T> style(Style s) { return style(v -> s); }
+        public ItemProperties<T> style(TextColor clr) { return style(noDeco(clr)); }
         
 
         private Material getMat() {
             return matGet.apply(propsObjSupplier.get());
         }
         private Style getStyle() {
-            return nameStyle;
+            return nameStyle.apply(propsObjSupplier.get());
         }
         private String getFormattedDescObj() {
             return formatter.apply(propsObjSupplier.get());
@@ -157,7 +158,7 @@ public class NodeItemStack extends ItemStack {
         /**
          * @return an extra lore that is either ACTIVE/INACTIVE based on if the provided object is true or false
          */
-        public static Function<Object, ExtraLore> fromBool() {
+        public static <T> Function<T, ExtraLore> fromBool() {
             return o -> {
                 var active = (boolean) o;
 
@@ -177,7 +178,7 @@ public class NodeItemStack extends ItemStack {
      * @param langKey the node's lang key
      * @param props the node's item properties
      */
-    public NodeItemStack(String langKey, ItemProperties props) {
+    public NodeItemStack(String langKey, ItemProperties<?> props) {
         super(props.getMat());
 
         this.langKey = langKey;

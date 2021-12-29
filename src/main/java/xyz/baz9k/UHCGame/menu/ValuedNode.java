@@ -49,7 +49,7 @@ public class ValuedNode extends Node {
      * WITH A RESTRICTING FUNCTION, THE TYPE MUST BE NUMERIC.
      * @param restrict This function maps invalid numeric values to the correct values.
      */
-    public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Type type, UnaryOperator<Number> restrict) {
+    public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties<Object> props, Type type, UnaryOperator<Number> restrict) {
         this(parent, slot, nodeName, props, type.requireNumeric());
         
         this.restrict = restrict;
@@ -64,7 +64,7 @@ public class ValuedNode extends Node {
      * those will be substituted with the config value.
      * @param type Type of data this value stores
      */
-    public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Type type) {
+    public ValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties<Object> props, Type type) {
         super(parent, slot, nodeName, props);
         this.type = type;
         
