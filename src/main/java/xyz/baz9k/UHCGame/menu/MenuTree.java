@@ -113,16 +113,16 @@ public class MenuTree {
             }
         );
 
-        new ActionNode(ctrlRoot, slotAt(4, 7), "clear_teams", 
-            new ItemProperties<>(Material.BLACK_DYE), 
-            p -> {
-                p.closeInventory();
-                var tm = plugin.getTeamManager();
-                tm.resetAllPlayers();
-            }
-        );
         new ActionNode(ctrlRoot, slotAt(4, 1), "assign_teams_x", 
-            new ItemProperties<>(Material.DIAMOND), 
+            new ItemProperties<Void>(Material.DIAMOND)
+                .extraLore(o -> {
+                    var tm = plugin.getTeamManager();
+                    int n_combs = tm.getCombatants().size();
+                    int n_specs = tm.getSpectators().size();
+                    return new ExtraLore(
+                        new Key("assign_teams_x.extra_lore"), n_combs, n_specs
+                    );
+                }),
             p -> {
                 var tm = plugin.getTeamManager();
                 new ValueRequest(plugin, p, ValueRequest.Type.NUMBER_REQUEST, "team_count", t -> {
@@ -145,6 +145,14 @@ public class MenuTree {
                 }
             );
         }
+        new ActionNode(ctrlRoot, slotAt(4, 7), "clear_teams",
+                new ItemProperties<>(Material.BLACK_DYE),
+                p -> {
+                    p.closeInventory();
+                    var tm = plugin.getTeamManager();
+                    tm.resetAllPlayers();
+                }
+        );
 
         return ctrlRoot;
     }

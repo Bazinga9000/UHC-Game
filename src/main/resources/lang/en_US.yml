@@ -166,7 +166,10 @@ xyz:
             desc: ""
           assign_teams_x:
             name: "Assign Teams"
-            desc: ""
+            desc: "Click to set the number of teams."
+            extra_lore: |-
+              Number of combatants: {0}
+              Number of spectators: {1}
           assign_teams_1:
             name: "Assign Solos"
             desc: "Teams of 1"
