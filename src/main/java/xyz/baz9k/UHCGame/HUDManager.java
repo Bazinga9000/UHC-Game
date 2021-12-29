@@ -50,7 +50,7 @@ public class HUDManager implements Listener {
         int team = teamManager.getTeam(p);
 
         if (state == PlayerState.COMBATANT_UNASSIGNED) {
-            return Component.translatable("team.unassigned", NamedTextColor.WHITE, ITALIC);
+            return new Key("team.unassigned").trans().style(Style.style(NamedTextColor.WHITE, ITALIC));
         }
         return TeamDisplay.getName(team);
     }
