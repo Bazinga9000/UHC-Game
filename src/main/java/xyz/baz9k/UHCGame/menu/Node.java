@@ -65,6 +65,16 @@ public abstract class Node {
         this.lock = () -> lockIf.test((T) this);
         return (T) this;
     }
+    /**
+     * Disable use of this node if the predicate is matched
+     * @param lockIf If returns true, node is locked and cannot be used.
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends Node> T lock(BooleanSupplier lockIf) {
+        this.lock = lockIf;
+        return (T) this;
+    }
 
     public boolean locked() {
         return lock.getAsBoolean();

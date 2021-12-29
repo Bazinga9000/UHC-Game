@@ -97,7 +97,7 @@ public class MenuTree {
             p.closeInventory();
             plugin.getWorldManager().reseedWorlds();
             }
-        );
+        ).lock(plugin.getGameManager()::hasUHCStarted);
         new ActionNode(ctrlRoot, slotAt(3, 2), "debug_toggle",
             new ItemProperties<Boolean>(d -> d ? Material.GLOWSTONE : Material.BLACKSTONE)
                 .useObject(Debug::isDebugging)
@@ -131,7 +131,7 @@ public class MenuTree {
                     tm.announceTeams();
                 }, false);
             }
-        );
+        ).lock(plugin.getGameManager()::hasUHCStarted);
         for (int i = 1; i <= 5; i++) {
             final int n = i;
             new ActionNode(ctrlRoot, slotAt(4, 1 + i), String.format("assign_teams_%s", i), 
@@ -143,7 +143,7 @@ public class MenuTree {
                     tm.assignTeams();
                     tm.announceTeams();
                 }
-            );
+            ).lock(plugin.getGameManager()::hasUHCStarted);
         }
         new ActionNode(ctrlRoot, slotAt(4, 7), "clear_teams",
                 new ItemProperties<>(Material.BLACK_DYE),
@@ -152,13 +152,14 @@ public class MenuTree {
                     var tm = plugin.getTeamManager();
                     tm.resetAllPlayers();
                 }
-        );
+        ).lock(plugin.getGameManager()::hasUHCStarted);
 
         return ctrlRoot;
     }
 
     private BranchNode createConfigBranch(BranchNode root) {
-        BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties<>(Material.GOLDEN_PICKAXE), 3);
+        BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties<>(Material.GOLDEN_PICKAXE), 3)
+            .lock(plugin.getGameManager()::hasUHCStarted);
         ValuedNode.cfgRoot = cfgRoot;
 
         BranchNode intervals = new BranchNode(cfgRoot, slotAt(1, 3), "intervals",  new ItemProperties<>(Material.CLOCK),                   3);
