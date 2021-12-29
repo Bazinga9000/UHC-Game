@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import net.kyori.adventure.text.*;
@@ -35,29 +34,19 @@ public final class ComponentUtils {
     /**
      * Convert a {@link TranslatableComponent} into readable text in the form of a {@link Component}.
      * @param c unrendered Component
-     * @param l locale to use
-     * @return rendered Component
-     */
-    public static Component render(Component c, Locale l) {
-        return GlobalTranslator.render(c, l);
-    }
-    /**
-     * Convert a {@link TranslatableComponent} into readable text in the form of a {@link Component}.
-     * @param c unrendered Component
      * @return rendered Component
      */
     public static Component render(Component c) {
-        return render(c, UHCGamePlugin.getLocale());
+        return GlobalTranslator.render(c, UHCGamePlugin.getLocale());
     }
 
     /**
      * Converts a {@link Component} (which may consist of components of type {@link TextComponent} 
      * and {@link TranslatableComponent}) into readable text.
      * @param c component
-     * @param l locale to use
      * @return string of the component text
      */
-    public static String renderString(Component c, Locale l) {
+    public static String renderString(Component c) {
         if (c instanceof TextComponent tc && c.children().size() == 0) return tc.content();
 
         List<Component> components = new ArrayList<>();
@@ -66,31 +55,20 @@ public final class ComponentUtils {
 
         return components.stream()
             .map(cpt -> {
-                Component rendered = render(cpt, l);
+                Component rendered = render(cpt);
                 if (rendered instanceof TextComponent renderedText) {
                     String buf = renderedText.content();
-                    for (Component child : renderedText.children()) buf += renderString(child, l);
+                    for (Component child : renderedText.children()) buf += renderString(child);
                     return buf;
                 } else if (rendered instanceof TranslatableComponent renderedTrans) {
                     String buf = renderedTrans.key();
-                    for (Component child : renderedTrans.children()) buf += renderString(child, l);
+                    for (Component child : renderedTrans.children()) buf += renderString(child);
                     return buf;
 
                 }
                 return rendered.toString(); // if not text, then can't really do anything
             })
             .collect(Collectors.joining());
-    }
-    
-    /**
-     * Converts a {@link Component} (which may consist of components of type {@link TextComponent} 
-     * and {@link TranslatableComponent}) into readable text.
-     * This uses the plugin's locale.
-     * @param c component
-     * @return string of the component text
-     */
-    public static String renderString(Component c) {
-        return renderString(c, UHCGamePlugin.getLocale());
     }
 
     /**
@@ -113,12 +91,11 @@ public final class ComponentUtils {
      * Returns an exception with a translatable component message
      * @param exc Exception type
      * @param msg Component message
-     * @param l Locale
      * @return The exception, which can be thrown.
      */
-    public static <X extends Throwable> X translatableErr(Class<X> exc, Component msg, Locale l){
+    public static <X extends Throwable> X translatableErr(Class<X> exc, Component msg){
         try {
-            return exc.getConstructor(String.class).newInstance(renderString(msg, l));
+            return exc.getConstructor(String.class).newInstance(renderString(msg));
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
@@ -126,18 +103,6 @@ public final class ComponentUtils {
 
     /**
      * Returns an exception with a translatable component message.
-     * This uses the plugin's locale.
-     * @param exc Exception type
-     * @param c Component message
-     * @return The exception, which can be thrown.
-     */
-    public static <X extends Throwable> X translatableErr(Class<X> exc, Component c){
-        return translatableErr(exc, c, UHCGamePlugin.getLocale());
-    }
-
-    /**
-     * Returns an exception with a translatable component message.
-     * This uses the plugin's locale.
      * @param key Translation key
      * @param args Objects which are passed as strings to the translatable component. (Components stay as components)
      * @return The exception, which can be thrown.
