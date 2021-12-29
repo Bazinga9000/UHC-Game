@@ -120,7 +120,7 @@ public class MenuTree {
                     int n_combs = tm.getCombatants().size();
                     int n_specs = tm.getSpectators().size();
                     return new ExtraLore(
-                        new Key("assign_teams_x.extra_lore"), n_combs, n_specs
+                        new Key("menu.inv.assign_teams_x.extra_lore"), n_combs, n_specs
                     );
                 }),
             p -> {
