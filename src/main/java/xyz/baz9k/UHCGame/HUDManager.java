@@ -194,8 +194,8 @@ public class HUDManager implements Listener {
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         // bukkit et al. apparently do not allow one obj in multiple display slots even though vanilla is 100% okay with that. no clue.
-        Objective hearts1 = newBoard.registerNewObjective("hearts1", "dummy", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
-        Objective hearts2 = newBoard.registerNewObjective("hearts2", "dummy", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
+        Objective hearts1 = newBoard.registerNewObjective("hearts1", "health", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
+        Objective hearts2 = newBoard.registerNewObjective("hearts2", "health", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
         hearts1.setDisplaySlot(DisplaySlot.PLAYER_LIST);
         hearts2.setDisplaySlot(DisplaySlot.BELOW_NAME);
     }
@@ -480,19 +480,19 @@ public class HUDManager implements Listener {
      * @param p Player whose health needs to be updated
      */
     private void updateHealthOnScoreboard(Scoreboard s, Player p, double health) {
-        int hp;
-        if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_ALIVE) {
-            hp = (int) Math.ceil(health);
-        } else {
-            hp = 0;
-        }
+        // int hp;
+        // if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_ALIVE) {
+        //     hp = (int) Math.ceil(health);
+        // } else {
+        //     hp = 0;
+        // }
 
-        List.of("hearts1", "hearts2")
-            .forEach(objName -> {
-                    Objective obj = s.getObjective(objName);
-                    Score score = obj.getScore(p);
-                    score.setScore(hp);
-            });
+        // List.of("hearts1", "hearts2")
+        //     .forEach(objName -> {
+        //             Objective obj = s.getObjective(objName);
+        //             Score score = obj.getScore(p);
+        //             score.setScore(hp);
+        //     });
     }
 
     public void updateHealthHUD(Player p) {
