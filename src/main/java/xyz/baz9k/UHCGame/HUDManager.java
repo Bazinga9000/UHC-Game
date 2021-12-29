@@ -295,12 +295,21 @@ public class HUDManager implements Listener {
      * Clean up any HUD setup for a player (if they join during lobby mode).
      * @param p Player to clean up
      */
+    private void cleanup(Player p) {
+        Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
+        p.setScoreboard(main);
+
+        main.getTeams().stream()
+            .filter(t -> t.getName().startsWith(PREFIXING_TEAM_FORMAT))
+            .forEach(Team::unregister);
+
+    }
+
     public void prepareToLobby(Player p) {
         if (teamManager.isAssignedCombatant(p)) {
             initPlayerHUDLite(p);
         } else {
-            Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
-            p.setScoreboard(main);
+            cleanup(p);
         }
     }
 
@@ -557,8 +566,7 @@ public class HUDManager implements Listener {
             if (state == PlayerState.COMBATANT_ALIVE || state == PlayerState.COMBATANT_DEAD) {
                 initPlayerHUD(pl);
             } else {
-                Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
-                pl.setScoreboard(main);
+                cleanup(pl);
             }
         }
     }
