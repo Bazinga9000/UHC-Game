@@ -56,7 +56,7 @@ public class MenuTree {
                 .extraLore(checks -> {
                     var lines = new ArrayList<Component>();
                     if (checks.size() > 0) {
-                        lines.add(render(new Key("err.menu.panel.check_end_failed").trans()));
+                        lines.add(render(new Key("err.menu.panel.check_start_failed").trans()));
 
                         for (var l : checks) {
                             lines.add(Component.text(l));
