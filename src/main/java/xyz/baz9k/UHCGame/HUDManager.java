@@ -232,6 +232,18 @@ public class HUDManager implements Listener {
     }
 
     /**
+      * Create a new scoreboard to display just the prefixes (and not disrupt the main scoreboard) while in lobby
+      * @param p Player 
+      */
+    public void initPlayerHUDLite(@NotNull Player p) {
+        Scoreboard sb = Bukkit.getScoreboardManager().getNewScoreboard();
+        p.setScoreboard(sb);
+
+        updatePrefixesOnHUD(p);
+        dispatchPrefixUpdate(p);
+    }
+
+    /**
      * Init a player's HUD (create scoreboard, reserve all the slots, load data onto all the slots)
      * @param p Player whose scoreboard should be initialized
      */
@@ -283,9 +295,13 @@ public class HUDManager implements Listener {
      * Clean up any HUD setup for a player (if they join during lobby mode).
      * @param p Player to clean up
      */
-    public void cleanup(Player p) {
-        Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
-        p.setScoreboard(main);
+    public void prepareToLobby(Player p) {
+        if (teamManager.isAssignedCombatant(p)) {
+            initPlayerHUDLite(p);
+        } else {
+            Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
+            p.setScoreboard(main);
+        }
     }
 
     /**

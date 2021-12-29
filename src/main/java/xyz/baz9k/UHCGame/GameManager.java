@@ -590,7 +590,7 @@ public class GameManager implements Listener {
 
     private void prepareToLobby(Player p, boolean onGameEnd) {
         bbManager.disable(p);
-        hudManager.cleanup(p);
+        hudManager.prepareToLobby(p);
         if (onGameEnd || worldManager.inGame(p)) {
             worldManager.escapePlayer(p);
             resetStatuses(p);
