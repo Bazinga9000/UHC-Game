@@ -267,7 +267,7 @@ public class GameManager implements Listener {
                 hudManager.updateWBHUD(p);
 
                 if (p.getGameMode() == GameMode.SPECTATOR && !p.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
-                    PotionEffectType.NIGHT_VISION.createEffect(20000000, 1);
+                    PotionEffectType.NIGHT_VISION.createEffect(20000000, 1).apply(p);
                 }
             }
         }, 0L, 1L);
