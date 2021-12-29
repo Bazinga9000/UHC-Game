@@ -108,9 +108,9 @@ public final class Utils {
         if (s == 0) return Component.empty();
 
         TranslatableComponent[] units = {
-            trans("xyz.baz9k.uhc.time.hour"),
-            trans("xyz.baz9k.uhc.time.minute"),
-            trans("xyz.baz9k.uhc.time.second"),
+            new Key("time.hour").trans(),
+            new Key("time.minute").trans(),
+            new Key("time.second").trans(),
         };
 
         List<Long> segs = new ArrayList<>();

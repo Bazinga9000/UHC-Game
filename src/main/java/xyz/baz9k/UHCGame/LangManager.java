@@ -49,7 +49,7 @@ public class LangManager {
         try {
             langResource = new InputStreamReader(plugin.getResource(filename));
         } catch (NullPointerException e) {
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.lang.missing_file", filename);
+            throw new Key("err.lang.missing_file").transErr(IllegalArgumentException.class, filename);
         }
 
         var yaml = YamlConfiguration.loadConfiguration(langResource);

@@ -30,7 +30,7 @@ public class ValueRequest {
         this(plugin, converser, switch (node.type) {
             case INTEGER, DOUBLE -> Type.NUMBER_REQUEST;
             case STRING -> Type.STRING_REQUEST;
-            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.prompt.wrong_type", node.type);
+            default -> throw new Key("err.menu.prompt.wrong_type").transErr(IllegalArgumentException.class, node.type);
         }, node.cfgKey(), node::set, true);
     }
 
@@ -55,7 +55,7 @@ public class ValueRequest {
             .addConversationAbandonedListener(e -> {
                 if (!e.gracefulExit()) {
                     Player p = (Player) e.getContext().getForWhom();
-                    p.sendMessage(trans("xyz.baz9k.uhc.menu.prompt.cancel"));
+                    p.sendMessage(new Key("menu.prompt.cancel").trans());
                 }
             })
             .buildConversation(converser)
@@ -67,7 +67,7 @@ public class ValueRequest {
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
             Object id = context.getSessionData("requestKey");
-            return renderString(trans("xyz.baz9k.uhc.menu.prompt.ask", id));
+            return renderString(new Key("menu.prompt.ask").trans(id));
         }
         
         @Override
@@ -82,7 +82,7 @@ public class ValueRequest {
         @Override
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
             Object id = context.getSessionData("requestKey");
-            return renderString(trans("xyz.baz9k.uhc.menu.prompt.ask", id));
+            return renderString(new Key("menu.prompt.ask").trans(id));
         }
 
         @Override
@@ -106,7 +106,7 @@ public class ValueRequest {
 
             consumer.accept(newValue);
             if (reopenInventory) ((Player) context.getForWhom()).openInventory(lastInventory);
-            return renderString(trans("xyz.baz9k.uhc.menu.prompt.succ", requestKey, newValue));
+            return renderString(new Key("menu.prompt.succ").trans(requestKey, newValue));
         }
 
         @Override

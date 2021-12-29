@@ -54,7 +54,7 @@ public final class Debug {
     }
 
     private static Component fmtDebug(Component msg) {
-        return trans("xyz.baz9k.uhc.debug.prefix", msg).color(NamedTextColor.YELLOW);
+        return new Key("debug.prefix").trans(msg).color(NamedTextColor.YELLOW);
     }
 
     /**

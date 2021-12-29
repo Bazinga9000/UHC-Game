@@ -13,7 +13,7 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 public class OptionValuedNode extends ValuedNode {
 
-    private static final String OPT_DESC_ID_FORMAT = "xyz.baz9k.uhc.menu.inv.%s.options";
+    private static final Key OPT_DESC_ID_FORMAT = new Key("menu.inv.%s.options");
 
     /**
      * @param parent Parent node
@@ -49,7 +49,7 @@ public class OptionValuedNode extends ValuedNode {
      */
     private String optDesc(int i) {
         var langYaml = plugin.getLangManager().langYaml();
-        var optDescs = langYaml.getStringList(String.format(OPT_DESC_ID_FORMAT, langKey()));
+        var optDescs = langYaml.getStringList(OPT_DESC_ID_FORMAT.args(langKey()).key());
         if (optDescs.size() == 0) {
             return String.format(OPT_DESC_ID_FORMAT + "[%s]", langKey(), i);
         } else {

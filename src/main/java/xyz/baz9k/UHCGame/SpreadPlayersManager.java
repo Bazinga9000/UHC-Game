@@ -240,10 +240,10 @@ public class SpreadPlayersManager {
                 );
         }
 
-        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.generated", samples.size()));
+        Debug.printDebug(new Key("debug.spreadplayers.generated").trans(samples.size()));
 
         if (samples.size() < numLocations) {
-            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.world.missing_spread_locs", samples.size(), numLocations);
+            throw new Key("err.world.missing_spread_locs").transErr(IllegalStateException.class, samples.size(), numLocations);
         }
 
         Map<Boolean, List<Location>> spawns =

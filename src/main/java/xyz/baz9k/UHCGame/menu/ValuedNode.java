@@ -32,7 +32,7 @@ public class ValuedNode extends Node {
 
         private Type requireNumeric() {
             if (isNumeric) return this;
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.not_numeric_type", this);
+            throw new Key("err.menu.not_numeric_type").transErr(IllegalArgumentException.class, this);
         }
     }
 
@@ -92,7 +92,7 @@ public class ValuedNode extends Node {
             case INTEGER, DOUBLE, STRING -> new ValueRequest(plugin, p, this);
             case BOOLEAN -> this.set(!cfg.getBoolean(cfgKey()));
             // case OPTION -> see OptionValuedNode#click
-            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.menu.needs_impl", type);
+            default -> throw new Key("err.menu.needs_impl").transErr(IllegalArgumentException.class, type);
         }
     }
 

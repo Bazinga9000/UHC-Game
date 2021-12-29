@@ -71,26 +71,26 @@ public class GameManager implements Listener {
     }
 
     private enum GameInitFailure {
-        TEAM_UNASSIGNED      ("xyz.baz9k.uhc.err.team.must_assigned"),
-        WORLDS_NOT_REGENED   ("xyz.baz9k.uhc.err.world.must_regened", "xyz.baz9k.uhc.err.world.must_regened_short"),
-        GAME_NOT_STARTED     ("xyz.baz9k.uhc.err.not_started"       ),
-        GAME_ALREADY_STARTED ("xyz.baz9k.uhc.err.already_started"   );
+        TEAM_UNASSIGNED      (new Key("err.team.must_assigned")),
+        WORLDS_NOT_REGENED   (new Key("err.world.must_regened"), new Key("err.world.must_regened_short")),
+        GAME_NOT_STARTED     (new Key("err.not_started")       ),
+        GAME_ALREADY_STARTED (new Key("err.already_started")   );
 
-        private final String errKey;
-        private final String panelErrKey;
-        GameInitFailure(String errKey) {
+        private final Key errKey;
+        private final Key panelErrKey;
+        GameInitFailure(Key errKey) {
             this(errKey, errKey);
         }
-        GameInitFailure(String errKey, String panelErrKey) {
+        GameInitFailure(Key errKey, Key panelErrKey) {
             this.errKey = errKey;
             this.panelErrKey = panelErrKey;
         }
 
         public IllegalStateException exception() {
-            return translatableErr(IllegalStateException.class, errKey);
+            return errKey.transErr(IllegalStateException.class);
         }
         public String panelErr() {
-            return renderString(trans(panelErrKey));
+            return renderString(panelErrKey.trans());
         }
     }
 
@@ -136,29 +136,29 @@ public class GameManager implements Listener {
     }
 
     private void runEventWithChecks(String eventKey, Runnable event, Supplier<List<GameInitFailure>> checks, boolean skipChecks) {
-        String EVENT_TRY       = String.format("xyz.baz9k.uhc.debug.%s.try", eventKey),
-               EVENT_FORCE_TRY = String.format("xyz.baz9k.uhc.debug.%s.force", eventKey),
-               EVENT_COMPLETE  = String.format("xyz.baz9k.uhc.debug.%s.complete", eventKey),
-               EVENT_FAIL      = String.format("xyz.baz9k.uhc.debug.%s.fail", eventKey);
+        Key EVENT_TRY       = new Key("debug.%s.try", eventKey),
+            EVENT_FORCE_TRY = new Key("debug.%s.force", eventKey),
+            EVENT_COMPLETE  = new Key("debug.%s.complete", eventKey),
+            EVENT_FAIL      = new Key("debug.%s.fail", eventKey);
         
         var prevStage = stage;
 
-        Debug.printDebug(trans(EVENT_TRY));
+        Debug.printDebug(EVENT_TRY.trans());
         if (!skipChecks) {
             var fails = checks.get();
             if (fails.size() != 0) {
                 throw fails.get(0).exception();
             }
         } else {
-            Debug.printDebug(trans(EVENT_FORCE_TRY));
+            Debug.printDebug(EVENT_FORCE_TRY.trans());
         }
 
         try {
             event.run();
-            Debug.printDebug(trans(EVENT_COMPLETE));
+            Debug.printDebug(EVENT_COMPLETE.trans());
         } catch (Exception e) {
             setStage(prevStage);
-            Debug.printDebug(trans(EVENT_FAIL));
+            Debug.printDebug(EVENT_FAIL.trans());
             Debug.printError(e);
         }
     }
@@ -194,14 +194,14 @@ public class GameManager implements Listener {
         worldManager.initWorlds();
 
         // do spreadplayers
-        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.start"));
+        Debug.printDebug(new Key("debug.spreadplayers.start").trans());
         double initialDiameter = GameStage.WB_STILL.wbDiameter();
         double max = initialDiameter,
                min = initialDiameter / (1 + teamManager.getNumTeams());
         Location defaultLoc = worldManager.gameSpawn();
 
         plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
-        Debug.printDebug(trans("xyz.baz9k.uhc.debug.spreadplayers.end"));
+        Debug.printDebug(new Key("debug.spreadplayers.end").trans());
 
         // unload world
         plugin.getMVWorldManager().unloadWorld("lobby", true);
@@ -242,13 +242,13 @@ public class GameManager implements Listener {
 
     public void requireStarted() {
         if (!hasUHCStarted()) {
-            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.not_started");
+            throw new Key("err.not_started").transErr(IllegalStateException.class);
         }
     }
 
     public void requireNotStarted() {
         if (hasUHCStarted()) {
-            throw translatableErr(IllegalStateException.class, "xyz.baz9k.uhc.err.already_started");
+            throw new Key("err.already_started").transErr(IllegalStateException.class);
         }
     }
 
@@ -449,7 +449,7 @@ public class GameManager implements Listener {
         if (teamManager.getAliveTeams().length > 1) return;
         endTick();
         int winner = teamManager.getAliveTeams()[0];
-        Component winMsg = trans("xyz.baz9k.uhc.win", TeamDisplay.getName(winner))
+        Component winMsg = new Key("win").trans(TeamDisplay.getName(winner))
             .style(noDeco(NamedTextColor.WHITE));
         winMsg = includeGameTimestamp(winMsg);
 
@@ -502,7 +502,7 @@ public class GameManager implements Listener {
             // check team death
             int t = teamManager.getTeam(dead);
             if (teamManager.isTeamEliminated(t)) {
-                Component teamElimMsg = trans("xyz.baz9k.uhc.eliminated", TeamDisplay.getName(t))
+                Component teamElimMsg = new Key("eliminated").trans(TeamDisplay.getName(t))
                     .style(noDeco(NamedTextColor.WHITE));
                 teamElimMsg = includeGameTimestamp(teamElimMsg);
                 // this msg should be displayed after player death

@@ -16,6 +16,48 @@ import xyz.baz9k.UHCGame.UHCGamePlugin;
 public final class ComponentUtils {
     private ComponentUtils() {}
 
+    public static record Key(String key) {
+        public static final String PREFIX = "xyz.baz9k.uhc";
+
+        public Key {
+            if (!key.startsWith(PREFIX)) key = PREFIX + "." + key;
+        }
+
+        public Key(String key, Object... args) {
+            this(String.format(key, args));
+        }
+
+        public Key args(Object... args) {
+            return new Key(key(), args);
+        }
+
+        /**
+         * Shorthand for {@link Component#translatable}. 
+         * Creates a translatable component that uses this key as the key and the specified objects as parameters.
+         * @param args Objects which are passed as parameters to the translatable component. (Components stay as components)
+         * @return component
+         */
+        public TranslatableComponent trans(Object... args) {
+            Component[] cargs = Arrays.stream(args)
+            .map(o -> {
+                if (o instanceof ComponentLike cl) return cl.asComponent();
+                return Component.text(String.valueOf(o));
+            })
+            .toArray(Component[]::new);
+
+            return Component.translatable(key()).args(cargs);
+        }
+
+        /**
+         * Returns an exception with a translatable component message.
+         * @param args Objects which are passed as strings to the translatable component. (Components stay as components)
+         * @return The exception, which can be thrown.
+         */
+        public <X extends Throwable> X transErr(Class<X> exc, Object... args) {
+            return componentErr(exc, trans(args));
+        }
+    }
+
     /**
      * Style with color, but no formatting, no italic, bold, etc.
      * @param clr Color of style
@@ -72,42 +114,16 @@ public final class ComponentUtils {
     }
 
     /**
-     * Shorthand for {@link Component#translatable}. Creates a translatable component that uses the specified objects as parameters.
-     * @param key Translation key
-     * @param args Objects which are passed as parameters to the translatable component. (Components stay as components)
-     * @return component
-     */
-    public static TranslatableComponent trans(String key, Object... args) {
-        Component[] cargs = Arrays.stream(args)
-            .map(o -> {
-                if (o instanceof ComponentLike cl) return cl.asComponent();
-                return Component.text(String.valueOf(o));
-            })
-            .toArray(Component[]::new);
-        return Component.translatable(key).args(cargs);
-    }
-
-    /**
      * Returns an exception with a translatable component message
      * @param exc Exception type
      * @param msg Component message
      * @return The exception, which can be thrown.
      */
-    public static <X extends Throwable> X translatableErr(Class<X> exc, Component msg){
+    public static <X extends Throwable> X componentErr(Class<X> exc, Component msg){
         try {
             return exc.getConstructor(String.class).newInstance(renderString(msg));
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Returns an exception with a translatable component message.
-     * @param key Translation key
-     * @param args Objects which are passed as strings to the translatable component. (Components stay as components)
-     * @return The exception, which can be thrown.
-     */
-    public static <X extends Throwable> X translatableErr(Class<X> exc, String key, Object... args){
-        return translatableErr(exc, trans(key, args));
     }
 }

@@ -40,10 +40,10 @@ public final class TeamDisplay {
      */
     public static Color getColor(int t) {
         if (t < 0) {
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.display.index_must_pos");
+            throw new Key("err.team.display.index_must_pos").transErr(IllegalArgumentException.class);
         }
         if (t > NUM_TEAM_COLORS) {
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.display.index_must_under_max", NUM_TEAM_COLORS);
+            throw new Key("err.team.display.index_must_under_max").transErr(IllegalArgumentException.class, NUM_TEAM_COLORS);
         }
         return teamColors[t];
     }
@@ -86,8 +86,9 @@ public final class TeamDisplay {
      * @return {@link TextComponent} of the prefix
      */
     public static Component getPrefix(int t) {
-        var prefix = trans("xyz.baz9k.uhc.team.prefix", t == 0 ? trans("xyz.baz9k.uhc.team.spectator_abbr") : t)
-            .style(getStyle(t));
+        var prefix = new Key("team.prefix").trans(
+            t == 0 ? new Key("team.spectator_abbr").trans() : t
+        ).style(getStyle(t));
         return render(prefix);
     }
 
@@ -116,7 +117,7 @@ public final class TeamDisplay {
      * @return {@link TextComponent}
      */
     public static Component getName(int t) {
-        String key = t == 0 ? "xyz.baz9k.uhc.team.spectator" : "xyz.baz9k.uhc.team.teamed";
-        return trans(key, t).style(getStyle(t));
+        var key = new Key("team.%s", t == 0 ? "spectator" : "teamed");
+        return key.trans(t).style(getStyle(t));
     }
 }

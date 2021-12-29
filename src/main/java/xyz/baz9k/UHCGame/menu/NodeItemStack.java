@@ -40,9 +40,6 @@ public class NodeItemStack extends ItemStack {
      */
     public static final Style DEFAULT_DESC_STYLE = noDeco(NamedTextColor.GRAY);
     //
-    
-    private static final String NAME_ID_FORMAT = "xyz.baz9k.uhc.menu.inv.%s.name";
-    private static final String DESC_ID_FORMAT = "xyz.baz9k.uhc.menu.inv.%s.desc";
 
     /**
      * Class provides additional properties about the ItemStack.<p>
@@ -123,13 +120,13 @@ public class NodeItemStack extends ItemStack {
     public static class ExtraLore { // extra lore can either be a translatable key or a list of components
         private List<Component> lore = null;
 
-        private String tKey = null;
+        private Key tKey = null;
         private Object[] tArgs = null;
 
         public ExtraLore(Component... lore) { this.lore = List.of(Objects.requireNonNull(lore)); }
         public ExtraLore(List<Component> lore) { this.lore = List.copyOf(Objects.requireNonNull(lore)); }
 
-        public ExtraLore(String key, Object... args) {
+        public ExtraLore(Key key, Object... args) {
             this.tKey = Objects.requireNonNull(key);
             this.tArgs = Objects.requireNonNull(args);
         }
@@ -152,7 +149,7 @@ public class NodeItemStack extends ItemStack {
                 })
                 .toArray();
 
-            return splitLines(render(trans(tKey, args).style(DEFAULT_DESC_STYLE)));
+            return splitLines(render(tKey.trans(args).style(DEFAULT_DESC_STYLE)));
         }
 
         /**
@@ -165,11 +162,11 @@ public class NodeItemStack extends ItemStack {
                 // keeps the description untouched, adds Status: ACTIVE/INACTIVE below it
                 TranslatableComponent status;
                 if (active) {
-                    status = trans("xyz.baz9k.uhc.menu.bool_valued.on").style(noDeco(NamedTextColor.GREEN));
+                    status = new Key("menu.bool_valued.on").trans().style(noDeco(NamedTextColor.GREEN));
                 } else {
-                    status = trans("xyz.baz9k.uhc.menu.bool_valued.off").style(noDeco(NamedTextColor.RED));
+                    status = new Key("menu.bool_valued.off").trans().style(noDeco(NamedTextColor.RED));
                 }
-                return new NodeItemStack.ExtraLore("xyz.baz9k.uhc.menu.bool_valued.status", status);
+                return new NodeItemStack.ExtraLore(new Key("menu.bool_valued.status"), status);
             };
         }
     }
@@ -273,6 +270,9 @@ public class NodeItemStack extends ItemStack {
         return lines;
     }
 
+    private static final Key NAME_KEY_FORMAT = new Key("menu.inv.%s.name");
+    private static final Key DESC_KEY_FORMAT = new Key("menu.inv.%s.desc");
+
     /**
      * Gets rendered name by translating the lang key<p>
      * Rendered components are text components that are already translated.
@@ -291,8 +291,8 @@ public class NodeItemStack extends ItemStack {
      * @return rendered {@link Component}
      */
     public static Component nameFromID(String langKey, Style s) {
-        String key = String.format(NAME_ID_FORMAT, langKey);
-        return render(trans(key).style(s));
+        Key fullLangKey = NAME_KEY_FORMAT.args(langKey);
+        return render(fullLangKey.trans().style(s));
     }
 
     /**
@@ -312,9 +312,9 @@ public class NodeItemStack extends ItemStack {
      * @return lines of rendered Component
      */
     public static List<Component> descFromID(String langKey, Style s) {
-        String fullLangKey = String.format(DESC_ID_FORMAT, langKey);
+        Key fullLangKey = DESC_KEY_FORMAT.args(langKey);
 
-        Component rendered = render(trans(fullLangKey).style(s));
+        Component rendered = render(fullLangKey.trans().style(s));
         if (renderString(rendered).equals("")) return List.of();
 
         return splitLines(rendered);

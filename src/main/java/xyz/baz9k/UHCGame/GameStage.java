@@ -65,9 +65,6 @@ public enum GameStage {
         }
     }
 
-    private static final String BB_TITLE_KEY = "xyz.baz9k.uhc.bossbar.%s";
-    private static final String BASE_CHAT_MSG_KEY = "xyz.baz9k.uhc.chat.stage_base.%s";
-
     private final BossBar.Color bbClr;
     private final ConfigDur dur;
     private final ConfigWBSize wbSize;
@@ -78,7 +75,7 @@ public enum GameStage {
     private final boolean isWBInstant;
     /**
      * 
-     * @param transID      Identifier in the translatable key that differentiates each stage
+     * @param langKey      Identifier in the translatable key that differentiates each stage
      * @param bbClr        Color of boss bar
      * @param dur          Duration of the stage (either a config ID or duration)
      * <p> If zero, the stage is skipped in iteration
@@ -87,7 +84,7 @@ public enum GameStage {
      * @param bbTitleStyle Style (color, text decoration, etc.) of the boss bar title
      * @param bodyStyle    Style of the base chat message
      */
-    GameStage(String transID, BossBar.Color bbClr, ConfigDur dur, ConfigWBSize wbDiameter, boolean isWBInstant, Style bbTitleStyle, Style bodyStyle) {
+    GameStage(String langKey, BossBar.Color bbClr, ConfigDur dur, ConfigWBSize wbDiameter, boolean isWBInstant, Style bbTitleStyle, Style bodyStyle) {
         // bossbar
         this.bbClr = bbClr;
 
@@ -100,9 +97,9 @@ public enum GameStage {
         this.bodyStyle = bodyStyle;
 
         // translatable components
-        if (transID != null) {
-            this.bbTitle     = trans(String.format(BB_TITLE_KEY,      transID)).style(bbTitleStyle);
-            this.baseChatMsg = trans(String.format(BASE_CHAT_MSG_KEY, transID)).style(bodyStyle);
+        if (langKey != null) {
+            this.bbTitle     = new Key("bossbar.%s",langKey).trans().style(bbTitleStyle);
+            this.baseChatMsg = new Key("chat.stage_base.%s",langKey).trans().style(bodyStyle);
         } else {
             this.bbTitle     = Component.empty();
             this.baseChatMsg = Component.empty();
@@ -214,20 +211,20 @@ public enum GameStage {
         return Component.text()
             .append(
                 Component.text("<", TextColor.color(0xCFCFFF), BOLD),
-                Component.translatable("xyz.baz9k.uhc.chat.name", TextColor.color(0xA679FE), BOLD),
+                new Key("chat.name").trans().style(Style.style(TextColor.color(0xA679FE), BOLD)),
                 Component.text("> ", TextColor.color(0xCFCFFF), BOLD)
             );
     }
 
-    private static final String WB_NAME = "xyz.baz9k.uhc.chat.wb.name";
-    private static final String WB_PRONOUN = "xyz.baz9k.uhc.chat.wb.pronoun";
+    private static final Key WB_NAME = new Key("chat.wb.name");
+    private static final Key WB_PRONOUN = new Key("chat.wb.pronoun");
 
-    private static final String WILL_SHRINK = "xyz.baz9k.uhc.chat.warning.wb_will_shrink";
-    private static final String WILL_SHRINK_INSTANT = "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink";
-    private static final String JUST_SHRINK = "xyz.baz9k.uhc.chat.warning.wb_will_shrink";
-    private static final String JUST_SHRINK_INSTANT = "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink";
+    private static final Key WILL_SHRINK = new Key("chat.warning.wb_will_shrink");
+    private static final Key WILL_SHRINK_INSTANT = new Key("chat.warning.wb_will_instant_shrink");
+    private static final Key JUST_SHRINK = new Key("chat.warning.wb_will_shrink");
+    private static final Key JUST_SHRINK_INSTANT = new Key("chat.warning.wb_will_instant_shrink");
     
-    private static final String DM_WARN = "xyz.baz9k.uhc.chat.warning.dm_warn";
+    private static final Key DM_WARN = new Key("chat.warning.dm_warn");
 
     /**
      * Sends the linked message in chat.
@@ -243,8 +240,8 @@ public enum GameStage {
             return;
         }
 
-        String situationKey = null;
-        Component subject = trans(this == WB_STILL ? WB_NAME : WB_PRONOUN);
+        Key situationKey = null;
+        Component subject = (this == WB_STILL ? WB_NAME : WB_PRONOUN).trans();
 
         GameStage next = next();
 
@@ -259,13 +256,13 @@ public enum GameStage {
         s.append(Component.space());
 
         if (situationKey != null) {
-            Component situation = trans(situationKey, subject, wbRadius(), getWordTime(duration()))
+            Component situation = situationKey.trans(subject, wbRadius(), getWordTime(duration()))
                 .style(bodyStyle);
             s.append(situation);
         }
 
         if (this == DEATHMATCH.prev()) {
-            Component dmwarn = trans(DM_WARN, getWordTime(duration())).style(bodyStyle);
+            Component dmwarn = DM_WARN.trans(getWordTime(duration())).style(bodyStyle);
             
             s.append(Component.space())
              .append(dmwarn);

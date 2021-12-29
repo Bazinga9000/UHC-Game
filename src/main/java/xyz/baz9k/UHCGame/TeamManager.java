@@ -91,7 +91,7 @@ public class TeamManager {
      */
     public void assignPlayerToTeam(@NotNull Player p, int t) {
         if (t <= 0 || t > numTeams) {
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.team.invalid");
+            throw new Key("team.invalid").transErr(IllegalArgumentException.class);
         }
 
         setNode(p, PlayerState.COMBATANT_ALIVE, t);
@@ -176,7 +176,7 @@ public class TeamManager {
      */
     public void setCombatantAliveStatus(@NotNull Player p, boolean alive) {
         if (!isAssignedCombatant(p)) {
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.must_assigned_comb");
+            throw new Key("err.team.must_assigned_comb").transErr(IllegalArgumentException.class);
         }
 
         PlayerState s = alive ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
@@ -231,7 +231,7 @@ public class TeamManager {
     @NotNull
     public Set<Player> getCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.invalid", team, numTeams);
+            throw new Key("err.team.invalid").transErr(IllegalArgumentException.class, team, numTeams);
         }
 
         return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR && n.state != PlayerState.COMBATANT_UNASSIGNED && n.team == team);
@@ -319,7 +319,7 @@ public class TeamManager {
             case "sextets" -> 6;
             case "septets" -> 7;
             case "octets" -> 8;
-            default -> throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.size_name_invalid", s);
+            default -> throw new Key("err.team.size_name_invalid").transErr(IllegalArgumentException.class, s);
         });
     }
 
@@ -338,7 +338,7 @@ public class TeamManager {
      */
     public void setNumTeams(int n) {
         if (n <= 0) {
-            throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.count_must_pos");
+            throw new Key("err.team.count_must_pos").transErr(IllegalArgumentException.class);
         }
 
         numTeams = n;

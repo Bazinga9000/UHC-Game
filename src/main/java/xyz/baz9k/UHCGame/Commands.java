@@ -222,7 +222,7 @@ public final class Commands {
             (sender, args) -> {
                 TeamManager tm = plugin.getTeamManager();
                 tm.resetAllPlayers();
-                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.clearteams.succ"));
+                sender.sendMessage(new Key("cmd.clearteams.succ").trans());
             }
         );
     }
@@ -234,9 +234,9 @@ public final class Commands {
         return new CommandAPICommand("reseed")
         .executes(
             (sender, args) -> {
-                Bukkit.getServer().sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.start").color(NamedTextColor.YELLOW));
+                Bukkit.getServer().sendMessage(new Key("cmd.reseed.start").trans().color(NamedTextColor.YELLOW));
                 plugin.getWorldManager().reseedWorlds();
-                Bukkit.getServer().sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.succ").color(NamedTextColor.YELLOW));
+                Bukkit.getServer().sendMessage(new Key("cmd.reseed.succ").trans().color(NamedTextColor.YELLOW));
             }
         );
     }
@@ -251,9 +251,9 @@ public final class Commands {
         )
         .executes(
             (sender, args) -> {
-                Bukkit.getServer().sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.start").color(NamedTextColor.YELLOW));
+                Bukkit.getServer().sendMessage(new Key("cmd.reseed.start").trans().color(NamedTextColor.YELLOW));
                 plugin.getWorldManager().reseedWorlds((long) args[0], false);
-                Bukkit.getServer().sendMessage(trans("xyz.baz9k.uhc.cmd.reseed.succ").color(NamedTextColor.YELLOW));
+                Bukkit.getServer().sendMessage(new Key("cmd.reseed.succ").trans().color(NamedTextColor.YELLOW));
             }
         );
     }
@@ -261,14 +261,14 @@ public final class Commands {
     private void _respawn(CommandSender sender, Player p, Location loc) {
         TeamManager tm = plugin.getTeamManager();
         if (tm.isSpectator(p)) {
-            sender.sendMessage(trans("xyz.baz9k.uhc.cmd.respawn.fail.spectator", p.getName()).color(NamedTextColor.RED));
+            sender.sendMessage(new Key("cmd.respawn.fail.spectator").trans(p.getName()).color(NamedTextColor.RED));
             return;
         }
 
         p.teleport(loc);
         tm.setCombatantAliveStatus(p, true);
         p.setGameMode(GameMode.SURVIVAL);
-        sender.sendMessage(trans("xyz.baz9k.uhc.cmd.respawn.succ", p.getName()));
+        sender.sendMessage(new Key("cmd.respawn.succ").trans(p.getName()));
     }
 
     // uhc respawn <target: players>
@@ -322,7 +322,7 @@ public final class Commands {
                 for (Player p : (Collection<Player>) args[0]) {
                     int team = tm.getTeam(p);
                     PlayerState state = tm.getPlayerState(p);
-                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.state_get.succ", p.getName(), state, team));
+                    sender.sendMessage(new Key("cmd.state_get.succ").trans(p.getName(), state, team));
                 }
             }
         );
@@ -345,7 +345,7 @@ public final class Commands {
                         case "spectator" -> tm.setSpectator(p);
                         case "combatant" -> tm.setUnassignedCombatant(p);
                     }
-                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.state_get.succ", p.getName(), tm.getPlayerState(p), tm.getTeam(p)));
+                    sender.sendMessage(new Key("cmd.state_get.succ").trans(p.getName(), tm.getPlayerState(p), tm.getTeam(p)));
                 }
             }
         );
@@ -368,7 +368,7 @@ public final class Commands {
                 try {
                     for (Player p : (Collection<Player>) args[0]) {
                         plugin.getTeamManager().assignPlayerToTeam(p, t);
-                        sender.sendMessage(trans("xyz.baz9k.uhc.cmd.state_set.succ", p.getName(), tm.getPlayerState(p), tm.getTeam(p)));
+                        sender.sendMessage(new Key("cmd.state_set.succ").trans(p.getName(), tm.getPlayerState(p), tm.getTeam(p)));
                     }
                 } catch (IllegalArgumentException e) {
                     CommandAPI.fail(e.getMessage());
@@ -389,7 +389,7 @@ public final class Commands {
                 GameManager gm = plugin.getGameManager();
 
                 gm.incrementStage();
-                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.stage_set.succ", gm.getStage()));
+                sender.sendMessage(new Key("cmd.stage_set.succ").trans(gm.getStage()));
             }
         );
     }
@@ -419,7 +419,7 @@ public final class Commands {
                 GameStage s = (GameStage) args[0];
 
                 gm.setStage(s);
-                sender.sendMessage(trans("xyz.baz9k.uhc.cmd.stage_set.succ", gm.getStage()));
+                sender.sendMessage(new Key("cmd.stage_set.succ").trans(gm.getStage()));
             }
         );
     }
@@ -431,7 +431,7 @@ public final class Commands {
         .executes(
             (sender, args) -> {
                 if (plugin.getGameManager().hasUHCStarted()) {
-                    sender.sendMessage(trans("xyz.baz9k.uhc.cmd.has_started.succ"));
+                    sender.sendMessage(new Key("cmd.has_started.succ").trans());
                     return;
                 }
                 requireStarted();
@@ -461,8 +461,8 @@ public final class Commands {
             (sender, args) -> {
                 Debug.setDebug(!Debug.isDebugging());
 
-                String onOff = Debug.isDebugging() ? "xyz.baz9k.uhc.cmd.debug.on" : "xyz.baz9k.uhc.cmd.debug.off";
-                sender.sendMessage(trans(onOff));
+                Key onOff = new Key("cmd.debug.%s", Debug.isDebugging() ? "on" : "off");
+                sender.sendMessage(onOff.trans());
             }
         );
     }
@@ -477,8 +477,8 @@ public final class Commands {
             (sender, args) -> {
                 Debug.setDebug((boolean) args[0]);
 
-                String onOff = Debug.isDebugging() ? "xyz.baz9k.uhc.cmd.debug.on" : "xyz.baz9k.uhc.cmd.debug.off";
-                sender.sendMessage(trans(onOff));
+                Key onOff = new Key("cmd.debug.%s", Debug.isDebugging() ? "on" : "off");
+                sender.sendMessage(onOff.trans());
             }
         );
     }
