@@ -26,12 +26,7 @@ public class NodeItemStack extends ItemStack {
     private final String langKey;
 
     /**
-     * Class that provides additional properties about the ItemStack, particularly:
-     * <p> - fn to map current config value to material
-     * <p> - name style
-     * <p> - fn to map current config value to object that can be substituted in the main desc
-     * <p> - fn to do miscellaneous meta edits (ench hide flags, ench glint)
-     * <p> - fn to map current config value to extra lore
+     * Properties to generate the item stack
      */
     private final ItemProperties props;
 
@@ -49,6 +44,20 @@ public class NodeItemStack extends ItemStack {
     private static final String NAME_ID_FORMAT = "xyz.baz9k.uhc.menu.inv.%s.name";
     private static final String DESC_ID_FORMAT = "xyz.baz9k.uhc.menu.inv.%s.desc";
 
+    /**
+     * Class provides additional properties about the ItemStack.<p>
+     * This class stores functions to map "an object" to the specified property.
+     * If this ItemStack is for a {@link ValuedNode}, the used object is the config value for the node.
+     * Otherwise, there is no object by default (and all the functions can be treated as suppliers).
+     * An object can be defined via the {@link ItemProperties#useObject} method.
+     * <p>
+     * The properties this class defines:
+     * <p> - Material
+     * <p> - Name style
+     * <p> - Mapping of "object" to string that can be substituted into the description
+     * <p> - Function to perform miscellaneous ItemMeta edits (ench hide flags, ench glint)
+     * <p> - extra lore, which provides information other than the description of the node
+     */
     public static class ItemProperties {
         private Supplier<Object> propsObjSupplier = () -> null;
         private Function<Object, Material> matGet = v -> Material.AIR;
@@ -107,6 +116,9 @@ public class NodeItemStack extends ItemStack {
         }
     }
 
+    /**
+     * Class that encapsulates extra lore. The extra lore can either be a component/list of lines or a translation key.
+     */
     public static class ExtraLore { // extra lore can either be a translatable key or a list of components
         private List<Component> lore = null;
 
@@ -121,6 +133,9 @@ public class NodeItemStack extends ItemStack {
             this.tArgs = Objects.requireNonNull(args);
         }
 
+        /**
+         * @return the extra lore in component form
+         */
         public List<Component> component() {
             if (lore != null) {
                 return List.copyOf(lore)
@@ -139,6 +154,9 @@ public class NodeItemStack extends ItemStack {
             return splitLines(render(trans(tKey, args).style(DEFAULT_DESC_STYLE)));
         }
 
+        /**
+         * @return an extra lore that is either ACTIVE/INACTIVE based on if the provided object is true or false
+         */
         public static Function<Object, ExtraLore> fromBool() {
             return o -> {
                 var active = (boolean) o;
@@ -155,13 +173,17 @@ public class NodeItemStack extends ItemStack {
         }
     }
 
+    /**
+     * @param langKey the node's lang key
+     * @param props the node's item properties
+     */
     public NodeItemStack(String langKey, ItemProperties props) {
         super(props.getMat());
 
         this.langKey = langKey;
         this.props = props;
 
-        editMeta(m -> { m.addItemFlags(ItemFlag.HIDE_ENCHANTS); });
+        editMeta(m -> m.addItemFlags(ItemFlag.HIDE_ENCHANTS));
         updateAll();
 
     }
@@ -203,7 +225,7 @@ public class NodeItemStack extends ItemStack {
     }
 
     /**
-     * Updates the ItemStack to be up to date with all properties.
+     * Updates the ItemStack to be up-to-date with all properties.
      */
     public NodeItemStack updateAll() {
         setType(props.getMat());
@@ -219,7 +241,7 @@ public class NodeItemStack extends ItemStack {
     /**
      * Splits a component into a list consisting of lines
      * @param comp Component to split into
-     * <p> Non-text components cannot be split, and will be returned in a list.
+     * @apiNote Don't put non-text/-translatable components in.
      * @return list
      */
     private static List<Component> splitLines(Component comp) {
@@ -251,20 +273,21 @@ public class NodeItemStack extends ItemStack {
     }
 
     /**
-     * Gets a rendered name by translation key
-     * <p> Rendered components are text components that are already translated.
-     * @param id translation key
-     * @return rendered Component
+     * Gets rendered name by translating the lang key<p>
+     * Rendered components are text components that are already translated.
+     * @param langKey lang key
+     * @return rendered {@link Component}
      */
     public static Component nameFromID(String langKey) {
         return nameFromID(langKey, DEFAULT_NAME_STYLE);
     }
+
     /**
-     * Gets a rendered name by translation key
-     * <p> Rendered components are text components that are already translated.
-     * @param id translation key
-     * @param s
-     * @return rendered Component
+     * Gets rendered name by translating the lang key<p>
+     * Rendered components are text components that are already translated.
+     * @param langKey lang key
+     * @param s Style of component
+     * @return rendered {@link Component}
      */
     public static Component nameFromID(String langKey, Style s) {
         String key = String.format(NAME_ID_FORMAT, langKey);
@@ -272,19 +295,19 @@ public class NodeItemStack extends ItemStack {
     }
 
     /**
-     * Gets a rendered description by translation key
-     * <p> Rendered components are text components that are already translated.
-     * @param id translation key
+     * Gets a rendered description by translating the lang key<p>
+     * Rendered components are text components that are already translated.
+     * @param langKey lang key
      * @return lines of rendered Component
      */
     public static List<Component> descFromID(String langKey) {
         return descFromID(langKey, DEFAULT_DESC_STYLE);
     }
     /**
-     * Gets a rendered description by translation key
-     * <p> Rendered components are text components that are already translated.
-     * @param id translation key
-     * @param s
+     * Gets a rendered description by translating the lang key<p>
+     * Rendered components are text components that are already translated.
+     * @param langKey lang key
+     * @param s Style of component
      * @return lines of rendered Component
      */
     public static List<Component> descFromID(String langKey, Style s) {

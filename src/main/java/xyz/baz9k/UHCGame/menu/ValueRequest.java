@@ -1,6 +1,5 @@
 package xyz.baz9k.UHCGame.menu;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -22,7 +21,7 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
  * Used to get a value from the {@link Player} once a prompting {@link ValuedNode} asks for one.
  */
 public class ValueRequest {
-    public static enum Type {
+    public enum Type {
         NUMBER_REQUEST,
         STRING_REQUEST
     }
@@ -45,7 +44,11 @@ public class ValueRequest {
         };
 
         new ConversationFactory(plugin)
-            .withInitialSessionData(new HashMap<>(Map.of("requestKey", requestKey, "consumer", consumer, "reopenInventory", reopenInventory, "lastInventory", lastInventory)))
+            .withInitialSessionData(Map.ofEntries(
+                    Map.entry("requestKey", requestKey),
+                    Map.entry("consumer", consumer),
+                    Map.entry("reopenInventory", reopenInventory),
+                    Map.entry("lastInventory", lastInventory)))
             .withTimeout(60)
             .withFirstPrompt(firstPrompt)
             .withEscapeSequence("cancel")
@@ -95,11 +98,11 @@ public class ValueRequest {
         @Override
         @SuppressWarnings("unchecked")
         public @NotNull String getPromptText(@NotNull ConversationContext context) {
-            String requestKey = (String) context.getSessionData("requestKey");
-            Consumer<Object> consumer = (Consumer<Object>) context.getSessionData("consumer");
-            Object newValue = context.getSessionData("newValue");
-            boolean reopenInventory = (boolean) context.getSessionData("reopenInventory");
-            var lastInventory = (Inventory) context.getSessionData("lastInventory");
+            var requestKey       = (String) context.getSessionData("requestKey");
+            var consumer         = (Consumer<Object>) context.getSessionData("consumer");
+            var newValue         = (Object) context.getSessionData("newValue");
+            var reopenInventory  = (boolean) context.getSessionData("reopenInventory");
+            var lastInventory    = (Inventory) context.getSessionData("lastInventory");
 
             consumer.accept(newValue);
             if (reopenInventory) ((Player) context.getForWhom()).openInventory(lastInventory);

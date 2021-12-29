@@ -19,8 +19,8 @@ public final class ComponentUtils {
 
     /**
      * Style with color, but no formatting, no italic, bold, etc.
-     * @param clr
-     * @return
+     * @param clr Color of style
+     * @return the new {@link Style}
      */
     public static Style noDeco(TextColor clr) {
         Style.Builder st = Style.style().color(clr);
@@ -34,17 +34,17 @@ public final class ComponentUtils {
 
     /**
      * Convert a {@link TranslatableComponent} into readable text in the form of a {@link Component}.
-     * @param c
+     * @param c unrendered Component
      * @param l locale to use
-     * @return new Component
+     * @return rendered Component
      */
     public static Component render(Component c, Locale l) {
         return GlobalTranslator.render(c, l);
     }
     /**
      * Convert a {@link TranslatableComponent} into readable text in the form of a {@link Component}.
-     * @param c
-     * @return new Component
+     * @param c unrendered Component
+     * @return rendered Component
      */
     public static Component render(Component c) {
         return render(c, UHCGamePlugin.getLocale());
@@ -76,7 +76,7 @@ public final class ComponentUtils {
                     for (Component child : renderedTrans.children()) buf += renderString(child, l);
                     return buf;
 
-                };
+                }
                 return rendered.toString(); // if not text, then can't really do anything
             })
             .collect(Collectors.joining());
@@ -110,8 +110,7 @@ public final class ComponentUtils {
     }
 
     /**
-     * Returns an exception of type X, with a translatable component message
-     * @param <X> 
+     * Returns an exception with a translatable component message
      * @param exc Exception type
      * @param msg Component message
      * @param l Locale
@@ -126,11 +125,10 @@ public final class ComponentUtils {
     }
 
     /**
-     * Returns an exception of type X, with a translatable component message.
+     * Returns an exception with a translatable component message.
      * This uses the plugin's locale.
-     * @param <X> 
      * @param exc Exception type
-     * @param msg Component message
+     * @param c Component message
      * @return The exception, which can be thrown.
      */
     public static <X extends Throwable> X translatableErr(Class<X> exc, Component c){
@@ -138,9 +136,8 @@ public final class ComponentUtils {
     }
 
     /**
-     * Returns an exception of type X, with a translatable component message.
+     * Returns an exception with a translatable component message.
      * This uses the plugin's locale.
-     * @param <X> 
      * @param key Translation key
      * @param args Objects which are passed as strings to the translatable component. (Components stay as components)
      * @return The exception, which can be thrown.

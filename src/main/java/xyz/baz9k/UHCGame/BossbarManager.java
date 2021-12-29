@@ -4,11 +4,13 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 
+import java.time.Duration;
+
 import static xyz.baz9k.UHCGame.util.Utils.*;
 
 public class BossbarManager {
-    private GameManager gameManager;
-    private BossBar bossbar;
+    private final GameManager gameManager;
+    private final BossBar bossbar;
 
     public BossbarManager(UHCGamePlugin plugin) {
         this.gameManager = plugin.getGameManager();
@@ -43,7 +45,7 @@ public class BossbarManager {
         }
         // update progress bar
         long remainingSecs = gameManager.getRemainingStageDuration()
-            .map(d -> d.toSeconds())
+            .map(Duration::toSeconds)
             .orElse(0L);
         long totalSecs = gameManager.getStageDuration().toSeconds();
 

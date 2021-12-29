@@ -31,8 +31,8 @@ public final class Debug {
     }
     /**
      * Display a stack trace error to an audience and also print a log
-     * @param audience
-     * @param e
+     * @param audience Audience to print error to
+     * @param err Exception to print
      */
     public static void printError(Audience audience, Throwable err) {
         if (isDebugging()) {
@@ -47,7 +47,7 @@ public final class Debug {
 
     /**
      * Display a stack trace error to chat and also print a log
-     * @param e
+     * @param e Exception to print
      */
     public static void printError(Throwable e) {
         printError(onlinePlayers(), e);
@@ -59,7 +59,7 @@ public final class Debug {
 
     /**
      * Broadcast a debug message in chat
-     * @param msg
+     * @param msg Message to print
      */
     public static void printDebug(String msg) {
         printDebug(Component.text(msg));
@@ -67,7 +67,7 @@ public final class Debug {
 
     /**
      * Broadcast a debug message in chat
-     * @param msg
+     * @param msg Message to print
      */
     public static void printDebug(Component msg) {
         if (isDebugging()) {

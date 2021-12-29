@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +40,7 @@ public class TeamManager {
      * Gets the stored node of the player in the player map.
      * <p>
      * If the player is not found in the map, a new Node of state {@link PlayerState#COMBATANT_UNASSIGNED} is created.
-     * @param p
+     * @param p Player to get node of
      * @return the node
      */
     @NotNull
@@ -68,7 +69,7 @@ public class TeamManager {
 
     /**
      * Sets a player's state to {@link PlayerState#SPECTATOR}
-     * @param p
+     * @param p Player to set
      */
     public void setSpectator(@NotNull Player p) {
         setNode(p, PlayerState.SPECTATOR, 0);
@@ -76,7 +77,7 @@ public class TeamManager {
 
     /**
      * Sets a player's state to {@link PlayerState#COMBATANT_UNASSIGNED}
-     * @param p
+     * @param p Player to set
      */
     public void setUnassignedCombatant(@NotNull Player p) {
         setNode(p, PlayerState.COMBATANT_UNASSIGNED, 0);
@@ -84,8 +85,8 @@ public class TeamManager {
 
     /**
      * Assigns a player to a combatant team.
-     * @param p
-     * @param team
+     * @param p Player to assign team to
+     * @param t Team to assign player to
      */
     public void assignPlayerToTeam(@NotNull Player p, int t) {
         if (t <= 0 || t > numTeams) {
@@ -145,19 +146,11 @@ public class TeamManager {
 
         // list of players one a team, separated by commas
         String tPlayers = players.stream()
-            .map(p -> p.getName())
+            .map(HumanEntity::getName)
             .collect(Collectors.joining(", "));
         
         b.append(Component.text(tPlayers, noDeco(NamedTextColor.WHITE)));
         Bukkit.getServer().sendMessage(b);
-    }
-
-    /**
-     * Removes a player from the TeamManager.
-     * @param p
-     */
-    public void removePlayer(@NotNull Player p) { // unused
-        playerMap.remove(p.getUniqueId());
     }
 
     @NotNull
@@ -177,8 +170,8 @@ public class TeamManager {
 
     /**
      * Sets player to alive or dead.
-     * @param p
-     * @param aliveStatus
+     * @param p Player to set
+     * @param aliveStatus Status to set
      */
     public void setCombatantAliveStatus(@NotNull Player p, boolean aliveStatus) {
         if (!isAssignedCombatant(p)) {
@@ -229,7 +222,7 @@ public class TeamManager {
     }
 
     /**
-     * @param team
+     * @param team Team to inspect
      * @return a {@link Set} of all combatants on a specific team
      */
     @NotNull
@@ -258,7 +251,7 @@ public class TeamManager {
     }
 
     /**
-     * @param t
+     * @param t Team to inspect
      * @return a {@link Set} of all online combatants on a specific team
      */
     @NotNull
@@ -278,7 +271,7 @@ public class TeamManager {
     }
 
     /**
-     * @param t
+     * @param t Team to inspect
      * @return if the specified team is eliminated
      */
     public boolean isTeamEliminated(int t) {
@@ -289,7 +282,7 @@ public class TeamManager {
     }
 
     /**
-     * @param p
+     * @param p Player to inspect
      * @return if the specified player is a {@link PlayerState#SPECTATOR}
      */
     public boolean isSpectator(@NotNull Player p) {
@@ -297,7 +290,7 @@ public class TeamManager {
     }
 
     /**
-     * @param p
+     * @param p Player to inspect
      * @return if the specified player is an assigned combatant.
      */
     public boolean isAssignedCombatant(@NotNull Player p) {
@@ -330,12 +323,16 @@ public class TeamManager {
     /**
      * Sets the number of players per team
      * If the # of combatants is not easily divisible by the team size, try to even as much as possible
-     * @param n
+     * @param n Number of members in each team
      */
     public void setTeamSize(int n) {
         setNumTeams((int) Math.round(getCombatants().size() / (double) n));
     }
 
+    /**
+     * Sets the number of teams
+     * @param n Number of teams
+     */
     public void setNumTeams(int n) {
         if (n <= 0) {
             throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.count_must_pos");

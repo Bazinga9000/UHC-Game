@@ -28,20 +28,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
 @SuppressWarnings("unchecked")
-public class Commands {
+public final class Commands {
     private final UHCGamePlugin plugin;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    private static @interface RegisterUHCSubCommand { }
+    private @interface RegisterUHCSubCommand { }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    private static @interface RegisterCommand { }
+    private @interface RegisterCommand { }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    private static @interface RegisterBrigadierCommand { }
+    private @interface RegisterBrigadierCommand { }
 
     public Commands(UHCGamePlugin plugin) {
         this.plugin = plugin;
@@ -517,7 +517,8 @@ public class Commands {
         .withArguments(new StringArgument("path"))
         .executes(
                 (sender, args) -> {
-                    sender.sendMessage(Component.text(plugin.getConfig().getString((String) args[0])));
+                    Object o = plugin.getConfig().get((String) args[0]);
+                    sender.sendMessage(Component.text(Objects.toString(o)));
                 }
         );
     }

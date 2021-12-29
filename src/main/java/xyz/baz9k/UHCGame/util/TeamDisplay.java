@@ -35,8 +35,8 @@ public final class TeamDisplay {
 
     /**
      * Returns color of the team in type {@link java.awt.Color}.
-     * @param t
-     * @return
+     * @param t Team number (or 0)
+     * @return the {@link java.awt.Color}
      */
     public static Color getColor(int t) {
         if (t < 0) {
@@ -78,10 +78,6 @@ public final class TeamDisplay {
     public static Style getStyle(int t) {
         TextDecoration deco = t == 0 ? ITALIC : BOLD;
         return Style.style(getTextColor(t), deco);
-    }
-
-    public static int getNumTeamColors() {
-        return NUM_TEAM_COLORS;
     }
 
     /**

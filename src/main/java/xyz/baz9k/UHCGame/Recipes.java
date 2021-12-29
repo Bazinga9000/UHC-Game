@@ -19,8 +19,8 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.jetbrains.annotations.NotNull;
 
 public final class Recipes {
-    private UHCGamePlugin plugin;
-    private Set<NamespacedKey> registered = new HashSet<>();
+    private final UHCGamePlugin plugin;
+    private final Set<NamespacedKey> registered = new HashSet<>();
     public Recipes(UHCGamePlugin plugin) {
         this.plugin = plugin;
     }
@@ -45,7 +45,7 @@ public final class Recipes {
 
     /**
      * Discover all registered recipes for a player
-     * @param p
+     * @param p Player to register recipes for
      */
     public void discoverFor(@NotNull Player p) {
         p.discoverRecipes(registered);
@@ -53,7 +53,7 @@ public final class Recipes {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    private static @interface DeclaredRecipe { }
+    private @interface DeclaredRecipe { }
 
     @NotNull
     private NamespacedKey key(String s) {

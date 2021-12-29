@@ -87,7 +87,7 @@ public enum GameStage {
      * @param bbTitleStyle Style (color, text decoration, etc.) of the boss bar title
      * @param bodyStyle    Style of the base chat message
      */
-    private GameStage(String transID, BossBar.Color bbClr, ConfigDur dur, ConfigWBSize wbDiameter, boolean isWBInstant, Style bbTitleStyle, Style bodyStyle) {
+    GameStage(String transID, BossBar.Color bbClr, ConfigDur dur, ConfigWBSize wbDiameter, boolean isWBInstant, Style bbTitleStyle, Style bodyStyle) {
         // bossbar
         this.bbClr = bbClr;
 
@@ -191,7 +191,7 @@ public enum GameStage {
     
     /**
      * Updates worlds to align with the stage's world border size.
-     * @param worlds
+     * @param worlds Worlds to apply world border to
      */
     public void applyWBSize(World... worlds) {
         if (this == NOT_IN_GAME) return;
@@ -219,15 +219,15 @@ public enum GameStage {
             );
     }
 
-    private static String WB_NAME = "xyz.baz9k.uhc.chat.wb.name";
-    private static String WB_PRONOUN = "xyz.baz9k.uhc.chat.wb.pronoun";
+    private static final String WB_NAME = "xyz.baz9k.uhc.chat.wb.name";
+    private static final String WB_PRONOUN = "xyz.baz9k.uhc.chat.wb.pronoun";
 
-    private static String WILL_SHRINK = "xyz.baz9k.uhc.chat.warning.wb_will_shrink";
-    private static String WILL_SHRINK_INSTANT = "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink";
-    private static String JUST_SHRINK = "xyz.baz9k.uhc.chat.warning.wb_will_shrink";
-    private static String JUST_SHRINK_INSTANT = "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink";
+    private static final String WILL_SHRINK = "xyz.baz9k.uhc.chat.warning.wb_will_shrink";
+    private static final String WILL_SHRINK_INSTANT = "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink";
+    private static final String JUST_SHRINK = "xyz.baz9k.uhc.chat.warning.wb_will_shrink";
+    private static final String JUST_SHRINK_INSTANT = "xyz.baz9k.uhc.chat.warning.wb_will_instant_shrink";
     
-    private static String DM_WARN = "xyz.baz9k.uhc.chat.warning.dm_warn";
+    private static final String DM_WARN = "xyz.baz9k.uhc.chat.warning.dm_warn";
 
     /**
      * Sends the linked message in chat.

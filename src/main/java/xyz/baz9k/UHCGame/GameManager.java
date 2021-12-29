@@ -37,7 +37,7 @@ import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 public class GameManager implements Listener {
-    private UHCGamePlugin plugin;
+    private final UHCGamePlugin plugin;
 
     private TeamManager teamManager;
     private HUDManager hudManager;
@@ -47,7 +47,7 @@ public class GameManager implements Listener {
     private BukkitTask tick;
     
     
-    private final HashMap<UUID, Component> previousDisplayNames = new HashMap<>();
+    private final HashMap<UUID, Component> prevDisplayNames = new HashMap<>();
     private final HashMap<UUID, Integer> kills = new HashMap<>();
     
     private GameStage stage = GameStage.NOT_IN_GAME;
@@ -70,18 +70,18 @@ public class GameManager implements Listener {
         recipes = plugin.getRecipes();
     }
 
-    private static enum GameInitFailure {
+    private enum GameInitFailure {
         TEAM_UNASSIGNED      ("xyz.baz9k.uhc.err.team.must_assigned"),
         WORLDS_NOT_REGENED   ("xyz.baz9k.uhc.err.world.must_regened", "xyz.baz9k.uhc.err.world.must_regened_short"),
         GAME_NOT_STARTED     ("xyz.baz9k.uhc.err.not_started"       ),
         GAME_ALREADY_STARTED ("xyz.baz9k.uhc.err.already_started"   );
 
-        private String errKey;
-        private String panelErrKey;
-        private GameInitFailure(String errKey) {
+        private final String errKey;
+        private final String panelErrKey;
+        GameInitFailure(String errKey) {
             this(errKey, errKey);
         }
-        private GameInitFailure(String errKey, String panelErrKey) {
+        GameInitFailure(String errKey, String panelErrKey) {
             this.errKey = errKey;
             this.panelErrKey = panelErrKey;
         }
@@ -279,7 +279,7 @@ public class GameManager implements Listener {
 
     /**
      * Resets a player's statuses (health, food, sat, xp, etc.)
-     * @param p
+     * @param p the player
      */
     public void resetStatuses(@NotNull Player p) {
         // fully heal, adequately saturate, remove XP
@@ -454,7 +454,7 @@ public class GameManager implements Listener {
         winMsg = includeGameTimestamp(winMsg);
 
         // this msg should be displayed after player death
-        delayedMessage(winMsg, plugin, 1);
+        delayedMessage(winMsg, 1);
         
         var fwe = FireworkEffect.builder()
             .withColor(TeamDisplay.getBukkitColor(winner), org.bukkit.Color.WHITE)
@@ -506,7 +506,7 @@ public class GameManager implements Listener {
                     .style(noDeco(NamedTextColor.WHITE));
                 teamElimMsg = includeGameTimestamp(teamElimMsg);
                 // this msg should be displayed after player death
-                delayedMessage(teamElimMsg, plugin, 1);
+                delayedMessage(teamElimMsg, 1);
             }
 
             // check win condition
@@ -570,7 +570,7 @@ public class GameManager implements Listener {
             }
 
             // handle display name
-            // previousDisplayNames.put(p.getUniqueId(), p.displayName());
+            // prevDisplayNames.put(p.getUniqueId(), p.displayName());
             
             if (teamManager.isSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
@@ -604,11 +604,7 @@ public class GameManager implements Listener {
             
             // update display names
             UUID uuid = p.getUniqueId();
-            if (previousDisplayNames.containsKey(uuid)) {
-                setDisplayName(p, previousDisplayNames.get(uuid));
-            } else {
-                setDisplayName(p, null);
-            }
+            setDisplayName(p, prevDisplayNames.get(uuid));
         }
     }
 }

@@ -18,15 +18,15 @@ public class ValuedNode extends Node {
     /**
      * Enum of the supported types for a {@link ValuedNode}.
      */
-    public static enum Type {
+    public enum Type {
         INTEGER (true), 
         DOUBLE  (true), 
         STRING  (false), 
         BOOLEAN (false), 
         OPTION  (true);
 
-        private boolean isNumeric;
-        private Type(boolean isNumeric) {
+        private final boolean isNumeric;
+        Type(boolean isNumeric) {
             this.isNumeric = isNumeric;
         }
 
@@ -38,9 +38,9 @@ public class ValuedNode extends Node {
 
     /**
      * @param parent Parent node
-     * @param slot lot of this node in parent's inventory
-     * @param nodeName Node name, which is used to determine the ID
-     * @param props {@link NodeItemStack#ItemProperties}
+     * @param slot Slot of this node in parent's inventory
+     * @param nodeName Name of the node
+     * @param props {@link NodeItemStack.ItemProperties}
      * <p>
      * If format strings are included in the item's description (%s, %.1f, etc.), 
      * those will be substituted with the config value.
@@ -56,9 +56,9 @@ public class ValuedNode extends Node {
     }
     /**
      * @param parent Parent node
-     * @param slot lot of this node in parent's inventory
-     * @param nodeName Node name, which is used to determine the ID
-     * @param props {@link NodeItemStack#ItemProperties}
+     * @param slot Slot of this node in parent's inventory
+     * @param nodeName Name of the node
+     * @param props {@link NodeItemStack.ItemProperties}
      * <p>
      * If format strings are included in the item's description (%s, %.1f, etc.), 
      * those will be substituted with the config value.
@@ -96,7 +96,10 @@ public class ValuedNode extends Node {
         }
     }
 
-    public void undo(Player p) {
+    /**
+     * Undoes a value change if the value change brings an invalid config state.
+     */
+    public void undo() {
         set(prevValue);
     }
 

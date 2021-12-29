@@ -19,7 +19,7 @@ public class LangManager {
     private static Locale pluginLocale = DEFAULT_LOCALE;
 
     private final UHCGamePlugin plugin;
-    private TranslationRegistry reg;
+    private final TranslationRegistry reg;
     private final HashMap<Locale, YamlConfiguration> yamlFileCache = new HashMap<>();
     private final Map<Locale, Map<String, MessageFormat>> cfgCache = new HashMap<>();
 

@@ -18,8 +18,8 @@ import java.util.*;
  * Setup for the config GUI tree
  */
 public class MenuTree {
-    private BranchNode root;
-    private UHCGamePlugin plugin;
+    private final BranchNode root;
+    private final UHCGamePlugin plugin;
 
     public MenuTree(UHCGamePlugin plugin) {
         this.plugin = plugin;

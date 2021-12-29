@@ -19,9 +19,9 @@ public abstract class Node {
 
     /**
      * @param parent Parent node
-     * @param parentSlot lot of this node in parent's inventory
-     * @param nodeName Node name, which is used to determine the ID
-     * @param props {@link NodeItemStack#ItemProperties}
+     * @param parentSlot Slot of this node in parent's inventory
+     * @param nodeName Name of the node
+     * @param props {@link NodeItemStack.ItemProperties}
      */
     public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.ItemProperties props) {
         this.parent = parent;
@@ -49,6 +49,9 @@ public abstract class Node {
      */
     public abstract void click(@NotNull Player p);
 
+    /**
+     * @return this node's item stack in inventory
+     */
     public ItemStack itemStack() {
         if (itemStack == null) {
             // item stack is accessed for first time. make it
@@ -64,11 +67,18 @@ public abstract class Node {
         return parentName + "." + nodeName;
     }
 
+    /**
+     * @return path relative to the root node
+     */
     public String path() {
         if (parent == null) return "";
         return appendNodeName(parent.path(), nodeName);
     }
 
+    /**
+     * @param b Node to find relative path
+     * @return path relative to the specified node
+     */
     public String pathRelativeTo(BranchNode b) {
         if (this.equals(b)) return "";
         if (parent == null) return null;
@@ -76,12 +86,11 @@ public abstract class Node {
     }
 
     /**
-     * Gets the lang key of this node, which is an identifier used in the lang files to give this node a name and description.
-     * (Also it looks cleaner to have all the langKey code in one place so BranchNode isn't overriding this method)
-     * 
-     * The lang key is just the path (the names of the nodes dotted together) + .root if the node is a BranchNode.
-     */
+      * @return the lang key of this node, an identifier used in the lang files to give node name and description.<p>
+      * Lang key is just the path + .root if the node is a Branch Node.
+      */
     public String langKey() {
+        // it looks cleaner to have all the langKey node in one place since it's so small
         if (this instanceof BranchNode) {
             return appendNodeName(path(), "root");
         }

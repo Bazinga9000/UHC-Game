@@ -17,7 +17,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class SpreadPlayersManager {
-    private UHCGamePlugin plugin;
+    private final UHCGamePlugin plugin;
 
     public SpreadPlayersManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
@@ -26,7 +26,7 @@ public class SpreadPlayersManager {
     /**
      * Stores information for determining what groups to spread together
      */
-    private static record Grouping(Function<UHCGamePlugin, Collection<? extends Collection<Player>>> groupGen, Location def) {
+    private record Grouping(Function<UHCGamePlugin, Collection<? extends Collection<Player>>> groupGen, Location def) {
         public Collection<? extends Collection<Player>> groups(UHCGamePlugin plugin) { return groupGen.apply(plugin); }
     }
     
@@ -36,7 +36,7 @@ public class SpreadPlayersManager {
      */
     public static Grouping BY_PLAYERS() {
         return BY_PLAYERS(null);
-    };
+    }
         
     /**
      * Generates a collection with each player in separate groups, meaning that all players are spread separately.
@@ -44,13 +44,11 @@ public class SpreadPlayersManager {
      * @return a new generator that spreads all players separately
      */
     public static Grouping BY_PLAYERS(Location def) {
-        return new Grouping(pl -> {
-            return pl.getTeamManager().getCombatants()
-                .stream()
-                .map(Collections::singleton)
-                .toList();
-        }, def);
-    };
+        return new Grouping(pl -> pl.getTeamManager().getCombatants()
+            .stream()
+            .map(Collections::singleton)
+            .toList(), def);
+    }
 
     /**
      * Generates a collection with each team in separate groups, meaning that all teams are spread together.
@@ -86,7 +84,8 @@ public class SpreadPlayersManager {
      */
     public static <K> Grouping BY(Function<Player, K> key) {
         return BY(key, null);
-    };
+    }
+
     /**
      * Generates a collection based on the provided key map. Players mapping to the same key are spread together.
      * <p>
@@ -104,7 +103,7 @@ public class SpreadPlayersManager {
             g.remove(null);
             return g.values();
         }, def);
-    };
+    }
 
     private List<Location> getRootsOfUnityLocations(Location center, int numLocations, double distance) {
         Point2D center2 = Point2D.fromLocation(center);
@@ -291,10 +290,10 @@ public class SpreadPlayersManager {
 
     /**
      * Spreads players randomly
-     * @param grouping
-     * @param center
-     * @param maximumRange
-     * @param minSeparation
+     * @param grouping Grouping designating which groups of players are teleported together
+     * @param center Center of spread radius
+     * @param maximumRange Maximum spread (diameter)
+     * @param minSeparation Minimum separation between groups
      */
     public void random(Grouping grouping, Location center, double maximumRange, double minSeparation) {
         spreadPlayers(grouping, n -> getRandomLocations(center, n, maximumRange, minSeparation));
@@ -302,9 +301,9 @@ public class SpreadPlayersManager {
 
     /**
      * Spreads players based on the roots of unity
-     * @param grouping
-     * @param center
-     * @param distance
+     * @param grouping Grouping designating which groups of players are teleported together
+     * @param center Center of spread radius
+     * @param distance Distance from center to spread
      */
     public void rootsOfUnity(Grouping grouping, Location center, double distance) {
         spreadPlayers(grouping, n -> getRootsOfUnityLocations(center, n, distance));

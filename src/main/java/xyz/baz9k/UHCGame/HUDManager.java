@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.*;
 import static net.kyori.adventure.text.format.TextDecoration.*;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Damageable;
 import xyz.baz9k.UHCGame.util.ColorGradient;
 import xyz.baz9k.UHCGame.util.Point2D;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
@@ -53,7 +54,7 @@ public class HUDManager implements Listener {
         return TeamDisplay.getName(team);
     }
 
-    private Component formatTeammate(@NotNull Player you, @NotNull Player teammate) {
+    private @NotNull Component formatTeammate(@NotNull Player you, @NotNull Player teammate) {
         TextComponent.Builder s = Component.text();
 
         double teammateHP = teammate.getHealth() + teammate.getAbsorptionAmount();
@@ -137,6 +138,11 @@ public class HUDManager implements Listener {
         return scoreboards;
     }
 
+    /**
+     * Register on a scoreboard the player's prefix team
+     * @param s Scoreboard to register player prefix on
+     * @param p Player to register prefix of
+     */
     private void applyPrefixOnScoreboard(Scoreboard s, Player p) {
         int team = teamManager.getTeam(p);
         
@@ -152,6 +158,10 @@ public class HUDManager implements Listener {
         t.addPlayer(p);
     }
 
+    /**
+     * Update all prefixes on player's HUD
+     * @param p Player to update scoreboard of
+     */
     public void updatePrefixesOnHUD(Player p) {
         Scoreboard s = p.getScoreboard();
         for (Player pl : Bukkit.getOnlinePlayers()) {
@@ -159,6 +169,10 @@ public class HUDManager implements Listener {
         }
     }
 
+    /**
+     * Update player's prefix on all HUDs
+     * @param p Player whose prefix should be dispatched
+     */
     public void dispatchPrefixUpdate(Player p) {
         for (Scoreboard s : scoreboardsInUse()) {
             applyPrefixOnScoreboard(s, p);
@@ -167,7 +181,7 @@ public class HUDManager implements Listener {
 
     /**
      * Creates the scoreboard for a player, adds necessary objectives (the main hud, hearts), registers all online players to it
-     * @param p
+     * @param p Player to create scoreboard for
      */
     private void createHUDScoreboard(@NotNull Player p){
         // give player scoreboard & objective
@@ -177,7 +191,7 @@ public class HUDManager implements Listener {
         Objective hud = newBoard.registerNewObjective("hud", "dummy", Component.text(p.getName(), NamedTextColor.WHITE));
         hud.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        // bukkit et al apparently do not allow one obj in multiple display slots even though vanilla is 100% okay with that. no clue.
+        // bukkit et al. apparently do not allow one obj in multiple display slots even though vanilla is 100% okay with that. no clue.
         Objective hearts1 = newBoard.registerNewObjective("hearts1", "dummy", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
         Objective hearts2 = newBoard.registerNewObjective("hearts2", "dummy", Component.text("♥", NamedTextColor.RED), RenderType.HEARTS);
         hearts1.setDisplaySlot(DisplaySlot.PLAYER_LIST);
@@ -188,7 +202,7 @@ public class HUDManager implements Listener {
 
     /**
      * Reserves a space for a HUD line at a position in a player's scoreboard
-     * @param p the player whose scoreboard will have a HUD line added
+     * @param p Player whose scoreboard will have a HUD line added
      * @param name Identifier to reference the HUD line again (to add stuff to it)
      * @param position Position to reserve
      */
@@ -217,8 +231,8 @@ public class HUDManager implements Listener {
     }
 
     /**
-     * Setup a player's HUD (create scoreboard, reserve all the slots, load data onto all the slots)
-     * @param p
+     * Init a player's HUD (create scoreboard, reserve all the slots, load data onto all the slots)
+     * @param p Player whose scoreboard should be initialized
      */
     public void initPlayerHUD(@NotNull Player p) {
         createHUDScoreboard(p);
@@ -248,6 +262,9 @@ public class HUDManager implements Listener {
         dispatchPrefixUpdate(p);
     }
 
+    /**
+     * Clean up any HUD setup when game ends.
+     */
     public void cleanup() {
         Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
 
@@ -262,7 +279,8 @@ public class HUDManager implements Listener {
     }
 
     /**
-     * Trash the player's scoreboard and return to the main scoreboard.
+     * Clean up any HUD setup for a player (if they join during lobby mode).
+     * @param p Player to clean up
      */
     public void cleanup(Player p) {
         Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -294,7 +312,7 @@ public class HUDManager implements Listener {
                 t1s == PlayerState.COMBATANT_ALIVE, 
                 t2s == PlayerState.COMBATANT_ALIVE);
         };
-        Comparator<Player> compareByHealth = (t1, t2) -> Double.compare(t1.getHealth(), t2.getHealth());
+        Comparator<Player> compareByHealth = Comparator.comparingDouble(Damageable::getHealth);
         Comparator<Player> compareByProximity = (t1, t2) -> {
             Location pl = p.getLocation(),
                     t1l = t1.getLocation(),
@@ -430,8 +448,8 @@ public class HUDManager implements Listener {
 
     /**
      * Updates the player's health on specified heart scoreboard
-     * @param s
-     * @param p
+     * @param s Scoreboard to update health on
+     * @param p Player whose health needs to be updated
      */
     private void updateHealthOnScoreboard(Scoreboard s, Player p) {
         int health;
@@ -459,13 +477,12 @@ public class HUDManager implements Listener {
 
     /**
      * Updates the teammate hud for everyone who could see this player's health / position
-     * @param p
+     * @param p Player whose health/position should be updated
      */
     public void dispatchTeammateHUDUpdate(@NotNull Player p) {
-        Set<Player> viewers = new HashSet<>();
 
         int t = teamManager.getTeam(p);
-        viewers.addAll(teamManager.getOnlineSpectators());
+        Set<Player> viewers = new HashSet<>(teamManager.getOnlineSpectators());
         if (t != 0) viewers.addAll(teamManager.getOnlineCombatantsOnTeam(t));
 
         for (Player viewer : viewers) {
@@ -475,7 +492,7 @@ public class HUDManager implements Listener {
 
     /**
      * Updates the player's health on everyone's heart scoreboard
-     * @param p
+     * @param p Player whose health should be updated
      */
     public void dispatchHealthHUDUpdate(Player p) {
         for (var s : scoreboardsInUse(false)) {

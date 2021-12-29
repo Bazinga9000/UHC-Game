@@ -17,9 +17,9 @@ import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.Point2D;
 
 public class WorldManager {
-    private UHCGamePlugin plugin;
+    private final UHCGamePlugin plugin;
     private boolean worldsRegened = false;
-    private List<String> worldNames = new ArrayList<>();
+    private final List<String> worldNames = new ArrayList<>();
     private final Point2D center = new Point2D(0.5, 0.5);
 
     public WorldManager(UHCGamePlugin plugin) {
@@ -151,10 +151,9 @@ public class WorldManager {
     }
 
     /**
-     * Reseed worlds then mark worlds as reseeded.
-     * <p>
+     * Reseed worlds then mark worlds as reseeded. <p>
      * Accessible through /uhc reseed <seed>
-     * @param seed
+     * @param seed Specified seed
      */
     public void reseedWorlds(long seed, boolean ignoreOverworld) {
         World[] worlds = getGameWorlds();
@@ -182,21 +181,21 @@ public class WorldManager {
         var loc = getHighestLoc(w, 1, 1);
         Debug.printDebug(String.format("Checking %s's biome", w.getSeed()));
         Biome b = w.getBiome(1, (int) loc.getY() - 1, 1);
-        Debug.printDebug(String.format("Checked %s's biome, it's %s", w.getSeed(), b.toString()));
+        Debug.printDebug(String.format("Checked %s's biome, it's %s", w.getSeed(), b));
         
         return !rejectedBiomes.contains(b);
     }
 
     /**
      * Kills all monsters in a world
-     * @param w
+     * @param w World to kill all monsters in
      */
     public void purgeWorld(World w) {
         var wm = plugin.getMVWorldManager();
         var purger = wm.getTheWorldPurger();
         var mvWorld = wm.getMVWorld(w);
 
-        purger.purgeWorld(mvWorld, Arrays.asList("MONSTERS"), false, false); // multiverse is stupid (purges all monsters, hopefully)
+        purger.purgeWorld(mvWorld, List.of("MONSTERS"), false, false); // multiverse is stupid (purges all monsters, hopefully)
     }
     
     public Location getCenter() {
@@ -227,7 +226,7 @@ public class WorldManager {
     }
 
     // GAMERULE STUFF
-    private final class Gamerules {
+    private static final class Gamerules {
         public static void set(World w) {
             w.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, true);
             w.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);

@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.NotNull;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
@@ -16,8 +17,8 @@ public class OptionValuedNode extends ValuedNode {
 
     /**
      * @param parent Parent node
-     * @param slot lot of this node in parent's inventory
-     * @param nodeName Node name, which is used to determine the ID
+     * @param slot Slot of this node in parent's inventory
+     * @param nodeName Name of the node
      * @param optMaterials Materials for the options supported
      */
     public OptionValuedNode(BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, Material... optMaterials) {
@@ -37,7 +38,7 @@ public class OptionValuedNode extends ValuedNode {
     }
 
     @Override
-    public void click(Player p) {
+    public void click(@NotNull Player p) {
         int currIndex = cfg.getInt(cfgKey());
         this.set(currIndex + 1);
     }

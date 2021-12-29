@@ -35,16 +35,15 @@ public class BranchNode extends Node {
      * Create a root {@link BranchNode}. This node does not have a parent.
      * @param guiHeight Number of rows in this node's inventory
      */
-    // remove tmp when impl complete
     public BranchNode(int guiHeight) {
         this(null, 0, null, null, guiHeight);
     }
 
     /**
      * @param parent Parent node
-     * @param slot lot of this node in parent's inventory
-     * @param nodeName Node name, which is used to determine the ID
-     * @param props {@link NodeItemStack#ItemProperties}
+     * @param slot Slot of this node in parent's inventory
+     * @param nodeName Name of the node
+     * @param props {@link NodeItemStack.ItemProperties}
      * @param guiHeight Number of rows in this node's inventory
      */
     public BranchNode(@Nullable BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties props, int guiHeight) {
@@ -58,9 +57,9 @@ public class BranchNode extends Node {
     }
 
     /**
-     * Adds check to node that checks that the config is not in an invalid state (e.g. incompatibility),<p>
+     * Adds a check to node that verifies that the config is not in an invalid state (e.g. incompatible settings),<p>
      * and undoes an event if so
-     * @param check
+     * @param check the check
      * @return this
      */
     public BranchNode check(Predicate<Configuration> check) {
@@ -100,8 +99,8 @@ public class BranchNode extends Node {
 
     /**
      * Set child to a slot. If child is null, the child at specified slot is removed from the slot.
-     * @param slot
-     * @param child
+     * @param slot Slot to set child to
+     * @param child The child
      */
     public void setChild(int slot, @Nullable Node child) {
         Objects.checkIndex(slot, children.length);
@@ -115,8 +114,8 @@ public class BranchNode extends Node {
 
     /**
      * Handles what happens when a player clicks the item in the slot in this node's inventory.
-     * @param p
-     * @param slot
+     * @param p Player who clicked the node
+     * @param slot The slot of the clicked node
      */
     public void onClick(@NotNull Player p, int slot) {
         Objects.checkIndex(0, slotCount);
@@ -137,7 +136,7 @@ public class BranchNode extends Node {
                 sound = 1;
                 
                 if (node instanceof ValuedNode vnode && !check.test(Node.cfg)) {
-                    vnode.undo(p);
+                    vnode.undo();
                     sound = 2;
                 }
             }
@@ -153,7 +152,8 @@ public class BranchNode extends Node {
         }
     }
 
-    public void click(Player p) {
+    @Override
+    public void click(@NotNull Player p) {
         // update (or create inv)
         if (hasInventoryViewed) {
             updateAllSlots();
@@ -188,8 +188,8 @@ public class BranchNode extends Node {
 
     private Optional<Node> findChild(String name) {
         return Arrays.stream(children)
-            .filter(c -> c != null)
-            .filter(c -> c.nodeName == name)
+            .filter(Objects::nonNull)
+            .filter(c -> c.nodeName.equals(name))
             .findAny();
     }
 
@@ -213,12 +213,11 @@ public class BranchNode extends Node {
     }
 
     /**
-     * Traverses the tree of a node to find the node that has a specified inventory
-     * @param inventory The inventory
-     * @param node The node tree to traverse
-     * @return The node (or null if absent)
+     * Traverses the tree of node to find the descendant with a matching inventory
+     * @param inventory the inventory
+     * @return the node (null if absent)
      */
-    public BranchNode getNodeFromInventory(Inventory inventory) {
+    public @Nullable BranchNode getNodeFromInventory(Inventory inventory) {
         if (this.inventory == inventory) {
             return this;
         }
