@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import xyz.baz9k.UHCGame.event.PlayerAliveStatusChangeEvent;
+import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.util.Set;
@@ -59,13 +59,24 @@ public class TeamManager {
     public void addPlayer(@NotNull Player p, boolean hasStarted) {
         Node n = getNode(p);
         if (isAssignedCombatant(p)) return;
+        // this doesn't count as a state change, b/c their state before is not relevant
         n.state = hasStarted ? PlayerState.SPECTATOR : PlayerState.COMBATANT_UNASSIGNED;
     }
 
-    private void setNode(@NotNull Player p, @NotNull PlayerState s, int team) {
+    private Node setState(@NotNull Player p, @NotNull PlayerState s) {
         Node n = getNode(p);
+        // if the node is a snapshot of the player (i.e. they left), rather than the player instance, don't dispatch the event
+        if (isOnline(p)) {
+            new PlayerStateChangeEvent(p, s).callEvent();
+        }
         n.state = s;
+        return n;
+    }
+
+    private Node setNode(@NotNull Player p, @NotNull PlayerState s, int team) {
+        Node n = setState(p, s);
         n.team = team;
+        return n;
     }
 
     /**
@@ -104,7 +115,7 @@ public class TeamManager {
     public void resetAllPlayers() {
         for (Node v : playerMap.values()) {
             if (v.state != PlayerState.SPECTATOR) {
-                v.state = PlayerState.COMBATANT_UNASSIGNED;
+                setState(v.player, PlayerState.COMBATANT_UNASSIGNED);
                 v.team = 0;
             }
         }
@@ -180,9 +191,7 @@ public class TeamManager {
         }
 
         PlayerState s = alive ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
-        new PlayerAliveStatusChangeEvent(p, s).callEvent();
-        Node n = getNode(p);
-        n.state = s;
+        setState(p, s);
     }
 
     /* LIST OF PLAYERS */

@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import xyz.baz9k.UHCGame.PlayerState;
 
-public class PlayerAliveStatusChangeEvent extends Event {
+public class PlayerStateChangeEvent extends Event {
     // boilerplate
     private static final HandlerList HANDLERS = new HandlerList();
 
@@ -22,7 +22,7 @@ public class PlayerAliveStatusChangeEvent extends Event {
     private final Player p;
     private final PlayerState state;
 
-    public PlayerAliveStatusChangeEvent(Player p, PlayerState state) {
+    public PlayerStateChangeEvent(Player p, PlayerState state) {
         this.p = p;
         this.state = state;
     }

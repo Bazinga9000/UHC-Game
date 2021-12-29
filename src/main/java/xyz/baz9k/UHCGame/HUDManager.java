@@ -6,7 +6,7 @@ import static net.kyori.adventure.text.format.TextDecoration.*;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Damageable;
-import xyz.baz9k.UHCGame.event.PlayerAliveStatusChangeEvent;
+import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
 import xyz.baz9k.UHCGame.util.ColorGradient;
 import xyz.baz9k.UHCGame.util.Point2D;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
@@ -541,10 +541,25 @@ public class HUDManager implements Listener {
     }
 
     @EventHandler
-    public void onPlayerAlivenessChange(PlayerAliveStatusChangeEvent e) {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            updateCombatantsAliveHUD(p);
-            updateTeamsAliveHUD(p);
+    public void onPlayerStateChange(PlayerStateChangeEvent e) {
+        Player pl = e.player();
+        PlayerState state = e.state();
+        if (gameManager.hasUHCStarted()) {
+            if (state == PlayerState.COMBATANT_ALIVE || state == PlayerState.COMBATANT_DEAD) {
+                // if they change state in game, then they just died or just respawned
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    updateCombatantsAliveHUD(p);
+                    updateTeamsAliveHUD(p);
+                }
+            }
+        } else {
+            // if they are now comb alive in lobby, then they must've just assigned teams
+            if (state == PlayerState.COMBATANT_ALIVE || state == PlayerState.COMBATANT_DEAD) {
+                initPlayerHUD(pl);
+            } else {
+                Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
+                pl.setScoreboard(main);
+            }
         }
     }
 }
