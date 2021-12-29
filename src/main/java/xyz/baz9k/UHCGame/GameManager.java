@@ -200,7 +200,7 @@ public class GameManager implements Listener {
                min = initialDiameter / (1 + teamManager.getNumTeams());
         Location defaultLoc = worldManager.gameSpawn();
 
-        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
+        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, 200);
         Debug.printDebug(new Key("debug.spreadplayers.end").trans());
 
         // unload world
