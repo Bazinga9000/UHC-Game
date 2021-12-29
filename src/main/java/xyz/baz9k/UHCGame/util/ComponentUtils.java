@@ -1,10 +1,9 @@
 package xyz.baz9k.UHCGame.util;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import org.bukkit.Bukkit;
 
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.format.Style;
@@ -88,29 +87,10 @@ public final class ComponentUtils {
      * @param c component
      * @return string of the component text
      */
+    // shhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh deprecation warning is fine it'll be fixed when paper updates itself
+    @SuppressWarnings("deprecation")
     public static String renderString(Component c) {
-        if (c instanceof TextComponent tc && c.children().size() == 0) return tc.content();
-
-        List<Component> components = new ArrayList<>();
-        components.add(c);
-        components.addAll(c.children());
-
-        return components.stream()
-            .map(cpt -> {
-                Component rendered = render(cpt);
-                if (rendered instanceof TextComponent renderedText) {
-                    String buf = renderedText.content();
-                    for (Component child : renderedText.children()) buf += renderString(child);
-                    return buf;
-                } else if (rendered instanceof TranslatableComponent renderedTrans) {
-                    String buf = renderedTrans.key();
-                    for (Component child : renderedTrans.children()) buf += renderString(child);
-                    return buf;
-
-                }
-                return rendered.toString(); // if not text, then can't really do anything
-            })
-            .collect(Collectors.joining());
+        return Bukkit.getUnsafe().plainTextSerializer().serialize(c);
     }
 
     /**
