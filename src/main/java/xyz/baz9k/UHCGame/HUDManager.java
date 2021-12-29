@@ -6,6 +6,7 @@ import static net.kyori.adventure.text.format.TextDecoration.*;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Damageable;
+import xyz.baz9k.UHCGame.event.PlayerAliveStatusChangeEvent;
 import xyz.baz9k.UHCGame.util.ColorGradient;
 import xyz.baz9k.UHCGame.util.Point2D;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
@@ -519,6 +520,14 @@ public class HUDManager implements Listener {
             // update hud if dmg taken
             dispatchHealthHUDUpdate(p);
             dispatchTeammateHUDUpdate(p);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerAlivenessChange(PlayerAliveStatusChangeEvent e) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            updateCombatantsAliveHUD(p);
+            updateTeamsAliveHUD(p);
         }
     }
 }

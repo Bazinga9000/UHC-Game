@@ -530,11 +530,6 @@ public class GameManager implements Listener {
                 hudManager.updateKillsHUD(killer);
             }
         }
-
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            hudManager.updateCombatantsAliveHUD(p);
-            hudManager.updateTeamsAliveHUD(p);
-        }
     }
 
     @EventHandler

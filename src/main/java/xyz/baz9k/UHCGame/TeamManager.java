@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import xyz.baz9k.UHCGame.event.PlayerAliveStatusChangeEvent;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.util.Set;
@@ -171,15 +172,17 @@ public class TeamManager {
     /**
      * Sets player to alive or dead.
      * @param p Player to set
-     * @param aliveStatus Status to set
+     * @param alive Status to set
      */
-    public void setCombatantAliveStatus(@NotNull Player p, boolean aliveStatus) {
+    public void setCombatantAliveStatus(@NotNull Player p, boolean alive) {
         if (!isAssignedCombatant(p)) {
             throw translatableErr(IllegalArgumentException.class, "xyz.baz9k.uhc.err.team.must_assigned_comb");
         }
-        
+
+        PlayerState s = alive ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
+        new PlayerAliveStatusChangeEvent(p, s).callEvent();
         Node n = getNode(p);
-        n.state = aliveStatus ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
+        n.state = s;
     }
 
     /* LIST OF PLAYERS */
