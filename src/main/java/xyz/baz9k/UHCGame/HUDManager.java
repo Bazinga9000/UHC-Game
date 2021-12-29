@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.*;
 import org.jetbrains.annotations.NotNull;
@@ -478,19 +479,19 @@ public class HUDManager implements Listener {
      * @param s Scoreboard to update health on
      * @param p Player whose health needs to be updated
      */
-    private void updateHealthOnScoreboard(Scoreboard s, Player p) {
-        int health;
+    private void updateHealthOnScoreboard(Scoreboard s, Player p, double health) {
+        int hp;
         if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_ALIVE) {
-            health = (int) Math.ceil(p.getHealth());
+            hp = (int) Math.ceil(health);
         } else {
-            health = 0;
+            hp = 0;
         }
 
         List.of("hearts1", "hearts2")
             .forEach(objName -> {
                     Objective obj = s.getObjective(objName);
                     Score score = obj.getScore(p);
-                    score.setScore(health);
+                    score.setScore(hp);
             });
     }
 
@@ -498,7 +499,7 @@ public class HUDManager implements Listener {
         Scoreboard s = p.getScoreboard();
 
         for (Player pl : teamManager.getCombatants()) {
-            updateHealthOnScoreboard(s, pl);
+            updateHealthOnScoreboard(s, pl, p.getHealth());
         }
     }
 
@@ -523,7 +524,12 @@ public class HUDManager implements Listener {
      */
     public void dispatchHealthHUDUpdate(Player p) {
         for (var s : scoreboardsInUse(false)) {
-            updateHealthOnScoreboard(s, p);
+            updateHealthOnScoreboard(s, p, p.getHealth());
+        }
+    }
+    public void dispatchHealthHUDUpdate(Player p, double health) {
+        for (var s : scoreboardsInUse(false)) {
+            updateHealthOnScoreboard(s, p, health);
         }
     }
 
@@ -537,13 +543,25 @@ public class HUDManager implements Listener {
         dispatchTeammateHUDUpdate(p);
     }
 
+    // TODO more elegantly write this
     @EventHandler
     public void onPlayerDamaged(EntityDamageEvent e) {
         if (!gameManager.hasUHCStarted()) return;
 
         if (e.getEntity() instanceof Player p) {
+            double newHealth = p.getHealth() - e.getFinalDamage();
             // update hud if dmg taken
-            dispatchHealthHUDUpdate(p);
+            dispatchHealthHUDUpdate(p, newHealth);
+            dispatchTeammateHUDUpdate(p);
+        }
+    }
+
+    public void onPlayerHeal(EntityRegainHealthEvent e) {
+        if (!gameManager.hasUHCStarted()) return;
+
+        if (e.getEntity() instanceof Player p) {
+            double newHealth = p.getHealth() + e.getAmount();
+            dispatchHealthHUDUpdate(p, newHealth);
             dispatchTeammateHUDUpdate(p);
         }
     }
