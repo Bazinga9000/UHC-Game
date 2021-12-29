@@ -542,7 +542,6 @@ public class HUDManager implements Listener {
         if (!gameManager.hasUHCStarted()) return;
 
         if (e.getEntity() instanceof Player p) {
-            if (!teamManager.isSpectator(p)) return;
             // update hud if dmg taken
             dispatchHealthHUDUpdate(p);
             dispatchTeammateHUDUpdate(p);
