@@ -66,16 +66,18 @@ public class TeamManager {
     private Node setState(@NotNull Player p, @NotNull PlayerState s) {
         Node n = getNode(p);
         // if the node is a snapshot of the player (i.e. they left), rather than the player instance, don't dispatch the event
+        n.state = s;
+        // TODO more elegantly deal
         if (isOnline(p)) {
             new PlayerStateChangeEvent(p, s).callEvent();
         }
-        n.state = s;
         return n;
     }
 
     private Node setNode(@NotNull Player p, @NotNull PlayerState s, int team) {
-        Node n = setState(p, s);
+        Node n = getNode(p);
         n.team = team;
+        setState(p, s);
         return n;
     }
 
