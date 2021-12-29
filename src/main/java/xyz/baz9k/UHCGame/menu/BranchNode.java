@@ -10,7 +10,6 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,10 +68,9 @@ public class BranchNode extends Node {
     
     private ItemStack emptyGlass() {
         ItemStack emptyGlass = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-        ItemMeta m = emptyGlass.getItemMeta();
-        m.displayName(Component.space());
-        emptyGlass.setItemMeta(m);
-
+        emptyGlass.editMeta(m -> {
+            m.displayName(Component.space());
+        });
         return emptyGlass;
     }
 
@@ -132,12 +130,19 @@ public class BranchNode extends Node {
         } else {
             Node node = children[slot];
             if (node != null) {
-                node.click(p);
-                sound = 1;
-                
-                if (node instanceof ValuedNode vnode && !check.test(Node.cfg)) {
-                    vnode.undo();
+                // lock = fail
+                if (node.locked()) {
                     sound = 2;
+                } else {
+                    // test click
+                    node.click(p);
+                    sound = 1;
+
+                    // check click was valid
+                    if (node instanceof ValuedNode vnode && !check.test(Node.cfg)) {
+                        vnode.undo();
+                        sound = 2;
+                    }
                 }
             }
 
