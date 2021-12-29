@@ -132,10 +132,18 @@ public class MenuTree {
                 }, false);
             }
         ).lock(plugin.getGameManager()::hasUHCStarted);
+
+        Material[] mats = new Material[]{
+            Material.RED_DYE,
+            Material.ORANGE_DYE,
+            Material.YELLOW_DYE,
+            Material.GREEN_DYE,
+            Material.BLUE_DYE,
+        };
         for (int i = 1; i <= 5; i++) {
             final int n = i;
             new ActionNode(ctrlRoot, slotAt(4, 1 + i), String.format("assign_teams_%s", i), 
-                new ItemProperties<>(Material.RED_DYE), 
+                new ItemProperties<>(mats[i - 1]), 
                 p -> {
                     p.closeInventory();
                     var tm = plugin.getTeamManager();
