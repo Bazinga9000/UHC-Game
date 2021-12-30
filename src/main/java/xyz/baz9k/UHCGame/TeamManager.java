@@ -128,12 +128,20 @@ public class TeamManager {
      */
     public void assignTeams() {
         List<Player> combatants = new ArrayList<>(getOnlineCombatants());
-        Collections.shuffle(combatants);
-
-        int i = 1;
-        for (Player p : combatants) {
-            assignPlayerToTeam(p, i);
-            i = i % numTeams + 1;
+        
+        if (combatants.size() == numTeams) { // solos
+            combatants.sort((p1, p2) -> p1.getName().compareTo(p2.getName()));
+            for (int i = 1; i <= numTeams; i++) {
+                assignPlayerToTeam(combatants.get(i), i);
+            }
+        } else {
+            Collections.shuffle(combatants);
+    
+            int i = 1;
+            for (Player p : combatants) {
+                assignPlayerToTeam(p, i);
+                i = i % numTeams + 1;
+            }
         }
     }
 
@@ -228,11 +236,18 @@ public class TeamManager {
     }
 
     /**
-     * @return a {@link Set} of all combatants
+     * @return a {@link Set} of all living combatants
      */
     @NotNull
     public Set<Player> getAliveCombatants() {
         return getAllPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE);
+    }
+    /**
+     * @return a {@link Set} of all assigned combatants
+     */
+    @NotNull
+    public Set<Player> getAssignedCombatants() {
+        return getAllPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE || n.state == PlayerState.COMBATANT_DEAD);
     }
 
     /**

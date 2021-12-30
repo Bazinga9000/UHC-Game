@@ -149,7 +149,10 @@ public class HUDManager implements Listener {
         int team = teamManager.getTeam(p);
         
         String teamName = PREFIXING_TEAM_FORMAT;
-        teamName += team == 0 ? "s" : team;
+        int n_users = Bukkit.getOnlinePlayers().size();
+        int n_users_mag = String.valueOf(n_users).length();
+        
+        teamName += team == 0 ? "s" : String.format("%0" + n_users_mag + "d", team);
 
         Team t = s.getTeam(teamName);
         if (t == null) {
@@ -335,7 +338,7 @@ public class HUDManager implements Listener {
             PlayerState t1s = teamManager.getPlayerState(t1),
                         t2s = teamManager.getPlayerState(t2);
             
-            return Boolean.compare(
+            return -Boolean.compare(
                 t1s == PlayerState.COMBATANT_ALIVE, 
                 t2s == PlayerState.COMBATANT_ALIVE);
         };
@@ -447,7 +450,7 @@ public class HUDManager implements Listener {
     public void updateCombatantsAliveHUD(@NotNull Player p) {
         var s = new Key("hud.combcount").trans(
             Component.text(teamManager.getAliveCombatants().size(), NamedTextColor.WHITE),
-            Component.text(teamManager.getCombatants().size(), NamedTextColor.WHITE)
+            Component.text(teamManager.getAssignedCombatants().size(), NamedTextColor.WHITE)
         ).color(NamedTextColor.WHITE);
         setHUDLine(p, "combsalive", s);
     }
@@ -556,6 +559,7 @@ public class HUDManager implements Listener {
         }
     }
 
+    @EventHandler
     public void onPlayerHeal(EntityRegainHealthEvent e) {
         if (!gameManager.hasUHCStarted()) return;
 

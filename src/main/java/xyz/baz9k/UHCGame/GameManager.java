@@ -548,7 +548,11 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerAdvancement(PlayerAdvancementDoneEvent e) {
         if (!hasUHCStarted()) return;
-        e.message(includeGameTimestamp(e.message()));
+
+        Player p = e.getPlayer();
+        if (!teamManager.getPlayerState(p).isSpectating()) {
+            e.message(includeGameTimestamp(e.message()));
+        }
     }
 
     private void prepareToGame(Player p, boolean onGameStart) {
