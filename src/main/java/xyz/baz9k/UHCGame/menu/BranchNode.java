@@ -1,10 +1,5 @@
 package xyz.baz9k.UHCGame.menu;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
@@ -23,11 +18,8 @@ import java.util.function.Predicate;
  * <p>
  * Each slot contains items that represent other Nodes.
  */
-public class BranchNode extends Node {
-    private final int slotCount;
+public final class BranchNode extends InventoryNode {
     private final Node[] children;
-    private final @NotNull Inventory inventory;
-    private boolean hasInventoryViewed = false;
     private Predicate<Configuration> check = cfg -> true;
 
     /**
@@ -46,13 +38,10 @@ public class BranchNode extends Node {
      * @param guiHeight Number of rows in this node's inventory
      */
     public BranchNode(@Nullable BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties<?> props, int guiHeight) {
-        super(parent, slot, nodeName, props);
-        slotCount = 9 * guiHeight;
+        super(parent, slot, nodeName, props, guiHeight, ReserveSlots.all());
 
         int arrLen = parent == null ? slotCount : slotCount - 1;
         children = new Node[arrLen];
-
-        inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameFromID(langKey()));
     }
 
     /**
@@ -65,34 +54,25 @@ public class BranchNode extends Node {
         this.check = check;
         return this;
     }
-    
-    private ItemStack emptyGlass() {
-        ItemStack emptyGlass = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-        emptyGlass.editMeta(m -> {
-            m.displayName(Component.space());
-        });
-        return emptyGlass;
-    }
 
-    private void initInventory() {
-        hasInventoryViewed = true;
-        
-        ItemStack emptyGlass = emptyGlass();
+    @Override
+    void initInventory() {
+        super.initInventory();
 
         // fill the inventory with all the items
-        ItemStack[] items = Arrays.stream(children)
-            .map(Optional::ofNullable)
-            .map(o -> o.map(Node::itemStack))
-            .map(o -> o.orElse(emptyGlass))
-            .toArray(ItemStack[]::new);
-            inventory.setContents(items);
-
-        // If we aren't root, add a slot for the "Go Back" button
-        if (parent != null) {
-            ItemStack goBack = new NodeItemStack("go_back", new NodeItemStack.ItemProperties<>(Material.ARROW).style(NamedTextColor.RED));
-
-            inventory.setItem(slotCount - 1, goBack);
+        ItemStack[] contents = inventory.getContents();
+        for (int i = 0; i < slotCount; i++) {
+            Node child = children[i];
+            if (child != null) {
+                contents[i] = child.itemStack();
+            }
         }
+        inventory.setContents(contents);
+    }
+
+    @Override
+    void updateInventory() {
+        for (int i = 0; i < children.length; i++) updateSlot(i);
     }
 
     /**
@@ -115,6 +95,7 @@ public class BranchNode extends Node {
      * @param p Player who clicked the node
      * @param slot The slot of the clicked node
      */
+    @Override
     public void onClick(@NotNull Player p, int slot) {
         Objects.checkIndex(0, slotCount);
 
@@ -157,18 +138,6 @@ public class BranchNode extends Node {
         }
     }
 
-    @Override
-    public void click(@NotNull Player p) {
-        // update (or create inv)
-        if (hasInventoryViewed) {
-            updateAllSlots();
-        } else {
-            initInventory();
-        }
-
-        p.openInventory(inventory);
-    }
-
     /**
      * Updates the {@link ItemStack} of the specified child of the inventory.
      * @param slot the slot
@@ -177,14 +146,6 @@ public class BranchNode extends Node {
         if (children[slot] != null) {
             inventory.setItem(slot, children[slot].itemStack());
         }
-    }
-    public void updateAllSlots() {
-        for (int i = 0; i < children.length; i++) updateSlot(i);
-    }
-
-    @NotNull
-    public Inventory getInventory() {
-        return inventory;
     }
 
     public Node[] getChildren() {
@@ -222,16 +183,22 @@ public class BranchNode extends Node {
      * @param inventory the inventory
      * @return the node (null if absent)
      */
-    public @Nullable BranchNode getNodeFromInventory(Inventory inventory) {
+    public @Nullable InventoryNode getNodeFromInventory(Inventory inventory) {
         if (this.inventory == inventory) {
             return this;
         }
 
         for (Node child : this.children) {
-            if (child instanceof BranchNode bChild) {
-                BranchNode check = bChild.getNodeFromInventory(inventory);
-                if (check != null) {
-                    return check;
+            if (child instanceof InventoryNode iChild) {
+                if (iChild.inventory == inventory) {
+                    return iChild;
+                }
+
+                if (child instanceof BranchNode bChild) {
+                    InventoryNode check = bChild.getNodeFromInventory(inventory);
+                    if (check != null) {
+                        return check;
+                    }
                 }
             }
         }

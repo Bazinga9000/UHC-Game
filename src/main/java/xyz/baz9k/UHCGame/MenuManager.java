@@ -66,13 +66,19 @@ public class MenuManager implements Listener {
 
     @EventHandler
     public void onInvClick(InventoryClickEvent e) {
-        BranchNode b = menuTree.getNodeFromInventory(e.getInventory());
+        InventoryNode n = menuTree.getNodeFromInventory(e.getInventory());
 
-        if (b != null) {
+        if (n != null) {
             // interacted inventory is a node inventory
             if (e.getInventory() == e.getClickedInventory()) { // handle clicks IF the clicked inv is the top of the view
                 try {
-                    if (e.getCurrentItem() != null) b.onClick((Player) e.getWhoClicked(), e.getSlot());
+                    if (e.getCurrentItem() != null) {
+                        Player p = (Player) e.getWhoClicked();
+                        int slot = e.getSlot();
+                        if (n.handlesSlot(slot)) {
+                            n.onClick(p, slot);
+                        }
+                    }
                 } finally {
                     e.setCancelled(true);
                 }

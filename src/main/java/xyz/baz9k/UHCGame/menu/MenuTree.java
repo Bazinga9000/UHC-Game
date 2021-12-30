@@ -43,7 +43,7 @@ public class MenuTree {
      * @param inventory The inventory
      * @return The node (or null if absent)
      */
-    public BranchNode getNodeFromInventory(Inventory inventory) {
+    public InventoryNode getNodeFromInventory(Inventory inventory) {
         return root.getNodeFromInventory(inventory);
     }
     
