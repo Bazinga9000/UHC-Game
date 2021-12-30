@@ -597,9 +597,7 @@ public class GameManager implements Listener {
 
         Player p = e.getPlayer();
         if (teamManager.getPlayerState(p).isSpectating()) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                prepareToSpectate(p);
-            }, 1);
+            prepareToSpectate(p);
         }
     }
 
@@ -660,8 +658,10 @@ public class GameManager implements Listener {
     }
 
     private void prepareToSpectate(Player p) {
-        new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, true, true, false)
-            .apply(p);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, true, true, false)
+                .apply(p);
+        }, 1);
     }
 
 }
