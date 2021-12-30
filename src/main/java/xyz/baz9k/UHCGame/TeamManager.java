@@ -130,7 +130,7 @@ public class TeamManager {
         
         if (combatants.size() == numTeams) { // solos
             combatants.sort((p1, p2) -> p1.getName().compareTo(p2.getName()));
-            for (int i = 1; i < numTeams; i++) {
+            for (int i = 0; i < numTeams; i++) {
                 assignPlayerToTeam(combatants.get(i), i + 1);
             }
         } else {
