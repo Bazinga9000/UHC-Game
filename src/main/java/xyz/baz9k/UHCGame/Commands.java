@@ -25,6 +25,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.*;
 
 @SuppressWarnings("unchecked")
@@ -268,6 +269,12 @@ public final class Commands {
         p.teleport(loc);
         tm.setCombatantAliveStatus(p, true);
         p.setGameMode(GameMode.SURVIVAL);
+        
+        // clear all potion effects
+        for (PotionEffect effect : p.getActivePotionEffects()) {
+            p.removePotionEffect(effect.getType());
+        }
+
         sender.sendMessage(new Key("cmd.respawn.succ").trans(p.getName()));
     }
 
