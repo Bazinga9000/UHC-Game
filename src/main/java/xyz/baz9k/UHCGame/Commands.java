@@ -91,9 +91,9 @@ public final class Commands {
         }
     }
 
-    // private void fail(String key, Object... args) throws WrapperCommandSyntaxException {
-    //     CommandAPI.fail(componentString(trans(key, args)));
-    // }
+    private void fail(Key key, Object... args) throws WrapperCommandSyntaxException {
+        CommandAPI.fail(renderString(key.trans(args)));
+    }
 
     /*
     /uhc start
@@ -258,10 +258,10 @@ public final class Commands {
         );
     }
 
-    private void _respawn(CommandSender sender, Player p, Location loc) {
+    private void _respawn(CommandSender sender, Player p, Location loc) throws WrapperCommandSyntaxException {
         TeamManager tm = plugin.getTeamManager();
         if (tm.isSpectator(p)) {
-            sender.sendMessage(new Key("cmd.respawn.fail.spectator").trans(p.getName()).color(NamedTextColor.RED));
+            fail(new Key("cmd.respawn.fail.spectator"), p.getName());
             return;
         }
 
@@ -523,6 +523,19 @@ public final class Commands {
         );
     }
 
+    @RegisterCommand
+    private CommandAPICommand invSee() {
+        return new CommandAPICommand("invsee")
+        .withArguments(new EntitySelectorArgument("target", EntitySelector.ONE_PLAYER))
+        .executesPlayer((sender, args) -> {
+            requireStarted();
+            if (!plugin.getTeamManager().getPlayerState(sender).isSpectating()) {
+                fail(new Key("cmd.invsee.fail.combatant"));
+            }
+
+            plugin.getMenuManager().invSee(sender, (Player) args[0]);
+        });
+    }
     ////// BEGIN FUNCTOOLS //////
     // delete as soon as possible //
 
