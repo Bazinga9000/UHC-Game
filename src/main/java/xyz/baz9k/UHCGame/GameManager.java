@@ -195,12 +195,40 @@ public class GameManager implements Listener {
 
         // do spreadplayers
         Debug.printDebug(new Key("debug.spreadplayers.start").trans());
-        double initialDiameter = GameStage.WB_STILL.wbDiameter();
-        double max = initialDiameter,
-               min = initialDiameter / (1 + teamManager.getNumTeams());
+        double max = GameStage.WB_STILL.wbDiameter(),
+               min = max / Math.sqrt(3 * teamManager.getNumTeams());
+
+        //    | # Groups | Min   | Max  |
+        //    |----------|-------|------|
+        //    |        1 | 692.8 | 1200 |
+        //    |        2 | 489.9 | 1200 |
+        //    |        3 | 400.0 | 1200 |
+        //    |        4 | 346.4 | 1200 |
+        //    |        5 | 309.8 | 1200 |
+        //    |        6 | 282.8 | 1200 |
+        //    |        7 | 261.9 | 1200 |
+        //    |        8 | 244.9 | 1200 |
+        //    |        9 | 230.9 | 1200 |
+        //    |       10 | 219.1 | 1200 |
+        //    |       11 | 208.9 | 1200 |
+        //    |       12 | 200.0 | 1200 |
+        //    |       13 | 192.2 | 1200 |
+        //    |       14 | 185.2 | 1200 |
+        //    |       15 | 178.9 | 1200 |
+
+        // btw if you're reading this,
+        // i sampled the average # of points generated at ratios of min/max
+        // x: min / max
+        // y: number of points generated
+        // y = .65 * (1/x)^2
+
+        // the min value calculation here is based on that 
+        // but the constant has been adjusted to give margin of error
+        // (in case SP produces less points than average)
+
         Location defaultLoc = worldManager.gameSpawn();
 
-        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, 200);
+        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
         Debug.printDebug(new Key("debug.spreadplayers.end").trans());
 
         // unload world
