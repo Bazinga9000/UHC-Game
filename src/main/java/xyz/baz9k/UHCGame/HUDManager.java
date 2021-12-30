@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.*;
@@ -56,10 +57,18 @@ public class HUDManager implements Listener {
         return TeamDisplay.getName(team);
     }
 
+    /**
+     * @param d Entity with health
+     * @return the total health (main health plus absorption amount)
+     */
+    private double getTotalHealth(Damageable d) {
+        return d.getHealth() + d.getAbsorptionAmount();
+    }
+
     private @NotNull Component formatTeammate(@NotNull Player you, @NotNull Player teammate) {
         TextComponent.Builder s = Component.text();
 
-        double teammateHP = teammate.getHealth() + teammate.getAbsorptionAmount();
+        double teammateHP = getTotalHealth(teammate);
         double teammateMaxHP = teammate.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
         Color FULL_HP = new Color(87, 232, 107);
         Color HALF_HP = new Color(254, 254, 105);
@@ -482,27 +491,27 @@ public class HUDManager implements Listener {
      * @param s Scoreboard to update health on
      * @param p Player whose health needs to be updated
      */
-    private void updateHealthOnScoreboard(Scoreboard s, Player p, double health) {
-        // int hp;
-        // if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_ALIVE) {
-        //     hp = (int) Math.ceil(health);
-        // } else {
-        //     hp = 0;
-        // }
+    private void updateHealthOnScoreboard(Scoreboard s, Player p) {
+        int hp;
+        if (teamManager.getPlayerState(p) == PlayerState.COMBATANT_ALIVE) {
+            hp = (int) Math.ceil(getTotalHealth(p));
+        } else {
+            hp = 0;
+        }
 
-        // List.of("hearts1", "hearts2")
-        //     .forEach(objName -> {
-        //             Objective obj = s.getObjective(objName);
-        //             Score score = obj.getScore(p);
-        //             score.setScore(hp);
-        //     });
+        List.of("hearts1", "hearts2")
+            .forEach(objName -> {
+                    Objective obj = s.getObjective(objName);
+                    Score score = obj.getScore(p);
+                    score.setScore(hp);
+            });
     }
 
     public void updateHealthHUD(Player p) {
         Scoreboard s = p.getScoreboard();
 
         for (Player pl : teamManager.getCombatants()) {
-            updateHealthOnScoreboard(s, pl, p.getHealth());
+            updateHealthOnScoreboard(s, pl);
         }
     }
 
@@ -527,12 +536,7 @@ public class HUDManager implements Listener {
      */
     public void dispatchHealthHUDUpdate(Player p) {
         for (var s : scoreboardsInUse(false)) {
-            updateHealthOnScoreboard(s, p, p.getHealth());
-        }
-    }
-    public void dispatchHealthHUDUpdate(Player p, double health) {
-        for (var s : scoreboardsInUse(false)) {
-            updateHealthOnScoreboard(s, p, health);
+            updateHealthOnScoreboard(s, p);
         }
     }
 
@@ -546,49 +550,47 @@ public class HUDManager implements Listener {
         dispatchTeammateHUDUpdate(p);
     }
 
-    // TODO more elegantly write this
-    @EventHandler
-    public void onPlayerDamaged(EntityDamageEvent e) {
-        if (!gameManager.hasUHCStarted()) return;
+    private final Runnable getHealthChangeHandler(EntityEvent e) {
+        return () -> {
+            if (!gameManager.hasUHCStarted()) return;
 
-        if (e.getEntity() instanceof Player p) {
-            double newHealth = p.getHealth() - e.getFinalDamage();
-            // update hud if dmg taken
-            dispatchHealthHUDUpdate(p, newHealth);
-            dispatchTeammateHUDUpdate(p);
-        }
+            if (e.getEntity() instanceof Player p) {
+                // update hud if dmg taken
+                dispatchHealthHUDUpdate(p);
+                dispatchTeammateHUDUpdate(p);
+            }
+        };
+    }
+
+    @EventHandler
+    public void onPlayerDamage(EntityDamageEvent e) {
+        Runnable handler = getHealthChangeHandler(e);
+        Bukkit.getScheduler().runTaskLater(plugin, handler, 1);
     }
 
     @EventHandler
     public void onPlayerHeal(EntityRegainHealthEvent e) {
-        if (!gameManager.hasUHCStarted()) return;
-
-        if (e.getEntity() instanceof Player p) {
-            double newHealth = p.getHealth() + e.getAmount();
-            dispatchHealthHUDUpdate(p, newHealth);
-            dispatchTeammateHUDUpdate(p);
-        }
+        Runnable handler = getHealthChangeHandler(e);
+        Bukkit.getScheduler().runTaskLater(plugin, handler, 1);
     }
 
     @EventHandler
     public void onPlayerStateChange(PlayerStateChangeEvent e) {
-        Player pl = e.player();
-        PlayerState state = e.state();
-        if (gameManager.hasUHCStarted()) {
-            if (state.isAssignedCombatant()) {
-                // if they change state in game, then they just died or just respawned
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    updateCombatantsAliveHUD(p);
-                    updateTeamsAliveHUD(p);
+        Runnable handler = () -> {
+            Player pl = e.player();
+
+            if (gameManager.hasUHCStarted()) {
+                if (teamManager.isAssignedCombatant(pl)) {
+                    // if they change state in game, then they just died or just respawned
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        updateCombatantsAliveHUD(p);
+                        updateTeamsAliveHUD(p);
+                    }
                 }
-            }
-        } else {
-            // if they are now comb alive in lobby, then they must've just assigned teams
-            if (state.isAssignedCombatant()) {
-                initPlayerHUD(pl);
             } else {
-                cleanup(pl);
+                prepareToLobby(pl);
             }
-        }
+        };
+        Bukkit.getScheduler().runTaskLater(plugin, handler, 1);
     }
 }
