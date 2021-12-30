@@ -125,7 +125,7 @@ public class BranchNode extends Node {
 
         // if not root, add go back trigger
         if (parent != null && slot == slotCount - 1) {
-            p.openInventory(parent.inventory);
+            parent.click(p);
             sound = 1;
         } else {
             Node node = children[slot];
