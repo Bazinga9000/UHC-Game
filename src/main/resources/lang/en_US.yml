@@ -357,6 +357,7 @@ xyz:
                   Direct combat is disabled.
                   Each player receives:
                       - 128 TNT
+                      - Unbreakable Flint & Steel
               custom:
                 name: "Custom Set"
                 desc: ""

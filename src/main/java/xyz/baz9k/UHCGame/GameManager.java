@@ -46,12 +46,12 @@ public class GameManager implements Listener {
     private Recipes recipes;
     private BukkitTask tick;
     
-    
     private final HashMap<UUID, Component> prevDisplayNames = new HashMap<>();
     private final HashMap<UUID, Integer> kills = new HashMap<>();
     
     private GameStage stage = GameStage.NOT_IN_GAME;
-    
+    private Kit kit = Kit.none();
+
     private Optional<Instant> startTime = Optional.empty();
     private Optional<Instant> lastStageInstant = Optional.empty();
 
@@ -464,6 +464,14 @@ public class GameManager implements Listener {
         }
         return OptionalInt.empty();
     }
+    
+    /**
+     * Set the kit for players to spawn with
+     * @param kit the kit
+     */
+    public void kit(Kit kit) {
+        this.kit = kit;
+    }
 
     private Component includeGameTimestamp(Component c) {
         if (c == null) return null;
@@ -612,6 +620,7 @@ public class GameManager implements Listener {
             if (teamManager.isSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
                 prepareToSpectate(p);
+                resetStatuses(p);
             } else {
                 p.setGameMode(GameMode.SURVIVAL);
 
@@ -622,9 +631,11 @@ public class GameManager implements Listener {
     
                 p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(max_health);
                 p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1 * movement_speed); // 0.1 is default value
+                
+                resetStatuses(p);
+                kit.apply(p);
             }
 
-            resetStatuses(p);
 
             // 60s grace period
             PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);

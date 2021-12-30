@@ -1,10 +1,13 @@
 package xyz.baz9k.UHCGame.menu;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.format.TextColor;
+import xyz.baz9k.UHCGame.Kit;
 import xyz.baz9k.UHCGame.UHCGamePlugin;
 import xyz.baz9k.UHCGame.util.Debug;
 
@@ -240,13 +243,71 @@ public class MenuTree {
         new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
 
         /* KIT SETTINGS */
-        // TODO, replace barebones with multi node
         i = 0;
-        new ValuedNode(kitSettings, i++, "none",          new ItemProperties<>(Material.BARRIER).style(TextColor.color(0xFFFFDF)),         ValuedNode.Type.BOOLEAN);
-        new ValuedNode(kitSettings, i++, "gone_fishing",  new ItemProperties<>(Material.FISHING_ROD).style(TextColor.color(0x3730FF)),     ValuedNode.Type.BOOLEAN);
-        new ValuedNode(kitSettings, i++, "always_elytra", new ItemProperties<>(Material.ELYTRA).style(TextColor.color(0xB5B8FF)),          ValuedNode.Type.BOOLEAN);
-        new ValuedNode(kitSettings, i++, "bomberman",     new ItemProperties<>(Material.GUNPOWDER).style(TextColor.color(0x800000)),       ValuedNode.Type.BOOLEAN);
-        new ValuedNode(kitSettings, i++, "custom",        new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)), ValuedNode.Type.BOOLEAN);
+        new ActionNode(kitSettings, i++, "none", 
+            new ItemProperties<Integer>(Material.BARRIER).style(TextColor.color(0xFFFFDF)), 
+            p -> {
+                plugin.getGameManager().kit(Kit.none());
+            });
+        new ActionNode(kitSettings, i++, "gone_fishing", 
+            new ItemProperties<>(Material.FISHING_ROD).style(TextColor.color(0x3730FF)), 
+            p -> {
+                // Each player receives:
+                // - An unbreakable maxed Fishing Rod
+                // - 64 Anvils
+                // - 1000 Levels
+                List<ItemStack> storage = new ArrayList<>();
+                storage.add(new ItemStack(Material.ANVIL, 64));
+
+                ItemStack rod = new ItemStack(Material.FISHING_ROD);
+                rod.addEnchantments(Map.ofEntries(
+                    Map.entry(Enchantment.LURE, 5),
+                    Map.entry(Enchantment.LUCK, 84)
+                ));
+                rod.editMeta(m -> m.setUnbreakable(true));
+                storage.add(rod);
+
+                plugin.getGameManager().kit(new Kit(storage.toArray(ItemStack[]::new), new ItemStack[4], null, 1000));
+            });
+        new ActionNode(kitSettings, i++, "always_elytra", 
+            new ItemProperties<>(Material.ELYTRA).style(TextColor.color(0xB5B8FF)), 
+            p -> {
+                // Everyone is in a flying state 
+                // for the entire game.
+                // Each player receives:
+                //     - Unbreakable Elytra w/ Curse of Binding
+                ItemStack elytra = new ItemStack(Material.ELYTRA);
+                elytra.editMeta(m -> m.setUnbreakable(true));
+                elytra.addEnchantment(Enchantment.BINDING_CURSE, 1);
+                ItemStack[] armor = new ItemStack[] {
+                    null, elytra, null, null
+                };
+                plugin.getGameManager().kit(new Kit(new ItemStack[0], armor, null, 0));
+            });
+        new ActionNode(kitSettings, i++, "bomberman", 
+            new ItemProperties<>(Material.GUNPOWDER).style(TextColor.color(0x800000)), 
+            p -> {
+                // Direct combat is disabled.
+                // Each player receives:
+                //     - 128 TNT
+                // TODO bomberman "Direct combat is disabled."
+
+                List<ItemStack> storage = new ArrayList<>();
+                storage.add(new ItemStack(Material.TNT, 64));
+                storage.add(new ItemStack(Material.TNT, 64));
+
+                ItemStack fns = new ItemStack(Material.FLINT_AND_STEEL);
+                fns.editMeta(m -> m.setUnbreakable(true));
+                storage.add(fns);
+
+                plugin.getGameManager().kit(new Kit(storage.toArray(ItemStack[]::new), new ItemStack[4], null, 0));
+            });
+        // TODO custom
+        new ActionNode(kitSettings, i++, "custom", 
+            new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)), 
+            p -> {
+                
+            });
 
         /* PRESETS */
         // TODO, add more presets
