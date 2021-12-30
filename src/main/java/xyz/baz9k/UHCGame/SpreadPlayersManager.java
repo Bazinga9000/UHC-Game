@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -137,60 +136,9 @@ public class SpreadPlayersManager {
         return (blockLocation.getBlock().getType() == Material.WATER);
     }
 
-    private record Index2D(int x, int y) {
-        public Index2D translate(int X, int Y) { return new Index2D(x + X, y + Y); } 
-    }
-    private static Index2D gridPoint(Point2D topLeft, double cellSize, Point2D pointToGet) {
-        Point2D diff = pointToGet.minus(topLeft);
-        int x = (int) Math.floor(diff.x() / cellSize),
-            y = (int) Math.floor(diff.z() / cellSize);
-        return new Index2D(x, y);
-    }
-    private static boolean isOnGrid(int[][] bgGrid, Index2D gridPoint) {
-        int x = gridPoint.x(),
-            y = gridPoint.y();
-        int w = bgGrid[0].length,
-            h = bgGrid.length;
-        return (0 <= x && x < w) && (0 <= y && y < h);
-    }
-    private static int getOnGrid(int[][] bgGrid, Index2D gridPoint) {
-        int x = gridPoint.x(),
-            y = gridPoint.y();
-        return bgGrid[y][x];
-    }
-    private static void setOnGrid(int[][] bgGrid, Index2D gridPoint, int val) {
-        int x = gridPoint.x(),
-            y = gridPoint.y();
-        bgGrid[y][x] = val;
-    }
-    private static Set<Integer> gridNeighbors(int[][] bgGrid, Index2D gridPoint) {
-        Set<Integer> s = new HashSet<>();
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                var neighborIndex = gridPoint.translate(x, y);
-                if (!isOnGrid(bgGrid, neighborIndex)) continue;
-                
-                var neighborSampleIndex = getOnGrid(bgGrid, neighborIndex);
-                if (neighborSampleIndex == -1) continue;
-                s.add(neighborSampleIndex);
-            }
-        }
-        return s;
-    }
-
     //poisson disk sampling https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf
     private static List<Location> getRandomLocations(Location center, int numLocations, double sideLength, double minSeparation) {
-        double cellSize = minSeparation / Math.sqrt(2);
-        int bgGridSize = (int) Math.ceil(sideLength / cellSize); // number of cells in one length of the bg grid
-        int[][] bgGrid = new int[bgGridSize][bgGridSize];
-        for (int y = 0; y < bgGrid.length; y++) {
-            for (int x = 0; x < bgGrid[0].length; x++) {
-                bgGrid[y][x] = -1;
-            }
-        }
-
         Point2D center2 = Point2D.fromLocation(center);
-        Point2D topLeft = center2.minus(sideLength / 2, sideLength / 2);
         List<Point2D> samples = new ArrayList<>();
         List<Point2D> activeList = new ArrayList<>();
         Random r = new Random();
@@ -201,43 +149,30 @@ public class SpreadPlayersManager {
         Point2D firstLocation = Point2D.uniformRand(center2, sideLength);
         activeList.add(firstLocation);
         samples.add(firstLocation);
-        setOnGrid(bgGrid, gridPoint(topLeft, cellSize, firstLocation), 0);
 
-        while (!activeList.isEmpty()) {
+        makeTestPoint: while (!activeList.isEmpty()) {
             int index = r.nextInt(activeList.size());
             Point2D search = activeList.get(index);
 
-            Stream.generate(() -> Point2D.ringRand(search, minSeparation, 2 * minSeparation))
-                .limit(POINTS_PER_ITER)
-                .filter(p -> p.inSquare(center2, sideLength))
-                .filter(p -> {
-                    OptionalDouble minDist = gridNeighbors(bgGrid, gridPoint(topLeft, cellSize, p)) // get the neighbor cells' sample points' indexes
-                        .stream()
-                        .mapToInt(Integer::intValue)
-                        .mapToObj(samples::get) // get the neighbor cells' sample points
-                        .mapToDouble(p::dist) // find distance of this point to the neighbor cells' points
-                        .min();
-                        
-                        if (minDist.isPresent()) { // there was at least one neighbor. this is the minimum distance between every neighbor
-                            return minDist.getAsDouble() >= minSeparation;
-                        } else { // there was not at least one neighbor so this point is far enough
-                            return true;
-                        }
-                })
-                .filter(p -> !isLocationUnspawnable(getHighestLoc(w, p)))
-                .findAny()
-                .ifPresentOrElse(
-                    p -> {
-                        int i = samples.size();
+            testPoints: for (int i = 0; i < POINTS_PER_ITER; i++) {
+                Point2D testPoint = Point2D.ringRand(search, minSeparation, 2 * minSeparation);
+                
+                // if not in square, then drop
+                if (!testPoint.inSquare(center2, sideLength)) continue;
 
-                        activeList.add(p);
-                        samples.add(p);
-                        setOnGrid(bgGrid, gridPoint(topLeft, cellSize, p), i);
-                    }, 
-                    () -> {
-                        activeList.remove(index);
-                    }
-                );
+                // if there's a point that's too close, then drop
+                for (Point2D s : samples) {
+                    if (s.dist(testPoint) < minSeparation) continue testPoints;
+                }
+
+                if (isLocationUnspawnable(getHighestLoc(w, testPoint))) continue;
+
+                activeList.add(testPoint);
+                samples.add(testPoint);
+                continue makeTestPoint;
+            }
+
+            activeList.remove(index);
         }
 
         Debug.printDebug(new Key("debug.spreadplayers.generated").trans(samples.size()));
