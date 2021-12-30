@@ -37,7 +37,8 @@ public class MenuManager implements Listener {
     }
 
     public void invSee(Player recipient, Player target) {
-        int N_SLOTS = 54;
+        int N_ROWS = 6,
+            N_SLOTS = 9 * N_ROWS;
         Inventory inv = Bukkit.createInventory(null, N_SLOTS, new Key("cmd.invsee.title", target.getName()).trans());
         PlayerInventory targetInv = target.getInventory();
         ItemStack[] contents = new ItemStack[N_SLOTS],
@@ -46,17 +47,17 @@ public class MenuManager implements Listener {
         ItemStack emptyItem = new ItemStack(Material.GRAY_STAINED_GLASS);
         emptyItem.editMeta(m -> m.displayName(Component.space()));
         
-        for (int i = 0; i < N_SLOTS / 2; i++) {
+        for (int i = 0; i < 9 * 2; i++) {
             contents[i] = emptyItem;
         }
-        contents[9 + 1] = targetInv.getHelmet();
-        contents[9 + 2] = targetInv.getChestplate();
-        contents[9 + 3] = targetInv.getLeggings();
-        contents[9 + 4] = targetInv.getBoots();
-        contents[9 + 6] = targetInv.getItemInMainHand();
-        contents[9 + 7] = targetInv.getItemInOffHand();
+        contents[1] = targetInv.getHelmet();
+        contents[2] = targetInv.getChestplate();
+        contents[3] = targetInv.getLeggings();
+        contents[4] = targetInv.getBoots();
+        contents[6] = targetInv.getItemInMainHand();
+        contents[7] = targetInv.getItemInOffHand();
 
-        System.arraycopy(targetContents, 0, contents, N_SLOTS / 2, targetContents.length);
+        System.arraycopy(targetContents, 0, contents, 9 * 2, targetContents.length);
         inv.setContents(contents);
 
         readOnlyInvs.add(inv);
