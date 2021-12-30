@@ -314,6 +314,6 @@ public class MenuTree {
         i = 0;
         new ActionNode(presetSettings, i++, "normal", new ItemProperties<>(), p -> {});
     
-         return cfgRoot;
+        return cfgRoot;
     }
 }
