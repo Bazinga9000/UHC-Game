@@ -98,8 +98,8 @@ xyz:
           "off": "Verbose messages off"
         invsee:
           fail: 
-            combatant: "You cannot look at someone's inventory while you're competing!"
-          title: "Snapshot of {0}'s inventory"
+            combatant: "You cannot look at someone''s inventory while you''re competing!"
+          title: "Snapshot of {0}''s inventory"
 
       err:
         team:
@@ -109,7 +109,7 @@ xyz:
           must_assigned: "Teams have not been assigned."
           must_assigned_comb: "Player must be an assigned combatant."
           invalid: "Invalid team {0}. Team must be positive and cannot exceed the number of teams ({1})."
-          size_name_invalid: "Unrecognized option '{0}'"
+          size_name_invalid: "Unrecognized option ''{0}''"
           count_must_pos: "Team count must be positive."
         world:
           must_regened: "UHC worlds have not been regenerated. Run /uhc reseed to regenerate."
@@ -135,7 +135,7 @@ xyz:
       
       menu:
         prompt:
-          ask: "Enter new value for \"{0}\" (type 'cancel' to cancel): "
+          ask: "Enter new value for \"{0}\" (type ''cancel'' to cancel): "
           cancel: "Prompt cancelled."
           succ: "Set \"{0}\" to {1}!"
         bool_valued:
