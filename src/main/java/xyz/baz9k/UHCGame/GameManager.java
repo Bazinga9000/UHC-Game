@@ -589,7 +589,9 @@ public class GameManager implements Listener {
 
         Player p = e.getPlayer();
         if (teamManager.getPlayerState(p).isSpectating()) {
-            prepareToSpectate(p);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                prepareToSpectate(p);
+            }, 1);
         }
     }
 
