@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.bukkit.*;
 import org.bukkit.World.Environment;
@@ -165,7 +166,7 @@ public class WorldManager {
         worldsRegened = true;
     }
 
-    private static final List<Biome> rejectedBiomes = List.of(
+    private static final Set<Biome> rejectedBiomes = Set.of(
         Biome.OCEAN,
         Biome.COLD_OCEAN,
         Biome.DEEP_COLD_OCEAN,
