@@ -11,14 +11,29 @@ intervals:
   movement2: 600
   dmwait: 300
 
-esoteric:
-  gone_fishing: false
-  boss_team: false
-  always_elytra: false
-  sardines: false
+global:
   wither_bonus: true
-  dn_cycle: 2
   nether_spawn: false
-  bomberman: false
+  dn_cycle: 2
+  spreadplayers: 0
+
+team:
+  hide_teams: 0
+  friendly_fire: false
+  boss_team: false
+  sardines: false
+
+player:
   max_health: 1
   mv_speed: 1
+  grace_period: 600
+  final_heal: -1
+  natural_regen: false
+
+kit:
+  kit:
+
+esoteric:
+  gone_fishing: false
+  always_elytra: false
+  bomberman: false

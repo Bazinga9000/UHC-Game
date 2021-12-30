@@ -54,6 +54,7 @@ public class NodeItemStack extends ItemStack {
      * <p> - Mapping of "object" to string that can be substituted into the description
      * <p> - Function to perform miscellaneous ItemMeta edits (ench hide flags, ench glint)
      * <p> - extra lore, which provides information other than the description of the node
+     * @param <T> type of object passed through each function
      */
     public static class ItemProperties<T> {
         private Supplier<T> propsObjSupplier = () -> null;

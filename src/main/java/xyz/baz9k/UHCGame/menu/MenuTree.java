@@ -166,14 +166,20 @@ public class MenuTree {
     }
 
     private BranchNode createConfigBranch(BranchNode root) {
-        BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties<>(Material.GOLDEN_PICKAXE), 3)
+        // TODO bind these onto game
+        BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties<>(Material.GOLDEN_PICKAXE), 4)
             .lock(plugin.getGameManager()::hasUHCStarted);
         ValuedNode.cfgRoot = cfgRoot;
 
         BranchNode intervals = new BranchNode(cfgRoot, slotAt(1, 3), "intervals",  new ItemProperties<>(Material.CLOCK),                   3);
-        BranchNode wbSize    = new BranchNode(cfgRoot, slotAt(1, 4), "wb_size",    new ItemProperties<>(Material.BLUE_STAINED_GLASS_PANE), 3);
-        BranchNode esoterics = new BranchNode(cfgRoot, slotAt(1, 5), "esoteric",   new ItemProperties<>(Material.NETHER_STAR),             6);
+        BranchNode wbSize    = new BranchNode(cfgRoot, slotAt(1, 5), "wb_size",    new ItemProperties<>(Material.BLUE_STAINED_GLASS_PANE), 3);
 
+        BranchNode globalSettings = new BranchNode(cfgRoot, slotAt(2, 2), "global",  new ItemProperties<>(Material.GRASS_BLOCK), 6);
+        BranchNode teamSettings   = new BranchNode(cfgRoot, slotAt(2, 3), "team",    new ItemProperties<>(Material.COOKED_BEEF), 6);
+        BranchNode playerSettings = new BranchNode(cfgRoot, slotAt(2, 4), "player",  new ItemProperties<>(Material.PLAYER_HEAD), 6);
+        BranchNode kitSettings    = new BranchNode(cfgRoot, slotAt(2, 5), "kit",     new ItemProperties<>(Material.GOLDEN_SWORD), 6);
+        BranchNode presetSettings = new BranchNode(cfgRoot, slotAt(2, 6), "presets", new ItemProperties<>(Material.ACACIA_BOAT), 6);
+        
         /* INTERVALS (in secs) */
         new ValuedNode(intervals, slotAt(1, 2), "start",     new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.RED_CONCRETE)   .formatter(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
         new ValuedNode(intervals, slotAt(1, 3), "movement1", new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.ORANGE_CONCRETE).formatter(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
@@ -187,43 +193,65 @@ public class MenuTree {
         new ValuedNode(wbSize, slotAt(1, 5), "border2",    new ItemProperties<>(Material.GREEN_STAINED_GLASS),  ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
         new ValuedNode(wbSize, slotAt(1, 6), "deathmatch", new ItemProperties<>(Material.PURPLE_STAINED_GLASS), ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
 
-        /* ESOTERICS */
+        /* GLOBAL SETTINGS */
         int i = 0;
-        new ValuedNode(esoterics, i++, "gone_fishing",  new ItemProperties<>(Material.FISHING_ROD)          .style(TextColor.color(0x3730FF)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, i++, "boss_team",     new ItemProperties<>(Material.DRAGON_HEAD)          .style(TextColor.color(0xA100FF)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, i++, "always_elytra", new ItemProperties<>(Material.ELYTRA)               .style(TextColor.color(0xB5B8FF)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, i++, "sardines",      new ItemProperties<>(Material.TROPICAL_FISH)        .style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, i++, "wither_bonus",  new ItemProperties<>(Material.WITHER_SKELETON_SKULL).style(TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
-        new OptionValuedNode(esoterics, i++, "dn_cycle", new ItemProperties<>().style(TextColor.color(0xFFEB85)),
+        new ValuedNode(globalSettings, i++, "wither_bonus",   new ItemProperties<>(Material.WITHER_SKELETON_SKULL).style(TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(globalSettings, i++, "nether_spawn",   new ItemProperties<>(Material.NETHERRACK).style(TextColor.color(0x9C4040)), ValuedNode.Type.BOOLEAN);
+        new OptionValuedNode(globalSettings, i++, "dn_cycle", new ItemProperties<>().style(TextColor.color(0xFFEB85)),
             Material.CLOCK,
             Material.COMPASS,
             Material.SNOWBALL,
             Material.GLOWSTONE,
             Material.LIGHT_GRAY_CONCRETE
         );
-        new ValuedNode(esoterics, i++, "nether_spawn",  new ItemProperties<>(Material.NETHERRACK).style(TextColor.color(0x9C4040)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(esoterics, i++, "bomberman",     new ItemProperties<>(Material.GUNPOWDER) .style(TextColor.color(0x800000)), ValuedNode.Type.BOOLEAN);
-        new OptionValuedNode(esoterics, i++, "max_health", new ItemProperties<>().style(TextColor.color(0xFF2121)),
+        new OptionValuedNode(globalSettings, i++, "spreadplayers", new ItemProperties<>(),
+            Material.WHEAT_SEEDS,
+            Material.WHEAT
+        );
+
+        /* TEAM SETTINGS */
+        i = 0;
+        new OptionValuedNode(teamSettings, i++, "hide_teams", new ItemProperties<>(),
+            Material.RED_STAINED_GLASS,
+            Material.RED_TERRACOTTA,
+            Material.RED_CONCRETE
+        );
+        new ValuedNode(teamSettings, i++, "friendly_fire", new ItemProperties<>(Material.FLINT_AND_STEEL).style(TextColor.color(0xFF9F5F)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(teamSettings, i++, "boss_team",     new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xA100FF)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(teamSettings, i++, "sardines",      new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
+
+        /* PLAYER SETTINGS */
+        // TODO, add limits to grace_period, final_heal, and also show disabled, etc etc
+        i = 0;
+        new OptionValuedNode(playerSettings, i++, "max_health", new ItemProperties<>().style(TextColor.color(0xFF2121)),
             Material.SPIDER_EYE,
             Material.APPLE,
             Material.GOLDEN_APPLE,
             Material.ENCHANTED_GOLDEN_APPLE
         );
-        new OptionValuedNode(esoterics, i++, "mv_speed", new ItemProperties<>().style(TextColor.color(0x61A877)),
+        new OptionValuedNode(playerSettings, i++, "mv_speed", new ItemProperties<>().style(TextColor.color(0x61A877)),
             Material.SOUL_SAND,
             Material.GRASS_BLOCK,
             Material.ICE,
             Material.EMERALD_BLOCK
         );
-        new ActionNode(esoterics, 52, "reset_to_defaults", new ItemProperties<>(Material.CREEPER_HEAD).style(TextColor.color(0x3BEBD3)), p -> {
-            var defaults = plugin.getConfig().getConfigurationSection("esoteric").getDefaultSection();
-            for (Node n : esoterics.getChildren()) {
-                if (n instanceof ValuedNode vn) {
-                    vn.set(defaults.get(vn.cfgKey()));
-                }
-            }
-            esoterics.updateAllSlots();
-         });
+        new ValuedNode(playerSettings, i++, "grace_period",  new ItemProperties<>(Material.SHIELD), ValuedNode.Type.INTEGER);
+        new ValuedNode(playerSettings, i++, "final_heal",    new ItemProperties<>(Material.GLOW_BERRIES), ValuedNode.Type.INTEGER);
+        new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
+
+        /* KIT SETTINGS */
+        // TODO, replace barebones with multi node
+        i = 0;
+        new ValuedNode(kitSettings, i++, "none",          new ItemProperties<>(Material.BARRIER).style(TextColor.color(0xFFFFDF)),         ValuedNode.Type.BOOLEAN);
+        new ValuedNode(kitSettings, i++, "gone_fishing",  new ItemProperties<>(Material.FISHING_ROD).style(TextColor.color(0x3730FF)),     ValuedNode.Type.BOOLEAN);
+        new ValuedNode(kitSettings, i++, "always_elytra", new ItemProperties<>(Material.ELYTRA).style(TextColor.color(0xB5B8FF)),          ValuedNode.Type.BOOLEAN);
+        new ValuedNode(kitSettings, i++, "bomberman",     new ItemProperties<>(Material.GUNPOWDER).style(TextColor.color(0x800000)),       ValuedNode.Type.BOOLEAN);
+        new ValuedNode(kitSettings, i++, "custom",        new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)), ValuedNode.Type.BOOLEAN);
+
+        /* PRESETS */
+        // TODO, add more presets
+        i = 0;
+        new ActionNode(presetSettings, i++, "normal", new ItemProperties<>(), p -> {});
     
          return cfgRoot;
     }

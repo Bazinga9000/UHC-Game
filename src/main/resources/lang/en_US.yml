@@ -223,49 +223,28 @@ xyz:
                 name: "Initial World Border"
                 desc: "Diameter: {0}"
               border1:
-                name: "First Movement"
+                name: "First Travel"
                 desc: "Diameter: {0}"
               border2:
-                name: "Second Movement"
+                name: "Second Travel"
                 desc: "Diameter: {0}"
               deathmatch:
                 name: "Deathmatch"
                 desc: "Diameter: {0}"
-            esoteric:
+            global:
               root:
-                name: "Esoterics"
+                name: "Global Settings"
                 desc: |-
-                  Toggle various additional settings for 
-                  untraditional gameplay.
-              gone_fishing:
-                name: "Gone Fishing"
-                desc: |-
-                  Each player receives:
-                    - An unbreakable maxed Fishing Rod
-                    - 64 Anvils
-                    - 1000 Levels
-              boss_team:
-                name: "Boss Team"
-                desc: |-
-                  Team 1 gets double health,
-                  but has fewer people.
-              always_elytra:
-                name: "Always Elytra"
-                desc: |-
-                  Everyone is in a flying state 
-                  for the entire game.
-                  Each player receives:
-                      - Unbreakable Elytra w/ Curse of Binding
-              sardines:
-                name: "Sardines"
-                desc: |-
-                  Players that find each other
-                  in game join into teams.
+                  Configure settings relating to
+                  the world.
               wither_bonus:
                 name: "Wither Bonus Round"
                 desc: |-
                   After the game ends, the winning 
                   team gets a Wither to fight.
+              nether_spawn:
+                name: "Spawn in Nether"
+                desc: ""
               dn_cycle:
                 name: "Day-Night Cycle"
                 desc: ""
@@ -275,15 +254,49 @@ xyz:
                   - "20:00 per cycle"
                   - "Always Day"
                   - "Always Night"
-              nether_spawn:
-                name: "Spawn in Nether"
-                desc: ""
-              bomberman:
-                name:  "Bomberman"
+              spreadplayers:
+                name: "Spread Players"
                 desc: |-
-                  Direct combat is disabled.
-                  Each player receives:
-                      - 128 TNT
+                  Determine if players should be
+                  spread together or apart
+                options:
+                  - "By Teams"
+                  - "Individually"
+            team:
+              root:
+                name: "Team Settings"
+                desc: |-
+                  Configure settings relating to
+                  how teams function.
+              hide_teams:
+                name: "Hide Teams"
+                desc: "Determine how to handle team display."
+                options:
+                  - "Display all teams"
+                  - "Display only your team"
+                  - "Do not display teams"
+              friendly_fire:
+                name: "Friendly Fire"
+                desc: |-
+                  Determine if players on the same team
+                  should be able to attack each other.
+              boss_team:
+                name: "Boss Team"
+                desc: |-
+                  Team 1 gets double health,
+                  but has fewer people.
+              sardines:
+                name: "Sardines"
+                desc: |-
+                  Players that find each other
+                  in game join into teams.
+            player:
+              root:
+                name: "Player Settings"
+                desc: |-
+                  Configure settings relating to
+                  player attributes or how players
+                  interact.
               max_health:
                 name: "Player Health"
                 desc: ""
@@ -300,8 +313,54 @@ xyz:
                   - "1.0x"
                   - "2.0x"
                   - "3.0x"
-              reset_to_defaults:
-                name: "Reset to Defaults"
+              grace_period:
+                name: "Grace Period"
+                desc: |-
+                  During the first {0} of the game,
+                  PvP is disabled.
+              final_heal:
+                name: "Final Heal"
+                desc: |-
+                  After {0} into the game,
+                  everyone is healed one more time.
+              natural_regen:
+                name: "Natural Regen"
+                desc: |-
+                  Determine whether players can heal
+                  by eating food.
+            kit:
+              root:
+                name: "Kit"
+                desc: |- 
+                  Give players certain items at 
+                  the beginning of the game
+              none:
+                name: "None"
                 desc: ""
-
-
+              gone_fishing:
+                name: "Gone Fishing"
+                desc: |-
+                  Each player receives:
+                    - An unbreakable maxed Fishing Rod
+                    - 64 Anvils
+                    - 1000 Levels
+              always_elytra:
+                name: "Always Elytra"
+                desc: |-
+                  Everyone is in a flying state 
+                  for the entire game.
+                  Each player receives:
+                      - Unbreakable Elytra w/ Curse of Binding
+              bomberman:
+                name: "Bomberman"
+                desc: |-
+                  Direct combat is disabled.
+                  Each player receives:
+                      - 128 TNT
+              custom:
+                name: "Custom Set"
+                desc: ""
+            presets:
+              root:
+                name: "Presets"
+                desc: "Enable premade presets for UHC"

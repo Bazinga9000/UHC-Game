@@ -615,10 +615,10 @@ public class GameManager implements Listener {
             } else {
                 p.setGameMode(GameMode.SURVIVAL);
 
-                // set maximum health and movement speed according to esoteric options
+                // set maximum health and movement speed according to config options
                 var cfg = plugin.getConfig();
-                int max_health = new int[]{10, 20, 40, 60}[cfg.getInt("esoteric.max_health")];
-                double movement_speed = new double[]{0.5,1,2,3}[cfg.getInt("esoteric.mv_speed")];
+                int max_health = new int[]{10, 20, 40, 60}[cfg.getInt("player.max_health")];
+                double movement_speed = new double[]{0.5,1,2,3}[cfg.getInt("player.mv_speed")];
     
                 p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(max_health);
                 p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1 * movement_speed); // 0.1 is default value
