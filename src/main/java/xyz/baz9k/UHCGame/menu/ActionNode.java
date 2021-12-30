@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * <p>
  * Runs an action that is not just setting a config store to a specified value.
  */
-public class ActionNode extends Node {
+public final class ActionNode extends Node {
     private final Consumer<Player> fn;
 
     /**

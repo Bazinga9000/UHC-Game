@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
-public class OptionValuedNode extends ValuedNode {
+public final class OptionValuedNode extends ValuedNode {
 
     private static final Key OPT_DESC_ID_FORMAT = new Key("menu.inv.%s.options");
 
