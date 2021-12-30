@@ -575,7 +575,7 @@ public class HUDManager implements Listener {
         Player pl = e.player();
         PlayerState state = e.state();
         if (gameManager.hasUHCStarted()) {
-            if (state == PlayerState.COMBATANT_ALIVE || state == PlayerState.COMBATANT_DEAD) {
+            if (state.isAssignedCombatant()) {
                 // if they change state in game, then they just died or just respawned
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     updateCombatantsAliveHUD(p);
@@ -584,7 +584,7 @@ public class HUDManager implements Listener {
             }
         } else {
             // if they are now comb alive in lobby, then they must've just assigned teams
-            if (state == PlayerState.COMBATANT_ALIVE || state == PlayerState.COMBATANT_DEAD) {
+            if (state.isAssignedCombatant()) {
                 initPlayerHUD(pl);
             } else {
                 cleanup(pl);

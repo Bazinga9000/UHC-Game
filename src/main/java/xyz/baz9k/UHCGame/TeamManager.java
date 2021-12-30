@@ -116,7 +116,7 @@ public class TeamManager {
      */
     public void resetAllPlayers() {
         for (Node v : playerMap.values()) {
-            if (v.state != PlayerState.SPECTATOR) {
+            if (v.state.isCombatant()) {
                 setState(v.player, PlayerState.COMBATANT_UNASSIGNED);
                 v.team = 0;
             }
@@ -224,7 +224,7 @@ public class TeamManager {
      */
     @NotNull
     public Set<Player> getSpectators() {
-        return getAllPlayersMatching(n -> n.state == PlayerState.SPECTATOR);
+        return getAllPlayersMatching(n -> n.state.isSpectator());
     }
 
     /**
@@ -232,7 +232,7 @@ public class TeamManager {
      */
     @NotNull
     public Set<Player> getCombatants() {
-        return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR);
+        return getAllPlayersMatching(n -> n.state.isCombatant());
     }
 
     /**
@@ -247,7 +247,7 @@ public class TeamManager {
      */
     @NotNull
     public Set<Player> getAssignedCombatants() {
-        return getAllPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE || n.state == PlayerState.COMBATANT_DEAD);
+        return getAllPlayersMatching(n -> n.state.isAssignedCombatant());
     }
 
     /**
@@ -260,7 +260,7 @@ public class TeamManager {
             throw new Key("err.team.invalid").transErr(IllegalArgumentException.class, team, numTeams);
         }
 
-        return getAllPlayersMatching(n -> n.state != PlayerState.SPECTATOR && n.state != PlayerState.COMBATANT_UNASSIGNED && n.team == team);
+        return getAllPlayersMatching(n -> n.state.isAssignedCombatant() && n.team == team);
     }
 
     /**
@@ -315,7 +315,7 @@ public class TeamManager {
      * @return if the specified player is a {@link PlayerState#SPECTATOR}
      */
     public boolean isSpectator(@NotNull Player p) {
-        return getPlayerState(p) == PlayerState.SPECTATOR;
+        return getPlayerState(p).isSpectator();
     }
 
     /**
@@ -323,8 +323,7 @@ public class TeamManager {
      * @return if the specified player is an assigned combatant.
      */
     public boolean isAssignedCombatant(@NotNull Player p) {
-        PlayerState state = getPlayerState(p);
-        return state == PlayerState.COMBATANT_ALIVE || state == PlayerState.COMBATANT_DEAD;
+        return getPlayerState(p).isAssignedCombatant();
     }
 
     public int getNumTeams() {
