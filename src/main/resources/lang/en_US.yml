@@ -34,7 +34,6 @@ xyz:
         neg_x: "-X"
         neg_z: "-Z"
         wbradius: "World Border: ±{0}"
-        wbdistance: "( {0} )"
         gametime: "Game Time: {0} {1}" # Game Time: 0:00:00 <symbol>
         combcount: "Combatants: {0} / {1}"
         teamcount: "Teams: {0} / {1}"

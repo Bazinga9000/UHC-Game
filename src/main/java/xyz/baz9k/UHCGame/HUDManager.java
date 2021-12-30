@@ -426,16 +426,11 @@ public class HUDManager implements Listener {
     }
 
     public void updateWBHUD(@NotNull Player p) {
-        Location loc = p.getLocation();
-        
         // world border radius format
         double r = (p.getWorld().getWorldBorder().getSize() / 2);
         Component wbrad = new Key("hud.wbradius").trans((int) r).color(NamedTextColor.AQUA);
-        // distance format
-        double distance = r - Math.max(Math.abs(loc.getX()), Math.abs(loc.getZ()));
-        Component wbdist = new Key("hud.wbdistance").trans((int) distance).color(NamedTextColor.WHITE)
 ;
-        setHUDLine(p, "wbpos", Component.join(JoinConfiguration.separator(Component.space()), wbrad, wbdist));
+        setHUDLine(p, "wbpos", wbrad);
     }
 
     public void updateElapsedTimeHUD(@NotNull Player p){

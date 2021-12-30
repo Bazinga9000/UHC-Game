@@ -293,10 +293,6 @@ public class GameManager implements Listener {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 hudManager.updateElapsedTimeHUD(p);
                 hudManager.updateWBHUD(p);
-
-                // if (p.getGameMode() == GameMode.SPECTATOR && !p.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
-                //     PotionEffectType.NIGHT_VISION.createEffect(20000000, 1).apply(p);
-                // }
             }
         }, 0L, 1L);
     }
@@ -314,7 +310,7 @@ public class GameManager implements Listener {
         p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
         p.setFoodLevel(20);
         p.setSaturation(5.0f);
-        p.setExp(0.0f);
+        p.setTotalExperience(0);
         p.getInventory().clear();
         
         // clear all potion effects
@@ -483,7 +479,6 @@ public class GameManager implements Listener {
 
     private void winMessage() {
         if (teamManager.getAliveTeams().length > 1) return;
-        endTick();
         int winner = teamManager.getAliveTeams()[0];
         Component winMsg = new Key("win").trans(TeamDisplay.getName(winner))
             .style(noDeco(NamedTextColor.WHITE));
