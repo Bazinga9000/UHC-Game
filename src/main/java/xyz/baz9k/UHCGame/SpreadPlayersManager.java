@@ -117,23 +117,23 @@ public class SpreadPlayersManager {
         return Collections.unmodifiableList(locations);
     }
 
-
+    private static final Set<Material> unspawnableMats = Set.of(
+        Material.LAVA,
+        Material.POWDER_SNOW
+    );
+    private static final Set<Material> avoidMats = Set.of(
+        Material.WATER
+    );
      //random location generation
      private static boolean isLocationUnspawnable(Location l) {
-        return isLocationOverLava(l);
+        Location blockLocation = l.add(0,-1,0);
+        Material ground = blockLocation.getBlock().getType();
+        return unspawnableMats.contains(ground);
     }
     private static boolean isLocationAvoidSpawn(Location l) {
-        return isLocationOverWater(l);
-    }
-
-    private static boolean isLocationOverLava(Location l) {
         Location blockLocation = l.add(0,-1,0);
-        return (blockLocation.getBlock().getType() == Material.LAVA);
-    }
-
-    private static boolean isLocationOverWater(Location l) {
-        Location blockLocation = l.add(0,-1,0);
-        return (blockLocation.getBlock().getType() == Material.WATER);
+        Material ground = blockLocation.getBlock().getType();
+        return avoidMats.contains(ground);
     }
 
     //poisson disk sampling https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf
