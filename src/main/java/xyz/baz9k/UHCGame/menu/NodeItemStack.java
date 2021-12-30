@@ -149,7 +149,11 @@ public class NodeItemStack extends ItemStack {
                 })
                 .toArray();
 
-            return splitLines(render(tKey.trans(args).style(DEFAULT_DESC_STYLE)));
+            List<Component> lines = splitLines(render(tKey.trans(args)));
+            lines.forEach(l -> {
+                if (!l.hasStyling()) l.style(DEFAULT_DESC_STYLE);
+            });
+            return lines;
         }
 
         /**
