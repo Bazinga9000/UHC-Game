@@ -39,7 +39,7 @@ public class MenuManager implements Listener {
     public void invSee(Player recipient, Player target) {
         int N_ROWS = 6,
             N_SLOTS = 9 * N_ROWS;
-        Inventory inv = Bukkit.createInventory(null, N_SLOTS, new Key("cmd.invsee.title", target.getName()).trans());
+        Inventory inv = Bukkit.createInventory(null, N_SLOTS, new Key("cmd.invsee.title").trans(target.getName()));
         PlayerInventory targetInv = target.getInventory();
         ItemStack[] contents = new ItemStack[N_SLOTS],
                     targetContents = targetInv.getStorageContents();
