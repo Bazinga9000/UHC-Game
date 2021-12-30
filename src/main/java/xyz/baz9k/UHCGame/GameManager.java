@@ -583,6 +583,16 @@ public class GameManager implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent e) {
+        if (!hasUHCStarted()) return;
+
+        Player p = e.getPlayer();
+        if (teamManager.getPlayerState(p).isSpectating()) {
+            prepareToSpectate(p);
+        }
+    }
+
     private void prepareToGame(Player p, boolean onGameStart) {
         bbManager.enable(p);
         hudManager.initPlayerHUD(p);
@@ -601,6 +611,7 @@ public class GameManager implements Listener {
             
             if (teamManager.isSpectator(p)) {
                 p.setGameMode(GameMode.SPECTATOR);
+                prepareToSpectate(p);
             } else {
                 p.setGameMode(GameMode.SURVIVAL);
 
@@ -634,4 +645,10 @@ public class GameManager implements Listener {
             setDisplayName(p, prevDisplayNames.get(uuid));
         }
     }
+
+    private void prepareToSpectate(Player p) {
+        new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, true, true, false)
+            .apply(p);
+    }
+
 }
