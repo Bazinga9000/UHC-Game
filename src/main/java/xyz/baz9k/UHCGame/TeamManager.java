@@ -44,16 +44,14 @@ public class TeamManager {
      * @param p Player to get node of
      * @return the node
      */
-    @NotNull
-    private Node getNode(@NotNull Player p) {
-        return playerMap.compute(p.getUniqueId(), (k, v) -> {
-            if (v == null) {
-                return new Node(PlayerState.COMBATANT_UNASSIGNED, 0, p);
-            } else {
+    private @NotNull Node getNode(@NotNull Player p) {
+        return playerMap.merge(p.getUniqueId(), 
+            new Node(PlayerState.COMBATANT_UNASSIGNED, 0, p), 
+            (k, v) -> {
                 v.player = p;
                 return v;
             }
-        });
+        );
     }
 
     public void addPlayer(@NotNull Player p, boolean hasStarted) {
@@ -66,7 +64,7 @@ public class TeamManager {
     private Node setState(@NotNull Player p, @NotNull PlayerState s) {
         Node n = getNode(p);
         // if the node is a snapshot of the player (i.e. they left), rather than the player instance, don't dispatch the event
-        if (isOnline(p)) {
+        if (isOnline(p) && n.state != s) {
             new PlayerStateChangeEvent(p, s).callEvent();
         }
         n.state = s;
@@ -115,10 +113,8 @@ public class TeamManager {
      */
     public void resetAllPlayers() {
         for (Node v : playerMap.values()) {
-            if (v.state.isCombatant()) {
-                setState(v.player, PlayerState.COMBATANT_UNASSIGNED);
-                v.team = 0;
-            }
+            setState(v.player, PlayerState.COMBATANT_UNASSIGNED);
+            v.team = 0;
         }
     }
 
@@ -174,8 +170,7 @@ public class TeamManager {
         Bukkit.getServer().sendMessage(b);
     }
 
-    @NotNull
-    public PlayerState getPlayerState(@NotNull Player p) {
+    public @NotNull PlayerState getPlayerState(@NotNull Player p) {
         return getNode(p).state;
     }
 
@@ -221,31 +216,27 @@ public class TeamManager {
     /**
      * @return a {@link Set} of all spectators
      */
-    @NotNull
-    public Set<Player> getSpectators() {
+    public @NotNull Set<Player> getSpectators() {
         return getAllPlayersMatching(n -> n.state.isSpectator());
     }
 
     /**
      * @return a {@link Set} of all combatants
      */
-    @NotNull
-    public Set<Player> getCombatants() {
+    public @NotNull Set<Player> getCombatants() {
         return getAllPlayersMatching(n -> n.state.isCombatant());
     }
 
     /**
      * @return a {@link Set} of all living combatants
      */
-    @NotNull
-    public Set<Player> getAliveCombatants() {
+    public @NotNull Set<Player> getAliveCombatants() {
         return getAllPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE);
     }
     /**
      * @return a {@link Set} of all assigned combatants
      */
-    @NotNull
-    public Set<Player> getAssignedCombatants() {
+    public @NotNull Set<Player> getAssignedCombatants() {
         return getAllPlayersMatching(n -> n.state.isAssignedCombatant());
     }
 
@@ -253,8 +244,7 @@ public class TeamManager {
      * @param team Team to inspect
      * @return a {@link Set} of all combatants on a specific team
      */
-    @NotNull
-    public Set<Player> getCombatantsOnTeam(int team) {
+    public @NotNull Set<Player> getCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
             throw new Key("err.team.invalid").transErr(IllegalArgumentException.class, team, numTeams);
         }
@@ -265,16 +255,14 @@ public class TeamManager {
     /**
      * @return a {@link Set} of all online spectators
      */
-    @NotNull
-    public Set<Player> getOnlineSpectators() {
+    public @NotNull Set<Player> getOnlineSpectators() {
         return filterOnline(getSpectators());
     }
 
     /**
      * @return a {@link Set} of all online combatants
      */
-    @NotNull
-    public Set<Player> getOnlineCombatants() {
+    public @NotNull Set<Player> getOnlineCombatants() {
         return filterOnline(getCombatants());
     }
 
@@ -282,8 +270,7 @@ public class TeamManager {
      * @param t Team to inspect
      * @return a {@link Set} of all online combatants on a specific team
      */
-    @NotNull
-    public Set<Player> getOnlineCombatantsOnTeam(int t) {
+    public @NotNull Set<Player> getOnlineCombatantsOnTeam(int t) {
         return filterOnline(getCombatantsOnTeam(t));
     }
     

@@ -431,8 +431,7 @@ public class GameManager implements Listener {
     /**
      * @return the {@link Duration} that the current stage lasts.
      */
-    @NotNull
-    public Duration getStageDuration() {
+    public @NotNull Duration getStageDuration() {
         requireStarted();
         return stage.duration();
     }
