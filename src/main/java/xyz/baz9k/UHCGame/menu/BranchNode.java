@@ -14,9 +14,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * {@link Node} that contains an {@link Inventory}.
- * <p>
- * Each slot contains items that represent other Nodes.
+ * {@link Node} that holds other Nodes. These children node are accessible through its inventory.
  */
 public final class BranchNode extends InventoryNode {
     private final Node[] children;

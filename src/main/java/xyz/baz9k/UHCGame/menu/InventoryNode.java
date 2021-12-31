@@ -13,6 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+/**
+ * {@link Node} that holds an Inventory, for whatever reason.
+ */
 public abstract class InventoryNode extends Node {
     protected final @NotNull Inventory inventory;
     protected final int slotCount;
@@ -20,8 +23,10 @@ public abstract class InventoryNode extends Node {
     protected final ReserveSlots rs;
 
     protected record ReserveSlots(int left, int right) {
+        public ReserveSlots(int left) { this(left, -1); }
+
         public static ReserveSlots rows(int left, int right) { return new ReserveSlots(left * 9, right * 9); }
-        public static ReserveSlots all() { return new ReserveSlots(0, -1); }
+        public static ReserveSlots all() { return new ReserveSlots(0); }
         public static ReserveSlots none() { return new ReserveSlots(0, 0); }
         
         public boolean contains(int slot) {
@@ -48,6 +53,11 @@ public abstract class InventoryNode extends Node {
         inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameFromID(langKey()));
     }
 
+    /**
+     * Handles what happens when a player clicks the item in the slot in this node's inventory.
+     * @param p Player who clicked the node
+     * @param slot The slot of the clicked node
+     */
     public abstract void onClick(@NotNull Player p, int slot);
     
     protected static ItemStack emptyGlass() {
@@ -58,6 +68,9 @@ public abstract class InventoryNode extends Node {
         return emptyGlass;
     }
     
+    /**
+     * When the inventory is first loaded, this function is run.
+     */
     void initInventory() {
         hasInventoryViewed = true;
 
@@ -83,6 +96,9 @@ public abstract class InventoryNode extends Node {
         inventory.setContents(contents);
     }
 
+    /**
+     * When the inventory is loaded after the first time, this function is loaded.
+     */
     void updateInventory() {}
 
     @Override
@@ -101,6 +117,12 @@ public abstract class InventoryNode extends Node {
         return inventory;
     }
 
+    /**
+     * Check if the slot is handled by this node's onClick handler.
+     * If this slot is handled by this node's onClick handler, it is readonly and cannot be removed.
+     * @param slot slot to check
+     * @return boolean
+     */
     public boolean handlesSlot(int slot) {
         return rs.contains(slot);
     }
