@@ -309,14 +309,14 @@ public class GameManager implements Listener {
             
             if (doGrace && !inGracePeriod()) {
                 doGrace = false;
-                Bukkit.getServer().sendMessage(new Key("chat.grace.end").trans()); // TODO, boxless this
+                GameStage.sendMessageAsBoxless(Bukkit.getServer(), new Key("chat.grace.end").trans());
             }
 
             if (doFinalHeal && !awaitingFinalHealPeriod()) {
                 doFinalHeal = false;
                 for (Player p : teamManager.getAliveCombatants()) {
                     p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
-                    Bukkit.getServer().sendMessage(new Key("chat.final_heal").trans()); // TODO, boxless this
+                    GameStage.sendMessageAsBoxless(Bukkit.getServer(), new Key("chat.final_heal").trans());
                 }
             }
 
