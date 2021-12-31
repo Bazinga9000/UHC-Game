@@ -260,14 +260,15 @@ public class MenuTree {
                 storage.add(new ItemStack(Material.ANVIL, 64));
 
                 ItemStack rod = new ItemStack(Material.FISHING_ROD);
-                rod.addEnchantments(Map.ofEntries(
+                rod.addUnsafeEnchantments(Map.ofEntries(
                     Map.entry(Enchantment.LURE, 5),
                     Map.entry(Enchantment.LUCK, 84)
                 ));
                 rod.editMeta(m -> m.setUnbreakable(true));
                 storage.add(rod);
 
-                plugin.getGameManager().kit(new Kit(storage.toArray(ItemStack[]::new), new ItemStack[4], null, 1000));
+                Kit k = new Kit(storage.toArray(ItemStack[]::new), new ItemStack[4], null, 1000);
+                plugin.getGameManager().kit(k);
             });
         new ActionNode(kitSettings, i++, "always_elytra", 
             new ItemProperties<>(Material.ELYTRA).style(TextColor.color(0xB5B8FF)), 
@@ -282,7 +283,8 @@ public class MenuTree {
                 ItemStack[] armor = new ItemStack[] {
                     null, elytra, null, null
                 };
-                plugin.getGameManager().kit(new Kit(new ItemStack[0], armor, null, 0));
+                Kit k = new Kit(new ItemStack[0], armor, null, 0);
+                plugin.getGameManager().kit(k);
             });
         new ActionNode(kitSettings, i++, "bomberman", 
             new ItemProperties<>(Material.GUNPOWDER).style(TextColor.color(0x800000)), 
@@ -300,14 +302,11 @@ public class MenuTree {
                 fns.editMeta(m -> m.setUnbreakable(true));
                 storage.add(fns);
 
-                plugin.getGameManager().kit(new Kit(storage.toArray(ItemStack[]::new), new ItemStack[4], null, 0));
+                Kit k = new Kit(storage.toArray(ItemStack[]::new), new ItemStack[4], null, 0);
+                plugin.getGameManager().kit(k);
             });
-        // TODO custom
-        new ActionNode(kitSettings, i++, "custom", 
-            new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)), 
-            p -> {
-                
-            });
+        new KitNode(kitSettings, i++, "custom", 
+            new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)));
 
         /* PRESETS */
         // TODO, add more presets

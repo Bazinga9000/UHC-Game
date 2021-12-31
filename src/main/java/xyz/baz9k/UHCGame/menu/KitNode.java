@@ -1,0 +1,89 @@
+package xyz.baz9k.UHCGame.menu;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import xyz.baz9k.UHCGame.Kit;
+import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
+
+public class KitNode extends InventoryNode {
+
+    private boolean grantXP = false;
+    private NodeItemStack xpStack;
+
+    public KitNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props) {
+        super(parent, slot, nodeName, props, 5, new ReserveSlots(9 * 5 - 4));
+
+        xpStack = new NodeItemStack("kit_xp", 
+        new ItemProperties<Boolean>(b -> b ? Material.EXPERIENCE_BOTTLE : Material.GLASS_BOTTLE)
+            .useObject(() -> this.grantXP)
+        );
+    }
+
+    @Override
+    void initInventory() {
+        inventory.setItem(rsLeft(), xpStack);
+        super.initInventory();
+        updateInventory();
+    }
+
+    @Override
+    void updateInventory() {
+        // load currently used kit
+        inventory.setContents(new ItemStack[rsLeft()]);
+        Kit k = kit();
+
+        inventory.setContents(k.storage());
+        
+        ItemStack[] armor = k.armor();
+        for (int i = 0; i < armor.length; i++) {
+            inventory.setItem(9 * 4 + i, armor[i]);
+        }
+        inventory.setItem(9 * 4 + 4, k.offhand());
+
+        grantXP(k.xpLevels() > 0);
+    }
+
+    @Override
+    public void onClick(@NotNull Player p, int slot) {
+        if (slot == rsLeft()) grantXP(!grantXP);
+    }
+
+    @Override
+    public void onClose(@NotNull Player p) {
+        // extract kit, save it
+        List<ItemStack> contents = Arrays.asList(inventory.getContents()).subList(0, rsLeft());
+        
+        ItemStack[] storage = contents.subList(0, 9 * 4).stream()
+            .filter(Objects::nonNull)
+            .toArray(ItemStack[]::new);
+        ItemStack[] armor = contents.subList(9 * 4, 9 * 4 + 4).toArray(ItemStack[]::new);
+        ItemStack offhand = contents.get(9 * 4 + 4);
+        
+        int xpLevels;
+        if (grantXP) {
+            xpLevels = kit().xpLevels();
+            if (xpLevels == 0) xpLevels = 100;
+        } else {
+            xpLevels = 0;
+        }
+
+        plugin.getGameManager().kit(new Kit(storage, armor, offhand, xpLevels));
+    }
+
+    private void grantXP(boolean gxp) {
+        grantXP = gxp;
+        inventory.setItem(rsRight() - 4, xpStack.updateAll());
+    }
+
+    private Kit kit() {
+        return plugin.getGameManager().kit();
+    }
+}

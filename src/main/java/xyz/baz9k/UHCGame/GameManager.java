@@ -463,6 +463,13 @@ public class GameManager implements Listener {
     }
     
     /**
+     * @return the kit players spawn with
+     */
+    public Kit kit() {
+        return this.kit;
+    }
+
+    /**
      * Set the kit for players to spawn with
      * @param kit the kit
      */

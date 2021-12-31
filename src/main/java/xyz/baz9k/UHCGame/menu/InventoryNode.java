@@ -60,6 +60,14 @@ public abstract class InventoryNode extends Node {
      */
     public abstract void onClick(@NotNull Player p, int slot);
     
+    /**
+     * Handles what happens when a player closes the inventory associated with this node.
+     * @param p Player who closed the inventory
+     */
+    public void onClose(@NotNull Player p) {
+
+    }
+
     protected static ItemStack emptyGlass() {
         ItemStack emptyGlass = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
         emptyGlass.editMeta(m -> {
@@ -68,6 +76,17 @@ public abstract class InventoryNode extends Node {
         return emptyGlass;
     }
     
+    protected int rsLeft() {
+        int l = rs.left();
+        if (l == -1) return 0;
+        return l;
+    }
+    protected int rsRight() {
+        int r = rs.right();
+        if (r == -1) return slotCount;
+        return r;
+    }
+
     /**
      * When the inventory is first loaded, this function is run.
      */
@@ -76,10 +95,8 @@ public abstract class InventoryNode extends Node {
 
         ItemStack[] contents = inventory.getContents();
         // fill reserve slots with empty glass
-        int l = rs.left(),
-            r = rs.right();
-        if (l == -1) l = 0;
-        if (r == -1) r = slotCount;
+        int l = rsLeft(),
+            r = rsRight();
 
         ItemStack empty = emptyGlass();
         Arrays.fill(contents, l, r, empty);
