@@ -427,8 +427,16 @@ public class HUDManager implements Listener {
 
     public void updateWBHUD(@NotNull Player p) {
         // world border radius format
+        GameStage gs = gameManager.getStage();
         double r = (p.getWorld().getWorldBorder().getSize() / 2);
-        Component wbrad = new Key("hud.wbradius").trans((int) r).color(NamedTextColor.AQUA);
+        Component wbrad;
+
+        if (gs.isWBInstant()) {
+            wbrad = new Key("hud.wbradius.stationary").trans((int) r).color(NamedTextColor.AQUA);
+        } else {
+            double finalR = gs.wbRadius();
+            wbrad = new Key("hud.wbradius.traveling").trans((int) r, (int) finalR).color(NamedTextColor.AQUA);
+        }
 ;
         setHUDLine(p, "wbpos", wbrad);
     }
