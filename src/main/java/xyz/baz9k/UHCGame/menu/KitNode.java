@@ -1,10 +1,14 @@
 package xyz.baz9k.UHCGame.menu;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import xyz.baz9k.UHCGame.Kit;
 import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 public class KitNode extends InventoryNode {
 
@@ -32,6 +37,9 @@ public class KitNode extends InventoryNode {
     void initInventory() {
         super.initInventory();
         inventory.setItem(rsLeft(), xpStack);
+
+        ItemStack saveStack = new NodeItemStack("kit_save", new ItemProperties<>(Material.STRUCTURE_BLOCK));
+        inventory.setItem(rsRight() - 2, saveStack);
         updateInventory();
     }
 
@@ -60,6 +68,23 @@ public class KitNode extends InventoryNode {
         if (slot == rsLeft()) {
             grantXP(!grantXP);
             return 1;
+        } else if (slot == rsRight() - 2) {
+            plugin.saveResource("new_kit.yml", true);
+            File f = new File(plugin.getDataFolder(), "new_kit.yml");
+            YamlConfiguration kitCfg = new YamlConfiguration();
+            try {
+                kitCfg.load(f);
+            } catch (IOException | InvalidConfigurationException e) {
+                throw new RuntimeException(e);
+            }
+            kitCfg.set("new_kit", kit());
+            try {
+                kitCfg.save(f);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            p.sendMessage(new Key("menu.inv.kit_save.succ").trans());
         }
         return 0;
     }

@@ -312,7 +312,7 @@ public class MenuTree {
                 Kit k = new Kit(storage.toArray(ItemStack[]::new), new ItemStack[4], null, 0);
                 plugin.getGameManager().kit(k);
             });
-        new KitNode(kitSettings, i++, "custom", 
+        new KitNode(kitSettings, 52, "custom", 
             new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)));
 
         /* PRESETS */

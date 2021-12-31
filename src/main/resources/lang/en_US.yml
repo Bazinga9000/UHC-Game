@@ -150,6 +150,10 @@ xyz:
           kit_xp:
             name: "Include XP"
             desc: "Toggle if XP should be included in kit"
+          kit_save:
+            name: "Save Kit"
+            desc: "Save kit to disk"
+            succ: "Kit has been saved to ''new_kit.yml''!"
 
           root:
             name: "Control Panel"
