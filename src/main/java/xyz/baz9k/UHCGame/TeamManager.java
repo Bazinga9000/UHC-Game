@@ -1,7 +1,7 @@
 package xyz.baz9k.UHCGame;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.HumanEntity;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class TeamManager {
     private record Node(PlayerState state, int team) {
@@ -147,7 +148,7 @@ public class TeamManager {
     }
 
     private void announceTeamsLine(PlayerState s, int t) {
-        Set<Player> players;
+        Set<? extends OfflinePlayer> players;
         if (s.isAssignedCombatant()) {
             players = getCombatantsOnTeam(t);
         } else {
@@ -161,7 +162,7 @@ public class TeamManager {
 
         // list of players one a team, separated by commas
         String tPlayers = players.stream()
-            .map(HumanEntity::getName)
+            .map(OfflinePlayer::getName)
             .collect(Collectors.joining(", "));
         
         b.append(Component.text(tPlayers, noDeco(NamedTextColor.WHITE)));
@@ -174,12 +175,6 @@ public class TeamManager {
 
     public int getTeam(@NotNull Player p) {
         return getNode(p).team;
-    }
-
-    private static boolean isOnline(Player p) {
-        Player pl = Bukkit.getPlayer(p.getUniqueId());
-
-        return pl != null;
     }
 
     /**
@@ -198,43 +193,55 @@ public class TeamManager {
 
     /* LIST OF PLAYERS */
     
-    private Set<Player> getAllPlayersMatching(Predicate<Node> predicate) {
-        return playerMap.values().stream()
-            .filter(predicate)
-            .map(n -> n.player)
+    private Set<OfflinePlayer> getAllPlayersMatching(Predicate<Node> predicate) {
+        return playerMap.entrySet().stream()
+            .filter(e -> predicate.test(e.getValue()))
+            .map(e -> Bukkit.getOfflinePlayer(e.getKey()))
             .collect(Collectors.toSet());
     }
 
-    private Set<Player> filterOnline(@NotNull Set<Player> pSet) {
+    private Set<Player> filterOnline(@NotNull Set<? extends OfflinePlayer> pSet) {
         return pSet.stream()
-            .filter(TeamManager::isOnline)
+            .map(OfflinePlayer::getPlayer)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+    }
+
+    private Set<Player> useCache(@NotNull Set<? extends OfflinePlayer> pSet) {
+        return pSet.stream()
+            .map(op -> {
+                Player p = op.getPlayer();
+                if (p != null) return p;
+                return cachedPlayers.get(op.getUniqueId());
+            })
+            .filter(Objects::nonNull)
             .collect(Collectors.toSet());
     }
 
     /**
      * @return a {@link Set} of all spectators
      */
-    public @NotNull Set<Player> getSpectators() {
+    public @NotNull Set<OfflinePlayer> getSpectators() {
         return getAllPlayersMatching(n -> n.state.isSpectator());
     }
 
     /**
      * @return a {@link Set} of all combatants
      */
-    public @NotNull Set<Player> getCombatants() {
+    public @NotNull Set<OfflinePlayer> getCombatants() {
         return getAllPlayersMatching(n -> n.state.isCombatant());
     }
 
     /**
      * @return a {@link Set} of all living combatants
      */
-    public @NotNull Set<Player> getAliveCombatants() {
+    public @NotNull Set<OfflinePlayer> getAliveCombatants() {
         return getAllPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE);
     }
     /**
      * @return a {@link Set} of all assigned combatants
      */
-    public @NotNull Set<Player> getAssignedCombatants() {
+    public @NotNull Set<OfflinePlayer> getAssignedCombatants() {
         return getAllPlayersMatching(n -> n.state.isAssignedCombatant());
     }
 
@@ -242,12 +249,20 @@ public class TeamManager {
      * @param team Team to inspect
      * @return a {@link Set} of all combatants on a specific team
      */
-    public @NotNull Set<Player> getCombatantsOnTeam(int team) {
+    public @NotNull Set<OfflinePlayer> getCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
             throw new Key("err.team.invalid").transErr(IllegalArgumentException.class, team, numTeams);
         }
 
         return getAllPlayersMatching(n -> n.state.isAssignedCombatant() && n.team == team);
+    }
+
+    /**
+     * @return a {@link Set} of all combatants, using cached snapshots of offline players
+     * <p>This method should only be used to query information from offline players.
+     */
+    public @NotNull Set<Player> getCachedCombatants() {
+        return useCache(getCombatants());
     }
 
     /**
