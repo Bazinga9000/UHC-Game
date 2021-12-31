@@ -66,7 +66,7 @@ public class TeamManager {
     private Node setState(@NotNull Player p, @NotNull PlayerState s) {
         Node n = getNode(p);
         // if the node is a snapshot of the player (i.e. they left), rather than the player instance, don't dispatch the event
-        if (isOnline(p)) {
+        if (isOnline(p) && n.state != s) {
             new PlayerStateChangeEvent(p, s).callEvent();
         }
         n.state = s;
@@ -115,10 +115,8 @@ public class TeamManager {
      */
     public void resetAllPlayers() {
         for (Node v : playerMap.values()) {
-            if (v.state.isCombatant()) {
-                setState(v.player, PlayerState.COMBATANT_UNASSIGNED);
-                v.team = 0;
-            }
+            setState(v.player, PlayerState.COMBATANT_UNASSIGNED);
+            v.team = 0;
         }
     }
 
