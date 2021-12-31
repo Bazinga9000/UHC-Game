@@ -73,6 +73,7 @@ xyz:
           dm_warn: "If the game does not end within {0}, I shall end it myself!" # duration
         grace:
           end: "The grace period has ended. Let the battles begin!"
+        final_heal: "Final heal!"
 
       time:
         hour: "{0}h"

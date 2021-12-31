@@ -242,7 +242,7 @@ public class MenuTree {
                 .formatter(v -> getTimeString((int) v)), 
             ValuedNode.Type.INTEGER, 
             n -> Math.max(-1, (int) n));
-        new ValuedNode(playerSettings, i++, "final_heal", // TODO
+        new ValuedNode(playerSettings, i++, "final_heal",
             new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.GLOW_BERRIES)
                 .formatter(v -> getTimeString((int) v)), 
             ValuedNode.Type.INTEGER, 

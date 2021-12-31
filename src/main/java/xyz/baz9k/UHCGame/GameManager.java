@@ -55,7 +55,8 @@ public class GameManager implements Listener {
     private Optional<Instant> startTime = Optional.empty();
     private Optional<Instant> lastStageInstant = Optional.empty();
 
-    private boolean grace;
+    private boolean doGrace;
+    private boolean doFinalHeal;
 
     public GameManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
@@ -252,7 +253,8 @@ public class GameManager implements Listener {
         setStage(GameStage.nth(0));
         startTime = lastStageInstant = Optional.of(Instant.now());
 
-        grace = inGracePeriod();
+        doGrace = inGracePeriod();
+        doFinalHeal = getFinalHealPeriod().isPresent();
         kills.clear();
         
 
@@ -305,9 +307,17 @@ public class GameManager implements Listener {
                 incrementStage();
             }
             
-            if (grace && !inGracePeriod()) {
-                grace = false;
+            if (doGrace && !inGracePeriod()) {
+                doGrace = false;
                 Bukkit.getServer().sendMessage(new Key("chat.grace.end").trans()); // TODO, boxless this
+            }
+
+            if (doFinalHeal && !awaitingFinalHealPeriod()) {
+                doFinalHeal = false;
+                for (Player p : teamManager.getAliveCombatants()) {
+                    p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
+                    Bukkit.getServer().sendMessage(new Key("chat.final_heal").trans()); // TODO, boxless this
+                }
             }
 
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -503,12 +513,29 @@ public class GameManager implements Listener {
         return Optional.of(Duration.ofSeconds(grace));
     }
 
+    private Optional<Duration> getFinalHealPeriod() {
+        int fh = plugin.getConfig().getInt("global.final_heal");
+
+        if (fh == -1) return Optional.empty();
+        return Optional.of(Duration.ofSeconds(fh));
+    }
+
     public boolean inGracePeriod() {
         Optional<Duration> grace = getGracePeriod();
         Optional<Duration> elapsedTime = getElapsedTime();
 
         if (elapsedTime.isPresent() && grace.isPresent()) {
             return grace.get().compareTo(elapsedTime.get()) <= 0;
+        }
+        return false;
+    }
+
+    public boolean awaitingFinalHealPeriod() {
+        Optional<Duration> fh = getFinalHealPeriod();
+        Optional<Duration> elapsedTime = getElapsedTime();
+
+        if (elapsedTime.isPresent() && fh.isPresent()) {
+            return fh.get().compareTo(elapsedTime.get()) <= 0;
         }
         return false;
     }
