@@ -186,6 +186,10 @@ public enum GameStage {
         return wbDiameter() / 2;
     }
     
+    public boolean isWBInstant() {
+        return isWBInstant;
+    }
+
     /**
      * Updates worlds to align with the stage's world border size.
      * @param worlds Worlds to apply world border to
