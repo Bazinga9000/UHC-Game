@@ -198,9 +198,9 @@ public class MenuTree {
 
         /* GLOBAL SETTINGS */
         int i = 0;
-        new ValuedNode(globalSettings, i++, "wither_bonus",   new ItemProperties<>(Material.WITHER_SKELETON_SKULL).style(TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(globalSettings, i++, "nether_spawn",   new ItemProperties<>(Material.NETHERRACK).style(TextColor.color(0x9C4040)),            ValuedNode.Type.BOOLEAN);
-        new OptionValuedNode(globalSettings, i++, "dn_cycle", new ItemProperties<>().style(TextColor.color(0xFFEB85)),
+        new ValuedNode(globalSettings, i++, "wither_bonus",   new ItemProperties<>(Material.WITHER_SKELETON_SKULL).style(TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN); // TODO
+        new ValuedNode(globalSettings, i++, "nether_spawn",   new ItemProperties<>(Material.NETHERRACK).style(TextColor.color(0x9C4040)),            ValuedNode.Type.BOOLEAN); // TODO
+        new OptionValuedNode(globalSettings, i++, "dn_cycle", new ItemProperties<>().style(TextColor.color(0xFFEB85)), // TODO
             Material.CLOCK,
             Material.COMPASS,
             Material.SNOWBALL,
@@ -214,14 +214,14 @@ public class MenuTree {
 
         /* TEAM SETTINGS */
         i = 0;
-        new OptionValuedNode(teamSettings, i++, "hide_teams", new ItemProperties<>(),
+        new OptionValuedNode(teamSettings, i++, "hide_teams", new ItemProperties<>(), // TODO
             Material.RED_STAINED_GLASS,
             Material.RED_TERRACOTTA,
             Material.RED_CONCRETE
         );
-        new ValuedNode(teamSettings, i++, "friendly_fire", new ItemProperties<>(Material.FLINT_AND_STEEL).style(TextColor.color(0xFF9F5F)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(teamSettings, i++, "boss_team",     new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xA100FF)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(teamSettings, i++, "sardines",      new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(teamSettings, i++, "friendly_fire", new ItemProperties<>(Material.FLINT_AND_STEEL).style(TextColor.color(0xFF9F5F)), ValuedNode.Type.BOOLEAN); // TODO
+        new ValuedNode(teamSettings, i++, "boss_team",     new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xA100FF)), ValuedNode.Type.BOOLEAN); // TODO
+        new ValuedNode(teamSettings, i++, "sardines",      new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN); // TODO
 
         /* PLAYER SETTINGS */
         i = 0;
@@ -237,17 +237,17 @@ public class MenuTree {
             Material.ICE,
             Material.EMERALD_BLOCK
         );
-        new ValuedNode(playerSettings, i++, "grace_period",  
+        new ValuedNode(playerSettings, i++, "grace_period", // TODO
             new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.SHIELD)
                 .formatter(v -> getTimeString((int) v)), 
             ValuedNode.Type.INTEGER, 
             n -> Math.max(-1, (int) n));
-        new ValuedNode(playerSettings, i++, "final_heal",    
+        new ValuedNode(playerSettings, i++, "final_heal", // TODO
             new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.GLOW_BERRIES)
                 .formatter(v -> getTimeString((int) v)), 
             ValuedNode.Type.INTEGER, 
             n -> Math.max(-1, (int) n));
-        new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN); // TODO
 
         /* KIT SETTINGS */
         YamlConfiguration kitsCfg = new YamlConfiguration();
