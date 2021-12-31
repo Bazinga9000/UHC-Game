@@ -100,7 +100,7 @@ xyz:
         invsee:
           fail: 
             combatant: "You cannot look at someone''s inventory while you''re competing!"
-          title: "Snapshot of {0}''s inventory"
+          title: "{0}''s inventory"
 
       err:
         team:
