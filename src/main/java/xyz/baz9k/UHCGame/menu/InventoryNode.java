@@ -1,9 +1,11 @@
 package xyz.baz9k.UHCGame.menu;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -21,6 +23,7 @@ public abstract class InventoryNode extends Node {
     protected final int slotCount;
     protected boolean hasInventoryViewed = false;
     protected final ReserveSlots rs;
+    protected Material fillReserved;
 
     protected record ReserveSlots(int left, int right) {
         public ReserveSlots(int left) { this(left, -1); }
@@ -49,17 +52,49 @@ public abstract class InventoryNode extends Node {
         super(parent, slot, nodeName, props);
         this.slotCount = 9 * guiHeight;
         this.rs = rs;
+        this.fillReserved = Material.LIGHT_GRAY_STAINED_GLASS_PANE;
 
         inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameFromID(langKey()));
     }
 
     /**
-     * Handles what happens when a player clicks the item in the slot in this node's inventory.
-     * @param p Player who clicked the node
-     * @param slot The slot of the clicked node
+     * Implementing classes need to implement how clicks are handled via this method (not onClick).
+     * Return 0 if nothing happened, 1 if action done was successful, 2 if action done failed.
+     * @param p Player who clicked the item
+     * @param slot The slot of the clicked item
+     * @return selected sound index
      */
-    public abstract void onClick(@NotNull Player p, int slot);
+    protected abstract int clickHandler(@NotNull Player p, int slot);
     
+    /**
+     * Handles what happens when a player clicks the item in the slot in this node's inventory.
+     * @param p Player who clicked the item
+     * @param slot The slot of the clicked item
+     */
+    public void onClick(@NotNull Player p, int slot) {
+        Objects.checkIndex(rsLeft(), rsRight());
+
+        // 0 = nothing
+        // 1 = success
+        // 2 = failure
+        int sound = 0; 
+
+        // if not root, add go back trigger
+        if (parent != null && slot == slotCount - 1) {
+            parent.click(p);
+            sound = 1;
+        } else {
+            sound = clickHandler(p, slot);
+        }
+
+        switch (sound) {
+            case 1 -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, 2);
+            case 2 -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, 0.5f, 0);
+            default -> {}
+        }
+
+    }
+
     /**
      * Handles what happens when a player closes the inventory associated with this node.
      * @param p Player who closed the inventory
@@ -68,12 +103,12 @@ public abstract class InventoryNode extends Node {
 
     }
 
-    protected static ItemStack emptyGlass() {
-        ItemStack emptyGlass = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-        emptyGlass.editMeta(m -> {
+    protected ItemStack filler() {
+        ItemStack filler = new ItemStack(fillReserved);
+        filler.editMeta(m -> {
             m.displayName(Component.space());
         });
-        return emptyGlass;
+        return filler;
     }
     
     protected int rsLeft() {
@@ -98,11 +133,11 @@ public abstract class InventoryNode extends Node {
         int l = rsLeft(),
             r = rsRight();
 
-        ItemStack empty = emptyGlass();
+        ItemStack empty = filler();
         Arrays.fill(contents, l, r, empty);
 
         // set last reserve slot to go back button
-        if (rs.contains(r - 1)) {
+        if (rs.contains(r - 1) && parent != null) {
             ItemStack goBack = new NodeItemStack("go_back", 
                 new NodeItemStack.ItemProperties<>(Material.ARROW).style(NamedTextColor.RED)
             );
@@ -120,7 +155,7 @@ public abstract class InventoryNode extends Node {
 
     @Override
     public void click(@NotNull Player p) {
-        if (hasInventoryViewed) {
+        if (!hasInventoryViewed) {
             initInventory();
         } else {
             updateInventory();

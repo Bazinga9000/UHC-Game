@@ -71,16 +71,15 @@ public class MenuManager implements Listener {
         if (n != null) {
             // interacted inventory is a node inventory
             if (e.getInventory() == e.getClickedInventory()) { // handle clicks IF the clicked inv is the top of the view
+                Player p = (Player) e.getWhoClicked();
+                int slot = e.getSlot();
+                boolean handlesSlot = n.handlesSlot(slot);
                 try {
                     if (e.getCurrentItem() != null) {
-                        Player p = (Player) e.getWhoClicked();
-                        int slot = e.getSlot();
-                        if (n.handlesSlot(slot)) {
-                            n.onClick(p, slot);
-                        }
+                        if (handlesSlot) n.onClick(p, slot);
                     }
                 } finally {
-                    e.setCancelled(true);
+                    if (handlesSlot) e.setCancelled(true);
                 }
             }
         } else {
@@ -94,6 +93,11 @@ public class MenuManager implements Listener {
     @EventHandler
     public void onInvClose(InventoryCloseEvent e) {
         Inventory inv = e.getInventory();
+
+        InventoryNode n = menuTree.getNodeFromInventory(inv);
+        if (n != null) {
+            n.onClose((Player) e.getPlayer());
+        }
         if (inv.getViewers().size() == 0 && readOnlyInvs.contains(inv)) {
             readOnlyInvs.remove(e.getInventory());
         }

@@ -147,6 +147,9 @@ xyz:
           go_back:
             name: "Go Back"
             desc: ""
+          kit_xp:
+            name: "Include XP"
+            desc: "Toggle if XP should be included in kit"
 
           root:
             name: "Control Panel"

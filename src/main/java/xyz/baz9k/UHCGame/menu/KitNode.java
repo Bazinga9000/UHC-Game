@@ -21,6 +21,7 @@ public class KitNode extends InventoryNode {
     public KitNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props) {
         super(parent, slot, nodeName, props, 5, new ReserveSlots(9 * 5 - 4));
 
+        this.fillReserved = Material.GRAY_STAINED_GLASS_PANE;
         xpStack = new NodeItemStack("kit_xp", 
         new ItemProperties<Boolean>(b -> b ? Material.EXPERIENCE_BOTTLE : Material.GLASS_BOTTLE)
             .useObject(() -> this.grantXP)
@@ -29,18 +30,21 @@ public class KitNode extends InventoryNode {
 
     @Override
     void initInventory() {
-        inventory.setItem(rsLeft(), xpStack);
         super.initInventory();
+        inventory.setItem(rsLeft(), xpStack);
         updateInventory();
     }
 
     @Override
     void updateInventory() {
         // load currently used kit
-        inventory.setContents(new ItemStack[rsLeft()]);
+        ItemStack[] contents = inventory.getContents();
+        Arrays.fill(contents, 0, rsLeft(), null);
         Kit k = kit();
 
-        inventory.setContents(k.storage());
+        ItemStack[] storage = k.storage();
+        System.arraycopy(storage, 0, contents, 0, storage.length);
+        inventory.setContents(contents);
         
         ItemStack[] armor = k.armor();
         for (int i = 0; i < armor.length; i++) {
@@ -52,8 +56,12 @@ public class KitNode extends InventoryNode {
     }
 
     @Override
-    public void onClick(@NotNull Player p, int slot) {
-        if (slot == rsLeft()) grantXP(!grantXP);
+    protected int clickHandler(@NotNull Player p, int slot) {
+        if (slot == rsLeft()) {
+            grantXP(!grantXP);
+            return 1;
+        }
+        return 0;
     }
 
     @Override
@@ -66,7 +74,7 @@ public class KitNode extends InventoryNode {
             .toArray(ItemStack[]::new);
         ItemStack[] armor = contents.subList(9 * 4, 9 * 4 + 4).toArray(ItemStack[]::new);
         ItemStack offhand = contents.get(9 * 4 + 4);
-        
+
         int xpLevels;
         if (grantXP) {
             xpLevels = kit().xpLevels();

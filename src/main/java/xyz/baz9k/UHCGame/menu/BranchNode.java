@@ -1,6 +1,5 @@
 package xyz.baz9k.UHCGame.menu;
 
-import org.bukkit.Sound;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -59,7 +58,7 @@ public final class BranchNode extends InventoryNode {
 
         // fill the inventory with all the items
         ItemStack[] contents = inventory.getContents();
-        for (int i = 0; i < slotCount; i++) {
+        for (int i = 0; i < children.length; i++) {
             Node child = children[i];
             if (child != null) {
                 contents[i] = child.itemStack();
@@ -83,57 +82,35 @@ public final class BranchNode extends InventoryNode {
 
         children[slot] = child;
         if (hasInventoryViewed) {
-            ItemStack item = child != null ? child.itemStack() : emptyGlass();
+            ItemStack item = child != null ? child.itemStack() : filler();
             inventory.setItem(slot, item);
         }
     }
 
-    /**
-     * Handles what happens when a player clicks the item in the slot in this node's inventory.
-     * @param p Player who clicked the node
-     * @param slot The slot of the clicked node
-     */
+    
     @Override
-    public void onClick(@NotNull Player p, int slot) {
-        Objects.checkIndex(0, slotCount);
+    protected int clickHandler(@NotNull Player p, int slot) {
+        int sound = 0;
+        Node node = children[slot];
+        if (node != null) {
+            // lock = fail
+            if (node.locked()) {
+                sound = 2;
+            } else {
+                // test click
+                node.click(p);
+                sound = 1;
 
-        // 0 = nothing
-        // 1 = success
-        // 2 = failure
-        int sound = 0; 
-
-        // if not root, add go back trigger
-        if (parent != null && slot == slotCount - 1) {
-            parent.click(p);
-            sound = 1;
-        } else {
-            Node node = children[slot];
-            if (node != null) {
-                // lock = fail
-                if (node.locked()) {
+                // check click was valid
+                if (node instanceof ValuedNode vnode && !check.test(Node.cfg)) {
+                    vnode.undo();
                     sound = 2;
-                } else {
-                    // test click
-                    node.click(p);
-                    sound = 1;
-
-                    // check click was valid
-                    if (node instanceof ValuedNode vnode && !check.test(Node.cfg)) {
-                        vnode.undo();
-                        sound = 2;
-                    }
                 }
             }
-
-            updateSlot(slot);
         }
 
-        
-        switch (sound) {
-            case 1 -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, 2);
-            case 2 -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, 0.5f, 0);
-            default -> {}
-        }
+        updateSlot(slot);
+        return sound;
     }
 
     /**
