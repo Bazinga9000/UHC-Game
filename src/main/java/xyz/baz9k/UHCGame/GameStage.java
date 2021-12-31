@@ -112,8 +112,7 @@ public enum GameStage {
      * @param n
      * @return the nth active stage. null if not valid
      */
-    @Nullable
-    public static GameStage nth(int n) {
+    public @Nullable static GameStage nth(int n) {
         return Arrays.stream(values())
             .filter(GameStage::isActive)
             .skip(n)
@@ -125,8 +124,7 @@ public enum GameStage {
      * @return the first previous stage that has a non-zero duration
      * <p> returns null if called on {@link #NOT_IN_GAME} or there is no previous active stage
      */
-    @Nullable
-    private GameStage prev() {
+    private @Nullable GameStage prev() {
         GameStage[] values = values();
 
         // iter every stage before this stage in reverse except NOT_IN_GAME
@@ -140,8 +138,7 @@ public enum GameStage {
      * @return the next stage that has a non-zero duration
      * <p> returns null if called on {@link #NOT_IN_GAME} or there is no further active stage
      */
-    @Nullable
-    public GameStage next() {
+    public @Nullable GameStage next() {
         if (this == NOT_IN_GAME) return null;
         
         return Arrays.stream(values())

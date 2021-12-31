@@ -182,8 +182,7 @@ public class BranchNode extends Node {
         for (int i = 0; i < children.length; i++) updateSlot(i);
     }
 
-    @NotNull
-    public Inventory getInventory() {
+    public @NotNull Inventory getInventory() {
         return inventory;
     }
 

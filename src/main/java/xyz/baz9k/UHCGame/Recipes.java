@@ -55,8 +55,7 @@ public final class Recipes {
     @Target(ElementType.METHOD)
     private @interface DeclaredRecipe { }
 
-    @NotNull
-    private NamespacedKey key(String s) {
+    private @NotNull NamespacedKey key(String s) {
         NamespacedKey nkey = new NamespacedKey(plugin, s);
         registered.add(nkey);
         return nkey;
