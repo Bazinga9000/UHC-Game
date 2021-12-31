@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.bukkit.Material;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -71,12 +70,7 @@ public class KitNode extends InventoryNode {
         } else if (slot == rsRight() - 2) {
             plugin.saveResource("new_kit.yml", true);
             File f = new File(plugin.getDataFolder(), "new_kit.yml");
-            YamlConfiguration kitCfg = new YamlConfiguration();
-            try {
-                kitCfg.load(f);
-            } catch (IOException | InvalidConfigurationException e) {
-                throw new RuntimeException(e);
-            }
+            YamlConfiguration kitCfg = YamlConfiguration.loadConfiguration(f);
             kitCfg.set("new_kit", kit());
             try {
                 kitCfg.save(f);

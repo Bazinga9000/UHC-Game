@@ -1,0 +1,102 @@
+kits:
+  - node_name: none
+    material: BARRIER
+    style_color: 0xFFFFDF
+    kit:
+      ==: xyz.baz9k.UHCGame.Kit
+      storage: []
+      xpLevels: 0
+      armor:
+      - null
+      - null
+      - null
+      - null
+      offhand:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: AIR
+  - node_name: gone_fishing
+    material: FISHING_ROD
+    style_color: 0x3730FF
+    kit:
+      ==: xyz.baz9k.UHCGame.Kit
+      storage:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: ANVIL
+        amount: 64
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: FISHING_ROD
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            LUCK: 84
+            LURE: 5
+          Unbreakable: true
+      xpLevels: 1000
+      armor:
+      - null
+      - null
+      - null
+      - null
+      offhand:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: AIR
+  - node_name: always_elytra
+    material: ELYTRA
+    style_color: 0xB5B8FF
+    kit:
+      ==: xyz.baz9k.UHCGame.Kit
+      storage: []
+      xpLevels: 0
+      armor:
+      - null
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: ELYTRA
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            BINDING_CURSE: 1
+          Unbreakable: true
+      - null
+      - null
+      offhand:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: AIR
+  - node_name: bomberman
+    material: GUNPOWDER
+    style_color: 0x800000
+    kit:
+      ==: xyz.baz9k.UHCGame.Kit
+      storage:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: TNT
+        amount: 64
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: TNT
+        amount: 64
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: FLINT_AND_STEEL
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          Unbreakable: true
+      xpLevels: 0
+      armor:
+      - null
+      - null
+      - null
+      - null
+      offhand:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: AIR

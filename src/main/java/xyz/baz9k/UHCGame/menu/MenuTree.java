@@ -1,9 +1,8 @@
 package xyz.baz9k.UHCGame.menu;
 
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.format.TextColor;
@@ -15,6 +14,7 @@ import static xyz.baz9k.UHCGame.menu.NodeItemStack.*;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
+import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -250,68 +250,29 @@ public class MenuTree {
         new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
 
         /* KIT SETTINGS */
-        i = 0;
-        new ActionNode(kitSettings, i++, "none", 
-            new ItemProperties<Integer>(Material.BARRIER).style(TextColor.color(0xFFFFDF)), 
-            p -> {
-                plugin.getGameManager().kit(Kit.none());
-            });
-        new ActionNode(kitSettings, i++, "gone_fishing", 
-            new ItemProperties<>(Material.FISHING_ROD).style(TextColor.color(0x3730FF)), 
-            p -> {
-                // Each player receives:
-                // - An unbreakable maxed Fishing Rod
-                // - 64 Anvils
-                // - 1000 Levels
-                List<ItemStack> storage = new ArrayList<>();
-                storage.add(new ItemStack(Material.ANVIL, 64));
+        YamlConfiguration kitsCfg = new YamlConfiguration();
+        InputStreamReader kitsResource = new InputStreamReader(plugin.getResource("kits.yml"));
+        kitsCfg = YamlConfiguration.loadConfiguration(kitsResource);
 
-                ItemStack rod = new ItemStack(Material.FISHING_ROD);
-                rod.addUnsafeEnchantments(Map.ofEntries(
-                    Map.entry(Enchantment.LURE, 5),
-                    Map.entry(Enchantment.LUCK, 84)
-                ));
-                rod.editMeta(m -> m.setUnbreakable(true));
-                storage.add(rod);
+        var kitNodes = kitsCfg.getMapList("kits");
 
-                Kit k = new Kit(storage.toArray(ItemStack[]::new), new ItemStack[4], null, 1000);
-                plugin.getGameManager().kit(k);
-            });
-        new ActionNode(kitSettings, i++, "always_elytra", 
-            new ItemProperties<>(Material.ELYTRA).style(TextColor.color(0xB5B8FF)), 
-            p -> {
-                // Everyone is in a flying state 
-                // for the entire game.
-                // Each player receives:
-                //     - Unbreakable Elytra w/ Curse of Binding
-                ItemStack elytra = new ItemStack(Material.ELYTRA);
-                elytra.editMeta(m -> m.setUnbreakable(true));
-                elytra.addEnchantment(Enchantment.BINDING_CURSE, 1);
-                ItemStack[] armor = new ItemStack[] {
-                    null, elytra, null, null
-                };
-                Kit k = new Kit(new ItemStack[0], armor, null, 0);
-                plugin.getGameManager().kit(k);
-            });
-        new ActionNode(kitSettings, i++, "bomberman", 
-            new ItemProperties<>(Material.GUNPOWDER).style(TextColor.color(0x800000)), 
-            p -> {
-                // Direct combat is disabled.
-                // Each player receives:
-                //     - 128 TNT
-                // TODO bomberman "Direct combat is disabled."
+        for (i = 0; i < kitNodes.size(); i++) {
+            Map<?, ?> kitNode = kitNodes.get(i);
 
-                List<ItemStack> storage = new ArrayList<>();
-                storage.add(new ItemStack(Material.TNT, 64));
-                storage.add(new ItemStack(Material.TNT, 64));
+            String nodeName = (String) kitNode.get("node_name");
+            String matType  = (String) kitNode.get("material");
+            int clrHex      = (int) kitNode.get("style_color");
+            Kit kit         = (Kit) kitNode.get("kit");
 
-                ItemStack fns = new ItemStack(Material.FLINT_AND_STEEL);
-                fns.editMeta(m -> m.setUnbreakable(true));
-                storage.add(fns);
+            Material mat = Material.valueOf(matType);
+            TextColor clr = TextColor.color(clrHex);
 
-                Kit k = new Kit(storage.toArray(ItemStack[]::new), new ItemStack[4], null, 0);
-                plugin.getGameManager().kit(k);
-            });
+            new ActionNode(kitSettings, i, nodeName,
+                new ItemProperties<>(mat).style(clr), 
+                p -> plugin.getGameManager().kit(kit)
+            );
+        }
+
         new KitNode(kitSettings, 52, "custom", 
             new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)));
 
