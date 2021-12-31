@@ -30,9 +30,6 @@ player:
   final_heal: -1
   natural_regen: false
 
-kit:
-  kit:
-
 esoteric:
   gone_fishing: false
   always_elytra: false

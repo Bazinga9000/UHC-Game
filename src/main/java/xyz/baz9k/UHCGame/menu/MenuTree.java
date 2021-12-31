@@ -246,7 +246,7 @@ public class MenuTree {
             new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.GLOW_BERRIES)
                 .formatter(v -> getTimeString((int) v)), 
             ValuedNode.Type.INTEGER, 
-            n -> Math.max(0, (int) n));
+            n -> Math.max(-1, (int) n));
         new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
 
         /* KIT SETTINGS */
