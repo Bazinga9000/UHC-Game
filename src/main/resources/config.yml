@@ -29,8 +29,3 @@ player:
   grace_period: 600
   final_heal: -1
   natural_regen: false
-
-esoteric:
-  gone_fishing: false
-  always_elytra: false
-  bomberman: false

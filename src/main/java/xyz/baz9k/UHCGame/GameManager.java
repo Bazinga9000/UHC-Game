@@ -55,6 +55,8 @@ public class GameManager implements Listener {
     private Optional<Instant> startTime = Optional.empty();
     private Optional<Instant> lastStageInstant = Optional.empty();
 
+    private boolean grace;
+
     public GameManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
     }
@@ -250,7 +252,7 @@ public class GameManager implements Listener {
         setStage(GameStage.nth(0));
         startTime = lastStageInstant = Optional.of(Instant.now());
 
-
+        grace = inGracePeriod();
         kills.clear();
         
 
@@ -303,6 +305,11 @@ public class GameManager implements Listener {
                 incrementStage();
             }
             
+            if (grace && !inGracePeriod()) {
+                grace = false;
+                Bukkit.getServer().sendMessage(new Key("chat.grace.end").trans()); // TODO, boxless this
+            }
+
             for (Player p : Bukkit.getOnlinePlayers()) {
                 hudManager.updateElapsedTimeHUD(p);
                 hudManager.updateWBHUD(p);
@@ -490,6 +497,27 @@ public class GameManager implements Listener {
         this.kit = kit;
     }
 
+    private Optional<Duration> getGracePeriod() {
+        int grace = plugin.getConfig().getInt("global.grace_period");
+
+        if (grace == -1) return Optional.empty();
+        return Optional.of(Duration.ofSeconds(grace));
+    }
+
+    public boolean inGracePeriod() {
+        Optional<Duration> grace = getGracePeriod();
+        Optional<Duration> elapsedTime = getElapsedTime();
+
+        if (elapsedTime.isPresent() && grace.isPresent()) {
+            return grace.get().compareTo(elapsedTime.get()) <= 0;
+        }
+        return false;
+    }
+
+    public boolean allowFriendlyFire() {
+        return plugin.getConfig().getBoolean("team.friendly_fire");
+    }
+
     private Component includeGameTimestamp(Component c) {
         if (c == null) return null;
         String timeStr = getLongTimeString(getElapsedTime(), "?");
@@ -587,18 +615,21 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerFight(EntityDamageByEntityEvent e) {
         if (!hasUHCStarted()) return;
-        // cancel friendly fire
         if (e.getEntity() instanceof Player target) {
             if (e.getDamager() instanceof Player damager) {
-                // TODO allow configuration
-                boolean inGracePeriod = getElapsedTime()
-                    .map(d -> d.compareTo(Duration.ofMinutes(10)) < 0)
-                    .orElse(false);
-                if (inGracePeriod) {
+                // grace period
+                if (inGracePeriod()) {
                     e.setCancelled(true);
-                } else if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
-                    e.setCancelled(true);
+                    return;
                 }
+
+                // cancel friendly fire
+                if (!allowFriendlyFire()) {
+                    if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
+                        e.setCancelled(true);
+                    }
+                }
+
             }
         }
     }

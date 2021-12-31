@@ -219,7 +219,7 @@ public class MenuTree {
             Material.RED_TERRACOTTA,
             Material.RED_CONCRETE
         );
-        new ValuedNode(teamSettings, i++, "friendly_fire", new ItemProperties<>(Material.FLINT_AND_STEEL).style(TextColor.color(0xFF9F5F)), ValuedNode.Type.BOOLEAN); // TODO
+        new ValuedNode(teamSettings, i++, "friendly_fire", new ItemProperties<>(Material.FLINT_AND_STEEL).style(TextColor.color(0xFF9F5F)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(teamSettings, i++, "boss_team",     new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xA100FF)), ValuedNode.Type.BOOLEAN); // TODO
         new ValuedNode(teamSettings, i++, "sardines",      new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN); // TODO
 
@@ -237,7 +237,7 @@ public class MenuTree {
             Material.ICE,
             Material.EMERALD_BLOCK
         );
-        new ValuedNode(playerSettings, i++, "grace_period", // TODO
+        new ValuedNode(playerSettings, i++, "grace_period",
             new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.SHIELD)
                 .formatter(v -> getTimeString((int) v)), 
             ValuedNode.Type.INTEGER, 
