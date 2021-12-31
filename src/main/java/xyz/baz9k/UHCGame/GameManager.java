@@ -310,7 +310,8 @@ public class GameManager implements Listener {
         p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
         p.setFoodLevel(20);
         p.setSaturation(5.0f);
-        p.setTotalExperience(0);
+        p.setLevel(0);
+        p.setExp(0);
         p.getInventory().clear();
         
         // clear all potion effects
@@ -320,7 +321,7 @@ public class GameManager implements Listener {
 
         // clear all advancements
         Iterable<Advancement> advancements = Bukkit::advancementIterator;
-        for (var a : advancements) {
+        for (Advancement a : advancements) {
             var progress = p.getAdvancementProgress(a);
             for (String criterion : progress.getAwardedCriteria()) {
                 progress.revokeCriteria(criterion);
