@@ -561,7 +561,13 @@ public class GameManager implements Listener {
         // cancel friendly fire
         if (e.getEntity() instanceof Player target) {
             if (e.getDamager() instanceof Player damager) {
-                if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
+                // TODO allow configuration
+                boolean inGracePeriod = getElapsedTime()
+                    .map(d -> d.compareTo(Duration.ofMinutes(10)) < 0)
+                    .orElse(false);
+                if (inGracePeriod) {
+                    e.setCancelled(true);
+                } else if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
                     e.setCancelled(true);
                 }
             }
