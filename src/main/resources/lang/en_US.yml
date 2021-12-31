@@ -44,10 +44,12 @@ xyz:
       team:
         name:
           combatant: "Team {0}"
+          wildcard: "Wildcard"
           spectator: "Spectator"
           unassigned: "Unassigned"
         prefix: 
           combatant: "[{0}]"
+          wildcard: "[W]" # should be unused, if you see this something went horribly wrong!
           spectator: "[S]"
           unassigned: "[U]"
 
