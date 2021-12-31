@@ -12,14 +12,17 @@ import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +31,38 @@ public class TeamManager {
         public Node {
             if (!state.isAssignedCombatant()) team = 0;
         }
+    }
+
+    public class UnresolvedPlayerSet extends AbstractSet<OfflinePlayer> {
+        private Set<OfflinePlayer> pSet;
+        private UnresolvedPlayerSet(Set<OfflinePlayer> pSet) {
+            this.pSet = pSet;
+        }
+
+        @Override
+        public Iterator<OfflinePlayer> iterator() {
+            return pSet.iterator();
+        }
+
+        @Override
+        public int size() {
+            return pSet.size();
+        }
+
+        private Set<Player> resolveOfflines(Function<UUID, Player> resolver) {
+            return this.stream()
+                .map(op -> {
+                    Player p = op.getPlayer();
+                    if (p != null) return p;
+                    return resolver.apply(op.getUniqueId());
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        }
+
+        public Set<Player> online() { return resolveOfflines(u -> null); }
+        public Set<Player> cached() { return resolveOfflines(cachedPlayers::get); }
+
     }
 
     private int numTeams = 2;
@@ -118,7 +153,7 @@ public class TeamManager {
      * Assigns all registered players to a team.
      */
     public void assignTeams() {
-        List<Player> combatants = new ArrayList<>(getOnlineCombatants());
+        List<Player> combatants = new ArrayList<>(getCombatants().online());
         
         if (combatants.size() == numTeams) { // solos
             combatants.sort((p1, p2) -> p1.getName().compareTo(p2.getName()));
@@ -152,7 +187,7 @@ public class TeamManager {
         if (s.isAssignedCombatant()) {
             players = getCombatantsOnTeam(t);
         } else {
-            players = filterOnline(getAllPlayersMatching(n -> n.state == s && n.team == t));
+            players = getAllPlayersMatching(n -> n.state == s && n.team == t).online();
         }
         if (players.size() == 0) return;
 
@@ -193,55 +228,39 @@ public class TeamManager {
 
     /* LIST OF PLAYERS */
     
-    private Set<OfflinePlayer> getAllPlayersMatching(Predicate<Node> predicate) {
-        return playerMap.entrySet().stream()
+    private UnresolvedPlayerSet getAllPlayersMatching(Predicate<Node> predicate) {
+        Set<OfflinePlayer> pSet = playerMap.entrySet().stream()
             .filter(e -> predicate.test(e.getValue()))
             .map(e -> Bukkit.getOfflinePlayer(e.getKey()))
             .collect(Collectors.toSet());
-    }
-
-    private Set<Player> filterOnline(@NotNull Set<? extends OfflinePlayer> pSet) {
-        return pSet.stream()
-            .map(OfflinePlayer::getPlayer)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
-    }
-
-    private Set<Player> useCache(@NotNull Set<? extends OfflinePlayer> pSet) {
-        return pSet.stream()
-            .map(op -> {
-                Player p = op.getPlayer();
-                if (p != null) return p;
-                return cachedPlayers.get(op.getUniqueId());
-            })
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
+        
+        return new UnresolvedPlayerSet(pSet);
     }
 
     /**
      * @return a {@link Set} of all spectators
      */
-    public @NotNull Set<OfflinePlayer> getSpectators() {
+    public @NotNull UnresolvedPlayerSet getSpectators() {
         return getAllPlayersMatching(n -> n.state.isSpectator());
     }
 
     /**
      * @return a {@link Set} of all combatants
      */
-    public @NotNull Set<OfflinePlayer> getCombatants() {
+    public @NotNull UnresolvedPlayerSet getCombatants() {
         return getAllPlayersMatching(n -> n.state.isCombatant());
     }
 
     /**
      * @return a {@link Set} of all living combatants
      */
-    public @NotNull Set<OfflinePlayer> getAliveCombatants() {
+    public @NotNull UnresolvedPlayerSet getAliveCombatants() {
         return getAllPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE);
     }
     /**
      * @return a {@link Set} of all assigned combatants
      */
-    public @NotNull Set<OfflinePlayer> getAssignedCombatants() {
+    public @NotNull UnresolvedPlayerSet getAssignedCombatants() {
         return getAllPlayersMatching(n -> n.state.isAssignedCombatant());
     }
 
@@ -249,7 +268,7 @@ public class TeamManager {
      * @param team Team to inspect
      * @return a {@link Set} of all combatants on a specific team
      */
-    public @NotNull Set<OfflinePlayer> getCombatantsOnTeam(int team) {
+    public @NotNull UnresolvedPlayerSet getCombatantsOnTeam(int team) {
         if (team <= 0 || team > numTeams) {
             throw new Key("err.team.invalid").transErr(IllegalArgumentException.class, team, numTeams);
         }
@@ -257,44 +276,6 @@ public class TeamManager {
         return getAllPlayersMatching(n -> n.state.isAssignedCombatant() && n.team == team);
     }
 
-    /**
-     * @return a {@link Set} of all combatants, using cached snapshots of offline players
-     * <p>This method should only be used to query information from offline players.
-     */
-    public @NotNull Set<Player> getCachedCombatants() {
-        return useCache(getCombatants());
-    }
-
-    /**
-     * @return a {@link Set} of all combatants, using cached snapshots of offline players
-     * <p>This method should only be used to query information from offline players.
-     */
-    public @NotNull Set<Player> getCachedCombatantsOnTeam(int t) {
-        return useCache(getCombatantsOnTeam(t));
-    }
-
-    /**
-     * @return a {@link Set} of all online spectators
-     */
-    public @NotNull Set<Player> getOnlineSpectators() {
-        return filterOnline(getSpectators());
-    }
-
-    /**
-     * @return a {@link Set} of all online combatants
-     */
-    public @NotNull Set<Player> getOnlineCombatants() {
-        return filterOnline(getCombatants());
-    }
-
-    /**
-     * @param t Team to inspect
-     * @return a {@link Set} of all online combatants on a specific team
-     */
-    public @NotNull Set<Player> getOnlineCombatantsOnTeam(int t) {
-        return filterOnline(getCombatantsOnTeam(t));
-    }
-    
     /**
      * @return an array of the alive teams by int
      */
@@ -361,7 +342,7 @@ public class TeamManager {
      * @param n Number of members in each team
      */
     public void setTeamSize(int n) {
-        setNumTeams((int) Math.round(getOnlineCombatants().size() / (double) n));
+        setNumTeams((int) Math.round(getCombatants().online().size() / (double) n));
     }
 
     /**

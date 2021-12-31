@@ -364,10 +364,10 @@ public class HUDManager implements Listener {
 
         Comparator<Player> sorter;
         if (teamManager.isAssignedCombatant(p)) {
-            teammateSet = teamManager.getCachedCombatantsOnTeam(team);
+            teammateSet = teamManager.getCombatantsOnTeam(team).cached();
             sorter = compareByAliveness.thenComparing(compareByHealth);
         } else {
-            teammateSet = teamManager.getCachedCombatants();
+            teammateSet = teamManager.getCombatants().cached();
             sorter = compareByAliveness.thenComparing(compareByProximity);
         }
 
@@ -516,7 +516,7 @@ public class HUDManager implements Listener {
     public void updateHealthHUD(Player p) {
         Scoreboard s = p.getScoreboard();
 
-        for (Player pl : teamManager.getOnlineCombatants()) {
+        for (Player pl : teamManager.getCombatants().online()) {
             updateHealthOnScoreboard(s, pl);
         }
     }
@@ -528,8 +528,8 @@ public class HUDManager implements Listener {
     public void dispatchTeammateHUDUpdate(@NotNull Player p) {
 
         int t = teamManager.getTeam(p);
-        Set<Player> viewers = new HashSet<>(teamManager.getOnlineSpectators());
-        if (t != 0) viewers.addAll(teamManager.getOnlineCombatantsOnTeam(t));
+        Set<Player> viewers = new HashSet<>(teamManager.getSpectators().online());
+        if (t != 0) viewers.addAll(teamManager.getCombatantsOnTeam(t).online());
 
         for (Player viewer : viewers) {
             updateTeammateHUD(viewer);
