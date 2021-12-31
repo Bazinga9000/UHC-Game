@@ -199,7 +199,7 @@ public class MenuTree {
         /* GLOBAL SETTINGS */
         int i = 0;
         new ValuedNode(globalSettings, i++, "wither_bonus",   new ItemProperties<>(Material.WITHER_SKELETON_SKULL).style(TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(globalSettings, i++, "nether_spawn",   new ItemProperties<>(Material.NETHERRACK).style(TextColor.color(0x9C4040)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(globalSettings, i++, "nether_spawn",   new ItemProperties<>(Material.NETHERRACK).style(TextColor.color(0x9C4040)),            ValuedNode.Type.BOOLEAN);
         new OptionValuedNode(globalSettings, i++, "dn_cycle", new ItemProperties<>().style(TextColor.color(0xFFEB85)),
             Material.CLOCK,
             Material.COMPASS,
@@ -224,7 +224,6 @@ public class MenuTree {
         new ValuedNode(teamSettings, i++, "sardines",      new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
 
         /* PLAYER SETTINGS */
-        // TODO, add limits to grace_period, final_heal, and also show disabled, etc etc
         i = 0;
         new OptionValuedNode(playerSettings, i++, "max_health", new ItemProperties<>().style(TextColor.color(0xFF2121)),
             Material.SPIDER_EYE,
@@ -238,8 +237,16 @@ public class MenuTree {
             Material.ICE,
             Material.EMERALD_BLOCK
         );
-        new ValuedNode(playerSettings, i++, "grace_period",  new ItemProperties<>(Material.SHIELD), ValuedNode.Type.INTEGER);
-        new ValuedNode(playerSettings, i++, "final_heal",    new ItemProperties<>(Material.GLOW_BERRIES), ValuedNode.Type.INTEGER);
+        new ValuedNode(playerSettings, i++, "grace_period",  
+            new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.SHIELD)
+                .formatter(v -> getTimeString((int) v)), 
+            ValuedNode.Type.INTEGER, 
+            n -> Math.max(-1, (int) n));
+        new ValuedNode(playerSettings, i++, "final_heal",    
+            new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.GLOW_BERRIES)
+                .formatter(v -> getTimeString((int) v)), 
+            ValuedNode.Type.INTEGER, 
+            n -> Math.max(0, (int) n));
         new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
 
         /* KIT SETTINGS */
@@ -310,6 +317,8 @@ public class MenuTree {
 
         /* PRESETS */
         // TODO, add more presets
+        // TODO, fill out normal preset
+        // TODO Ah. presets.
         i = 0;
         new ActionNode(presetSettings, i++, "normal", new ItemProperties<>(), p -> {});
     
