@@ -45,13 +45,14 @@ public class TeamManager {
      * @return the node
      */
     private @NotNull Node getNode(@NotNull Player p) {
-        return playerMap.merge(p.getUniqueId(), 
-            new Node(PlayerState.COMBATANT_UNASSIGNED, 0, p), 
-            (k, v) -> {
+        return playerMap.compute(p.getUniqueId(), (k, v) -> {
+            if (v == null) {
+                return new Node(PlayerState.COMBATANT_UNASSIGNED, 0, p);
+            } else {
                 v.player = p;
                 return v;
             }
-        );
+        });
     }
 
     public void addPlayer(@NotNull Player p, boolean hasStarted) {

@@ -10,8 +10,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.TextComponent;
@@ -202,21 +204,6 @@ public enum GameStage {
         }
     }
 
-    /**
-     * Gives a builder that starts a warning message by the game.
-     * [warn prefix] [message]
-     * <p>
-     * {@literal <!> World border is shrinking in ---}
-     */
-    private static TextComponent.Builder getMessageBuilder() {
-        return Component.text()
-            .append(
-                Component.text("<", TextColor.color(0xCFCFFF), BOLD),
-                new Key("chat.name").trans().style(Style.style(TextColor.color(0xA679FE), BOLD)),
-                Component.text("> ", TextColor.color(0xCFCFFF), BOLD)
-            );
-    }
-
     private static final Key WB_NAME = new Key("chat.wb.name");
     private static final Key WB_PRONOUN = new Key("chat.wb.pronoun");
 
@@ -233,42 +220,48 @@ public enum GameStage {
     public void sendMessage() {
         if (this == NOT_IN_GAME) return;
 
-        TextComponent.Builder s = getMessageBuilder()
-            .append(baseChatMsg);
+        TextComponent.Builder msg = Component.text().append(baseChatMsg);
+        if (this != DEATHMATCH) {
+            Key situationKey = null;
+            Component subject = (this == WB_STILL ? WB_NAME : WB_PRONOUN).trans();
 
-        if (this == DEATHMATCH) {
-            Bukkit.getServer().sendMessage(s);
-            return;
-        }
+            GameStage next = next();
 
-        Key situationKey = null;
-        Component subject = (this == WB_STILL ? WB_NAME : WB_PRONOUN).trans();
-
-        GameStage next = next();
-
-        // at the beginning of each wb change, add a msg
-        // at the end of each wb change, add a msg
-        if (prev() != null && prev().wbChangesAfter()) {
-            situationKey = isWBInstant ? JUST_SHRINK_INSTANT : JUST_SHRINK;
-        } else if (wbChangesAfter()) {
-            situationKey = next.isWBInstant ? WILL_SHRINK_INSTANT : WILL_SHRINK;
-        }
-        
-        s.append(Component.space());
-
-        if (situationKey != null) {
-            Component situation = situationKey.trans(subject, wbRadius(), getWordTime(duration()))
-                .style(bodyStyle);
-            s.append(situation);
-        }
-
-        if (this == DEATHMATCH.prev()) {
-            Component dmwarn = DM_WARN.trans(getWordTime(duration())).style(bodyStyle);
+            // at the beginning of each wb change, add a msg
+            // at the end of each wb change, add a msg
+            if (prev() != null && prev().wbChangesAfter()) {
+                situationKey = isWBInstant ? JUST_SHRINK_INSTANT : JUST_SHRINK;
+            } else if (wbChangesAfter()) {
+                situationKey = next.isWBInstant ? WILL_SHRINK_INSTANT : WILL_SHRINK;
+            }
             
-            s.append(Component.space())
-             .append(dmwarn);
+            msg.append(Component.space());
+
+            if (situationKey != null) {
+                Component situation = situationKey.trans(subject, wbRadius(), getWordTime(duration()))
+                    .style(bodyStyle);
+                msg.append(situation);
+            }
+
+            if (this == DEATHMATCH.prev()) {
+                Component dmwarn = DM_WARN.trans(getWordTime(duration())).style(bodyStyle);
+                
+                msg.append(Component.space())
+                .append(dmwarn);
+            }
         }
         
-        Bukkit.getServer().sendMessage(s);
+        sendMessageAsBoxless(Bukkit.getServer(), msg);
+    }
+
+    public static void sendMessageAsBoxless(Audience a, ComponentLike c) {
+        Style nameStyle = Style.style(TextColor.color(0xA679FE), BOLD),
+              chatStyle = Style.style(TextColor.color(0xCFCFFF), BOLD);
+
+        Component msg = Component.translatable("chat.type.text",
+            new Key("chat.name").trans().style(nameStyle), c
+        ).style(chatStyle);
+
+        a.sendMessage(msg);
     }
 }
