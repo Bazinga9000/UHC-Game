@@ -10,8 +10,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.TextComponent;
@@ -249,11 +251,17 @@ public enum GameStage {
             }
         }
         
-        Component s = Component.translatable("chat.type.text", 
-            new Key("chat.name").trans().style(Style.style(TextColor.color(0xA679FE), BOLD)),
-            msg
-        ).style(Style.style(TextColor.color(0xCFCFFF), BOLD));
+        sendMessageAsBoxless(Bukkit.getServer(), msg);
+    }
 
-        Bukkit.getServer().sendMessage(s);
+    public static void sendMessageAsBoxless(Audience a, ComponentLike c) {
+        Style nameStyle = Style.style(TextColor.color(0xA679FE), BOLD),
+              chatStyle = Style.style(TextColor.color(0xCFCFFF), BOLD);
+
+        Component msg = Component.translatable("chat.type.text",
+            new Key("chat.name").trans().style(nameStyle), c
+        ).style(chatStyle);
+
+        a.sendMessage(msg);
     }
 }
