@@ -23,19 +23,15 @@ import java.util.HashMap;
 import java.util.List;
 
 public class TeamManager {
-    private static class Node {
-        public int team;
-        public PlayerState state;
-        public Player player;
-        public Node(PlayerState state, int team, Player player) {
-            this.team = team;
-            this.state = state;
-            this.player = player;
+    private record Node(PlayerState state, int team) {
+        public Node {
+            if (!state.isAssignedCombatant()) team = 0;
         }
     }
 
     private int numTeams = 2;
     private final HashMap<UUID, Node> playerMap = new HashMap<>();
+    private final HashMap<UUID, Player> cachedPlayers = new HashMap<>();
 
     /**
      * Gets the stored node of the player in the player map.
@@ -45,38 +41,35 @@ public class TeamManager {
      * @return the node
      */
     private @NotNull Node getNode(@NotNull Player p) {
-        return playerMap.compute(p.getUniqueId(), (k, v) -> {
-            if (v == null) {
-                return new Node(PlayerState.COMBATANT_UNASSIGNED, 0, p);
-            } else {
-                v.player = p;
-                return v;
-            }
-        });
+        cachedPlayers.put(p.getUniqueId(), p);
+        return playerMap.computeIfAbsent(p.getUniqueId(), 
+            k -> new Node(PlayerState.COMBATANT_UNASSIGNED, 0)
+        );
     }
 
     public void addPlayer(@NotNull Player p, boolean hasStarted) {
         Node n = getNode(p);
         if (isAssignedCombatant(p)) return;
         // this doesn't count as a state change, b/c their state before is not relevant
-        n.state = hasStarted ? PlayerState.SPECTATOR : PlayerState.COMBATANT_UNASSIGNED;
+        PlayerState s = hasStarted ? PlayerState.SPECTATOR : PlayerState.COMBATANT_UNASSIGNED;
+        setNode(p, s, n.team(), false);
+    }
+
+    private Node setNode(@NotNull Player p, @NotNull PlayerState s, int t, boolean callEvent) {
+        Node n = getNode(p);
+        if (callEvent && p.isOnline() && n.state() != s) {
+            new PlayerStateChangeEvent(p, s).callEvent();
+        }
+        playerMap.put(p.getUniqueId(), new Node(s, t));
+        return getNode(p);
+    }
+    private Node setNode(@NotNull Player p, @NotNull PlayerState s, int t) {
+        return setNode(p, s, t, true);
     }
 
     private Node setState(@NotNull Player p, @NotNull PlayerState s) {
         Node n = getNode(p);
-        // if the node is a snapshot of the player (i.e. they left), rather than the player instance, don't dispatch the event
-        if (isOnline(p) && n.state != s) {
-            new PlayerStateChangeEvent(p, s).callEvent();
-        }
-        n.state = s;
-        return n;
-    }
-
-    private Node setNode(@NotNull Player p, @NotNull PlayerState s, int team) {
-        Node n = getNode(p);
-        n.team = team;
-        setState(p, s);
-        return n;
+        return setNode(p, s, n.team());
     }
 
     /**
@@ -113,10 +106,11 @@ public class TeamManager {
      * Resets all players.
      */
     public void resetAllPlayers() {
-        for (Node v : playerMap.values()) {
-            setState(v.player, PlayerState.COMBATANT_UNASSIGNED);
-            v.team = 0;
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            setNode(p, PlayerState.COMBATANT_UNASSIGNED, 0);
         }
+
+        playerMap.replaceAll((k, v) -> new Node(PlayerState.COMBATANT_UNASSIGNED, 0));
     }
 
     /**
@@ -142,7 +136,7 @@ public class TeamManager {
     }
 
     public void announceTeams() {
-        for (int i = 1; i <= getNumTeams(); i++) {
+        for (int i = 1; i <= numTeams; i++) {
             announceTeamsLine(PlayerState.COMBATANT_ALIVE, i);
         }
 
