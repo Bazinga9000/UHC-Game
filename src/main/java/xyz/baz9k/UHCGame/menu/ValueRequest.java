@@ -35,7 +35,7 @@ public class ValueRequest {
     }
 
     public ValueRequest(UHCGamePlugin plugin, Player converser, Type requestType, String requestKey, Consumer<Object> consumer, boolean reopenInventory) {
-        var lastInventory = converser.getInventory();
+        Inventory lastInventory = converser.getOpenInventory().getTopInventory();
         converser.closeInventory();
 
         Prompt firstPrompt = switch (requestType) {
