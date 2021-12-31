@@ -266,6 +266,14 @@ public class TeamManager {
     }
 
     /**
+     * @return a {@link Set} of all combatants, using cached snapshots of offline players
+     * <p>This method should only be used to query information from offline players.
+     */
+    public @NotNull Set<Player> getCachedCombatantsOnTeam(int t) {
+        return useCache(getCombatantsOnTeam(t));
+    }
+
+    /**
      * @return a {@link Set} of all online spectators
      */
     public @NotNull Set<Player> getOnlineSpectators() {
@@ -353,7 +361,7 @@ public class TeamManager {
      * @param n Number of members in each team
      */
     public void setTeamSize(int n) {
-        setNumTeams((int) Math.round(getCombatants().size() / (double) n));
+        setNumTeams((int) Math.round(getOnlineCombatants().size() / (double) n));
     }
 
     /**

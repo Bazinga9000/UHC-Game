@@ -117,8 +117,8 @@ public class MenuTree {
             new ItemProperties<Void>(Material.DIAMOND)
                 .extraLore(o -> {
                     var tm = plugin.getTeamManager();
-                    int n_combs = tm.getCombatants().size();
-                    int n_specs = tm.getSpectators().size();
+                    int n_combs = tm.getOnlineCombatants().size();
+                    int n_specs = tm.getOnlineSpectators().size();
                     return new ExtraLore(
                         new Key("menu.inv.assign_teams_x.extra_lore"), n_combs, n_specs
                     );

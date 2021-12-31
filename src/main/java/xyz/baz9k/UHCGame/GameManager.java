@@ -389,7 +389,7 @@ public class GameManager implements Listener {
                 w.getBlockAt(radius + 1, w.getMaxHeight() - 1, z).setType(Material.BARRIER);
             }
 
-            for (Player p : teamManager.getCombatants()) {
+            for (Player p : teamManager.getOnlineCombatants()) {
                 p.addPotionEffects(Arrays.asList(
                     PotionEffectType.DAMAGE_RESISTANCE.createEffect(10 * 20, 10),
                     PotionEffectType.SLOW.createEffect(10 * 20, 10),
@@ -487,7 +487,7 @@ public class GameManager implements Listener {
             .withFlicker()
             .withTrail()
             .build();
-        for (Player p : teamManager.getCombatantsOnTeam(winner)) {
+        for (Player p : teamManager.getOnlineCombatantsOnTeam(winner)) {
             Firework fw = p.getWorld().spawn(p.getLocation(), Firework.class);
             FireworkMeta meta = fw.getFireworkMeta();
             meta.addEffect(fwe);
