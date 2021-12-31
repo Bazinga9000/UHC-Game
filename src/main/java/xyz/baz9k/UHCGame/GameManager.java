@@ -55,8 +55,21 @@ public class GameManager implements Listener {
     private Optional<Instant> startTime = Optional.empty();
     private Optional<Instant> lastStageInstant = Optional.empty();
 
-    private boolean doGrace;
-    private boolean doFinalHeal;
+    private static final TreeSet<TimedEvent> timedEvents = new TreeSet<>();
+    public record TimedEvent(Instant when, Runnable action) implements Comparable<TimedEvent> {
+
+        @Override
+        // according to TreeSet java docs, this violates the general contract of Set...
+        // but then says it's not a problem so...
+        public int compareTo(TimedEvent o) {
+            return this.when.compareTo(o.when);
+        }
+
+        public boolean cancel() {
+            return timedEvents.remove(this);
+        }
+
+    }
 
     public GameManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
@@ -252,10 +265,28 @@ public class GameManager implements Listener {
 
         setStage(GameStage.nth(0));
         startTime = lastStageInstant = Optional.of(Instant.now());
-
-        doGrace = inGracePeriod();
-        doFinalHeal = getFinalHealPeriod().isPresent();
+        
         kills.clear();
+        timedEvents.clear();
+        // register event for when grace period ends
+        getGracePeriod().ifPresent(d -> {
+            Instant end = startTime.get().plus(d);
+            registerEvent(end, () -> {
+                // grace period does its check via inGracePeriod, so nothing else needs to be done
+                GameStage.sendMessageAsBoxless(Bukkit.getServer(), new Key("chat.grace.end").trans());
+            });
+        });
+
+        // register event for when final heal hits
+        getFinalHealPeriod().ifPresent(d -> {
+            Instant end = startTime.get().plus(d);
+            registerEvent(end, () -> {
+                GameStage.sendMessageAsBoxless(Bukkit.getServer(), new Key("chat.final_heal").trans());
+                for (Player p : teamManager.getAliveCombatants()) {
+                    p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
+                }
+            });
+        });
         
 
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -307,17 +338,12 @@ public class GameManager implements Listener {
                 incrementStage();
             }
             
-            if (doGrace && !inGracePeriod()) {
-                doGrace = false;
-                GameStage.sendMessageAsBoxless(Bukkit.getServer(), new Key("chat.grace.end").trans());
-            }
-
-            if (doFinalHeal && !awaitingFinalHealPeriod()) {
-                doFinalHeal = false;
-                for (Player p : teamManager.getAliveCombatants()) {
-                    p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
-                    GameStage.sendMessageAsBoxless(Bukkit.getServer(), new Key("chat.final_heal").trans());
-                }
+            // run thru all the events that have been registered and whose time have passed
+            TimedEvent e = timedEvents.first();
+            while (e.when().isBefore(Instant.now())) {
+                timedEvents.pollFirst();
+                e.action.run();
+                e = timedEvents.first();
             }
 
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -504,6 +530,14 @@ public class GameManager implements Listener {
      */
     public void kit(Kit kit) {
         this.kit = kit;
+    }
+
+    public TimedEvent registerEvent(Instant when, Runnable action) {
+        TimedEvent e = new TimedEvent(when, action);
+        boolean succ = timedEvents.add(e);
+
+        if (succ) return e;
+        throw new IllegalArgumentException("uh oh you bozo don't copy your arguments");
     }
 
     private Optional<Duration> getGracePeriod() {
