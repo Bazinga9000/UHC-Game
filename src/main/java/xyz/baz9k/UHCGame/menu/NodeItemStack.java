@@ -151,7 +151,7 @@ public class NodeItemStack extends ItemStack {
                 .toArray();
 
             List<Component> lines = splitLines(render(tKey.trans(args)));
-            lines.forEach(l -> l.style(DEFAULT_DESC_STYLE));
+            lines.replaceAll(l -> l.style(DEFAULT_DESC_STYLE));
             return lines;
         }
 
