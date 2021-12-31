@@ -195,8 +195,6 @@ public class GameManager implements Listener {
 
         // do spreadplayers
         Debug.printDebug(new Key("debug.spreadplayers.start").trans());
-        double max = GameStage.WB_STILL.wbDiameter(),
-               min = max / Math.sqrt(3 * teamManager.getNumTeams());
 
         //    | # Groups | Min   | Max  |
         //    |----------|-------|------|
@@ -226,11 +224,26 @@ public class GameManager implements Listener {
         // but the constant has been adjusted to give margin of error
         // (in case SP produces less points than average)
 
+        int sp = plugin.getConfig().getInt("global.spreadplayers");
+        // 0 = by teams
+        // 1 = individually
+        double max = GameStage.WB_STILL.wbDiameter();
         Location defaultLoc = worldManager.gameSpawn();
-
-        plugin.spreadPlayers().random(SpreadPlayersManager.BY_TEAMS(defaultLoc), worldManager.getCenter(), max, min);
+        Location center = worldManager.getCenter();
+        var spreadPlayers = plugin.spreadPlayers();
+        switch (sp) {
+            case 0 -> {
+                double min = max / Math.sqrt(3 * teamManager.getNumTeams());
+                spreadPlayers.random(SpreadPlayersManager.BY_TEAMS(defaultLoc), center, max, min);
+            }
+            case 1 -> {
+                double min = max / Math.sqrt(3 * teamManager.getOnlineCombatants().size());
+                spreadPlayers.random(SpreadPlayersManager.BY_PLAYERS(defaultLoc), center, max, min);
+                
+            }
+        }
+        
         Debug.printDebug(new Key("debug.spreadplayers.end").trans());
-
         // unload world
         plugin.getMVWorldManager().unloadWorld("lobby", true);
 
