@@ -143,23 +143,26 @@ public class TeamManager {
 
     public void announceTeams() {
         for (int i = 1; i <= getNumTeams(); i++) {
-            announceTeamsLine(i);
+            announceTeamsLine(PlayerState.COMBATANT_ALIVE, i);
         }
-        announceTeamsLine(0);
+
+        announceTeamsLine(PlayerState.COMBATANT_ALIVE, 0);
+        announceTeamsLine(PlayerState.COMBATANT_UNASSIGNED, 0);
+        announceTeamsLine(PlayerState.SPECTATOR, 0);
 
     }
 
-    private void announceTeamsLine(int t) {
+    private void announceTeamsLine(PlayerState s, int t) {
         Set<Player> players;
-        if (t == 0) {
-            players = getOnlineSpectators();
-        } else {
+        if (s.isAssignedCombatant()) {
             players = getCombatantsOnTeam(t);
+        } else {
+            players = filterOnline(getAllPlayersMatching(n -> n.state == s && n.team == t));
         }
         if (players.size() == 0) return;
 
         var b = Component.text()
-            .append(TeamDisplay.getName(t))
+            .append(TeamDisplay.getName(s, t))
             .append(Component.text(": ", noDeco(NamedTextColor.WHITE)));
 
         // list of players one a team, separated by commas

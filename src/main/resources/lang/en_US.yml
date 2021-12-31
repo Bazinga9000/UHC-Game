@@ -42,11 +42,14 @@ xyz:
         killcount: "Kills: {0}"
         
       team:
-        spectator: "Spectator"
-        unassigned: "Unassigned"
-        teamed: "Team {0}"
-        prefix: "[{0}]"
-        spectator_abbr: "S"
+        name:
+          combatant: "Team {0}"
+          spectator: "Spectator"
+          unassigned: "Unassigned"
+        prefix: 
+          combatant: "[{0}]"
+          spectator: "[S]"
+          unassigned: "[U]"
 
       eliminated: "{0} has been eliminated!"
       win: "{0} has won!"
@@ -104,9 +107,6 @@ xyz:
 
       err:
         team:
-          display:
-            index_must_pos: "Team index must be positive."
-            index_must_under_max: "Team index must be less than number of predefined team colors ({0})."
           must_assigned: "Teams have not been assigned."
           must_assigned_comb: "Player must be an assigned combatant."
           invalid: "Invalid team {0}. Team must be positive and cannot exceed the number of teams ({1})."

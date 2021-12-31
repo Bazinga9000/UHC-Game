@@ -47,14 +47,10 @@ public class HUDManager implements Listener {
 
     /* FORMATTING */
     private Component formatState(@NotNull Player p) {
-
         PlayerState state = teamManager.getPlayerState(p);
         int team = teamManager.getTeam(p);
 
-        if (state == PlayerState.COMBATANT_UNASSIGNED) {
-            return new Key("team.unassigned").trans().style(Style.style(NamedTextColor.WHITE, ITALIC));
-        }
-        return TeamDisplay.getName(team);
+        return TeamDisplay.getName(state, team);
     }
 
     /**
@@ -85,8 +81,9 @@ public class HUDManager implements Listener {
 
         // prefix if spectator
         if (teamManager.isSpectator(you)) {
+            PlayerState state = teamManager.getPlayerState(teammate);
             int team = teamManager.getTeam(teammate);
-            s.append(TeamDisplay.getPrefixWithSpace(team));
+            s.append(TeamDisplay.getPrefixWithSpace(state, team));
         }
 
         // name and health
@@ -134,7 +131,7 @@ public class HUDManager implements Listener {
     /**
      * Prefix of the scoreboard team names that give each team their chat prefix
      */
-    private static final String PREFIXING_TEAM_FORMAT = "uhc_prefix_";
+    private static final String PREFIXING_TEAM_FORMAT = "uhc_";
 
     private Set<Scoreboard> scoreboardsInUse() {
         return scoreboardsInUse(true);
@@ -155,18 +152,24 @@ public class HUDManager implements Listener {
      * @param p Player to register prefix of
      */
     private void applyPrefixOnScoreboard(Scoreboard s, Player p) {
+        PlayerState state = teamManager.getPlayerState(p);
         int team = teamManager.getTeam(p);
         
         String teamName = PREFIXING_TEAM_FORMAT;
         int n_users = Bukkit.getOnlinePlayers().size();
         int n_users_mag = String.valueOf(n_users).length();
         
-        teamName += team == 0 ? "s" : String.format("%0" + n_users_mag + "d", team);
+        String classifier = switch (state) {
+            case COMBATANT_ALIVE, COMBATANT_DEAD -> "c";
+            case COMBATANT_UNASSIGNED -> "u";
+            case SPECTATOR -> "s";
+        };
+        teamName += String.format("%s%0" + n_users_mag + "d", classifier, team);
 
         Team t = s.getTeam(teamName);
         if (t == null) {
             t = s.registerNewTeam(teamName);
-            t.prefix(TeamDisplay.getPrefixWithSpace(team));
+            t.prefix(TeamDisplay.getPrefixWithSpace(state, team));
         }
 
         t.addPlayer(p);
