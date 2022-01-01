@@ -38,9 +38,10 @@ public final class OptionValuedNode extends ValuedNode {
     }
 
     @Override
-    public void click(@NotNull Player p) {
+    public boolean click(@NotNull Player p) {
         int currIndex = cfg.getInt(cfgKey());
         this.set(currIndex + 1);
+        return true;
     }
 
     /**

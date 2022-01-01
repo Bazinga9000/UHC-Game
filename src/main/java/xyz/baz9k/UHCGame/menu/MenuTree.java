@@ -70,7 +70,11 @@ public class MenuTree {
             ),
             p -> {
                 p.closeInventory();
-                plugin.getGameManager().startUHC(false);
+                try {
+                    plugin.getGameManager().startUHC(false);
+                } catch (IllegalStateException e) {
+                    throw new ActionNode.ActionFailedException(e);
+                }
             }
         );
         new ActionNode(ctrlRoot, slotAt(1, 6), "end_game",
@@ -90,7 +94,11 @@ public class MenuTree {
             ),
             p -> {
                 p.closeInventory();
-                plugin.getGameManager().endUHC(false);
+                try {
+                    plugin.getGameManager().endUHC(false);
+                } catch (IllegalStateException e) {
+                    throw new ActionNode.ActionFailedException(e);
+                }
             }
         );
 

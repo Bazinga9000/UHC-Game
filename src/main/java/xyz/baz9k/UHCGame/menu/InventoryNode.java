@@ -154,7 +154,7 @@ public abstract class InventoryNode extends Node {
     void updateInventory() {}
 
     @Override
-    public void click(@NotNull Player p) {
+    public boolean click(@NotNull Player p) {
         if (!hasInventoryViewed) {
             initInventory();
         } else {
@@ -162,6 +162,7 @@ public abstract class InventoryNode extends Node {
         }
 
         p.openInventory(inventory);
+        return true;
     }
 
     @NotNull

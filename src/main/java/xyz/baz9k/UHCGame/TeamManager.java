@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -105,7 +106,11 @@ public class TeamManager {
             throw new Key("team.invalid").transErr(IllegalArgumentException.class);
         }
 
-        setNode(p, PlayerState.COMBATANT_ALIVE, t);
+        // set to comb alive unless they're dead then set to dead
+        Node n = getNode(p);
+        PlayerState s = PlayerState.COMBATANT_ALIVE;
+        if (n.state.isAssignedCombatant()) s = n.state;
+        setNode(p, s, t);
 
     }
 
@@ -139,27 +144,33 @@ public class TeamManager {
                 i = i % numTeams + 1;
             }
         }
+
+        // set numTeams to actual number of teams
+        numTeams = Arrays.stream(getAliveTeams()).max().orElse(1);
     }
 
     public void announceTeams() {
         for (int i = 1; i <= getNumTeams(); i++) {
-            announceTeamsLine(i);
+            announceTeamsLine(PlayerState.COMBATANT_ALIVE, i);
         }
-        announceTeamsLine(0);
+
+        announceTeamsLine(PlayerState.COMBATANT_ALIVE, 0);
+        announceTeamsLine(PlayerState.COMBATANT_UNASSIGNED, 0);
+        announceTeamsLine(PlayerState.SPECTATOR, 0);
 
     }
 
-    private void announceTeamsLine(int t) {
+    private void announceTeamsLine(PlayerState s, int t) {
         Set<Player> players;
-        if (t == 0) {
-            players = getOnlineSpectators();
-        } else {
+        if (s.isAssignedCombatant()) {
             players = getCombatantsOnTeam(t);
+        } else {
+            players = filterOnline(getAllPlayersMatching(n -> n.state == s && n.team == t));
         }
         if (players.size() == 0) return;
 
         var b = Component.text()
-            .append(TeamDisplay.getName(t))
+            .append(TeamDisplay.getName(s, t))
             .append(Component.text(": ", noDeco(NamedTextColor.WHITE)));
 
         // list of players one a team, separated by commas
@@ -321,7 +332,7 @@ public class TeamManager {
      * Sets the number of players per team
      * @param s "solos", "duos", "trios", "quartets", "quintets", "sextets", "septets", "octets"
      */
-    public void setTeamSize(String s) {
+    public void setTeamSize(String s) throws IllegalArgumentException {
         setTeamSize(switch (s) {
             case "solos" -> 1;
             case "duos" -> 2;
@@ -349,10 +360,6 @@ public class TeamManager {
      * @param n Number of teams
      */
     public void setNumTeams(int n) {
-        if (n <= 0) {
-            throw new Key("err.team.count_must_pos").transErr(IllegalArgumentException.class);
-        }
-
-        numTeams = n;
+        numTeams = Math.max(1, n);
     }
 }

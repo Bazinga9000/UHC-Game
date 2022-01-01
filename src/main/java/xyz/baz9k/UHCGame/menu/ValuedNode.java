@@ -87,13 +87,14 @@ public class ValuedNode extends Node {
     }
 
     @Override
-    public void click(@NotNull Player p) {
+    public boolean click(@NotNull Player p) {
         switch (type) {
             case INTEGER, DOUBLE, STRING -> new ValueRequest(plugin, p, this);
             case BOOLEAN -> this.set(!cfg.getBoolean(cfgKey()));
             // case OPTION -> see OptionValuedNode#click
             default -> throw new Key("err.menu.needs_impl").transErr(IllegalArgumentException.class, type);
         }
+        return true;
     }
 
     /**

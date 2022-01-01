@@ -51,9 +51,10 @@ public abstract class Node {
 
     /**
      * Action to run when this node is clicked in parent's inventory
-     * @param p Player who clicked the node
+     * @param p
+     * @return true/false if action was successful
      */
-    public abstract void click(@NotNull Player p);
+    public abstract boolean click(@NotNull Player p);
 
     /**
      * Disable use of this node if the predicate is matched

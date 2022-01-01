@@ -98,8 +98,8 @@ public final class BranchNode extends InventoryNode {
                 sound = 2;
             } else {
                 // test click
-                node.click(p);
-                sound = 1;
+                boolean succ = node.click(p);
+                sound = succ ? 1 : 2;
 
                 // check click was valid
                 if (node instanceof ValuedNode vnode && !check.test(Node.cfg)) {

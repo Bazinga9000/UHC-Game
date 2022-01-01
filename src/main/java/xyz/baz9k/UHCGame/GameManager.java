@@ -151,7 +151,7 @@ public class GameManager implements Listener {
             .toList();
     }
 
-    private void runEventWithChecks(String eventKey, Runnable event, Supplier<List<GameInitFailure>> checks, boolean skipChecks) {
+    private void runEventWithChecks(String eventKey, Runnable event, Supplier<List<GameInitFailure>> checks, boolean skipChecks) throws IllegalStateException {
         Key EVENT_TRY       = new Key("debug.%s.try", eventKey),
             EVENT_FORCE_TRY = new Key("debug.%s.force", eventKey),
             EVENT_COMPLETE  = new Key("debug.%s.complete", eventKey),
@@ -188,7 +188,7 @@ public class GameManager implements Listener {
      * /uhc start force: Skips checks
      * @param skipChecks If true, all checks are ignored.
      */
-    public void startUHC(boolean skipChecks) {
+    public void startUHC(boolean skipChecks) throws IllegalStateException {
         runEventWithChecks("start", this::_startUHC, this::checkStart, skipChecks);
     }
 
@@ -202,7 +202,7 @@ public class GameManager implements Listener {
      * /uhc end force: Forcibly starts game
      * @param skipChecks If true, started game checks are ignored.
      */
-    public void endUHC(boolean skipChecks) {
+    public void endUHC(boolean skipChecks) throws IllegalStateException {
         runEventWithChecks("end", this::_endUHC, this::checkEnd, skipChecks);
     }
 
@@ -316,13 +316,13 @@ public class GameManager implements Listener {
         return stage != GameStage.NOT_IN_GAME;
     }
 
-    public void requireStarted() {
+    public void requireStarted() throws IllegalStateException {
         if (!hasUHCStarted()) {
             throw new Key("err.not_started").transErr(IllegalStateException.class);
         }
     }
 
-    public void requireNotStarted() {
+    public void requireNotStarted() throws IllegalStateException {
         if (hasUHCStarted()) {
             throw new Key("err.already_started").transErr(IllegalStateException.class);
         }
@@ -589,7 +589,9 @@ public class GameManager implements Listener {
     private void winMessage() {
         if (teamManager.getAliveTeams().length > 1) return;
         int winner = teamManager.getAliveTeams()[0];
-        Component winMsg = new Key("win").trans(TeamDisplay.getName(winner))
+        Component winName = TeamDisplay.getName(PlayerState.COMBATANT_ALIVE, winner);
+        var winBukkitClr = TeamDisplay.getBukkitColor(PlayerState.COMBATANT_ALIVE, winner);
+        Component winMsg = new Key("win").trans(winName)
             .style(noDeco(NamedTextColor.WHITE));
         winMsg = includeGameTimestamp(winMsg);
 
@@ -597,7 +599,7 @@ public class GameManager implements Listener {
         delayedMessage(winMsg, 1);
         
         var fwe = FireworkEffect.builder()
-            .withColor(TeamDisplay.getBukkitColor(winner), org.bukkit.Color.WHITE)
+            .withColor(winBukkitClr, org.bukkit.Color.WHITE)
             .with(FireworkEffect.Type.BURST)
             .withFlicker()
             .withTrail()
@@ -642,7 +644,7 @@ public class GameManager implements Listener {
             // check team death
             int t = teamManager.getTeam(dead);
             if (teamManager.isTeamEliminated(t)) {
-                Component teamElimMsg = new Key("eliminated").trans(TeamDisplay.getName(t))
+                Component teamElimMsg = new Key("eliminated").trans(TeamDisplay.getName(PlayerState.COMBATANT_ALIVE, t))
                     .style(noDeco(NamedTextColor.WHITE));
                 teamElimMsg = includeGameTimestamp(teamElimMsg);
                 // this msg should be displayed after player death
@@ -719,7 +721,10 @@ public class GameManager implements Listener {
         hudManager.initPlayerHUD(p);
         
         recipes.discoverFor(p);
-        setDisplayName(p, TeamDisplay.prefixed(teamManager.getTeam(p), p.getName()));
+
+        PlayerState s = teamManager.getPlayerState(p);
+        int t = teamManager.getTeam(p);
+        setDisplayName(p, TeamDisplay.prefixed(s, t, p.getName()));
         
         if (onGameStart || !worldManager.inGame(p)) {
             // if the player joins midgame and are in the lobby, then idk where to put them! put in spawn
