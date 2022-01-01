@@ -338,6 +338,22 @@ public class GameManager implements Listener {
                 incrementStage();
             }
             
+            int dnCycle = plugin.getConfig().getInt("global.dn_cycle");
+            // 0: 05:00 per cycle
+            // 1: 10:00 per cycle
+            // 2: 20:00 per cycle
+            // 3: Always Day
+            // 4: Always Night
+            int timeIncr = switch (dnCycle) {
+                case 0 -> 4;
+                case 1 -> 2;
+                default -> 0;
+            };
+            if (timeIncr != 0) {
+                World w = worldManager.getGameWorld(0);
+                w.setTime(w.getTime() + timeIncr);
+            }
+
             // run thru all the events that have been registered and whose time have passed
             TimedEvent e = timedEvents.first();
             while (e.when().isBefore(Instant.now())) {

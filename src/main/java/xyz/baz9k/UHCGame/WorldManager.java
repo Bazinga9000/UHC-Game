@@ -90,9 +90,17 @@ public class WorldManager {
     public void initWorlds() {
         worldsRegened = false;
 
+        boolean natRegen = plugin.getConfig().getBoolean("player.natural_regen");
+        int dnCycle = plugin.getConfig().getInt("global.dn_cycle");
+        // 0: 05:00 per cycle
+        // 1: 10:00 per cycle
+        // 2: 20:00 per cycle
+        // 3: Always Day
+        // 4: Always Night
+
         for (World w : getGameWorlds()) {
             // set time to 0 and delete rain
-            w.setTime(0);
+            w.setTime(dnCycle == 4 ? 18000 : 0);
             w.setClearWeatherDuration(Integer.MAX_VALUE); // there is NO rain. Ever again. [ :( ]
             w.setDifficulty(Difficulty.HARD);
 
@@ -102,8 +110,8 @@ public class WorldManager {
             w.getWorldBorder().setDamageAmount(1);
 
             DefaultGamerules.set(w);
-            w.setGameRule(GameRule.NATURAL_REGENERATION, 
-                plugin.getConfig().getBoolean("player.natural_regen"));
+            w.setGameRule(GameRule.NATURAL_REGENERATION, natRegen);
+            w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, dnCycle == 2);
 
             purgeWorld(w);
 
