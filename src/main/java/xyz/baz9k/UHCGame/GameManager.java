@@ -135,7 +135,7 @@ public class GameManager implements Listener {
             .toList();
     }
 
-    private void runEventWithChecks(String eventKey, Runnable event, Supplier<List<GameInitFailure>> checks, boolean skipChecks) {
+    private void runEventWithChecks(String eventKey, Runnable event, Supplier<List<GameInitFailure>> checks, boolean skipChecks) throws IllegalStateException {
         Key EVENT_TRY       = new Key("debug.%s.try", eventKey),
             EVENT_FORCE_TRY = new Key("debug.%s.force", eventKey),
             EVENT_COMPLETE  = new Key("debug.%s.complete", eventKey),
@@ -172,7 +172,7 @@ public class GameManager implements Listener {
      * /uhc start force: Skips checks
      * @param skipChecks If true, all checks are ignored.
      */
-    public void startUHC(boolean skipChecks) {
+    public void startUHC(boolean skipChecks) throws IllegalStateException {
         runEventWithChecks("start", this::_startUHC, this::checkStart, skipChecks);
     }
 
@@ -186,7 +186,7 @@ public class GameManager implements Listener {
      * /uhc end force: Forcibly starts game
      * @param skipChecks If true, started game checks are ignored.
      */
-    public void endUHC(boolean skipChecks) {
+    public void endUHC(boolean skipChecks) throws IllegalStateException {
         runEventWithChecks("end", this::_endUHC, this::checkEnd, skipChecks);
     }
 
@@ -268,13 +268,13 @@ public class GameManager implements Listener {
         return stage != GameStage.NOT_IN_GAME;
     }
 
-    public void requireStarted() {
+    public void requireStarted() throws IllegalStateException {
         if (!hasUHCStarted()) {
             throw new Key("err.not_started").transErr(IllegalStateException.class);
         }
     }
 
-    public void requireNotStarted() {
+    public void requireNotStarted() throws IllegalStateException {
         if (hasUHCStarted()) {
             throw new Key("err.already_started").transErr(IllegalStateException.class);
         }

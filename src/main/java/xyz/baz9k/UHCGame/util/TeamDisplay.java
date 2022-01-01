@@ -40,6 +40,26 @@ public final class TeamDisplay {
     private static final Color UNASSIGNED_COLOR = new Color(0xFFFFFF);
     private static final int NUM_TEAM_COLORS = TEAM_COLORS.length - 1;
 
+    private enum DisplayClassifier {
+        COMBATANT, WILDCARD, UNASSIGNED, SPECTATOR;
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
+
+        private static DisplayClassifier of(PlayerState s, int t) {
+            return switch (s) {
+                case COMBATANT_ALIVE, COMBATANT_DEAD -> {
+                    if (t <= 0) yield WILDCARD;
+                    yield COMBATANT;
+                }
+                case COMBATANT_UNASSIGNED -> UNASSIGNED;
+                case SPECTATOR -> SPECTATOR;
+            };
+        }
+    }
+
     /**
      * Returns color of the team in type {@link java.awt.Color}.
      * @param s Player state
@@ -47,13 +67,13 @@ public final class TeamDisplay {
      * @return the {@link java.awt.Color}
      */
     public static Color getColor(PlayerState s, int t) {
-        return switch (s) {
-            case COMBATANT_ALIVE, COMBATANT_DEAD -> {
-                if (t <= 0) yield TEAM_COLORS[0];
+        return switch (DisplayClassifier.of(s, t)) {
+            case COMBATANT -> {
                 int ci = (t - 1) % NUM_TEAM_COLORS + 1;
                 yield TEAM_COLORS[ci];
             }
-            case COMBATANT_UNASSIGNED -> UNASSIGNED_COLOR;
+            case WILDCARD -> TEAM_COLORS[0];
+            case UNASSIGNED -> UNASSIGNED_COLOR;
             case SPECTATOR -> SPECTATOR_COLOR;
 
         };
@@ -94,14 +114,6 @@ public final class TeamDisplay {
         return Style.style(getTextColor(s, t), deco);
     }
 
-    private static String classifier(PlayerState s) {
-        return switch (s) {
-            case COMBATANT_ALIVE, COMBATANT_DEAD -> "combatant";
-            case COMBATANT_UNASSIGNED -> "unassigned";
-            case SPECTATOR -> "spectator";
-        };
-    }
-
     /**
      * Returns the chat prefix of the team.
      * @param s Player state
@@ -109,9 +121,10 @@ public final class TeamDisplay {
      * @return {@link TextComponent} of the prefix
      */
     public static Component getPrefix(PlayerState s, int t) {
-        if (s.isAssignedCombatant() && t == 0) return Component.empty();
+        DisplayClassifier dc = DisplayClassifier.of(s, t);
+        if (dc == DisplayClassifier.WILDCARD) return Component.empty();
         
-        Component prefix = new Key("team.prefix.%s", classifier(s))
+        Component prefix = new Key("team.prefix.%s", dc)
             .trans(t)
             .style(getStyle(s, t));
         return render(prefix);
@@ -124,7 +137,9 @@ public final class TeamDisplay {
      * @return {@link TextComponent}
      */
     public static Component getPrefixWithSpace(PlayerState s, int t) {
-        if (s.isAssignedCombatant() && t == 0) return Component.empty();
+        DisplayClassifier dc = DisplayClassifier.of(s, t);
+        if (dc == DisplayClassifier.WILDCARD) return Component.empty();
+
         return getPrefix(s, t).append(Component.space());
     }
 
@@ -146,7 +161,7 @@ public final class TeamDisplay {
      * @return {@link TextComponent}
      */
     public static Component getName(PlayerState s, int t) {
-        return new Key("team.name.%s", classifier(s))
+        return new Key("team.name.%s", DisplayClassifier.of(s, t))
             .trans(t)
             .style(getStyle(s, t));
     }
