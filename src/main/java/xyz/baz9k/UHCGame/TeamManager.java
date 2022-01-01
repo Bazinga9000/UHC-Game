@@ -95,11 +95,12 @@ public class TeamManager {
     }
 
     private Node setNode(@NotNull Player p, @NotNull PlayerState s, int t, boolean callEvent) {
-        Node n = getNode(p);
-        if (callEvent && p.isOnline() && n.state() != s) {
-            new PlayerStateChangeEvent(p, s).callEvent();
+        Node oldNode = getNode(p);
+        Node newNode = new Node(s, t);
+        if (callEvent && p.isOnline() && oldNode != newNode) {
+            new PlayerStateChangeEvent(p, s, t).callEvent();
         }
-        playerMap.put(p.getUniqueId(), new Node(s, t));
+        playerMap.put(p.getUniqueId(), newNode);
         return getNode(p);
     }
     private Node setNode(@NotNull Player p, @NotNull PlayerState s, int t) {

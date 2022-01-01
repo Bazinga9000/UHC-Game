@@ -191,8 +191,12 @@ public class HUDManager implements Listener {
      * @param p Player whose prefix should be dispatched
      */
     public void dispatchPrefixUpdate(Player p) {
-        for (Scoreboard s : scoreboardsInUse()) {
-            applyPrefixOnScoreboard(s, p);
+        PlayerState s = teamManager.getPlayerState(p);
+        int t = teamManager.getTeam(p);
+        setDisplayName(p, TeamDisplay.prefixed(s, t, p.getName()));
+
+        for (Scoreboard sb : scoreboardsInUse()) {
+            applyPrefixOnScoreboard(sb, p);
         }
     }
 
@@ -587,11 +591,15 @@ public class HUDManager implements Listener {
 
             if (gameManager.hasUHCStarted()) {
                 if (teamManager.isAssignedCombatant(pl)) {
-                    // if they change state in game, then they just died or just respawned
+                    // if they change state in game, 
+                    
+                    //they might've just died or respawned
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         updateCombatantsAliveHUD(p);
                         updateTeamsAliveHUD(p);
                     }
+                    // they might've switched teams
+                    dispatchPrefixUpdate(pl);
                 }
             } else {
                 prepareToLobby(pl);
