@@ -133,9 +133,6 @@ public class HUDManager implements Listener {
      */
     private static final String PREFIXING_TEAM_FORMAT = "uhc_";
 
-    private Set<Scoreboard> scoreboardsInUse() {
-        return scoreboardsInUse(true);
-    }
     private Set<Scoreboard> scoreboardsInUse(boolean includeMain) {
         Set<Scoreboard> scoreboards = new HashSet<>();
         if (includeMain) scoreboards.add(Bukkit.getScoreboardManager().getMainScoreboard());
@@ -147,13 +144,15 @@ public class HUDManager implements Listener {
     }
 
     /**
-     * Register on a scoreboard the player's prefix team
-     * @param s Scoreboard to register player prefix on
-     * @param p Player to register prefix of
+     * Register on a player's prefix team onto a scoreboard
+     * @param recipient Player whose scoreboard registers target player prefix
+     * @param target Player to register prefix of
      */
-    private void applyPrefixOnScoreboard(Scoreboard s, Player p) {
-        PlayerState state = teamManager.getPlayerState(p);
-        int team = teamManager.getTeam(p);
+    private void applyPrefixOnScoreboard(Player recipient, Player target) {
+        Scoreboard rsb = recipient.getScoreboard();
+        
+        PlayerState state = teamManager.getPlayerState(target);
+        int team = teamManager.getTeam(target);
         
         String teamName = PREFIXING_TEAM_FORMAT;
         int n_users = Bukkit.getOnlinePlayers().size();
@@ -166,13 +165,13 @@ public class HUDManager implements Listener {
         };
         teamName += String.format("%s%0" + n_users_mag + "d", classifier, team);
 
-        Team t = s.getTeam(teamName);
+        Team t = rsb.getTeam(teamName);
         if (t == null) {
-            t = s.registerNewTeam(teamName);
+            t = rsb.registerNewTeam(teamName);
             t.prefix(TeamDisplay.getPrefixWithSpace(state, team));
         }
 
-        t.addPlayer(p);
+        t.addPlayer(target);
     }
 
     /**
@@ -180,9 +179,8 @@ public class HUDManager implements Listener {
      * @param p Player to update scoreboard of
      */
     public void updatePrefixesOnHUD(Player p) {
-        Scoreboard s = p.getScoreboard();
-        for (Player pl : Bukkit.getOnlinePlayers()) {
-            applyPrefixOnScoreboard(s, pl);
+        for (Player o : Bukkit.getOnlinePlayers()) {
+            applyPrefixOnScoreboard(p, o);
         }
     }
 
@@ -191,8 +189,12 @@ public class HUDManager implements Listener {
      * @param p Player whose prefix should be dispatched
      */
     public void dispatchPrefixUpdate(Player p) {
-        for (Scoreboard s : scoreboardsInUse()) {
-            applyPrefixOnScoreboard(s, p);
+        PlayerState s = teamManager.getPlayerState(p);
+        int t = teamManager.getTeam(p);
+        setDisplayName(p, TeamDisplay.prefixed(s, t, p.getName()));
+
+        for (Player o : Bukkit.getOnlinePlayers()) {
+            applyPrefixOnScoreboard(o, p);
         }
     }
 
@@ -587,11 +589,15 @@ public class HUDManager implements Listener {
 
             if (gameManager.hasUHCStarted()) {
                 if (teamManager.isAssignedCombatant(pl)) {
-                    // if they change state in game, then they just died or just respawned
+                    // if they change state in game, 
+                    
+                    //they might've just died or respawned
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         updateCombatantsAliveHUD(p);
                         updateTeamsAliveHUD(p);
                     }
+                    // they might've switched teams
+                    dispatchPrefixUpdate(pl);
                 }
             } else {
                 prepareToLobby(pl);

@@ -21,13 +21,16 @@ public class PlayerStateChangeEvent extends Event {
 
     private final Player p;
     private final PlayerState state;
+    private final int team;
 
-    public PlayerStateChangeEvent(Player p, PlayerState state) {
+    public PlayerStateChangeEvent(Player p, PlayerState state, int team) {
         this.p = p;
         this.state = state;
+        this.team = team;
     }
 
     public Player player() { return p; }
     public PlayerState state() { return state; }
-
+    public int team() { return team; }
+    
 }
