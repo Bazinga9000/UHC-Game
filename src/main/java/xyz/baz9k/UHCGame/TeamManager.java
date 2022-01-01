@@ -3,6 +3,7 @@ package xyz.baz9k.UHCGame;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.audience.Audience;
@@ -185,6 +186,13 @@ public class TeamManager {
     }
 
     public void announceTeams() {
+        // guess who's too lazy to pass plugin as a param to this class
+        int hideTeams = JavaPlugin.getPlugin(UHCGamePlugin.class).getConfig().getInt("team.hide_teams");
+        // 0: Display all teams
+        // 1: Display only your team
+        // 2: Do not display teams
+        if (hideTeams != 0) return;
+        
         for (int i = 1; i <= numTeams; i++) {
             announceTeamsLine(PlayerState.COMBATANT_ALIVE, i);
         }

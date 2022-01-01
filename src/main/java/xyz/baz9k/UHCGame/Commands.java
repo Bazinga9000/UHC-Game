@@ -552,6 +552,11 @@ public final class Commands {
             .withArguments(new GreedyStringArgument("msg"))
             .executesPlayer((sender, args) -> {
                 requireStarted();
+                int hideTeams = plugin.getConfig().getInt("team.hide_teams");
+                if (hideTeams == 2) {
+                    CommandAPI.fail("/tc is disabled, since teams are hidden");
+                }
+
                 String msg = (String) args[0];
 
                 var tm = plugin.getTeamManager();

@@ -222,7 +222,7 @@ public class MenuTree {
 
         /* TEAM SETTINGS */
         i = 0;
-        new OptionValuedNode(teamSettings, i++, "hide_teams", new ItemProperties<>(), // TODO
+        new OptionValuedNode(teamSettings, i++, "hide_teams", new ItemProperties<>(),
             Material.RED_STAINED_GLASS,
             Material.RED_TERRACOTTA,
             Material.RED_CONCRETE

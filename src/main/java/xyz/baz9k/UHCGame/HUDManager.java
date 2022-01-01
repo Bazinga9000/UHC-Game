@@ -133,9 +133,6 @@ public class HUDManager implements Listener {
      */
     private static final String PREFIXING_TEAM_FORMAT = "uhc_";
 
-    private Set<Scoreboard> scoreboardsInUse() {
-        return scoreboardsInUse(true);
-    }
     private Set<Scoreboard> scoreboardsInUse(boolean includeMain) {
         Set<Scoreboard> scoreboards = new HashSet<>();
         if (includeMain) scoreboards.add(Bukkit.getScoreboardManager().getMainScoreboard());
@@ -146,33 +143,85 @@ public class HUDManager implements Listener {
         return scoreboards;
     }
 
+    private record TeamProperties(PlayerState s, int t, boolean showPrefix) {
+        public String teamName() {
+            int n_users = Bukkit.getOnlinePlayers().size();
+            int n_users_mag = String.valueOf(n_users).length();
+
+            String classifier = switch (s) {
+                case COMBATANT_ALIVE, COMBATANT_DEAD -> t > 0 ? "c" : "d";
+                case SPECTATOR -> "s";
+                case COMBATANT_UNASSIGNED -> "u";
+            };
+
+            return PREFIXING_TEAM_FORMAT + String.format("%s%0" + n_users_mag + "d", classifier, t);
+        }
+
+        public Component prefix() {
+            return TeamDisplay.getPrefixWithSpace(s, t);
+        }
+    }
+
     /**
-     * Register on a scoreboard the player's prefix team
+     * Get the team properties of the target player as viewed by the recipient.
+     * @param recipient Recipient player
+     * @param target Target player
+     * @return team properties
+     */
+    private TeamProperties playerTeamProperties(Player recipient, Player target) {
+        PlayerState tState = teamManager.getPlayerState(target);
+        int tTeam = teamManager.getTeam(target);
+
+        if (!tState.isAssignedCombatant()) {
+            // always display non-assigned comb properties with no changes
+            return new TeamProperties(tState, tTeam, true);
+        }
+
+        int hideTeams = plugin.getConfig().getInt("team.hide_teams");
+        // 0: Display all teams
+        // 1: Display only your team
+        // 2: Do not display teams
+
+        return switch (hideTeams) {
+            case 0 -> new TeamProperties(tState, tTeam, true);
+
+            // if same, target should display as their team
+            // if not same, target should appear under the recipient team, no prefix
+            case 1 -> {
+                boolean same = teamManager.onSameTeam(recipient, target);
+                yield new TeamProperties(tState, tTeam + (same ? 0 : 1), same);
+            }
+
+            // do not show any prefixes, everyone is same priority
+            default -> new TeamProperties(tState, 1, false);
+        };
+    }
+
+    /**
+     * Register the player's prefix to a scoreboard
      * @param s Scoreboard to register player prefix on
      * @param p Player to register prefix of
+     * @param tp Properties of the player's prefix
      */
-    private void applyPrefixOnScoreboard(Scoreboard s, Player p) {
-        PlayerState state = teamManager.getPlayerState(p);
-        int team = teamManager.getTeam(p);
-        
-        String teamName = PREFIXING_TEAM_FORMAT;
-        int n_users = Bukkit.getOnlinePlayers().size();
-        int n_users_mag = String.valueOf(n_users).length();
-        
-        String classifier = switch (state) {
-            case COMBATANT_ALIVE, COMBATANT_DEAD -> "c";
-            case COMBATANT_UNASSIGNED -> "u";
-            case SPECTATOR -> "s";
-        };
-        teamName += String.format("%s%0" + n_users_mag + "d", classifier, team);
-
+    private void applyPrefixOnScoreboard(Scoreboard s, Player p, TeamProperties tp) {
+        String teamName = tp.teamName();
         Team t = s.getTeam(teamName);
         if (t == null) {
             t = s.registerNewTeam(teamName);
-            t.prefix(TeamDisplay.getPrefixWithSpace(state, team));
+            if (tp.showPrefix()) t.prefix(tp.prefix());
         }
 
         t.addPlayer(p);
+    }
+
+    /**
+     * Register the target's prefix to the recipient's scoreboard
+     * @param recipient Player whose scoreboard will register the target's prefix
+     * @param target Player to register prefix of
+     */
+    private void applyPrefixOnPlayerScoreboard(Player recipient, Player target) {
+        TeamProperties tp = playerTeamProperties(recipient, target);
+        applyPrefixOnScoreboard(recipient.getScoreboard(), target, tp);
     }
 
     /**
@@ -180,9 +229,8 @@ public class HUDManager implements Listener {
      * @param p Player to update scoreboard of
      */
     public void updatePrefixesOnHUD(Player p) {
-        Scoreboard s = p.getScoreboard();
-        for (Player pl : Bukkit.getOnlinePlayers()) {
-            applyPrefixOnScoreboard(s, pl);
+        for (Player q : Bukkit.getOnlinePlayers()) {
+            applyPrefixOnPlayerScoreboard(p, q);
         }
     }
 
@@ -191,12 +239,19 @@ public class HUDManager implements Listener {
      * @param p Player whose prefix should be dispatched
      */
     public void dispatchPrefixUpdate(Player p) {
-        PlayerState s = teamManager.getPlayerState(p);
-        int t = teamManager.getTeam(p);
-        setDisplayName(p, TeamDisplay.prefixed(s, t, p.getName()));
+        int hideTeams = plugin.getConfig().getInt("team.hide_teams");
+        if (hideTeams == 0) {
+            // these are global, so they need to be hidden if team display is not global
+            PlayerState s = teamManager.getPlayerState(p);
+            int t = teamManager.getTeam(p);
+            setDisplayName(p, TeamDisplay.prefixed(s, t, p.getName()));
 
-        for (Scoreboard sb : scoreboardsInUse()) {
-            applyPrefixOnScoreboard(sb, p);
+            Scoreboard main = Bukkit.getScoreboardManager().getMainScoreboard();
+            applyPrefixOnScoreboard(main, p, new TeamProperties(s, t, true));
+        }
+
+        for (Player q : Bukkit.getOnlinePlayers()) {
+            applyPrefixOnPlayerScoreboard(q, p);
         }
     }
 
