@@ -340,6 +340,38 @@ public class TeamManager {
             .toArray();
     }
 
+    public record AliveGroup(int team, UUID uuid) {
+        @Override
+        public boolean equals(Object o) {
+            // wildcards are distinguished by UUIDs, teams are not
+            if (o instanceof AliveGroup g) {
+                if (this.team() == 0 && g.team() == 0) {
+                    return this.uuid().equals(g.uuid());
+                } else {
+                    return this.team() == g.team();
+                }
+            }
+
+            return false;
+        }
+
+        public Component getName() {
+            if (team > 0) return TeamDisplay.getPrefix(PlayerState.COMBATANT_ALIVE, team);
+            return Component.text(Bukkit.getOfflinePlayer(uuid).getName());
+        }
+    }
+
+    /**
+     * @return an array of alive teams and wildcards
+     */
+    public AliveGroup[] getAliveGroups() {
+        return playerMap.entrySet().stream()
+            .filter(e -> e.getValue().state == PlayerState.COMBATANT_ALIVE)
+            .map(e -> new AliveGroup(e.getValue().team(), e.getKey()))
+            .distinct()
+            .toArray(AliveGroup[]::new);
+    }
+
     public record ChatGroup(Component groupName, Audience audience) {}
     public ChatGroup getChatBuddies(Player p) {
         Node pn = getNode(p);

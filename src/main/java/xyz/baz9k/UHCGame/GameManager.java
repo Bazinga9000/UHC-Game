@@ -11,6 +11,7 @@ import org.bukkit.advancement.Advancement;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
@@ -70,6 +71,7 @@ public class GameManager implements Listener {
         }
 
     }
+    private boolean win = false;
 
     public GameManager(UHCGamePlugin plugin) {
         this.plugin = plugin;
@@ -266,6 +268,7 @@ public class GameManager implements Listener {
         setStage(GameStage.nth(0));
         startTime = lastStageInstant = Optional.of(Instant.now());
         
+        win = false;
         kills.clear();
         timedEvents.clear();
         // register event for when grace period ends
@@ -511,6 +514,7 @@ public class GameManager implements Listener {
      * @return if the stage has completed and needs to be incremented.
      */
     public boolean isStageComplete() {
+        if (win) return false;
         if (isDeathmatch()) return false;
         return lastStageInstant.map(instant -> {
                 var end = instant.plus(stage.duration());
@@ -602,11 +606,18 @@ public class GameManager implements Listener {
                .append(c);
     }
 
-    private void winMessage() {
-        if (teamManager.getAliveTeams().length > 1) return;
-        int winner = teamManager.getAliveTeams()[0];
-        Component winName = TeamDisplay.getName(PlayerState.COMBATANT_ALIVE, winner);
-        var winBukkitClr = TeamDisplay.getBukkitColor(PlayerState.COMBATANT_ALIVE, winner);
+    private void trySendWinMessage() {
+        // check if qualify for win message
+        if (win) return; // if win message already triggered, don't trigger it again
+
+        var aliveGroups = teamManager.getAliveGroups();
+        if (aliveGroups.length != 1) return; // only 1 group
+
+        win = true;
+        var winner = aliveGroups[0];
+        Component winName = winner.getName();
+        var winBukkitClr = TeamDisplay.getBukkitColor(PlayerState.COMBATANT_ALIVE, winner.team());
+
         Component winMsg = new Key("win").trans(winName)
             .style(noDeco(NamedTextColor.WHITE));
         winMsg = includeGameTimestamp(winMsg);
@@ -614,19 +625,46 @@ public class GameManager implements Listener {
         // this msg should be displayed after player death
         delayedMessage(winMsg, 1);
         
+        // fireworks
         var fwe = FireworkEffect.builder()
             .withColor(winBukkitClr, org.bukkit.Color.WHITE)
             .with(FireworkEffect.Type.BURST)
-            .withFlicker()
             .withTrail()
             .build();
-        for (Player p : teamManager.getCombatantsOnTeam(winner).online()) {
+        
+        boolean isWildcard = winner.team() == 0;
+        List<Player> winners;
+        if (isWildcard) {
+            Player p = Bukkit.getPlayer(winner.uuid());
+            if (p != null) winners = List.of(p);
+            else winners = List.of();
+        } else {
+            winners = List.copyOf(teamManager.getCombatantsOnTeam(winner.team()).online());
+        }
+
+        for (Player p : winners) {
             Firework fw = p.getWorld().spawn(p.getLocation(), Firework.class);
             FireworkMeta meta = fw.getFireworkMeta();
             meta.addEffect(fwe);
             meta.setPower(1);
             fw.setFireworkMeta(meta);
         }
+
+        // wither bonus round
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            int nWinners = winners.size();
+            Location spawnLoc;
+
+            if (nWinners == 0) {
+                spawnLoc = worldManager.getCenter();
+            } else {
+                int i = new Random().nextInt(winners.size());
+                spawnLoc = winners.get(i).getLocation();
+            }
+
+            spawnLoc = spawnLoc.add(0, 10, 0);
+            spawnLoc.getWorld().spawn(spawnLoc, Wither.class);
+        }, 60);
     }
 
     @EventHandler
@@ -668,9 +706,7 @@ public class GameManager implements Listener {
             }
 
             // check win condition
-            if (teamManager.getAliveTeams().length == 1) {
-                winMessage();
-            }
+            trySendWinMessage();
         }
         
         // set bed spawn
