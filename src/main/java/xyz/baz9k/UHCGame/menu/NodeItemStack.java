@@ -51,7 +51,7 @@ public class NodeItemStack extends ItemStack {
      * The properties this class defines:
      * <p> - Material
      * <p> - Name style
-     * <p> - Mapping of "object" to string that can be substituted into the description
+     * <p> - Format arguments for the description
      * <p> - Function to perform miscellaneous ItemMeta edits (ench hide flags, ench glint)
      * <p> - extra lore, which provides information other than the description of the node
      * @param <T> type of object passed through each function
@@ -60,7 +60,7 @@ public class NodeItemStack extends ItemStack {
         private Supplier<T> propsObjSupplier = () -> null;
         private Function<T, Material> matGet = v -> Material.AIR;
         private Function<T, Style> nameStyle = v -> DEFAULT_NAME_STYLE;
-        private Function<T, String> formatter = String::valueOf;
+        private Function<T, Object[]> formatArgs = v -> new Object[]{v};
         private BiConsumer<T, ItemMeta> miscMetaChanges = (v, m) -> {};
         private Function<T, ExtraLore> elGet = v -> new ExtraLore();
 
@@ -80,8 +80,8 @@ public class NodeItemStack extends ItemStack {
             this.nameStyle = style;
             return this;
         }
-        public ItemProperties<T> formatter(Function<T, String> formatter) {
-            this.formatter = formatter;
+        public ItemProperties<T> formatArgs(Function<T, Object[]> formatArgs) {
+            this.formatArgs = formatArgs;
             return this;
         }
         public ItemProperties<T> metaChanges(BiConsumer<T, ItemMeta> mc) {
@@ -96,7 +96,7 @@ public class NodeItemStack extends ItemStack {
         public ItemProperties<T> mat(Material mat) { return mat(v -> mat); }
         public ItemProperties<T> style(Style s) { return style(v -> s); }
         public ItemProperties<T> style(TextColor clr) { return style(noDeco(clr)); }
-        
+        public ItemProperties<T> formatArg(Function<T, Object> formatArg) { return formatArgs(formatArg.andThen(o -> new Object[]{o})); }
 
         private Material getMat() {
             return matGet.apply(propsObjSupplier.get());
@@ -104,8 +104,8 @@ public class NodeItemStack extends ItemStack {
         private Style getStyle() {
             return nameStyle.apply(propsObjSupplier.get());
         }
-        private String getFormattedDescObj() {
-            return formatter.apply(propsObjSupplier.get());
+        private Object[] getFormatArgs() {
+            return formatArgs.apply(propsObjSupplier.get());
         }
         private void editMeta(ItemMeta m) {
             miscMetaChanges.accept(propsObjSupplier.get(), m);
@@ -198,8 +198,8 @@ public class NodeItemStack extends ItemStack {
             .map(c -> {
                 if (c instanceof TextComponent tc) {
                     String content = tc.content();
-                    String fmtObj = props.getFormattedDescObj();
-                    return tc.content(MessageFormat.format(content, fmtObj));
+                    Object[] fmtArgs = props.getFormatArgs();
+                    return tc.content(MessageFormat.format(content, fmtArgs));
                 } else return c;
             })
             .toList();
