@@ -20,7 +20,7 @@ global:
 team:
   hide_teams: 0
   friendly_fire: false
-  boss_team: false
+  boss_team: 0
   sardines: false
 
 player:

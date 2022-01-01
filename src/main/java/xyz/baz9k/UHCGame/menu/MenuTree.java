@@ -228,8 +228,13 @@ public class MenuTree {
             Material.RED_CONCRETE
         );
         new ValuedNode(teamSettings, i++, "friendly_fire", new ItemProperties<>(Material.FLINT_AND_STEEL).style(TextColor.color(0xFF9F5F)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(teamSettings, i++, "boss_team",     new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xA100FF)),     ValuedNode.Type.BOOLEAN); // TODO
-        new ValuedNode(teamSettings, i++, "sardines",      new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xFFBC70)),     ValuedNode.Type.BOOLEAN); // TODO
+        new ValuedNode(teamSettings, i++, "boss_team", 
+            new ItemProperties<>(v -> (int) v == 0 ? Material.DRAGON_EGG : Material.DRAGON_HEAD)
+                .style(TextColor.color(0xA100FF)), 
+            ValuedNode.Type.INTEGER, 
+            v -> Math.max(0, (int) v)
+        ); // TODO
+        new ValuedNode(teamSettings, i++, "sardines", new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN); // TODO
 
         /* PLAYER SETTINGS */
         i = 0;
