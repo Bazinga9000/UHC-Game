@@ -1,10 +1,11 @@
 package xyz.baz9k.UHCGame;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.HumanEntity;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
@@ -12,31 +13,66 @@ import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class TeamManager {
-    private static class Node {
-        public int team;
-        public PlayerState state;
-        public Player player;
-        public Node(PlayerState state, int team, Player player) {
-            this.team = team;
-            this.state = state;
-            this.player = player;
+    private record Node(PlayerState state, int team) {
+        public Node {
+            if (!state.isAssignedCombatant()) team = 0;
         }
+    }
+
+    public class UnresolvedPlayerSet extends AbstractSet<OfflinePlayer> {
+        private Set<OfflinePlayer> pSet;
+        private UnresolvedPlayerSet(Set<OfflinePlayer> pSet) {
+            this.pSet = pSet;
+        }
+
+        @Override
+        public Iterator<OfflinePlayer> iterator() {
+            return pSet.iterator();
+        }
+
+        @Override
+        public int size() {
+            return pSet.size();
+        }
+
+        private Set<Player> resolveOfflines(Function<UUID, Player> resolver) {
+            return this.stream()
+                .map(op -> {
+                    Player p = op.getPlayer();
+                    if (p != null) return p;
+                    return resolver.apply(op.getUniqueId());
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        }
+
+        public Set<Player> online() { return resolveOfflines(u -> null); }
+        public Set<Player> cached() { return resolveOfflines(cachedPlayers::get); }
+
     }
 
     private int numTeams = 2;
     private final HashMap<UUID, Node> playerMap = new HashMap<>();
+    private final HashMap<UUID, Player> cachedPlayers = new HashMap<>();
 
     /**
      * Gets the stored node of the player in the player map.
@@ -46,37 +82,36 @@ public class TeamManager {
      * @return the node
      */
     private @NotNull Node getNode(@NotNull Player p) {
-        return playerMap.compute(p.getUniqueId(), (k, v) -> {
-            if (v == null) {
-                return new Node(PlayerState.COMBATANT_UNASSIGNED, 0, p);
-            } else {
-                v.player = p;
-                return v;
-            }
-        });
+        cachedPlayers.put(p.getUniqueId(), p);
+        return playerMap.computeIfAbsent(p.getUniqueId(), 
+            k -> new Node(PlayerState.COMBATANT_UNASSIGNED, 0)
+        );
     }
 
     public void addPlayer(@NotNull Player p, boolean hasStarted) {
         Node n = getNode(p);
         if (isAssignedCombatant(p)) return;
         // this doesn't count as a state change, b/c their state before is not relevant
-        n.state = hasStarted ? PlayerState.SPECTATOR : PlayerState.COMBATANT_UNASSIGNED;
+        PlayerState s = hasStarted ? PlayerState.SPECTATOR : PlayerState.COMBATANT_UNASSIGNED;
+        setNode(p, s, n.team(), false);
+    }
+
+    private Node setNode(@NotNull Player p, @NotNull PlayerState s, int t, boolean callEvent) {
+        Node oldNode = getNode(p);
+        Node newNode = new Node(s, t);
+        if (callEvent && p.isOnline() && oldNode != newNode) {
+            new PlayerStateChangeEvent(p, s, t).callEvent();
+        }
+        playerMap.put(p.getUniqueId(), newNode);
+        return getNode(p);
+    }
+    private Node setNode(@NotNull Player p, @NotNull PlayerState s, int t) {
+        return setNode(p, s, t, true);
     }
 
     private Node setState(@NotNull Player p, @NotNull PlayerState s) {
         Node n = getNode(p);
-        return setNode(p, s, n.team);
-    }
-
-    private Node setNode(@NotNull Player p, @NotNull PlayerState s, int t) {
-        Node n = getNode(p);
-        // dispatch event only if player is online, state changed, or team changed
-        if (isOnline(p) && (n.state != s || n.team != t)) {
-            new PlayerStateChangeEvent(p, s, t).callEvent();
-        }
-        n.state = s;
-        n.team = t;
-        return n;
+        return setNode(p, s, n.team());
     }
 
     /**
@@ -117,17 +152,18 @@ public class TeamManager {
      * Resets all players.
      */
     public void resetAllPlayers() {
-        for (Node v : playerMap.values()) {
-            setState(v.player, PlayerState.COMBATANT_UNASSIGNED);
-            v.team = 0;
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            setNode(p, PlayerState.COMBATANT_UNASSIGNED, 0);
         }
+
+        playerMap.replaceAll((k, v) -> new Node(PlayerState.COMBATANT_UNASSIGNED, 0));
     }
 
     /**
      * Assigns all registered players to a team.
      */
     public void assignTeams() {
-        List<Player> combatants = new ArrayList<>(getOnlineCombatants());
+        List<Player> combatants = new ArrayList<>(getCombatants().online());
         
         if (combatants.size() == numTeams) { // solos
             combatants.sort((p1, p2) -> p1.getName().compareTo(p2.getName()));
@@ -149,7 +185,7 @@ public class TeamManager {
     }
 
     public void announceTeams() {
-        for (int i = 1; i <= getNumTeams(); i++) {
+        for (int i = 1; i <= numTeams; i++) {
             announceTeamsLine(PlayerState.COMBATANT_ALIVE, i);
         }
 
@@ -160,11 +196,11 @@ public class TeamManager {
     }
 
     private void announceTeamsLine(PlayerState s, int t) {
-        Set<Player> players;
+        Set<? extends OfflinePlayer> players;
         if (s.isAssignedCombatant()) {
             players = getCombatantsOnTeam(t);
         } else {
-            players = filterOnline(getAllPlayersMatching(n -> n.state == s && n.team == t));
+            players = getAllPlayersMatching(n -> n.state == s && n.team == t).online();
         }
         if (players.size() == 0) return;
 
@@ -174,7 +210,7 @@ public class TeamManager {
 
         // list of players one a team, separated by commas
         String tPlayers = players.stream()
-            .map(HumanEntity::getName)
+            .map(OfflinePlayer::getName)
             .collect(Collectors.joining(", "));
         
         b.append(Component.text(tPlayers, noDeco(NamedTextColor.WHITE)));
@@ -187,12 +223,6 @@ public class TeamManager {
 
     public int getTeam(@NotNull Player p) {
         return getNode(p).team;
-    }
-
-    private static boolean isOnline(Player p) {
-        Player pl = Bukkit.getPlayer(p.getUniqueId());
-
-        return pl != null;
     }
 
     /**
@@ -211,43 +241,46 @@ public class TeamManager {
 
     /* LIST OF PLAYERS */
     
-    private Set<Player> getAllPlayersMatching(Predicate<Node> predicate) {
-        return playerMap.values().stream()
-            .filter(predicate)
-            .map(n -> n.player)
+    private UnresolvedPlayerSet getAllPlayersMatching(Predicate<Node> predicate) {
+        Set<OfflinePlayer> pSet = playerMap.entrySet().stream()
+            .filter(e -> predicate.test(e.getValue()))
+            .map(e -> Bukkit.getOfflinePlayer(e.getKey()))
             .collect(Collectors.toSet());
-    }
-
-    private Set<Player> filterOnline(@NotNull Set<Player> pSet) {
-        return pSet.stream()
-            .filter(TeamManager::isOnline)
-            .collect(Collectors.toSet());
+        
+        return new UnresolvedPlayerSet(pSet);
     }
 
     /**
      * @return a {@link Set} of all spectators
      */
-    public @NotNull Set<Player> getSpectators() {
+    public @NotNull UnresolvedPlayerSet getSpectators() {
         return getAllPlayersMatching(n -> n.state.isSpectator());
     }
 
     /**
      * @return a {@link Set} of all combatants
      */
-    public @NotNull Set<Player> getCombatants() {
+    public @NotNull UnresolvedPlayerSet getCombatants() {
         return getAllPlayersMatching(n -> n.state.isCombatant());
+    }
+
+    /**
+     * @return a {@link Set} of all wildcards (players that do not have a known team while in game)
+     */
+    public @NotNull UnresolvedPlayerSet getWildcards() {
+        return getAllPlayersMatching(n -> n.state.isAssignedCombatant() && n.team == 0);
     }
 
     /**
      * @return a {@link Set} of all living combatants
      */
-    public @NotNull Set<Player> getAliveCombatants() {
+    public @NotNull UnresolvedPlayerSet getAliveCombatants() {
         return getAllPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE);
     }
     /**
      * @return a {@link Set} of all assigned combatants
      */
-    public @NotNull Set<Player> getAssignedCombatants() {
+    public @NotNull UnresolvedPlayerSet getAssignedCombatants() {
         return getAllPlayersMatching(n -> n.state.isAssignedCombatant());
     }
 
@@ -255,36 +288,38 @@ public class TeamManager {
      * @param team Team to inspect
      * @return a {@link Set} of all combatants on a specific team
      */
-    public @NotNull Set<Player> getCombatantsOnTeam(int team) {
-        if (team <= 0 || team > numTeams) {
+    public @NotNull UnresolvedPlayerSet getCombatantsOnTeam(int team) {
+        if (team < 0 || team > numTeams) {
             throw new Key("err.team.invalid").transErr(IllegalArgumentException.class, team, numTeams);
         }
 
+        if (team == 0) return new UnresolvedPlayerSet(Set.of()); // wildcard
         return getAllPlayersMatching(n -> n.state.isAssignedCombatant() && n.team == team);
     }
 
     /**
-     * @return a {@link Set} of all online spectators
+     * @return a collection of spread groups if spreading by teams.
+     * <p>Each team is spread together and each wild card is spread separately.
      */
-    public @NotNull Set<Player> getOnlineSpectators() {
-        return filterOnline(getSpectators());
+    public @NotNull Collection<Collection<Player>> getSpreadGroups() {
+        // break up online assigned combatants to their teams
+        Map<Integer, List<Player>> teamDivs = getAssignedCombatants().online()
+            .stream()
+            .collect(Collectors.groupingBy(this::getTeam));
+        
+        // add teams to the final group list, but add each wildcard individually
+        return teamDivs.entrySet().stream()
+            .<Collection<Player>>mapMulti((e, acceptor) -> {
+                if (e.getKey() > 0) {
+                    // add teams as a group
+                    acceptor.accept(e.getValue());
+                } else {
+                    // add all wildcards individually
+                    e.getValue().forEach(wild -> acceptor.accept(Collections.singleton(wild)));
+                }
+            })
+            .toList();
     }
-
-    /**
-     * @return a {@link Set} of all online combatants
-     */
-    public @NotNull Set<Player> getOnlineCombatants() {
-        return filterOnline(getCombatants());
-    }
-
-    /**
-     * @param t Team to inspect
-     * @return a {@link Set} of all online combatants on a specific team
-     */
-    public @NotNull Set<Player> getOnlineCombatantsOnTeam(int t) {
-        return filterOnline(getCombatantsOnTeam(t));
-    }
-    
     /**
      * @return an array of the alive teams by int
      */
@@ -292,15 +327,46 @@ public class TeamManager {
         return playerMap.values().stream()
             .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
             .mapToInt(n -> n.team)
+            .filter(n -> n > 0)
             .distinct()
             .toArray();
     }
 
+    public record ChatGroup(Component groupName, Audience audience) {}
+    public ChatGroup getChatBuddies(Player p) {
+        Node pn = getNode(p);
+        PlayerState s = pn.state;
+        int t = pn.team;
+
+        Component groupName = Component.empty(); 
+        Set<? extends Audience> aud = Set.of();
+
+        if (s == PlayerState.COMBATANT_ALIVE && t != 0) {
+            // team chat
+            groupName = TeamDisplay.getPrefix(s, t);
+            aud = getAllPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE && n.team == t).online();
+        } else if (s == PlayerState.COMBATANT_ALIVE && t == 0) {
+            // wildcard chat
+            groupName = Component.text("[:(]");
+            aud = Set.of();
+        } else if (s.isSpectating()) {
+            // dead chat
+            groupName = TeamDisplay.getDeadPrefix();
+            aud = getAllPlayersMatching(n -> n.state.isSpectating()).online();
+        } 
+
+        aud = new HashSet<>(aud);
+        aud.remove(p);
+        
+        return new ChatGroup(groupName, Audience.audience(aud));
+    }
     /**
      * @param t Team to inspect
      * @return if the specified team is eliminated
      */
     public boolean isTeamEliminated(int t) {
+        if (t == 0) return false; // wildcard d/n have team
+
         return playerMap.values().stream()
             .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
             .mapToInt(n -> n.team)
@@ -323,8 +389,56 @@ public class TeamManager {
         return getPlayerState(p).isAssignedCombatant();
     }
 
+    /**
+     * Check if two players are on the same team
+     * <p> Both players need to be non-wildcard assigned combatants for this method to return true.
+     * @param p1 Player 1 to check
+     * @param p2 Player 2 to check
+     * @return if the two players are on the same team
+     */
+    public boolean onSameTeam(@NotNull Player p1, @NotNull Player p2) {
+        Node n1 = getNode(p1),
+             n2 = getNode(p2);
+        
+        // check both players are assigned
+        if (n1.state().isAssignedCombatant() && n2.state().isAssignedCombatant()) {
+            // check both players are not wildcards
+            if (n1.team() != 0 && n2.team() != 0) {
+                return n1.team() == n2.team();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return get number of wildcards in game
+     */
+    public int getNumWildcards() {
+        return getWildcards().size();
+    }
+
+    /*
+     * @param p Player to inspect
+     * @return if the specified player is a wildcard.
+     */
+    public boolean isWildcard(@NotNull Player p) {
+        Node n = getNode(p);
+        return n.state.isAssignedCombatant() && n.team == 0;
+    }
+
+    /**
+     * @return the number of teams in game
+     */
     public int getNumTeams() {
         return numTeams;
+    }
+
+    /**
+     * @return the number of spawn locations Spreadplayers needs to generate with these teams
+     */
+    public int getNumSpreadGroups() {
+        return getNumWildcards() + getNumTeams();
     }
 
     /**
@@ -351,7 +465,7 @@ public class TeamManager {
      * @param n Number of members in each team
      */
     public void setTeamSize(int n) {
-        setNumTeams((int) Math.round(getCombatants().size() / (double) n));
+        setNumTeams((int) Math.round(getCombatants().online().size() / (double) n));
     }
 
     /**

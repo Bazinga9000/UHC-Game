@@ -133,6 +133,9 @@ public class HUDManager implements Listener {
      */
     private static final String PREFIXING_TEAM_FORMAT = "uhc_";
 
+    private Set<Scoreboard> scoreboardsInUse() {
+        return scoreboardsInUse(true);
+    }
     private Set<Scoreboard> scoreboardsInUse(boolean includeMain) {
         Set<Scoreboard> scoreboards = new HashSet<>();
         if (includeMain) scoreboards.add(Bukkit.getScoreboardManager().getMainScoreboard());
@@ -144,15 +147,13 @@ public class HUDManager implements Listener {
     }
 
     /**
-     * Register on a player's prefix team onto a scoreboard
-     * @param recipient Player whose scoreboard registers target player prefix
-     * @param target Player to register prefix of
+     * Register on a scoreboard the player's prefix team
+     * @param s Scoreboard to register player prefix on
+     * @param p Player to register prefix of
      */
-    private void applyPrefixOnScoreboard(Player recipient, Player target) {
-        Scoreboard rsb = recipient.getScoreboard();
-        
-        PlayerState state = teamManager.getPlayerState(target);
-        int team = teamManager.getTeam(target);
+    private void applyPrefixOnScoreboard(Scoreboard s, Player p) {
+        PlayerState state = teamManager.getPlayerState(p);
+        int team = teamManager.getTeam(p);
         
         String teamName = PREFIXING_TEAM_FORMAT;
         int n_users = Bukkit.getOnlinePlayers().size();
@@ -165,13 +166,13 @@ public class HUDManager implements Listener {
         };
         teamName += String.format("%s%0" + n_users_mag + "d", classifier, team);
 
-        Team t = rsb.getTeam(teamName);
+        Team t = s.getTeam(teamName);
         if (t == null) {
-            t = rsb.registerNewTeam(teamName);
+            t = s.registerNewTeam(teamName);
             t.prefix(TeamDisplay.getPrefixWithSpace(state, team));
         }
 
-        t.addPlayer(target);
+        t.addPlayer(p);
     }
 
     /**
@@ -179,8 +180,9 @@ public class HUDManager implements Listener {
      * @param p Player to update scoreboard of
      */
     public void updatePrefixesOnHUD(Player p) {
-        for (Player o : Bukkit.getOnlinePlayers()) {
-            applyPrefixOnScoreboard(p, o);
+        Scoreboard s = p.getScoreboard();
+        for (Player pl : Bukkit.getOnlinePlayers()) {
+            applyPrefixOnScoreboard(s, pl);
         }
     }
 
@@ -193,8 +195,8 @@ public class HUDManager implements Listener {
         int t = teamManager.getTeam(p);
         setDisplayName(p, TeamDisplay.prefixed(s, t, p.getName()));
 
-        for (Player o : Bukkit.getOnlinePlayers()) {
-            applyPrefixOnScoreboard(o, p);
+        for (Scoreboard sb : scoreboardsInUse()) {
+            applyPrefixOnScoreboard(sb, p);
         }
     }
 
@@ -366,10 +368,10 @@ public class HUDManager implements Listener {
 
         Comparator<Player> sorter;
         if (teamManager.isAssignedCombatant(p)) {
-            teammateSet = teamManager.getCombatantsOnTeam(team);
+            teammateSet = teamManager.getCombatantsOnTeam(team).cached();
             sorter = compareByAliveness.thenComparing(compareByHealth);
         } else {
-            teammateSet = teamManager.getCombatants();
+            teammateSet = teamManager.getCombatants().cached();
             sorter = compareByAliveness.thenComparing(compareByProximity);
         }
 
@@ -518,7 +520,7 @@ public class HUDManager implements Listener {
     public void updateHealthHUD(Player p) {
         Scoreboard s = p.getScoreboard();
 
-        for (Player pl : teamManager.getCombatants()) {
+        for (Player pl : teamManager.getCombatants().online()) {
             updateHealthOnScoreboard(s, pl);
         }
     }
@@ -530,8 +532,8 @@ public class HUDManager implements Listener {
     public void dispatchTeammateHUDUpdate(@NotNull Player p) {
 
         int t = teamManager.getTeam(p);
-        Set<Player> viewers = new HashSet<>(teamManager.getOnlineSpectators());
-        if (t != 0) viewers.addAll(teamManager.getOnlineCombatantsOnTeam(t));
+        Set<Player> viewers = new HashSet<>(teamManager.getSpectators().online());
+        if (t != 0) viewers.addAll(teamManager.getCombatantsOnTeam(t).online());
 
         for (Player viewer : viewers) {
             updateTeammateHUD(viewer);

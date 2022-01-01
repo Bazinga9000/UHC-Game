@@ -253,7 +253,7 @@ public class GameManager implements Listener {
                 spreadPlayers.random(SpreadPlayersManager.BY_TEAMS(defaultLoc), center, max, min);
             }
             case 1 -> {
-                double min = max / Math.sqrt(3 * teamManager.getOnlineCombatants().size());
+                double min = max / Math.sqrt(3 * teamManager.getNumSpreadGroups());
                 spreadPlayers.random(SpreadPlayersManager.BY_PLAYERS(defaultLoc), center, max, min);
                 
             }
@@ -282,7 +282,7 @@ public class GameManager implements Listener {
             Instant end = startTime.get().plus(d);
             registerEvent(end, () -> {
                 GameStage.sendMessageAsBoxless(Bukkit.getServer(), new Key("chat.final_heal").trans());
-                for (Player p : teamManager.getAliveCombatants()) {
+                for (Player p : teamManager.getAliveCombatants().online()) {
                     p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
                 }
             });
@@ -445,7 +445,7 @@ public class GameManager implements Listener {
                 w.getBlockAt(radius + 1, w.getMaxHeight() - 1, z).setType(Material.BARRIER);
             }
 
-            for (Player p : teamManager.getCombatants()) {
+            for (Player p : teamManager.getCombatants().online()) {
                 p.addPotionEffects(Arrays.asList(
                     PotionEffectType.DAMAGE_RESISTANCE.createEffect(10 * 20, 10),
                     PotionEffectType.SLOW.createEffect(10 * 20, 10),
@@ -604,7 +604,7 @@ public class GameManager implements Listener {
             .withFlicker()
             .withTrail()
             .build();
-        for (Player p : teamManager.getCombatantsOnTeam(winner)) {
+        for (Player p : teamManager.getCombatantsOnTeam(winner).online()) {
             Firework fw = p.getWorld().spawn(p.getLocation(), Firework.class);
             FireworkMeta meta = fw.getFireworkMeta();
             meta.addEffect(fwe);
@@ -687,7 +687,7 @@ public class GameManager implements Listener {
 
                 // cancel friendly fire
                 if (!allowFriendlyFire()) {
-                    if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
+                    if (teamManager.onSameTeam(target, damager)) {
                         e.setCancelled(true);
                     }
                 }

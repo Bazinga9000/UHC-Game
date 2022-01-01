@@ -52,6 +52,7 @@ xyz:
           wildcard: "[W]" # should be unused, if you see this something went horribly wrong!
           spectator: "[S]"
           unassigned: "[U]"
+          dead: "[DEAD]"
 
       eliminated: "{0} has been eliminated!"
       win: "{0} has won!"
