@@ -106,7 +106,11 @@ public class TeamManager {
             throw new Key("team.invalid").transErr(IllegalArgumentException.class);
         }
 
-        setNode(p, PlayerState.COMBATANT_ALIVE, t);
+        // set to comb alive unless they're dead then set to dead
+        Node n = getNode(p);
+        PlayerState s = PlayerState.COMBATANT_ALIVE;
+        if (n.state.isAssignedCombatant()) s = n.state;
+        setNode(p, s, t);
 
     }
 
