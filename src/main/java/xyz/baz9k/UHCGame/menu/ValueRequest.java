@@ -10,7 +10,6 @@ import org.bukkit.conversations.NumericPrompt;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,11 +30,16 @@ public class ValueRequest {
             case INTEGER, DOUBLE -> Type.NUMBER_REQUEST;
             case STRING -> Type.STRING_REQUEST;
             default -> throw new Key("err.menu.prompt.wrong_type").transErr(IllegalArgumentException.class, node.type);
-        }, node.cfgKey(), node::set, true);
+        }, node.cfgKey(), node::set, node.parent);
     }
 
-    public ValueRequest(UHCGamePlugin plugin, Player converser, Type requestType, String requestKey, Consumer<Object> consumer, boolean reopenInventory) {
-        Inventory lastInventory = converser.getOpenInventory().getTopInventory();
+    public ValueRequest(UHCGamePlugin plugin, Player converser, Type requestType, String requestKey, Consumer<Object> consumer) {
+        this(plugin, converser, requestType, requestKey, consumer, false, null);
+    }
+    public ValueRequest(UHCGamePlugin plugin, Player converser, Type requestType, String requestKey, Consumer<Object> consumer, Node returnNode) {
+        this(plugin, converser, requestType, requestKey, consumer, true, returnNode);
+    }
+    private ValueRequest(UHCGamePlugin plugin, Player converser, Type requestType, String requestKey, Consumer<Object> consumer, boolean reopenInventory, Node returnNode) {
         converser.closeInventory();
 
         Prompt firstPrompt = switch (requestType) {
@@ -48,7 +52,7 @@ public class ValueRequest {
                     Map.entry("requestKey", requestKey),
                     Map.entry("consumer", consumer),
                     Map.entry("reopenInventory", reopenInventory),
-                    Map.entry("lastInventory", lastInventory)))
+                    Map.entry("returnNode", returnNode)))
             .withTimeout(60)
             .withFirstPrompt(firstPrompt)
             .withEscapeSequence("cancel")
@@ -102,10 +106,10 @@ public class ValueRequest {
             var consumer         = (Consumer<Object>) context.getSessionData("consumer");
             var newValue         = (Object) context.getSessionData("newValue");
             var reopenInventory  = (boolean) context.getSessionData("reopenInventory");
-            var lastInventory    = (Inventory) context.getSessionData("lastInventory");
+            var returnNode       = (Node) context.getSessionData("returnNode");
 
             consumer.accept(newValue);
-            if (reopenInventory) ((Player) context.getForWhom()).openInventory(lastInventory);
+            if (reopenInventory) returnNode.click((Player) context.getForWhom());
             return renderString(new Key("menu.prompt.succ").trans(requestKey, newValue));
         }
 

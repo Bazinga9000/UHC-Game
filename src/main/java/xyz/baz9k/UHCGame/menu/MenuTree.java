@@ -145,7 +145,7 @@ public class MenuTree {
                     tm.setNumTeams((int) t);
                     tm.assignTeams();
                     tm.announceTeams();
-                }, false);
+                });
             }
         ).lock(plugin.getGameManager()::hasUHCStarted);
 
