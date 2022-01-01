@@ -91,7 +91,10 @@ public class WorldManager {
             w.getWorldBorder().setDamageBuffer(0);
             w.getWorldBorder().setDamageAmount(1);
 
-            Gamerules.set(w);
+            DefaultGamerules.set(w);
+            w.setGameRule(GameRule.NATURAL_REGENERATION, 
+                plugin.getConfig().getBoolean("player.natural_regen"));
+
             purgeWorld(w);
 
             // create beacon in worlds
@@ -227,7 +230,7 @@ public class WorldManager {
     }
 
     // GAMERULE STUFF
-    private static final class Gamerules {
+    private static final class DefaultGamerules {
         public static void set(World w) {
             w.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, true);
             w.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);
@@ -253,7 +256,7 @@ public class WorldManager {
             w.setGameRule(GameRule.MAX_COMMAND_CHAIN_LENGTH, 65536);
             w.setGameRule(GameRule.MAX_ENTITY_CRAMMING, 24);
             w.setGameRule(GameRule.MOB_GRIEFING, true);
-            w.setGameRule(GameRule.NATURAL_REGENERATION, false);
+            // w.setGameRule(GameRule.NATURAL_REGENERATION, false);
             w.setGameRule(GameRule.RANDOM_TICK_SPEED, 3);
             w.setGameRule(GameRule.REDUCED_DEBUG_INFO, false);
             w.setGameRule(GameRule.SEND_COMMAND_FEEDBACK, true);
