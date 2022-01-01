@@ -48,6 +48,7 @@ public class BossbarManager {
             .map(Duration::toSeconds)
             .orElse(0L);
         long totalSecs = gameManager.getStageDuration().toSeconds();
+        remainingSecs = Math.min(remainingSecs, totalSecs);
 
         bossbar.progress((float) clamp(0, (double) remainingSecs / totalSecs, 1));
         // change display title
