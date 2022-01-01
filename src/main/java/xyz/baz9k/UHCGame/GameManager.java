@@ -425,7 +425,7 @@ public class GameManager implements Listener {
 
         // deathmatch
         if (isDeathmatch()) {
-            World w = worldManager.getGameWorld(0);
+            World w = worldManager.getMainWorld();
 
             int radius = (int) GameStage.DEATHMATCH.wbRadius();
             for (int x = -radius; x <= radius; x++) {

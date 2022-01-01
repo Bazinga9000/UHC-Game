@@ -61,13 +61,23 @@ public class WorldManager {
         return Bukkit.getWorld(worldNames.get(i));
     }
 
+    /**
+     * Get the main game world (where players spawn).
+     * @return the world
+     */
+    public World getMainWorld() {
+        boolean isNether = plugin.getConfig().getBoolean("global.nether_spawn");
+        int worldIndex = isNether ? 1 : 0;
+        return Bukkit.getWorld(worldNames.get(worldIndex));
+    }
+
     public World getLobbyWorld() {
         World lobby = Bukkit.getWorld("lobby");
         return lobby != null ? lobby : Bukkit.getWorld("world");
     }
 
     public Location gameSpawn() {
-        return getGameWorld(0).getSpawnLocation();
+        return getMainWorld().getSpawnLocation();
     }
     public Location lobbySpawn() {
         return getLobbyWorld().getSpawnLocation();
@@ -207,11 +217,11 @@ public class WorldManager {
     }
     
     public Location getCenterAtY(double y) {
-        return center.loc(getGameWorld(0), y);
+        return center.loc(getMainWorld(), y);
     }
 
     public Location getHighCenter() {
-        return getHighestLoc(getGameWorld(0), center);
+        return getHighestLoc(getMainWorld(), center);
     }
 
     /**
