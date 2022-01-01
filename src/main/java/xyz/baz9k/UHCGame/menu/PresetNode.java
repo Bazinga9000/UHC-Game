@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import xyz.baz9k.UHCGame.Kit;
 import xyz.baz9k.UHCGame.menu.NodeItemStack.ExtraLore;
 import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
+import xyz.baz9k.UHCGame.util.Path;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 // sorry
@@ -58,24 +59,8 @@ public class PresetNode extends Node {
     }
 
     private Object fromPreset(String path) {
-        String[] nodeNames = path.split("\\.");
-        Map<?, ?> map = preset;
-        
-        for (int i = 0; i < nodeNames.length - 1; i++) {
-            String nodeName = nodeNames[i];
-            var match = preset.get(nodeName);
-            if (match != null && match instanceof Map<?, ?> m) {
-                    map = m;
-                    continue;
-            }
-            map = null;
-            break;
-        }
-
-        Object o = null;
-        if (map != null) o = map.get(nodeName);
-        if (o != null) return formatted(path, o);
-        return formatted(path, cfg.get(path));
+        Optional<Object> o = new Path(path).get(preset);
+        return formatted(path, o.orElse(cfg.get(path)));
     }
 
     @SuppressWarnings("unchecked")
@@ -106,14 +91,15 @@ public class PresetNode extends Node {
     }
 
     private String settingsText(String path) {
-        Object o = preset.get(path);
+        Path p = new Path(path);
+        Object o = preset.get(p);
 
         String text;
         if (o instanceof Map<?, ?> om) {
             text = om.entrySet().stream()
             .map(e -> {
-                var cfgKey = path + "." + (String) e.getKey();
-                var maybeNode = node(cfgKey);
+                String cfgKey = Path.join(path, (String) e.getKey());
+                Optional<Node> maybeNode = node(cfgKey);
 
                 if (maybeNode.isPresent()) {
                     Node n = maybeNode.get();

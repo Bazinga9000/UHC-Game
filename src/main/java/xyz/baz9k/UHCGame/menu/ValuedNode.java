@@ -4,6 +4,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import xyz.baz9k.UHCGame.util.Path;
+
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.Objects;
@@ -84,7 +86,9 @@ public class ValuedNode extends Node implements ValueHolder {
     @Override
     public String cfgKey() {
         Objects.requireNonNull(cfgRoot, "Config root not yet declared, cannot initialize valued nodes");
-        return Objects.requireNonNull(pathRelativeTo(cfgRoot));
+        return pathRelativeTo(cfgRoot)
+            .map(Path::toString)
+            .get();
     }
 
     @Override

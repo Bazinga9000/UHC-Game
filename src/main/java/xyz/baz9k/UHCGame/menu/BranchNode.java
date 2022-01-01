@@ -7,6 +7,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import xyz.baz9k.UHCGame.util.Path;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -130,28 +132,12 @@ public final class BranchNode extends InventoryNode {
 
     private Optional<Node> findChild(String name) {
         return Arrays.stream(children)
-            .filter(Objects::nonNull)
-            .filter(c -> c.nodeName.equals(name))
+            .filter(c -> Objects.equals(c.nodeName, name))
             .findAny();
     }
 
     public Optional<Node> findDescendant(String path) {
-        if (path.isBlank()) return Optional.of(this);
-
-        String[] nodeNames = path.split("\\.");
-        BranchNode n = this;
-
-        for (int i = 0; i < nodeNames.length - 1; i++) {
-            String nodeName = nodeNames[i];
-            var match = n.findChild(nodeName);
-            if (match.isPresent() && match.get() instanceof BranchNode b) {
-                    n = b;
-                    continue;
-            }
-            return Optional.empty();
-        }
-
-        return n.findChild(nodeNames[nodeNames.length - 1]);
+        return new Path(path).get(this, BranchNode::findChild);
     }
 
     public void loadPreset(Map<?, ?> preset) {

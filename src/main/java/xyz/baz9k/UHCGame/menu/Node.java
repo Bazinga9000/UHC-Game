@@ -8,7 +8,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import xyz.baz9k.UHCGame.UHCGamePlugin;
+import xyz.baz9k.UHCGame.util.Path;
 
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
@@ -103,29 +105,23 @@ public abstract class Node {
         }
         return itemStack.updateAll();
     }
-
-    private static String appendNodeName(String parentName, String nodeName) {
-        if (parentName == null) return null;
-        if (parentName.equals("")) return nodeName;
-        return parentName + "." + nodeName;
-    }
-
+    
     /**
      * @return path relative to the root node
      */
-    public String path() {
-        if (parent == null) return "";
-        return appendNodeName(parent.path(), nodeName);
+    public Path path() {
+        if (parent == null) return new Path();
+        return parent.path().append(nodeName);
     }
 
     /**
      * @param b Node to find relative path
      * @return path relative to the specified node
      */
-    public String pathRelativeTo(BranchNode b) {
-        if (this.equals(b)) return "";
-        if (parent == null) return null;
-        return appendNodeName(parent.pathRelativeTo(b), nodeName);
+    public Optional<Path> pathRelativeTo(BranchNode b) {
+        if (this.equals(b)) return Optional.of(new Path());
+        if (parent == null) return Optional.empty();
+        return parent.pathRelativeTo(b).map(p -> p.append(nodeName));
     }
 
     /**
@@ -135,9 +131,9 @@ public abstract class Node {
     public String langKey() {
         // it looks cleaner to have all the langKey node in one place since it's so small
         if (this instanceof BranchNode) {
-            return appendNodeName(path(), "root");
+            return path().append("root").toString();
         }
-        return path();
+        return path().toString();
     }
 
 }
