@@ -196,7 +196,7 @@ public class GameManager implements Listener {
         // do spreadplayers
         Debug.printDebug(new Key("debug.spreadplayers.start").trans());
         double max = GameStage.WB_STILL.wbDiameter(),
-               min = max / Math.sqrt(3 * teamManager.getNumTeams());
+               min = max / Math.sqrt(3 * teamManager.getNumSpreadGroups());
 
         //    | # Groups | Min   | Max  |
         //    |----------|-------|------|
@@ -569,7 +569,7 @@ public class GameManager implements Listener {
                     .orElse(false);
                 if (inGracePeriod) {
                     e.setCancelled(true);
-                } else if (teamManager.getTeam(target) == teamManager.getTeam(damager)) {
+                } else if (teamManager.onSameTeam(target, damager)) {
                     e.setCancelled(true);
                 }
             }

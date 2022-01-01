@@ -21,10 +21,12 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class TeamManager {
@@ -260,6 +262,13 @@ public class TeamManager {
     }
 
     /**
+     * @return a {@link Set} of all wildcards (players that do not have a known team while in game)
+     */
+    public @NotNull UnresolvedPlayerSet getWildcards() {
+        return getAllPlayersMatching(n -> n.state.isAssignedCombatant() && n.team == 0);
+    }
+
+    /**
      * @return a {@link Set} of all living combatants
      */
     public @NotNull UnresolvedPlayerSet getAliveCombatants() {
@@ -277,13 +286,37 @@ public class TeamManager {
      * @return a {@link Set} of all combatants on a specific team
      */
     public @NotNull UnresolvedPlayerSet getCombatantsOnTeam(int team) {
-        if (team <= 0 || team > numTeams) {
+        if (team < 0 || team > numTeams) {
             throw new Key("err.team.invalid").transErr(IllegalArgumentException.class, team, numTeams);
         }
 
+        if (team == 0) return new UnresolvedPlayerSet(Set.of()); // wildcard
         return getAllPlayersMatching(n -> n.state.isAssignedCombatant() && n.team == team);
     }
 
+    /**
+     * @return a collection of spread groups if spreading by teams.
+     * <p>Each team is spread together and each wild card is spread separately.
+     */
+    public @NotNull Collection<Collection<Player>> getSpreadGroups() {
+        // break up online assigned combatants to their teams
+        Map<Integer, List<Player>> teamDivs = getAssignedCombatants().online()
+            .stream()
+            .collect(Collectors.groupingBy(this::getTeam));
+        
+        // add teams to the final group list, but add each wildcard individually
+        return teamDivs.entrySet().stream()
+            .<Collection<Player>>mapMulti((e, acceptor) -> {
+                if (e.getKey() > 0) {
+                    // add teams as a group
+                    acceptor.accept(e.getValue());
+                } else {
+                    // add all wildcards individually
+                    e.getValue().forEach(wild -> acceptor.accept(Collections.singleton(wild)));
+                }
+            })
+            .toList();
+    }
     /**
      * @return an array of the alive teams by int
      */
@@ -291,6 +324,7 @@ public class TeamManager {
         return playerMap.values().stream()
             .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
             .mapToInt(n -> n.team)
+            .filter(n -> n > 0)
             .distinct()
             .toArray();
     }
@@ -300,6 +334,8 @@ public class TeamManager {
      * @return if the specified team is eliminated
      */
     public boolean isTeamEliminated(int t) {
+        if (t == 0) return false; // wildcard d/n have team
+
         return playerMap.values().stream()
             .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
             .mapToInt(n -> n.team)
@@ -322,8 +358,47 @@ public class TeamManager {
         return getPlayerState(p).isAssignedCombatant();
     }
 
+    /**
+     * Check if two players are on the same team
+     * <p> Both players need to be non-wildcard assigned combatants for this method to return true.
+     * @param p1 Player 1 to check
+     * @param p2 Player 2 to check
+     * @return if the two players are on the same team
+     */
+    public boolean onSameTeam(@NotNull Player p1, @NotNull Player p2) {
+        Node n1 = getNode(p1),
+             n2 = getNode(p2);
+        
+        // check both players are assigned
+        if (n1.state().isAssignedCombatant() && n2.state().isAssignedCombatant()) {
+            // check both players are not wildcards
+            if (n1.team() != 0 && n2.team() != 0) {
+                return n1.team() == n2.team();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return get number of wildcards in game
+     */
+    public int getNumWildcards() {
+        return getWildcards().size();
+    }
+
+    /**
+     * @return the number of teams in game
+     */
     public int getNumTeams() {
         return numTeams;
+    }
+
+    /**
+     * @return the number of spawn locations Spreadplayers needs to generate with these teams
+     */
+    public int getNumSpreadGroups() {
+        return getNumWildcards() + getNumTeams();
     }
 
     /**

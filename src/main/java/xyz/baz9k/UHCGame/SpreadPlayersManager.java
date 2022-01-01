@@ -65,12 +65,7 @@ public class SpreadPlayersManager {
      * @return a new generator that spreads based on teams
      */
     public static Grouping BY_TEAMS(Location def) {
-        return new Grouping(pl -> {
-            var tm = pl.getTeamManager();
-            return Arrays.stream(tm.getAliveTeams())
-                .mapToObj(i -> tm.getCombatantsOnTeam(i).online())
-                .toList();
-        }, def);
+        return new Grouping(pl -> pl.getTeamManager().getSpreadGroups(), def);
     }
     
     /**
