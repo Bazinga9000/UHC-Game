@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import xyz.baz9k.UHCGame.util.Path;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -130,25 +129,23 @@ public final class BranchNode extends InventoryNode {
         return children;
     }
 
+    /**
+     * @param name node name of child
+     * @return the direct descendant who has the name
+     */
     private Optional<Node> findChild(String name) {
         return Arrays.stream(children)
             .filter(c -> Objects.equals(c.nodeName, name))
             .findAny();
     }
 
+    /**
+     * @param path path of child relative to this node
+     * @return the descendant with the matching path
+     */
     public Optional<Node> findDescendant(String path) {
         return new Path(path).get(this, BranchNode::findChild);
     }
-
-    public void loadPreset(Map<?, ?> preset) {
-        for (var e : preset.entrySet()) {
-            String path = (String) e.getKey();
-            Object val = e.getValue();
-
-            cfg.set(path, val);
-        }
-    }
-
     
     /**
      * Traverses the tree of node to find the descendant with a matching inventory

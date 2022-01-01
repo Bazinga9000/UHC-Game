@@ -18,7 +18,10 @@ import xyz.baz9k.UHCGame.util.Path;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 // sorry
 
-public class PresetNode extends Node {
+/**
+ * {@link Node} that stores the preset and can set the game preset.
+ */
+public final class PresetNode extends Node {
     // Duration: {start} / {movement1} / {stop} / {movement2} / {dmwait}
     // World Border: {initial} → {border1} → {border2} / {deathmatch}
     // Global:
@@ -29,8 +32,7 @@ public class PresetNode extends Node {
     // { - etc}
     // Kit: {name @ index, or Custom}
 
-    private final Map<?, ?> preset;
-    static PresetNode defaultPreset;
+    private final Map<?, ?> preset; // nested map of preset settings
 
     public PresetNode(BranchNode parent, int parentSlot, String nodeName, ItemProperties<?> props, Map<?, ?> preset) {
         super(parent, parentSlot, nodeName, props);
@@ -50,19 +52,41 @@ public class PresetNode extends Node {
 
     @Override
     public boolean click(@NotNull Player p) {
-        ValuedNode.cfgRoot.loadPreset(preset);
+        // load prefix to config
+        for (var e : preset.entrySet()) {
+            String path = (String) e.getKey();
+            Object val = e.getValue();
+
+            cfg.set(path, val);
+        }
+
         return true;
     }
     
+    /**
+     * @param cfgKey config key
+     * @return get node associated from the config key, if it exists
+     */
     private Optional<Node> node(String cfgKey) {
         return ValuedNode.cfgRoot.findDescendant(cfgKey);
     }
 
-    private Object fromPreset(String path) {
+    /**
+     * @param path config key
+     * @return get a format arg located at the specified config key
+     */
+    private String fromPreset(String path) {
         Optional<Object> o = new Path(path).get(preset);
         return formatted(path, o.orElse(cfg.get(path)));
     }
 
+    /**
+     * Format an config value into a format argument based the formatting 
+     * settings of the node associated with the specified config key
+     * @param cfgKey config key 
+     * @param o config value to format
+     * @return format argument
+     */
     @SuppressWarnings("unchecked")
     private String formatted(String cfgKey, Object o) {
         var maybeNode = node(cfgKey);
@@ -70,7 +94,7 @@ public class PresetNode extends Node {
         if (maybeNode.isPresent()) {
             Node n = maybeNode.get();
 
-            // value, one of:
+            // VN & OVN have specialized formatting
             if (n instanceof OptionValuedNode ovn) {
                 // option selected
                 return String.valueOf(ovn.optDesc((int) o));
@@ -83,13 +107,15 @@ public class PresetNode extends Node {
                 }
                 return Arrays.toString(fmtArgs);
             }
-            // just the raw value
-            return String.valueOf(o);
         }
 
         return String.valueOf(o);
     }
 
+    /**
+     * @param path the path
+     * @return formatted settings for path. This doesn't evaluate deeply.
+     */
     private String settingsText(String path) {
         Path p = new Path(path);
         Object o = preset.get(p);
@@ -123,6 +149,9 @@ public class PresetNode extends Node {
         return "\n" + text;
     }
 
+    /**
+     * Display kit
+     */
     private Component kitSettings() {
         Object kit = fromPreset("kit");
         var kitParent = ValuedNode.cfgRoot.findDescendant("kit");

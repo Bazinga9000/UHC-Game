@@ -18,12 +18,22 @@ import xyz.baz9k.UHCGame.Kit;
 import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
+/**
+ * {@link Node} that holds a custom kit editor. It also communicates the kit to the config.
+ */
 public class KitNode extends InventoryNode implements ValueHolder {
 
     private boolean grantXP = false;
     private final NodeItemStack xpStack;
     private final List<Kit> kits;
 
+    /**
+     * @param parent Parent node
+     * @param slot Slot of this node in parent's inventory
+     * @param nodeName Name of the node
+     * @param props {@link NodeItemStack.ItemProperties}
+     * @param kits Mapping of kit indexes to kits
+     */
     public KitNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props, List<Kit> kits) {
         super(parent, slot, nodeName, props, 5, new ReserveSlots(9 * 5 - 4));
 
@@ -68,9 +78,11 @@ public class KitNode extends InventoryNode implements ValueHolder {
     @Override
     protected int clickHandler(@NotNull Player p, int slot) {
         if (slot == rsLeft()) {
+            // grant xp
             grantXP(!grantXP);
             return 1;
         } else if (slot == rsRight() - 2) {
+            // save kit
             plugin.saveResource("new_kit.yml", true);
             File f = new File(plugin.getDataFolder(), "new_kit.yml");
             YamlConfiguration kitCfg = YamlConfiguration.loadConfiguration(f);
@@ -124,7 +136,8 @@ public class KitNode extends InventoryNode implements ValueHolder {
 
     @Override
     public void set(Object o) {
-        Kit kit = null;
+        // config can either store a number or a kit index
+        Kit kit;
         if (o instanceof Kit k) {
             kit = k;
         } else if (o instanceof Integer ki && 0 <= ki && ki < kits.size()) {
