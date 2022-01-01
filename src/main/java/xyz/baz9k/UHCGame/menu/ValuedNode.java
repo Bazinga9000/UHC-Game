@@ -9,7 +9,7 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
-public class ValuedNode extends Node {
+public class ValuedNode extends Node implements ValueHolder {
     protected final Type type;
     protected UnaryOperator<Number> restrict = UnaryOperator.identity();
     private Object prevValue;
@@ -68,7 +68,7 @@ public class ValuedNode extends Node {
         super(parent, slot, nodeName, props);
         this.type = type;
         
-        props.useObject(() -> cfg.get(cfgKey()));
+        props.useObject(this::get);
         if (type == Type.BOOLEAN) {
             props.metaChanges((o, m) -> {
                 var active = (boolean) o;
@@ -81,6 +81,7 @@ public class ValuedNode extends Node {
         }
     }
 
+    @Override
     public String cfgKey() {
         Objects.requireNonNull(cfgRoot, "Config root not yet declared, cannot initialize valued nodes");
         return Objects.requireNonNull(pathRelativeTo(cfgRoot));
@@ -108,9 +109,10 @@ public class ValuedNode extends Node {
      * Sets the current object for the config key corresponding to this node.
      * @param value value to set key to
      */
+    @Override
     public void set(Object value) {
         prevValue = cfg.get(cfgKey());
         if (type.isNumeric) value = restrict.apply((Number) value);
-        cfg.set(cfgKey(), value);
+        ValueHolder.super.set(value);
     }
 }

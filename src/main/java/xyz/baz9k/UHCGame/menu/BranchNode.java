@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -153,6 +154,21 @@ public final class BranchNode extends InventoryNode {
         return n.findChild(nodeNames[nodeNames.length - 1]);
     }
 
+    public void loadPreset(Map<String, Object> preset) {
+        for (var e : preset.entrySet()) {
+            String path = e.getKey();
+            Object val = e.getValue();
+
+            // find node that matches this path
+            // if it's a value holder, call its set fn
+            findDescendant(path)
+                .filter(n -> n instanceof ValueHolder)
+                .map(n -> (ValueHolder) n)
+                .ifPresent(n -> n.set(val));
+        }
+    }
+
+    
     /**
      * Traverses the tree of node to find the descendant with a matching inventory
      * @param inventory the inventory

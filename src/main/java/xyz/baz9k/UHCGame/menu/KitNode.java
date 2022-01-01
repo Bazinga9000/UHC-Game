@@ -3,6 +3,7 @@ package xyz.baz9k.UHCGame.menu;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,19 +18,21 @@ import xyz.baz9k.UHCGame.Kit;
 import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
-public class KitNode extends InventoryNode {
+public class KitNode extends InventoryNode implements ValueHolder {
 
     private boolean grantXP = false;
-    private NodeItemStack xpStack;
+    private final NodeItemStack xpStack;
+    private final List<Kit> kits;
 
-    public KitNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props) {
+    public KitNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props, List<Kit> kits) {
         super(parent, slot, nodeName, props, 5, new ReserveSlots(9 * 5 - 4));
 
         this.fillReserved = Material.GRAY_STAINED_GLASS_PANE;
-        xpStack = new NodeItemStack("kit_xp", 
+        this.xpStack = new NodeItemStack("kit_xp", 
         new ItemProperties<Boolean>(b -> b ? Material.EXPERIENCE_BOTTLE : Material.GLASS_BOTTLE)
             .useObject(() -> this.grantXP)
         );
+        this.kits = Collections.unmodifiableList(kits);
     }
 
     @Override
@@ -102,7 +105,7 @@ public class KitNode extends InventoryNode {
             xpLevels = 0;
         }
 
-        plugin.getGameManager().kit(new Kit(storage, armor, offhand, xpLevels));
+        set(new Kit(storage, armor, offhand, xpLevels));
     }
 
     private void grantXP(boolean gxp) {
@@ -112,5 +115,25 @@ public class KitNode extends InventoryNode {
 
     private Kit kit() {
         return plugin.getGameManager().kit();
+    }
+
+    @Override
+    public String cfgKey() {
+        return "kit";
+    }
+
+    @Override
+    public void set(Object o) {
+        Kit kit = null;
+        if (o instanceof Kit k) {
+            kit = k;
+        } else if (o instanceof Integer ki && 0 <= ki && ki < kits.size()) {
+            kit = kits.get(ki);
+        } else {
+            throw new IllegalArgumentException("Kit must be a kit index or a kit");
+        }
+
+        plugin.getGameManager().kit(kit);
+        ValueHolder.super.set(o);
     }
 }

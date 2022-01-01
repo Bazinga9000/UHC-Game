@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame.menu;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
 
@@ -40,7 +41,11 @@ public class MenuTree {
         return row * 9 + col;
     }
 
-    
+    private YamlConfiguration loadYMLResource(String filename) {
+        var resource = new InputStreamReader(plugin.getResource(filename));
+        return YamlConfiguration.loadConfiguration(resource);
+    }
+
     /**
      * Returns the node in the tree that has the specified inventory
      * @param inventory The inventory
@@ -263,38 +268,54 @@ public class MenuTree {
         new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
 
         /* KIT SETTINGS */
-        YamlConfiguration kitsCfg = new YamlConfiguration();
-        InputStreamReader kitsResource = new InputStreamReader(plugin.getResource("kits.yml"));
-        kitsCfg = YamlConfiguration.loadConfiguration(kitsResource);
+        var kitsYml = loadYMLResource("kits.yml");
+        var kitPropsList = kitsYml.getMapList("kits");
+        List<Kit> kits = new ArrayList<>();
 
-        var kitNodes = kitsCfg.getMapList("kits");
+        var kitNode = new KitNode(kitSettings, 52, "custom", 
+            new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)),
+            kits);
 
-        for (i = 0; i < kitNodes.size(); i++) {
-            Map<?, ?> kitNode = kitNodes.get(i);
+        for (int j = 0; j < kitPropsList.size(); j++) {
+            Map<?, ?> kitProps = kitPropsList.get(j);
 
-            String nodeName = (String) kitNode.get("node_name");
-            String matType  = (String) kitNode.get("material");
-            int clrHex      = (int) kitNode.get("style_color");
-            Kit kit         = (Kit) kitNode.get("kit");
+            String nodeName = (String) kitProps.get("node_name");
+            String matType  = (String) kitProps.get("material");
+            int clrHex      = (int) kitProps.get("style_color");
+            Kit kit         = (Kit) kitProps.get("kit");
+
+            Material mat = Material.valueOf(matType);
+            TextColor clr = TextColor.color(clrHex);
+            kits.add(kit);
+
+            int ki = j;
+            new ActionNode(kitSettings, j, nodeName,
+                new ItemProperties<>(mat).style(clr), 
+                p -> kitNode.set(ki)
+            );
+        }
+
+        /* PRESETS */
+        // TODO, add more presets
+        var presetsYml = loadYMLResource("presets.yml");
+        var presetPropsList = presetsYml.getMapList("presets");
+
+        for (int j = 0; j < kitPropsList.size(); j++) {
+            Map<?, ?> presetProps = presetPropsList.get(j);
+
+            var nodeName = (String) presetProps.get("node_name");
+            var matType  = (String) presetProps.get("material");
+            var clrHex   = (int) presetProps.get("style_color");
+            var preset   = (ConfigurationSection) presetProps.get("preset");
 
             Material mat = Material.valueOf(matType);
             TextColor clr = TextColor.color(clrHex);
 
-            new ActionNode(kitSettings, i, nodeName,
+            new PresetNode(presetSettings, j, nodeName, 
                 new ItemProperties<>(mat).style(clr), 
-                p -> plugin.getGameManager().kit(kit)
+                preset.getValues(true)
             );
         }
-
-        new KitNode(kitSettings, 52, "custom", 
-            new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)));
-
-        /* PRESETS */
-        // TODO, add more presets
-        // TODO, fill out normal preset
-        // TODO Ah. presets.
-        i = 0;
-        new ActionNode(presetSettings, i++, "normal", new ItemProperties<>(), p -> {});
     
         return cfgRoot;
     }

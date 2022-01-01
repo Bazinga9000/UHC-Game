@@ -1,0 +1,33 @@
+presets:
+  - node_name: default
+    material: NETHERITE_BOOTS
+    style_color: 0xAAFFAA
+    preset:
+      wb_size:
+        initial: 1200
+        border1: 25
+        border2: 3
+        deathmatch: 20
+      intervals:
+        start: 3600
+        movement1: 900
+        stop: 300
+        movement2: 600
+        dmwait: 300
+      global:
+        wither_bonus: true
+        nether_spawn: false
+        dn_cycle: 2
+        spreadplayers: 0
+      team:
+        hide_teams: 0
+        friendly_fire: false
+        boss_team: 0
+        sardines: false
+      player:
+        max_health: 1
+        mv_speed: 1
+        grace_period: 600
+        final_heal: -1
+        natural_regen: false
+      kit: 0

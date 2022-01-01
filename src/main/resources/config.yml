@@ -29,3 +29,5 @@ player:
   grace_period: 600
   final_heal: -1
   natural_regen: false
+
+kit: 0
