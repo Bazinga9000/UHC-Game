@@ -48,7 +48,7 @@ public final class OptionValuedNode extends ValuedNode {
      * @param i
      * @return the description for option i
      */
-    private String optDesc(int i) {
+    public String optDesc(int i) {
         var langYaml = plugin.getLangManager().langYaml();
         var optDescs = langYaml.getStringList(OPT_DESC_ID_FORMAT.args(langKey()).key());
         if (optDescs.size() == 0) {

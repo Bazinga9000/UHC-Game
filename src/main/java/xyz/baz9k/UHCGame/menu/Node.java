@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 public abstract class Node {
     protected final BranchNode parent;
     private NodeItemStack itemStack;
-    private final NodeItemStack.ItemProperties<?> itemProperties;
+    protected final NodeItemStack.ItemProperties<?> itemProperties;
     protected final int parentSlot;
     protected final String nodeName;
     protected BooleanSupplier lock = () -> false;

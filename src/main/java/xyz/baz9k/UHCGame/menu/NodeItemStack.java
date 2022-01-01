@@ -98,19 +98,21 @@ public class NodeItemStack extends ItemStack {
         public ItemProperties<T> style(TextColor clr) { return style(noDeco(clr)); }
         public ItemProperties<T> formatArg(Function<T, Object> formatArg) { return formatArgs(formatArg.andThen(o -> new Object[]{o})); }
 
-        private Material getMat() {
+        // querying
+        public Material getMat() {
             return matGet.apply(propsObjSupplier.get());
         }
-        private Style getStyle() {
+        public Style getStyle() {
             return nameStyle.apply(propsObjSupplier.get());
         }
-        private Object[] getFormatArgs() {
+        public Object[] getFormatArgs() {
             return formatArgs.apply(propsObjSupplier.get());
         }
-        private void editMeta(ItemMeta m) {
+        public Object[] format(T a) { return formatArgs.apply(a); }
+        public void editMeta(ItemMeta m) {
             miscMetaChanges.accept(propsObjSupplier.get(), m);
         }
-        private ExtraLore getExtraLore() {
+        public ExtraLore getExtraLore() {
             return elGet.apply(propsObjSupplier.get());
         }
     }

@@ -1,7 +1,6 @@
 package xyz.baz9k.UHCGame.menu;
 
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
 
@@ -300,23 +299,22 @@ public class MenuTree {
         var presetsYml = loadYMLResource("presets.yml");
         var presetPropsList = presetsYml.getMapList("presets");
 
-        for (int j = 0; j < kitPropsList.size(); j++) {
+        for (int j = 0; j < presetPropsList.size(); j++) {
             Map<?, ?> presetProps = presetPropsList.get(j);
 
             var nodeName = (String) presetProps.get("node_name");
             var matType  = (String) presetProps.get("material");
             var clrHex   = (int) presetProps.get("style_color");
-            var preset   = (ConfigurationSection) presetProps.get("preset");
+            var preset = (Map<?, ?>) presetProps.get("preset");
 
             Material mat = Material.valueOf(matType);
             TextColor clr = TextColor.color(clrHex);
 
             new PresetNode(presetSettings, j, nodeName, 
-                new ItemProperties<>(mat).style(clr), 
-                preset.getValues(true)
+                new ItemProperties<>(mat).style(clr), preset
             );
         }
-    
+        
         return cfgRoot;
     }
 }

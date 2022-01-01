@@ -154,17 +154,12 @@ public final class BranchNode extends InventoryNode {
         return n.findChild(nodeNames[nodeNames.length - 1]);
     }
 
-    public void loadPreset(Map<String, Object> preset) {
+    public void loadPreset(Map<?, ?> preset) {
         for (var e : preset.entrySet()) {
-            String path = e.getKey();
+            String path = (String) e.getKey();
             Object val = e.getValue();
 
-            // find node that matches this path
-            // if it's a value holder, call its set fn
-            findDescendant(path)
-                .filter(n -> n instanceof ValueHolder)
-                .map(n -> (ValueHolder) n)
-                .ifPresent(n -> n.set(val));
+            cfg.set(path, val);
         }
     }
 

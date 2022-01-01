@@ -13,7 +13,7 @@ public class ValuedNode extends Node implements ValueHolder {
     protected final Type type;
     protected UnaryOperator<Number> restrict = UnaryOperator.identity();
     private Object prevValue;
-    public static BranchNode cfgRoot;
+    static BranchNode cfgRoot;
 
     /**
      * Enum of the supported types for a {@link ValuedNode}.
