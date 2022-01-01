@@ -135,8 +135,8 @@ public class BranchNode extends Node {
                     sound = 2;
                 } else {
                     // test click
-                    node.click(p);
-                    sound = 1;
+                    boolean succ = node.click(p);
+                    sound = succ ? 1 : 2;
 
                     // check click was valid
                     if (node instanceof ValuedNode vnode && !check.test(Node.cfg)) {
@@ -158,7 +158,7 @@ public class BranchNode extends Node {
     }
 
     @Override
-    public void click(@NotNull Player p) {
+    public boolean click(@NotNull Player p) {
         // update (or create inv)
         if (hasInventoryViewed) {
             updateAllSlots();
@@ -167,6 +167,7 @@ public class BranchNode extends Node {
         }
 
         p.openInventory(inventory);
+        return true;
     }
 
     /**

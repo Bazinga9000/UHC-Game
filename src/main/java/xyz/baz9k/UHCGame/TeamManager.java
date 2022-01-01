@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -139,6 +140,9 @@ public class TeamManager {
                 i = i % numTeams + 1;
             }
         }
+
+        // set numTeams to actual number of teams
+        numTeams = Arrays.stream(getAliveTeams()).max().orElse(1);
     }
 
     public void announceTeams() {
@@ -324,7 +328,7 @@ public class TeamManager {
      * Sets the number of players per team
      * @param s "solos", "duos", "trios", "quartets", "quintets", "sextets", "septets", "octets"
      */
-    public void setTeamSize(String s) {
+    public void setTeamSize(String s) throws IllegalArgumentException {
         setTeamSize(switch (s) {
             case "solos" -> 1;
             case "duos" -> 2;
@@ -352,10 +356,6 @@ public class TeamManager {
      * @param n Number of teams
      */
     public void setNumTeams(int n) {
-        if (n <= 0) {
-            throw new Key("err.team.count_must_pos").transErr(IllegalArgumentException.class);
-        }
-
-        numTeams = n;
+        numTeams = Math.max(1, n);
     }
 }
