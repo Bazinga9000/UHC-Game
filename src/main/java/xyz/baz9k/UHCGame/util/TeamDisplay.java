@@ -3,6 +3,8 @@ package xyz.baz9k.UHCGame.util;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
+
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -128,6 +130,15 @@ public final class TeamDisplay {
             .trans(t)
             .style(getStyle(s, t));
         return render(prefix);
+    }
+
+    /**
+     * @return get the prefix for dead chat
+     */
+    public static Component getDeadPrefix() {
+        return new Key("team.prefix.dead")
+            .trans()
+            .style(Style.style(NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
     /**

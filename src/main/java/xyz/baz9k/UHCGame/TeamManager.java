@@ -5,6 +5,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class TeamManager {
@@ -296,6 +298,34 @@ public class TeamManager {
             .toArray();
     }
 
+    public record ChatGroup(Component groupName, Audience audience) {}
+    public ChatGroup getChatBuddies(Player p) {
+        Node pn = getNode(p);
+        PlayerState s = pn.state;
+        int t = pn.team;
+
+        Component groupName = Component.empty(); 
+        Set<? extends Audience> aud = Set.of();
+
+        if (s == PlayerState.COMBATANT_ALIVE && t != 0) {
+            // team chat
+            groupName = TeamDisplay.getPrefix(s, t);
+            aud = getAllPlayersMatching(n -> n.state == PlayerState.COMBATANT_ALIVE && n.team == t);
+        } else if (s == PlayerState.COMBATANT_ALIVE && t == 0) {
+            // wildcard chat
+            groupName = Component.text("[:(]");
+            aud = Set.of();
+        } else if (s.isSpectating()) {
+            // dead chat
+            groupName = TeamDisplay.getDeadPrefix();
+            aud = getAllPlayersMatching(n -> n.state.isSpectating());
+        } 
+
+        aud = new HashSet<>(aud);
+        aud.remove(p);
+        
+        return new ChatGroup(groupName, Audience.audience(aud));
+    }
     /**
      * @param t Team to inspect
      * @return if the specified team is eliminated
@@ -321,6 +351,15 @@ public class TeamManager {
      */
     public boolean isAssignedCombatant(@NotNull Player p) {
         return getPlayerState(p).isAssignedCombatant();
+    }
+
+    /**
+     * @param p Player to inspect
+     * @return if the specified player is a wildcard.
+     */
+    public boolean isWildcard(@NotNull Player p) {
+        Node n = getNode(p);
+        return n.state.isAssignedCombatant() && n.team == 0;
     }
 
     public int getNumTeams() {

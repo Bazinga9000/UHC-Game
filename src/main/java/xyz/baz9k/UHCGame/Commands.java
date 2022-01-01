@@ -7,6 +7,7 @@ import dev.jorel.commandapi.arguments.CustomArgument.*;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.*;
 import dev.jorel.commandapi.wrappers.*;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.util.Debug;
@@ -542,6 +543,31 @@ public final class Commands {
 
             plugin.getMenuManager().invSee(sender, (Player) args[0]);
         });
+    }
+
+    @RegisterCommand
+    private CommandAPICommand teamChannel() {
+        return new CommandAPICommand("teamchannel")
+            .withAliases("tc", "teamchan")
+            .withArguments(new GreedyStringArgument("msg"))
+            .executesPlayer((sender, args) -> {
+                requireStarted();
+                String msg = (String) args[0];
+
+                var tm = plugin.getTeamManager();
+                var buds = tm.getChatBuddies(sender);
+
+                Component groupName = buds.groupName();
+                Audience aud = buds.audience();
+                
+                Component recipientText = Component.translatable("chat.type.team.text", 
+                    groupName, sender.displayName(), Component.text(msg));
+                Component senderText = Component.translatable("chat.type.team.sent", 
+                    groupName, sender.displayName(), Component.text(msg));
+                
+                sender.sendMessage(senderText);
+                aud.sendMessage(recipientText);
+            });
     }
     ////// BEGIN FUNCTOOLS //////
     // delete as soon as possible //
