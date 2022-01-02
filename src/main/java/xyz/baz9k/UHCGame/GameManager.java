@@ -584,16 +584,6 @@ public class GameManager implements Listener {
         return false;
     }
 
-    public boolean awaitingFinalHealPeriod() {
-        Optional<Duration> fh = getFinalHealPeriod();
-        Optional<Duration> elapsedTime = getElapsedTime();
-
-        if (elapsedTime.isPresent() && fh.isPresent()) {
-            return fh.get().compareTo(elapsedTime.get()) <= 0;
-        }
-        return false;
-    }
-
     public boolean allowFriendlyFire() {
         return plugin.getConfig().getBoolean("team.friendly_fire");
     }
@@ -684,8 +674,6 @@ public class GameManager implements Listener {
         } else {
             prepareToLobby(p, false);
         }
-
-        
     }
 
     @EventHandler
