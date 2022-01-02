@@ -651,6 +651,9 @@ public class GameManager implements Listener {
         }
 
         // wither bonus round
+        boolean wbr = plugin.getConfig().getBoolean("global.wither_bonus");
+        
+        if (!wbr) return;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             int nWinners = winners.size();
             Location spawnLoc;
