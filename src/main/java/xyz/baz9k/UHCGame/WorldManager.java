@@ -29,6 +29,8 @@ public class WorldManager {
         // create MV worlds if missing
         registerWorld("game", Environment.NORMAL);
         registerWorld("game_nether", Environment.NETHER);
+
+        plugin.getMVWorldManager().setFirstSpawnWorld(getLobbyWorld().getName());
     }
 
     public boolean worldsRegened() { return worldsRegened; }
@@ -145,13 +147,7 @@ public class WorldManager {
      * Accessible through /uhc reseed
      */
     private void reseedWorld(World w, long seed) {
-        var wc = new WorldCreator(w.getName())
-            .environment(w.getEnvironment())
-            .seed(seed);
-        
-        Bukkit.unloadWorld(w, false);
-        plugin.getMVWorldManager().deleteWorld(wc.name(), false, true);
-        Bukkit.createWorld(wc);
+        plugin.getMVWorldManager().regenWorld(w.getName(), true, false, String.valueOf(seed));
     }
 
     /**
