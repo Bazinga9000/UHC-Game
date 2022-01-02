@@ -77,7 +77,7 @@ public final class PresetNode extends Node {
      */
     private String fromPreset(String path) {
         Optional<Object> o = new Path(path).traverse(preset);
-        return formatted(path, o.orElse(cfg.get(path)));
+        return formatted(path, o.orElseGet(() -> cfg.get(path)));
     }
 
     /**
