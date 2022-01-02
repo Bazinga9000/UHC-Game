@@ -251,11 +251,11 @@ public class GameManager implements Listener {
         var spreadPlayers = plugin.spreadPlayers();
         switch (sp) {
             case 0 -> {
-                double min = max / Math.sqrt(3 * teamManager.getNumTeams());
+                double min = max / Math.sqrt(3 * teamManager.getNumSpreadGroups());
                 spreadPlayers.random(SpreadPlayersManager.BY_TEAMS(defaultLoc), center, max, min);
             }
             case 1 -> {
-                double min = max / Math.sqrt(3 * teamManager.getNumSpreadGroups());
+                double min = max / Math.sqrt(3 * teamManager.getCombatants().online().size());
                 spreadPlayers.random(SpreadPlayersManager.BY_PLAYERS(defaultLoc), center, max, min);
                 
             }
