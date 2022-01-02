@@ -532,7 +532,7 @@ public class GameManager implements Listener {
 
             spawnLoc = spawnLoc.add(0, 10, 0);
             spawnLoc.getWorld().spawn(spawnLoc, Wither.class);
-        }, 60);
+        }, 20 * 10);
     }
 
     @EventHandler
