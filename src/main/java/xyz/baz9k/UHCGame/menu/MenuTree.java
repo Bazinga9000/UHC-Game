@@ -235,7 +235,7 @@ public class MenuTree {
                 }),
             ValuedNode.Type.INTEGER, 
             v -> Math.max(0, (int) v)
-        ); // TODO
+        );
         new ValuedNode(teamSettings, i++, "sardines", new ItemProperties<>(Material.TROPICAL_FISH).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN); // TODO
 
         /* PLAYER SETTINGS */
