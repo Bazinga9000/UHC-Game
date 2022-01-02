@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import xyz.baz9k.UHCGame.util.Debug;
 
 public class UHCGamePlugin extends JavaPlugin {
+    private ConfigValues configValues;
     private TeamManager teamManager;
     private GameManager gameManager;
     private HUDManager hudManager;
@@ -29,6 +30,7 @@ public class UHCGamePlugin extends JavaPlugin {
         Debug.setLogger(getLogger());
         
         GameStage.setPlugin(this);
+        configValues = new ConfigValues(this);
         teamManager = new TeamManager(this);
         gameManager = new GameManager(this);
         hudManager = new HUDManager(this);
@@ -54,6 +56,9 @@ public class UHCGamePlugin extends JavaPlugin {
         this.saveConfig();
     }
     
+    public ConfigValues configValues() {
+        return configValues;
+    }
     public TeamManager getTeamManager() {
         return teamManager;
     }

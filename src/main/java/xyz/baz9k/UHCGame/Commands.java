@@ -525,7 +525,7 @@ public final class Commands {
         .withArguments(new StringArgument("path"))
         .executes(
                 (sender, args) -> {
-                    Object o = plugin.getConfig().get((String) args[0]);
+                    Object o = plugin.configValues().get((String) args[0]);
                     sender.sendMessage(Component.text(Objects.toString(o)));
                 }
         );
@@ -552,7 +552,7 @@ public final class Commands {
             .withArguments(new GreedyStringArgument("msg"))
             .executesPlayer((sender, args) -> {
                 requireStarted();
-                int hideTeams = plugin.getConfig().getInt("team.hide_teams");
+                int hideTeams = plugin.configValues().hideTeams();
                 if (hideTeams == 2) {
                     CommandAPI.fail("/tc is disabled, since teams are hidden");
                 }

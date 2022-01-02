@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import xyz.baz9k.UHCGame.ConfigValues.BossMode;
 import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
@@ -212,10 +213,10 @@ public class TeamManager {
     public void assignTeams() {
         List<Player> combatants = new ArrayList<>(getCombatants().online());
         
-        int bossTeam = plugin.getConfig().getInt("team.boss_teams");
-        boolean sardines = plugin.getConfig().getBoolean("team.sardines");
+        var boss = plugin.configValues().bossMode();
+        boolean sardines = plugin.configValues().sardines();
 
-        if (bossTeam > 0) {
+        if (boss.enabled()) {
             // boss team shuffling
             boolean t1Assigned = IntStream.of(getAliveTeams()).anyMatch(t -> t == 1);
 
@@ -226,7 +227,7 @@ public class TeamManager {
                     .toList();
             } else {
                 combatantsToAssign = new ArrayList<>(combatants);
-                var t1 = removeNRandom(combatantsToAssign, bossTeam);
+                var t1 = removeNRandom(combatantsToAssign, boss.nPlayers());
 
                 for (Player p : t1) assignPlayerToTeam(p, 1);
             }
@@ -256,8 +257,8 @@ public class TeamManager {
     }
 
     public void announceTeams() {
-        int hideTeams = plugin.getConfig().getInt("team.hide_teams");
-        int bossTeam = plugin.getConfig().getInt("team.boss_teams");
+        int hideTeams = plugin.configValues().hideTeams();
+        var boss = plugin.configValues().bossMode();
 
         // 0: Display all teams
         // 1: Display only your team
@@ -265,8 +266,8 @@ public class TeamManager {
         if (hideTeams != 0) return;
         
         int i;
-        if (bossTeam > 0) {
-            announceTeamsLine(PlayerState.COMBATANT_ALIVE, 1, true, plugin.getGameManager().getBossMaxHealth());
+        if (boss.enabled()) {
+            announceTeamsLine(PlayerState.COMBATANT_ALIVE, 1, boss);
             i = 2;
         } else {
             i = 1;
@@ -282,10 +283,10 @@ public class TeamManager {
     }
 
     private void announceTeamsLine(PlayerState s, int t) {
-        announceTeamsLine(s, t, false, 0);
+        announceTeamsLine(s, t, BossMode.disabled());
     }
 
-    private void announceTeamsLine(PlayerState s, int t, boolean boss, int bossHealth) {
+    private void announceTeamsLine(PlayerState s, int t, BossMode boss) {
         Set<? extends OfflinePlayer> players;
         if (s.isAssignedCombatant()) {
             players = getCombatantsOnTeam(t);
@@ -297,9 +298,9 @@ public class TeamManager {
         var b = Component.text()
             .append(TeamDisplay.getName(s, t));
         
-        if (boss) {
+        if (boss.enabled()) {
             b.append(Component.text(" (", noDeco(NamedTextColor.WHITE)))
-             .append(Component.text(String.format("%s\u2665", bossHealth), TextColor.color(0xA100FF), TextDecoration.BOLD))
+             .append(Component.text(String.format("%s\u2665", boss.bossHealth()), TextColor.color(0xA100FF), TextDecoration.BOLD))
              .append(Component.text(")", noDeco(NamedTextColor.WHITE)));
         }
         

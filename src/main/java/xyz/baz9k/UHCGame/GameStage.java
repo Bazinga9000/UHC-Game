@@ -33,12 +33,12 @@ import static java.time.temporal.ChronoUnit.FOREVER;
 public enum GameStage {
     NOT_IN_GAME (null, BossBar.Color.WHITE, new ConfigDur(Duration.ZERO), new ConfigWBSize(-1), false, null, null),
 
-    WB_STILL    ("wb_still",   BossBar.Color.RED,    new ConfigDur("intervals.start"),     new ConfigWBSize("wb_size.initial"),    true,  Style.style(NamedTextColor.RED),         Style.style(NamedTextColor.GREEN, BOLD)),
-    WB_1        ("wb_1",       BossBar.Color.BLUE,   new ConfigDur("intervals.movement1"), new ConfigWBSize("wb_size.border1"),    false, Style.style(NamedTextColor.BLUE),        Style.style(NamedTextColor.RED, BOLD)),
-    WB_STOP     ("wb_stop",    BossBar.Color.RED,    new ConfigDur("intervals.stop"),      new ConfigWBSize("wb_size.border1"),    true,  Style.style(NamedTextColor.RED),         Style.style(NamedTextColor.AQUA)),
-    WB_2        ("wb_2",       BossBar.Color.BLUE,   new ConfigDur("intervals.movement2"), new ConfigWBSize("wb_size.border2"),    false, Style.style(NamedTextColor.BLUE),        Style.style(NamedTextColor.RED)),
-    DM_WAIT     ("dm_wait",    BossBar.Color.WHITE,  new ConfigDur("intervals.dmwait"),    new ConfigWBSize("wb_size.border2"),    true,  Style.style(NamedTextColor.WHITE),       Style.style(NamedTextColor.DARK_AQUA)),
-    DEATHMATCH  ("deathmatch", BossBar.Color.PURPLE, new ConfigDur(FOREVER.getDuration()), new ConfigWBSize("wb_size.deathmatch"), true,  Style.style(NamedTextColor.DARK_PURPLE), Style.style(NamedTextColor.BLUE, BOLD));
+    WB_STILL    ("wb_still",   BossBar.Color.RED,    new ConfigDur("start"),               new ConfigWBSize("initial"),    true,  Style.style(NamedTextColor.RED),         Style.style(NamedTextColor.GREEN, BOLD)),
+    WB_1        ("wb_1",       BossBar.Color.BLUE,   new ConfigDur("movement1"),           new ConfigWBSize("border1"),    false, Style.style(NamedTextColor.BLUE),        Style.style(NamedTextColor.RED, BOLD)),
+    WB_STOP     ("wb_stop",    BossBar.Color.RED,    new ConfigDur("stop"),                new ConfigWBSize("border1"),    true,  Style.style(NamedTextColor.RED),         Style.style(NamedTextColor.AQUA)),
+    WB_2        ("wb_2",       BossBar.Color.BLUE,   new ConfigDur("movement2"),           new ConfigWBSize("border2"),    false, Style.style(NamedTextColor.BLUE),        Style.style(NamedTextColor.RED)),
+    DM_WAIT     ("dm_wait",    BossBar.Color.WHITE,  new ConfigDur("dmwait"),              new ConfigWBSize("border2"),    true,  Style.style(NamedTextColor.WHITE),       Style.style(NamedTextColor.DARK_AQUA)),
+    DEATHMATCH  ("deathmatch", BossBar.Color.PURPLE, new ConfigDur(FOREVER.getDuration()), new ConfigWBSize("deathmatch"), true,  Style.style(NamedTextColor.DARK_PURPLE), Style.style(NamedTextColor.BLUE, BOLD));
     
     private static UHCGamePlugin plugin;
     public static void setPlugin(UHCGamePlugin plugin) { GameStage.plugin = plugin; }
@@ -49,9 +49,8 @@ public enum GameStage {
         public ConfigDur(Duration def) { this(null, def); }
         
         public Duration get() {
-            var cfg = plugin.getConfig();
-            if (id != null) return Duration.ofSeconds(cfg.getInt(id));
-            return def;
+            var cfg = plugin.configValues();
+            return cfg.stageDuration(id).orElse(def);
         }
     }
 
@@ -61,9 +60,8 @@ public enum GameStage {
         public ConfigWBSize(double def)   { this(null, def); }
         
         public double get() {
-            var cfg = plugin.getConfig();
-            if (id != null) return cfg.getDouble(id);
-            return def;
+            var cfg = plugin.configValues();
+            return cfg.wbDiameter(id, def);
         }
     }
 

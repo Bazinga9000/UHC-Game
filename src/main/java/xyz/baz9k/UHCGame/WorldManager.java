@@ -66,7 +66,7 @@ public class WorldManager {
      * @return the world
      */
     public World getMainWorld() {
-        boolean isNether = plugin.getConfig().getBoolean("global.nether_spawn");
+        boolean isNether = plugin.configValues().netherSpawn();
         int worldIndex = isNether ? 1 : 0;
         return Bukkit.getWorld(worldNames.get(worldIndex));
     }
@@ -90,8 +90,8 @@ public class WorldManager {
     public void initWorlds() {
         worldsRegened = false;
 
-        boolean natRegen = plugin.getConfig().getBoolean("player.natural_regen");
-        int dnCycle = plugin.getConfig().getInt("global.dn_cycle");
+        boolean natRegen = plugin.configValues().naturalRegen();
+        int dnCycle = plugin.configValues().dnCycle();
         // 0: 05:00 per cycle
         // 1: 10:00 per cycle
         // 2: 20:00 per cycle

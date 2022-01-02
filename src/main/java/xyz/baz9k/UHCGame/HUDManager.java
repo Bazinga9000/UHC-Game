@@ -177,7 +177,7 @@ public class HUDManager implements Listener {
             return new TeamProperties(tState, tTeam, true);
         }
 
-        int hideTeams = plugin.getConfig().getInt("team.hide_teams");
+        int hideTeams = plugin.configValues().hideTeams();
         // 0: Display all teams
         // 1: Display only your team
         // 2: Do not display teams
@@ -239,7 +239,7 @@ public class HUDManager implements Listener {
      * @param p Player whose prefix should be dispatched
      */
     public void dispatchPrefixUpdate(Player p) {
-        int hideTeams = plugin.getConfig().getInt("team.hide_teams");
+        int hideTeams = plugin.configValues().hideTeams();
         if (hideTeams == 0) {
             // these are global, so they need to be hidden if team display is not global
             PlayerState s = teamManager.getPlayerState(p);

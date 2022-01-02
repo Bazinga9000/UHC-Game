@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 /**
  * Utility class for dealing with chained strings.
  * Example: "a.b.c.d.e.f.g.h"
+ * <p> Nulls are ignored and filtered out of arguments.
  */
 public final class Path implements Iterable<String> {
     private final String[] path;
@@ -42,6 +43,7 @@ public final class Path implements Iterable<String> {
         Objects.requireNonNull(paths);
         return new Path(false,
             Arrays.stream(paths)
+                .filter(Objects::nonNull)
                 .flatMap(p -> Arrays.stream(p.path))
                 .toArray(String[]::new)
         );
@@ -49,7 +51,7 @@ public final class Path implements Iterable<String> {
 
     public static String join(String... paths) {
         Objects.requireNonNull(paths);
-        return new Path(false, paths).toString();
+        return new Path(paths).toString();
     }
 
     public Path append(String... nodes) {
@@ -152,6 +154,7 @@ public final class Path implements Iterable<String> {
     
     private static Stream<String> stream(String[] path) {
         return Arrays.stream(path)
+            .filter(Objects::nonNull)
             .flatMap(n -> Arrays.stream(n.split("\\.")));
     }
     

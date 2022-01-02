@@ -242,7 +242,7 @@ public class GameManager implements Listener {
         // but the constant has been adjusted to give margin of error
         // (in case SP produces less points than average)
 
-        int sp = plugin.getConfig().getInt("global.spreadplayers");
+        int sp = plugin.configValues().spreadPlayersMethod();
         // 0 = by teams
         // 1 = individually
         double max = GameStage.WB_STILL.wbDiameter();
@@ -272,7 +272,7 @@ public class GameManager implements Listener {
         kills.clear();
         timedEvents.clear();
         // register event for when grace period ends
-        getGracePeriod().ifPresent(d -> {
+        plugin.configValues().gracePeriod().ifPresent(d -> {
             Instant end = startTime.get().plus(d);
             registerEvent(end, () -> {
                 // grace period does its check via inGracePeriod, so nothing else needs to be done
@@ -281,7 +281,7 @@ public class GameManager implements Listener {
         });
 
         // register event for when final heal hits
-        getFinalHealPeriod().ifPresent(d -> {
+        plugin.configValues().finalHealPeriod().ifPresent(d -> {
             Instant end = startTime.get().plus(d);
             registerEvent(end, () -> {
                 GameStage.sendMessageAsBoxless(Bukkit.getServer(), new Key("chat.final_heal").trans());
@@ -341,7 +341,7 @@ public class GameManager implements Listener {
                 incrementStage();
             }
             
-            int dnCycle = plugin.getConfig().getInt("global.dn_cycle");
+            int dnCycle = plugin.configValues().dnCycle();
             // 0: 05:00 per cycle
             // 1: 10:00 per cycle
             // 2: 20:00 per cycle
@@ -560,52 +560,14 @@ public class GameManager implements Listener {
         throw new IllegalArgumentException("uh oh you bozo don't copy your arguments");
     }
 
-    private Optional<Duration> getGracePeriod() {
-        int grace = plugin.getConfig().getInt("global.grace_period");
-
-        if (grace < 0) return Optional.empty();
-        return Optional.of(Duration.ofSeconds(grace));
-    }
-
-    private Optional<Duration> getFinalHealPeriod() {
-        int fh = plugin.getConfig().getInt("global.final_heal");
-
-        if (fh < 0) return Optional.empty();
-        return Optional.of(Duration.ofSeconds(fh));
-    }
-
     public boolean inGracePeriod() {
-        Optional<Duration> grace = getGracePeriod();
+        Optional<Duration> grace = plugin.configValues().gracePeriod();
         Optional<Duration> elapsedTime = getElapsedTime();
 
         if (elapsedTime.isPresent() && grace.isPresent()) {
             return grace.get().compareTo(elapsedTime.get()) <= 0;
         }
         return false;
-    }
-
-    public boolean allowFriendlyFire() {
-        return plugin.getConfig().getBoolean("team.friendly_fire");
-    }
-
-    public int getMaxHealth() {
-        return new int[]{10, 20, 40, 60}[plugin.getConfig().getInt("player.max_health")];
-    }
-
-    public double getMovementSpeed() {
-        return new double[]{0.5,1,2,3}[plugin.getConfig().getInt("player.mv_speed")];
-    }
-
-    public boolean isBossMode() {
-        return plugin.getConfig().getInt("team.boss_team") > 0;
-    }
-
-    public int getBossMaxHealth() {
-        int normalHealth = getMaxHealth();
-        int bossN = plugin.getConfig().getInt("team.boss_team");
-        int normalN = teamManager.getCombatantsOnTeam(2).size();
-
-        return normalHealth * normalN / bossN;
     }
 
     private Component includeGameTimestamp(Component c) {
@@ -661,7 +623,7 @@ public class GameManager implements Listener {
         }
 
         // wither bonus round
-        boolean wbr = plugin.getConfig().getBoolean("global.wither_bonus");
+        boolean wbr = plugin.configValues().witherBonus();
         
         if (!wbr) return;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -749,7 +711,7 @@ public class GameManager implements Listener {
                 }
 
                 // cancel friendly fire
-                if (!allowFriendlyFire()) {
+                if (!plugin.configValues().allowFriendlyFire()) {
                     if (teamManager.onSameTeam(target, damager)) {
                         e.setCancelled(true);
                     }
@@ -805,12 +767,14 @@ public class GameManager implements Listener {
             } else {
                 p.setGameMode(GameMode.SURVIVAL);
 
+                var cfgValues = plugin.configValues();
                 // set maximum health and movement speed according to config options
-                int maxHealth = getMaxHealth();
-                double mvSpeed = getMovementSpeed();
-    
-                if (isBossMode()) {
-                    int bossMaxHealth = getBossMaxHealth();
+                int maxHealth = cfgValues.maxHealth();
+                double mvSpeed = cfgValues.movementSpeed();
+                var bossMode = cfgValues.bossMode();
+
+                if (bossMode.enabled()) {
+                    int bossMaxHealth = bossMode.bossHealth();
                     if (t == 1) {
                         p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossMaxHealth);
                     } else {
