@@ -11,6 +11,8 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.util.Debug;
+
+import static xyz.baz9k.UHCGame.util.CommandAPIUtils.*;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.lang.annotation.ElementType;
@@ -78,21 +80,6 @@ public final class Commands {
         uhc.register();
     }
 
-    private void requireNotStarted() throws WrapperCommandSyntaxException {
-        try {
-            plugin.getGameManager().requireNotStarted();
-        } catch (IllegalStateException e) {
-            CommandAPI.fail(e.getMessage());
-        }
-    }
-    private void requireStarted() throws WrapperCommandSyntaxException {
-        try {
-            plugin.getGameManager().requireStarted();
-        } catch (IllegalStateException e) {
-            CommandAPI.fail(e.getMessage());
-        }
-    }
-
     private void fail(Key key, Object... args) throws WrapperCommandSyntaxException {
         CommandAPI.fail(renderString(key.trans(args)));
     }
@@ -125,14 +112,9 @@ public final class Commands {
     @RegisterUHCSubCommand
     private CommandAPICommand start() {
         return new CommandAPICommand("start")
-        .executes(
+        .executes((UHCCommandExecutor)
             (sender, args) -> {
-                try {
-                    plugin.getGameManager().startUHC(false);
-                } catch (IllegalStateException e) {
-                    CommandAPI.fail(e.getMessage());
-                    e.printStackTrace();
-                }
+                plugin.getGameManager().startUHC(false);
             }
         );
     }
@@ -141,18 +123,13 @@ public final class Commands {
     @RegisterUHCSubCommand
     private CommandAPICommand end() {
         return new CommandAPICommand("end")
-        .executes(
+        .executes((UHCCommandExecutor)
             (sender, args) -> {
-                try {
-                    plugin.getGameManager().endUHC(false);
-                } catch (IllegalStateException e) {
-                    CommandAPI.fail(e.getMessage());
-                    Debug.printError(e);
-                }
+                plugin.getGameManager().endUHC(false);
+
             }
         );
     }
-
     // uhc start force
     @RegisterUHCSubCommand
     private CommandAPICommand startForce() {
@@ -160,14 +137,9 @@ public final class Commands {
         .withArguments(
             new LiteralArgument("force")
         )
-        .executes(
+        .executes((UHCCommandExecutor)
             (sender, args) -> {
-                try {
-                    plugin.getGameManager().startUHC(true);
-                } catch (IllegalStateException e) {
-                    CommandAPI.fail(e.getMessage());
-                    Debug.printError(e);
-                }
+                plugin.getGameManager().startUHC(true);
             }
         );
     }
