@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import xyz.baz9k.UHCGame.exception.UHCCheckFailException;
+import xyz.baz9k.UHCGame.exception.UHCException;
 import xyz.baz9k.UHCGame.util.*;
 
 import java.time.*;
@@ -104,8 +106,8 @@ public class GameManager implements Listener {
             this.panelErrKey = panelErrKey;
         }
 
-        public IllegalStateException exception() {
-            return errKey.transErr(IllegalStateException.class);
+        public UHCCheckFailException exception() {
+            return new UHCCheckFailException(errKey);
         }
         public String panelErr() {
             return renderString(panelErrKey.trans());
@@ -153,7 +155,7 @@ public class GameManager implements Listener {
             .toList();
     }
 
-    private void runEventWithChecks(String eventKey, Runnable event, Supplier<List<GameInitFailure>> checks, boolean skipChecks) throws IllegalStateException {
+    private void runEventWithChecks(String eventKey, Runnable event, Supplier<List<GameInitFailure>> checks, boolean skipChecks) throws UHCCheckFailException {
         Key EVENT_TRY       = new Key("debug.%s.try", eventKey),
             EVENT_FORCE_TRY = new Key("debug.%s.force", eventKey),
             EVENT_COMPLETE  = new Key("debug.%s.complete", eventKey),
@@ -190,7 +192,7 @@ public class GameManager implements Listener {
      * /uhc start force: Skips checks
      * @param skipChecks If true, all checks are ignored.
      */
-    public void startUHC(boolean skipChecks) throws IllegalStateException {
+    public void startUHC(boolean skipChecks) throws UHCCheckFailException {
         runEventWithChecks("start", this::_startUHC, this::checkStart, skipChecks);
     }
 
@@ -204,7 +206,7 @@ public class GameManager implements Listener {
      * /uhc end force: Forcibly starts game
      * @param skipChecks If true, started game checks are ignored.
      */
-    public void endUHC(boolean skipChecks) throws IllegalStateException {
+    public void endUHC(boolean skipChecks) throws UHCCheckFailException {
         runEventWithChecks("end", this::_endUHC, this::checkEnd, skipChecks);
     }
 
@@ -319,15 +321,27 @@ public class GameManager implements Listener {
         return stage != GameStage.NOT_IN_GAME;
     }
 
-    public void requireStarted() throws IllegalStateException {
+    public void requireStarted() throws UHCException {
         if (!hasUHCStarted()) {
-            throw new Key("err.not_started").transErr(IllegalStateException.class);
+            throw new UHCException(new Key("err.not_started"));
         }
     }
 
-    public void requireNotStarted() throws IllegalStateException {
+    public void requireNotStarted() throws UHCException {
         if (hasUHCStarted()) {
-            throw new Key("err.already_started").transErr(IllegalStateException.class);
+            throw new UHCException(new Key("err.already_started"));
+        }
+    }
+
+    public <X extends Throwable> void requireStarted(Class<X> exc) throws X {
+        if (!hasUHCStarted()) {
+            throw new Key("err.not_started").transErr(exc);
+        }
+    }
+
+    public <X extends Throwable> void requireNotStarted(Class<X> exc) throws X {
+        if (hasUHCStarted()) {
+            throw new Key("err.already_started").transErr(exc);
         }
     }
 
@@ -487,7 +501,7 @@ public class GameManager implements Listener {
      * @return the {@link Duration} that the current stage lasts.
      */
     public @NotNull Duration getStageDuration() {
-        requireStarted();
+        requireStarted(IllegalStateException.class);
         return stage.duration();
     }
 
@@ -495,7 +509,7 @@ public class GameManager implements Listener {
      * @return the {@link Duration} until the current stage ends.
      */
     public Optional<Duration> getRemainingStageDuration() {
-        requireStarted();
+        requireStarted(IllegalStateException.class);
         Duration stageDur = getStageDuration();
         if (isDeathmatch()) return Optional.of(stageDur); // if deathmatch, just return ∞
         return lastStageInstant.map(instant -> 
@@ -568,6 +582,22 @@ public class GameManager implements Listener {
             return grace.get().compareTo(elapsedTime.get()) <= 0;
         }
         return false;
+    }
+
+    public void respawnPlayer(Player p, Location loc) throws UHCException {
+        TeamManager tm = plugin.getTeamManager();
+        if (tm.isSpectator(p)) {
+            throw new UHCException(new Key("cmd.respawn.fail.spectator"), p.getName());
+        }
+
+        p.teleport(loc);
+        tm.setCombatantAliveStatus(p, true);
+        p.setGameMode(GameMode.SURVIVAL);
+        
+        // clear all potion effects
+        for (PotionEffect effect : p.getActivePotionEffects()) {
+            p.removePotionEffect(effect.getType());
+        }
     }
 
     private Component includeGameTimestamp(Component c) {

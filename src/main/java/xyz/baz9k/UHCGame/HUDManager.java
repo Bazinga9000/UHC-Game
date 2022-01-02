@@ -332,7 +332,7 @@ public class HUDManager implements Listener {
         addHUDLine(p, "wbpos",       7);
         addHUDLine(p, "newline",     6);
         addHUDLine(p, "combsalive",  5);
-        addHUDLine(p, "teamsalive",  4);
+        // 4 is teamsalive
         addHUDLine(p, "kills",       3);
         addHUDLine(p, "newline",     2);
         addHUDLine(p, "elapsedTime", 1);
@@ -530,12 +530,19 @@ public class HUDManager implements Listener {
     }
 
     public void updateTeamsAliveHUD(@NotNull Player p) {
-        var s = new Key("hud.teamcount").trans(
-            Component.text(teamManager.getAliveTeams().length, NamedTextColor.WHITE),
-            Component.text(teamManager.getNumTeams(), NamedTextColor.WHITE)
-        ).color(NamedTextColor.WHITE);
+        int nAlive = teamManager.getAliveTeams().length,
+            nTeams = teamManager.getNumTeams();
+        
+        if (nTeams != 0) {
+            addHUDLine(p, "teamsalive",  4);
 
-        setHUDLine(p, "teamsalive", s);
+            var s = new Key("hud.teamcount").trans(
+                Component.text(nAlive, NamedTextColor.WHITE),
+                Component.text(nTeams, NamedTextColor.WHITE)
+            ).color(NamedTextColor.WHITE);
+    
+            setHUDLine(p, "teamsalive", s);
+        }
         
     }
 

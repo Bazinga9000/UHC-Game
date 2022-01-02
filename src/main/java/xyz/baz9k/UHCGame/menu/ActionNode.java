@@ -4,7 +4,9 @@ package xyz.baz9k.UHCGame.menu;
 import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
+import xyz.baz9k.UHCGame.exception.UHCException;
 import xyz.baz9k.UHCGame.util.Debug;
 
 import org.bukkit.entity.Player;
@@ -16,14 +18,16 @@ import org.bukkit.inventory.Inventory;
  * Runs an action that is not just setting a config store to a specified value.
  */
 public class ActionNode extends Node {
-    public static class ActionFailedException extends Exception {
+    public static class ActionFailedException extends Exception implements ComponentLike {
         public ActionFailedException(String message) { super(message); }
         public ActionFailedException(Throwable cause) { super(cause); }
+        @Override
+        public @NotNull Component asComponent() { return Component.text(getMessage(), NamedTextColor.RED); }
     }
     
     @FunctionalInterface
     public interface NodeAction {
-        void run(Player p) throws ActionFailedException;
+        void run(Player p) throws UHCException, ActionFailedException;
     }
 
     private final NodeAction fn;
@@ -44,11 +48,12 @@ public class ActionNode extends Node {
     public boolean click(@NotNull Player p) {
         try {
             fn.run(p);
-        } catch (ActionFailedException e) {
-            p.sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));
+        } catch (UHCException | ActionFailedException e) {
+            p.sendMessage(e);
             return false;
         } catch (Exception e) {
             Debug.printError(e);
+            return false;
         }
         return true;
     }
