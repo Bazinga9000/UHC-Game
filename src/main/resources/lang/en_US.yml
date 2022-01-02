@@ -297,7 +297,7 @@ xyz:
               boss_team:
                 name: "Boss Team"
                 desc: |-
-                  Team 1 gets double health,
+                  Team 1 gets more health,
                   but has fewer people ({0}).
                 players_1: "{0} player"
                 players_n: "{0} players"
@@ -317,10 +317,10 @@ xyz:
                 name: "Player Health"
                 desc: ""
                 options:
-                  - "\u2764 05"
-                  - "\u2764 10"
-                  - "\u2764 20"
-                  - "\u2764 30"
+                  - "\u2665 05"
+                  - "\u2665 10"
+                  - "\u2665 20"
+                  - "\u2665 30"
               mv_speed:
                 name: "Movement Speed"
                 desc: ""

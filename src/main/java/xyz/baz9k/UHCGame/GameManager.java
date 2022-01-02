@@ -588,6 +588,26 @@ public class GameManager implements Listener {
         return plugin.getConfig().getBoolean("team.friendly_fire");
     }
 
+    public int getMaxHealth() {
+        return new int[]{10, 20, 40, 60}[plugin.getConfig().getInt("player.max_health")];
+    }
+
+    public double getMovementSpeed() {
+        return new double[]{0.5,1,2,3}[plugin.getConfig().getInt("player.mv_speed")];
+    }
+
+    public boolean isBossMode() {
+        return plugin.getConfig().getInt("team.boss_team") > 0;
+    }
+
+    public int getBossMaxHealth() {
+        int normalHealth = getMaxHealth();
+        int bossN = plugin.getConfig().getInt("team.boss_team");
+        int normalN = teamManager.getCombatantsOnTeam(2).size();
+
+        return normalHealth * normalN / bossN;
+    }
+
     private Component includeGameTimestamp(Component c) {
         if (c == null) return null;
         String timeStr = getLongTimeString(getElapsedTime(), "?");
@@ -786,12 +806,21 @@ public class GameManager implements Listener {
                 p.setGameMode(GameMode.SURVIVAL);
 
                 // set maximum health and movement speed according to config options
-                var cfg = plugin.getConfig();
-                int max_health = new int[]{10, 20, 40, 60}[cfg.getInt("player.max_health")];
-                double movement_speed = new double[]{0.5,1,2,3}[cfg.getInt("player.mv_speed")];
+                int maxHealth = getMaxHealth();
+                double mvSpeed = getMovementSpeed();
     
-                p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(max_health);
-                p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1 * movement_speed); // 0.1 is default value
+                if (isBossMode()) {
+                    int bossMaxHealth = getBossMaxHealth();
+                    if (t == 1) {
+                        p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossMaxHealth);
+                    } else {
+                        p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+                    }
+                } else {
+                    p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+                }
+
+                p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1 * mvSpeed); // 0.1 is default value
                 
                 resetStatuses(p);
                 kit.apply(p);

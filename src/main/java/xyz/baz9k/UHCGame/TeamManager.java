@@ -3,12 +3,13 @@ package xyz.baz9k.UHCGame;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
@@ -31,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 public class TeamManager {
     private record Node(PlayerState state, int team) {
@@ -71,9 +74,14 @@ public class TeamManager {
 
     }
 
+    private final UHCGamePlugin plugin;
     private int numTeams = 2;
     private final HashMap<UUID, Node> playerMap = new HashMap<>();
     private final HashMap<UUID, Player> cachedPlayers = new HashMap<>();
+
+    public TeamManager(UHCGamePlugin plugin) {
+        this.plugin = plugin;
+    }
 
     /**
      * Gets the stored node of the player in the player map.
@@ -160,40 +168,110 @@ public class TeamManager {
         playerMap.replaceAll((k, v) -> new Node(PlayerState.COMBATANT_UNASSIGNED, 0));
     }
 
+    private void shuffleAssign(List<Player> combatants, int first, int last) {
+        int n = last - first + 1; // n of ints in interval [first, last]
+        
+        if (n < 0) {
+            throw new IllegalArgumentException(String.format("Cannot assign players between %s and %s", first, last));
+        }
+        if (n == 0) { // optimization
+            for (Player p : combatants) assignPlayerToTeam(p, first);
+            return;
+        }
+
+        var shufCombs = new ArrayList<>(combatants);
+        Collections.shuffle(shufCombs);
+
+        int i = 0;
+        for (Player p : shufCombs) {
+            assignPlayerToTeam(p, i + first);
+            i++;
+            i %= n;
+        }
+    }
+
+    private <T> List<T> removeNRandom(List<T> list, int n) {
+        if (n > list.size()) throw new IllegalArgumentException("n is larger than the size of the list");
+        if (n == list.size()) {
+            var newList = List.copyOf(list);
+            list.clear();
+            return newList;
+        }
+        
+        Random r = new Random();
+        var newList = new ArrayList<T>();
+        for (int i = 0; i < n; i++) {
+            int j = r.nextInt(list.size());
+            newList.add(list.remove(j));
+        }
+        return Collections.unmodifiableList(newList);
+    }
     /**
      * Assigns all registered players to a team.
      */
     public void assignTeams() {
         List<Player> combatants = new ArrayList<>(getCombatants().online());
         
-        if (combatants.size() == numTeams) { // solos
-            combatants.sort((p1, p2) -> p1.getName().compareTo(p2.getName()));
-            for (int i = 0; i < numTeams; i++) {
-                assignPlayerToTeam(combatants.get(i), i + 1);
+        int bossTeam = plugin.getConfig().getInt("team.boss_teams");
+        boolean sardines = plugin.getConfig().getBoolean("team.sardines");
+
+        if (bossTeam > 0) {
+            // boss team shuffling
+            boolean t1Assigned = IntStream.of(getAliveTeams()).anyMatch(t -> t == 1);
+
+            List<Player> combatantsToAssign;
+            if (t1Assigned) {
+                combatantsToAssign = combatants.stream()
+                    .filter(p -> getTeam(p) == 1)
+                    .toList();
+            } else {
+                combatantsToAssign = new ArrayList<>(combatants);
+                var t1 = removeNRandom(combatantsToAssign, bossTeam);
+
+                for (Player p : t1) assignPlayerToTeam(p, 1);
             }
+
+            shuffleAssign(combatantsToAssign, 2, numTeams);
+
+        } else if (sardines) {
+
         } else {
-            Collections.shuffle(combatants);
-    
-            int i = 1;
-            for (Player p : combatants) {
-                assignPlayerToTeam(p, i);
-                i = i % numTeams + 1;
+            if (combatants.size() == numTeams) { 
+                // solos assigning
+                combatants.sort((p1, p2) -> p1.getName().compareTo(p2.getName()));
+                for (int i = 0; i < numTeams; i++) {
+                    assignPlayerToTeam(combatants.get(i), i + 1);
+                }
+            } else {
+                // regular assigning
+                shuffleAssign(combatants, 1, numTeams);
             }
         }
 
+
         // set numTeams to actual number of teams
         numTeams = Arrays.stream(getAliveTeams()).max().orElse(1);
+
+        // TODO: abort if nt == 1 on boss teams
     }
 
     public void announceTeams() {
-        // guess who's too lazy to pass plugin as a param to this class
-        int hideTeams = JavaPlugin.getPlugin(UHCGamePlugin.class).getConfig().getInt("team.hide_teams");
+        int hideTeams = plugin.getConfig().getInt("team.hide_teams");
+        int bossTeam = plugin.getConfig().getInt("team.boss_teams");
+
         // 0: Display all teams
         // 1: Display only your team
         // 2: Do not display teams
         if (hideTeams != 0) return;
         
-        for (int i = 1; i <= numTeams; i++) {
+        int i;
+        if (bossTeam > 0) {
+            announceTeamsLine(PlayerState.COMBATANT_ALIVE, 1, true, plugin.getGameManager().getBossMaxHealth());
+            i = 2;
+        } else {
+            i = 1;
+        }
+        for (; i <= numTeams; i++) {
             announceTeamsLine(PlayerState.COMBATANT_ALIVE, i);
         }
 
@@ -204,6 +282,10 @@ public class TeamManager {
     }
 
     private void announceTeamsLine(PlayerState s, int t) {
+        announceTeamsLine(s, t, false, 0);
+    }
+
+    private void announceTeamsLine(PlayerState s, int t, boolean boss, int bossHealth) {
         Set<? extends OfflinePlayer> players;
         if (s.isAssignedCombatant()) {
             players = getCombatantsOnTeam(t);
@@ -213,8 +295,15 @@ public class TeamManager {
         if (players.size() == 0) return;
 
         var b = Component.text()
-            .append(TeamDisplay.getName(s, t))
-            .append(Component.text(": ", noDeco(NamedTextColor.WHITE)));
+            .append(TeamDisplay.getName(s, t));
+        
+        if (boss) {
+            b.append(Component.text(" (", noDeco(NamedTextColor.WHITE)))
+             .append(Component.text(String.format("%s\u2665", bossHealth), TextColor.color(0xA100FF), TextDecoration.BOLD))
+             .append(Component.text(")", noDeco(NamedTextColor.WHITE)));
+        }
+        
+        b.append(Component.text(": ", noDeco(NamedTextColor.WHITE)));
 
         // list of players one a team, separated by commas
         String tPlayers = players.stream()

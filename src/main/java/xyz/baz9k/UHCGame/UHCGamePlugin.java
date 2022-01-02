@@ -29,7 +29,7 @@ public class UHCGamePlugin extends JavaPlugin {
         Debug.setLogger(getLogger());
         
         GameStage.setPlugin(this);
-        teamManager = new TeamManager();
+        teamManager = new TeamManager(this);
         gameManager = new GameManager(this);
         hudManager = new HUDManager(this);
         bbManager = new BossbarManager(this);
