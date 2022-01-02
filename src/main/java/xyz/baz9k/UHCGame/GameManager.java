@@ -563,14 +563,14 @@ public class GameManager implements Listener {
     private Optional<Duration> getGracePeriod() {
         int grace = plugin.getConfig().getInt("global.grace_period");
 
-        if (grace == -1) return Optional.empty();
+        if (grace < 0) return Optional.empty();
         return Optional.of(Duration.ofSeconds(grace));
     }
 
     private Optional<Duration> getFinalHealPeriod() {
         int fh = plugin.getConfig().getInt("global.final_heal");
 
-        if (fh == -1) return Optional.empty();
+        if (fh < 0) return Optional.empty();
         return Optional.of(Duration.ofSeconds(fh));
     }
 

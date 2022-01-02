@@ -234,7 +234,13 @@ public class MenuTree {
         new ValuedNode(teamSettings, i++, "friendly_fire", new ItemProperties<>(Material.FLINT_AND_STEEL).style(TextColor.color(0xFF9F5F)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(teamSettings, i++, "boss_team", 
             new ItemProperties<>(v -> (int) v == 0 ? Material.DRAGON_EGG : Material.DRAGON_HEAD)
-                .style(TextColor.color(0xA100FF)), 
+                .style(TextColor.color(0xA100FF)) 
+                .formatArg(v -> {
+                    int nPlayers = (int) v;
+                    if (nPlayers < 1) return new Key("menu.inv.presets.disabled").trans();
+                    Key k = new Key("menu.inv.global.boss_team.players_%s", nPlayers == 1 ? "1" : "n");
+                    return k.trans(nPlayers);
+                }),
             ValuedNode.Type.INTEGER, 
             v -> Math.max(0, (int) v)
         ); // TODO
@@ -256,12 +262,20 @@ public class MenuTree {
         );
         new ValuedNode(playerSettings, i++, "grace_period",
             new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.SHIELD)
-                .formatArg(v -> getTimeString((int) v)), 
+                .formatArg(v -> {
+                    int secs = (int) v;
+                    if (secs < 0) return new Key("menu.inv.presets.disabled").trans();
+                    return getTimeString(secs);
+                }), 
             ValuedNode.Type.INTEGER, 
             n -> Math.max(-1, (int) n));
         new ValuedNode(playerSettings, i++, "final_heal",
             new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.GLOW_BERRIES)
-                .formatArg(v -> getTimeString((int) v)), 
+                .formatArg(v -> {
+                    int secs = (int) v;
+                    if (secs < 0) return new Key("menu.inv.presets.disabled").trans();
+                    return getTimeString(secs);
+                }), 
             ValuedNode.Type.INTEGER, 
             n -> Math.max(-1, (int) n));
         new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);

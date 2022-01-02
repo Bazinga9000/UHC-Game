@@ -298,7 +298,9 @@ xyz:
                 name: "Boss Team"
                 desc: |-
                   Team 1 gets double health,
-                  but has fewer people.
+                  but has fewer people ({0}).
+                players_1: "{0} player"
+                players_n: "{0} players"
               sardines:
                 name: "Sardines"
                 desc: |-
@@ -395,6 +397,7 @@ xyz:
               # Players:
               # { - etc}
               # Kit: {name @ index, or Custom}
+              disabled: "Disabled"
               root:
                 name: "Presets"
                 desc: "Enable premade presets for UHC"
