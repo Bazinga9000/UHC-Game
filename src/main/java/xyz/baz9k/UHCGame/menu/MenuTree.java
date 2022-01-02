@@ -109,8 +109,8 @@ public class MenuTree {
         new ActionNode(ctrlRoot, slotAt(3, 1), "reseed_worlds", 
             new ItemProperties<>(Material.APPLE), 
             p -> {
-            p.closeInventory();
-            plugin.getWorldManager().reseedWorlds();
+                p.closeInventory();
+                plugin.getWorldManager().reseedWorlds();
             }
         ).lock(plugin.getGameManager()::hasUHCStarted);
         new ActionNode(ctrlRoot, slotAt(3, 2), "debug_toggle",
@@ -244,7 +244,7 @@ public class MenuTree {
             ValuedNode.Type.INTEGER, 
             v -> Math.max(0, (int) v)
         ); // TODO
-        new ValuedNode(teamSettings, i++, "sardines", new ItemProperties<>(Material.DRAGON_HEAD).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN); // TODO
+        new ValuedNode(teamSettings, i++, "sardines", new ItemProperties<>(Material.TROPICAL_FISH).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN); // TODO
 
         /* PLAYER SETTINGS */
         i = 0;
@@ -261,7 +261,7 @@ public class MenuTree {
             Material.EMERALD_BLOCK
         );
         new ValuedNode(playerSettings, i++, "grace_period",
-            new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.SHIELD)
+            new ItemProperties<>(v -> (int) v >= 0 ? Material.SHIELD : Material.BLACK_CONCRETE)
                 .formatArg(v -> {
                     int secs = (int) v;
                     if (secs < 0) return new Key("menu.inv.presets.disabled").trans();
@@ -270,7 +270,7 @@ public class MenuTree {
             ValuedNode.Type.INTEGER, 
             n -> Math.max(-1, (int) n));
         new ValuedNode(playerSettings, i++, "final_heal",
-            new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.GLOW_BERRIES)
+            new ItemProperties<>(v -> (int) v >= 0 ? Material.GLOW_BERRIES : Material.BLACK_CONCRETE)
                 .formatArg(v -> {
                     int secs = (int) v;
                     if (secs < 0) return new Key("menu.inv.presets.disabled").trans();
