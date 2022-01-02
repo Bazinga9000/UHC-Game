@@ -118,6 +118,7 @@ xyz:
           invalid: "Invalid team {0}. Team must be positive and cannot exceed the number of teams ({1})."
           size_name_invalid: "Unrecognized option ''{0}''"
           count_must_pos: "Team count must be positive."
+          boss_must_2: "There must be at least 2 teams in boss mode."
         world:
           must_regened: "UHC worlds have not been regenerated. Run /uhc reseed to regenerate."
           must_regened_short: "Worlds have not been regenerated."

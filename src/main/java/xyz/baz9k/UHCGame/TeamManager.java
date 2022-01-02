@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import xyz.baz9k.UHCGame.ConfigValues.BossMode;
 import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
+import xyz.baz9k.UHCGame.exception.UHCException;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.util.Set;
@@ -25,7 +26,6 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.AbstractSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -210,7 +210,7 @@ public class TeamManager {
     /**
      * Assigns all registered players to a team.
      */
-    public void assignTeams() {
+    private void assignTeams() {
         List<Player> combatants = new ArrayList<>(getCombatants().online());
         
         var boss = plugin.configValues().bossMode();
@@ -251,9 +251,7 @@ public class TeamManager {
 
 
         // set numTeams to actual number of teams
-        numTeams = Arrays.stream(getAliveTeams()).max().orElse(1);
-
-        // TODO: abort if nt == 1 on boss teams
+        numTeams = getAliveTeams().length;
     }
 
     public void announceTeams() {
@@ -313,6 +311,20 @@ public class TeamManager {
         
         b.append(Component.text(tPlayers, noDeco(NamedTextColor.WHITE)));
         Bukkit.getServer().sendMessage(b);
+    }
+
+    public void tryAssignTeams() throws UHCException {
+        assignTeams();
+
+        // verify teams are valid
+        var boss = plugin.configValues().bossMode();
+        if (boss.enabled() && numTeams < 2) {
+            resetAllPlayers();
+            throw new UHCException(new Key("err.team.boss_must_2"));
+        }
+        
+        // announce teams if valid
+        announceTeams();
     }
 
     public @NotNull PlayerState getPlayerState(@NotNull Player p) {

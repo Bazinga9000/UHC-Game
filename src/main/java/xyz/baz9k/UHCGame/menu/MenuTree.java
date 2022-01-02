@@ -134,8 +134,9 @@ public class MenuTree {
                 var tm = plugin.getTeamManager();
                 new ValueRequest(plugin, p, ValueRequest.Type.NUMBER_REQUEST, "team_count", t -> {
                     tm.setNumTeams((int) t);
-                    tm.assignTeams();
-                    tm.announceTeams();
+                    // why did everything have to resolve cleanly EXCEPT for this
+                    ActionNode.NodeAction ta = pl -> tm.tryAssignTeams();
+                    ta.eval(p);
                 });
             }
         ).lock(plugin.getGameManager()::hasUHCStarted);
@@ -155,8 +156,7 @@ public class MenuTree {
                     p.closeInventory();
                     var tm = plugin.getTeamManager();
                     tm.setTeamSize(n);
-                    tm.assignTeams();
-                    tm.announceTeams();
+                    tm.tryAssignTeams();
                 }
             ).lock(plugin.getGameManager()::hasUHCStarted);
         }

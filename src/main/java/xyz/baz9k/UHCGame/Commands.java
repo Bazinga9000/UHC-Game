@@ -151,14 +151,13 @@ public final class Commands {
             new LiteralArgument("assign"),
             new MultiLiteralArgument("solos", "duos", "trios", "quartets", "quintets")
         )
-        .executes(
+        .executes((UHCCommandExecutor)
             (sender, args) -> {
                 TeamManager tm = plugin.getTeamManager();
                 String s = (String) args[0];
 
                 tm.setTeamSize(s);
-                tm.assignTeams();
-                tm.announceTeams();
+                tm.tryAssignTeams();
 
             }
         );
@@ -172,14 +171,13 @@ public final class Commands {
             new LiteralArgument("assign"),
             new IntegerArgument("n", 1)
         )
-        .executes(
+        .executes((UHCCommandExecutor)
             (sender, args) -> {
                 TeamManager tm = plugin.getTeamManager();
                 int n = (int) args[0];
 
                 tm.setNumTeams(n);
-                tm.assignTeams();
-                tm.announceTeams();
+                tm.tryAssignTeams();
             }
         );
     }

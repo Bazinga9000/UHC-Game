@@ -28,6 +28,24 @@ public class ActionNode extends Node {
     @FunctionalInterface
     public interface NodeAction {
         void run(Player p) throws UHCException, ActionFailedException;
+        
+        /**
+         * Runs the action and handles any exceptions that results
+         * @param p Player who did action
+         * @return true/false if event was successful
+         */
+        default boolean eval(Player p) {
+            try {
+                run(p);
+            } catch (UHCException | ActionFailedException e) {
+                p.sendMessage(e);
+                return false;
+            } catch (RuntimeException e) {
+                Debug.printError(e);
+                return false;
+            }
+            return true;
+        }
     }
 
     private final NodeAction fn;
@@ -46,16 +64,6 @@ public class ActionNode extends Node {
 
     @Override
     public boolean click(@NotNull Player p) {
-        try {
-            fn.run(p);
-        } catch (UHCException | ActionFailedException e) {
-            p.sendMessage(e);
-            return false;
-        } catch (Exception e) {
-            Debug.printError(e);
-            return false;
-        }
-        return true;
+        return fn.eval(p);
     }
-
 }
