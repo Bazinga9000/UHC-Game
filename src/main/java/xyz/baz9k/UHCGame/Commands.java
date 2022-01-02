@@ -10,6 +10,7 @@ import dev.jorel.commandapi.wrappers.*;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import xyz.baz9k.UHCGame.exception.UHCException;
 import xyz.baz9k.UHCGame.util.Debug;
 
 import static xyz.baz9k.UHCGame.util.CommandAPIUtils.*;
@@ -24,11 +25,9 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.*;
 
 @SuppressWarnings("unchecked")
@@ -232,25 +231,6 @@ public final class Commands {
         );
     }
 
-    private void _respawn(CommandSender sender, Player p, Location loc) throws WrapperCommandSyntaxException {
-        TeamManager tm = plugin.getTeamManager();
-        if (tm.isSpectator(p)) {
-            fail(new Key("cmd.respawn.fail.spectator"), p.getName());
-            return;
-        }
-
-        p.teleport(loc);
-        tm.setCombatantAliveStatus(p, true);
-        p.setGameMode(GameMode.SURVIVAL);
-        
-        // clear all potion effects
-        for (PotionEffect effect : p.getActivePotionEffects()) {
-            p.removePotionEffect(effect.getType());
-        }
-
-        sender.sendMessage(new Key("cmd.respawn.succ").trans(p.getName()));
-    }
-
     // uhc respawn <target: players>
     @RegisterUHCSubCommand
     private CommandAPICommand respawn() {
@@ -261,10 +241,24 @@ public final class Commands {
         .executes(
             (sender, args) -> {
                 requireStarted();
-                
+                var gm = plugin.getGameManager();
+                List<String> successes = new ArrayList<>();
+
                 for (Player p : (Collection<Player>) args[0]) {
-                    _respawn(sender, p, p.getBedSpawnLocation());
+                    try {
+                        gm.respawnPlayer(p, p.getBedSpawnLocation());
+                        successes.add(p.getName());
+                    } catch (UHCException e) {
+                        sender.sendMessage(e);
+                    }
                 }
+
+                if (successes.size() > 0) {
+                    sender.sendMessage(new Key("cmd.respawn.succ").trans(
+                        String.join(", ", successes)
+                    ));
+                }
+                return successes.size();
             }
         );
     }
@@ -280,10 +274,25 @@ public final class Commands {
         .executes(
             (sender, args) -> {
                 requireStarted();
-                
+                var gm = plugin.getGameManager();
+                List<String> successes = new ArrayList<>();
+                Location loc = (Location) args[1];
+
                 for (Player p : (Collection<Player>) args[0]) {
-                    _respawn(sender, p, (Location) args[1]);
+                    try {
+                        gm.respawnPlayer(p, loc);
+                        successes.add(p.getName());
+                    } catch (UHCException e) {
+                        sender.sendMessage(e);
+                    }
                 }
+
+                if (successes.size() > 0) {
+                    sender.sendMessage(new Key("cmd.respawn.succ").trans(
+                        String.join(", ", successes)
+                    ));
+                }
+                return successes.size();
             }
         );
     }

@@ -480,6 +480,22 @@ public class GameManager implements Listener {
         return OptionalInt.empty();
     }
 
+    public void respawnPlayer(Player p, Location loc) throws UHCException {
+        TeamManager tm = plugin.getTeamManager();
+        if (tm.isSpectator(p)) {
+            throw new UHCException(new Key("cmd.respawn.fail.spectator"), p.getName());
+        }
+
+        p.teleport(loc);
+        tm.setCombatantAliveStatus(p, true);
+        p.setGameMode(GameMode.SURVIVAL);
+        
+        // clear all potion effects
+        for (PotionEffect effect : p.getActivePotionEffects()) {
+            p.removePotionEffect(effect.getType());
+        }
+    }
+
     private Component includeGameTimestamp(Component c) {
         if (c == null) return null;
         String timeStr = getLongTimeString(getElapsedTime(), "?");
