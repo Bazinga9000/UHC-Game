@@ -160,13 +160,15 @@ public class WorldManager {
      * Accessible through /uhc reseed
      */
     public void reseedWorlds() {
+        boolean doVerify = !plugin.configValues().netherSpawn();
+
         Random r = new Random();
         long l;
         do {
             l = r.nextLong();
-            Debug.printDebug(String.format("Checking seed %s", l));
-            reseedWorld(getGameWorld(0), l);
-        } while(!isGoodWorld(getGameWorld(0)));
+            if (doVerify) Debug.printDebug(String.format("Checking seed %s", l));
+            reseedWorld(getMainWorld(), l);
+        } while(doVerify && !isGoodWorld(getMainWorld()));
         
         Debug.printDebug(String.format("Using seed %s", l));
         reseedWorlds(l, true);
