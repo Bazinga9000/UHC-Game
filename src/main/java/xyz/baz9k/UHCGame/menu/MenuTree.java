@@ -319,7 +319,7 @@ public class MenuTree {
             var nodeName = (String) presetProps.get("node_name");
             var matType  = (String) presetProps.get("material");
             var clrHex   = (int) presetProps.get("style_color");
-            var preset = (Map<?, ?>) presetProps.get("preset");
+            var preset   = (Map<?, ?>) presetProps.get("preset");
 
             Material mat = Material.valueOf(matType);
             TextColor clr = TextColor.color(clrHex);

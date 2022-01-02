@@ -76,7 +76,7 @@ public final class PresetNode extends Node {
      * @return get a format arg located at the specified config key
      */
     private String fromPreset(String path) {
-        Optional<Object> o = new Path(path).get(preset);
+        Optional<Object> o = new Path(path).traverse(preset);
         return formatted(path, o.orElse(cfg.get(path)));
     }
 
@@ -89,7 +89,7 @@ public final class PresetNode extends Node {
      */
     @SuppressWarnings("unchecked")
     private String formatted(String cfgKey, Object o) {
-        var maybeNode = node(cfgKey);
+        Optional<Node> maybeNode = node(cfgKey);
 
         if (maybeNode.isPresent()) {
             Node n = maybeNode.get();
@@ -118,10 +118,10 @@ public final class PresetNode extends Node {
      */
     private String settingsText(String path) {
         Path p = new Path(path);
-        Object o = preset.get(p);
+        Optional<Object> o = p.traverse(preset);
 
         String text;
-        if (o instanceof Map<?, ?> om) {
+        if (o.isPresent() && o.get() instanceof Map<?, ?> om) {
             text = om.entrySet().stream()
             .map(e -> {
                 String cfgKey = Path.join(path, (String) e.getKey());
@@ -143,7 +143,7 @@ public final class PresetNode extends Node {
             .filter(Objects::nonNull)
             .collect(Collectors.joining("\n"));
         } else {
-            text = String.valueOf(o);
+            text = String.valueOf(o.orElse(null));
         }
 
         return "\n" + text;

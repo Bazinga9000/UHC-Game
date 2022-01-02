@@ -15,6 +15,10 @@ import java.util.stream.Stream;
 public final class Path implements Iterable<String> {
     private final String[] path;
 
+    /**
+     * @param splitString whether or not to break up path strings into node components
+     * @param path the path
+     */
     private Path(boolean splitString, String... path) {
         Objects.requireNonNull(path);
         if (splitString) {
@@ -68,8 +72,16 @@ public final class Path implements Iterable<String> {
         return path.length == 0;
     }
 
+    /**
+     * Traverses a tree with named nodes.
+     * @param <N> Class of every node
+     * @param <B> Class of every branch node
+     * @param root The top node to start traversing from
+     * @param getChild Method to get from a branch node to a child
+     * @return the descendant at the path, if it exists
+     */
     @SuppressWarnings("unchecked")
-    public <N, B extends N> Optional<N> get(B root, BiFunction<B, String, Optional<N>> getChild) {
+    public <N, B extends N> Optional<N> traverse(B root, BiFunction<B, String, Optional<N>> getChild) {
         if (isRoot()) return Optional.of(root);
 
         Class<B> branchClass = (Class<B>) root.getClass();
@@ -98,8 +110,20 @@ public final class Path implements Iterable<String> {
         return getChild.apply(node, childName);
     }
 
-    public Optional<Object> get(Map<?, ?> root) {
-        return get(root, (m, s) -> Optional.ofNullable(m.get(s)));
+    /**
+     * Traverses a nested map.
+     * <p><code> 
+     *     new Path("a.b.c.d").traverse(map);
+     * </code>
+     * is equivalent to
+     * <code>
+     *     ((Map&lt;?,?&gt;) ((Map&lt;?,?&gt;) ((Map&lt;?,?&gt;) map.get("a")).get("b")).get("c")).get("d")
+     * </code>
+     * @param root The top map to start traversing from
+     * @return the descendant at the path, if it exists
+     */
+    public Optional<Object> traverse(Map<?, ?> root) {
+        return traverse(root, (m, s) -> Optional.ofNullable(m.get(s)));
     }
 
     // pregenerated
@@ -124,7 +148,8 @@ public final class Path implements Iterable<String> {
             return false;
         return true;
     }
-
+    //
+    
     private static Stream<String> stream(String[] path) {
         return Arrays.stream(path)
             .flatMap(n -> Arrays.stream(n.split("\\.")));
