@@ -19,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -41,6 +42,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Supplier;
+
+import com.destroystokyo.paper.MaterialTags;
 
 import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
@@ -838,6 +841,29 @@ public class GameManager implements Listener {
 
         var cfg = plugin.configValues();
         new LeafDropProducer(e, cfg).addDrops();
+    }
+
+    @EventHandler
+    public void onCraftTool(CraftItemEvent e) {
+        if (!hasUHCStarted()) return;
+        var cfg = plugin.configValues();
+        var hastyBoys = cfg.hastyBoys();
+        var luckyBoys = cfg.luckyBoys();
+
+        
+        ItemStack result = e.getRecipe().getResult();
+        if (MaterialTags.ENCHANTABLE.isTagged(result)) {
+            if (hastyBoys.isPresent()) {
+                result.addUnsafeEnchantments(Map.ofEntries(
+                    Map.entry(Ench.EFFICIENCY, hastyBoys.getAsInt()),
+                    Map.entry(Ench.UNBREAKING, 3)
+                ));
+            }
+    
+            if (luckyBoys.isPresent()) {
+                result.addUnsafeEnchantment(Ench.FORTUNE, luckyBoys.getAsInt());
+            }
+        }
     }
 
     private void prepareToGame(Player p, boolean onGameStart) {

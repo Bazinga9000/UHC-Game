@@ -172,9 +172,7 @@ public class MenuTree {
         return ctrlRoot;
     }
 
-    // TODO impl 
-    // player.hasty_boys
-    // player.lucky_boys
+    // TODO impl
     // player.prox_track
     
     private BranchNode createConfigBranch(BranchNode root) {
