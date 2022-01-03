@@ -3,6 +3,7 @@ package xyz.baz9k.UHCGame;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.OptionalDouble;
+import java.util.OptionalInt;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -92,6 +93,53 @@ public class ConfigValues {
         return cfg.getInt("global.spreadplayers");
     }
 
+        
+    /**
+     * @return if iron, gold, copper autosmelt when mined
+     */
+    public boolean autoSmelt() {
+        return cfg.getBoolean("global.auto_smelt");
+    }
+
+        
+    /**
+     * @return if mobs auto cook when killed
+     */
+    public boolean autoCook() {
+        return cfg.getBoolean("global.auto_cook");
+    }
+
+        
+    /**
+     * @return if gravel always drops flint
+     */
+    public boolean alwaysFlint() {
+        return cfg.getBoolean("global.always_flint");
+    }
+
+        
+    /**
+     * @return the drop rate multiplier of apple drops
+     */
+    public int appleDropRate() {
+        return new int[]{0, 1, 2, 4, 8}[cfg.getInt("global.apple_drop_rate")];
+    }
+
+        
+    /**
+     * @return if shearing drops apples
+     */
+    public boolean shearApple() {
+        return cfg.getBoolean("global.shear_apple");
+    }
+
+        
+    /**
+     * @return if all leaves drop apples
+     */
+    public boolean allLeaves() {
+        return cfg.getBoolean("global.all_leaves");
+    }
     /// TEAMS ///
 
     /**
@@ -213,5 +261,32 @@ public class ConfigValues {
      */
     public boolean freezeDamage() {
         return cfg.getBoolean("player.freeze_damage");
+    }
+
+    /**
+     * @return the level of Hasty Boys, if enabled
+     */
+    public OptionalInt hastyBoys() {
+        int v = cfg.getInt("player.hasty_boys");
+        
+        if (v > 0) return OptionalInt.of(v);
+        return OptionalInt.empty();
+    }
+
+    /**
+     * @return the level set for Lucky Boys, if enabled
+     */
+    public OptionalInt luckyBoys() {
+        int v = cfg.getInt("player.lucky_boys");
+        
+        if (v > 0) return OptionalInt.of(v);
+        return OptionalInt.empty();
+    }
+
+    /**
+     * @return if compasses track nearest non-team player
+     */
+    public boolean proxTrack() {
+        return cfg.getBoolean("player.prox_track");
     }
 }

@@ -173,9 +173,6 @@ public class MenuTree {
     }
 
     // TODO impl 
-    // global.auto_smelt
-    // global.auto_cook
-    // global.always_flint
     // global.apple_drop_rate
     // global.shear_apple
     // global.all_leaves
@@ -215,15 +212,15 @@ public class MenuTree {
         new ValuedNode(globalSettings, i++, "wither_bonus",   new ItemProperties<>(Material.WITHER_SKELETON_SKULL).style(TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(globalSettings, i++, "nether_spawn",   new ItemProperties<>(Material.NETHERRACK).style(TextColor.color(0x9C4040)),            ValuedNode.Type.BOOLEAN);
         new OptionValuedNode(globalSettings, i++, "dn_cycle", new ItemProperties<>().style(TextColor.color(0xFFEB85)),
-        Material.CLOCK,
-        Material.COMPASS,
-        Material.SNOWBALL,
-        Material.GLOWSTONE,
-        Material.LIGHT_GRAY_CONCRETE
+            Material.CLOCK,
+            Material.COMPASS,
+            Material.SNOWBALL,
+            Material.GLOWSTONE,
+            Material.LIGHT_GRAY_CONCRETE
         );
         new OptionValuedNode(globalSettings, i++, "spreadplayers", new ItemProperties<>(),
-        Material.WHEAT_SEEDS,
-        Material.WHEAT
+            Material.WHEAT_SEEDS,
+            Material.WHEAT
         );
         new ValuedNode(globalSettings, i++, "auto_smelt",      new ItemProperties<>(Material.IRON_INGOT).style(TextColor.color(0xCFCFCF)),      ValuedNode.Type.BOOLEAN);
         new ValuedNode(globalSettings, i++, "auto_cook",       new ItemProperties<>(Material.COOKED_PORKCHOP).style(TextColor.color(0xF9E9C9)), ValuedNode.Type.BOOLEAN);

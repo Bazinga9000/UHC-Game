@@ -10,12 +10,15 @@ import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -768,6 +771,67 @@ public class GameManager implements Listener {
         Player p = e.getPlayer();
         if (teamManager.getPlayerState(p).isSpectating()) {
             prepareToSpectate(p);
+        }
+    }
+
+    private record DropTransformer(Material fromMat, Material toMat) {
+        public void transform(ItemStack s) {
+            if (s.getType() == fromMat) s.setType(toMat);
+        }
+        public void transform(Item it) {
+            transform(it.getItemStack());
+        }
+    }
+    private static final Map<Material, DropTransformer> AUTO_SMELT_MAP = Map.ofEntries(
+        Map.entry(Material.IRON_ORE, new DropTransformer(Material.RAW_IRON, Material.IRON_INGOT)),
+        Map.entry(Material.GOLD_ORE, new DropTransformer(Material.RAW_GOLD, Material.GOLD_INGOT)),
+        Map.entry(Material.COPPER_ORE, new DropTransformer(Material.RAW_COPPER, Material.COPPER_INGOT))
+    );
+    private static final DropTransformer GRAVEL_TRANSFORMER = new DropTransformer(Material.GRAVEL, Material.FLINT);
+    private static final Map<Material, Material> GORDON_RAMSEYS_RECIPE_BOOK = Map.ofEntries(
+        Map.entry(Material.BEEF,      Material.COOKED_BEEF),
+        Map.entry(Material.CHICKEN,   Material.COOKED_CHICKEN),
+        // Map.entry(Material.COD,    Material.COOKED_COD), // i see a universe where someone wants to tame a cat
+        Map.entry(Material.MUTTON,    Material.COOKED_MUTTON),
+        Map.entry(Material.PORKCHOP,  Material.COOKED_PORKCHOP),
+        Map.entry(Material.RABBIT,    Material.COOKED_RABBIT)
+        // Map.entry(Material.SALMON, Material.COOKED_SALMON)
+    );
+
+    @EventHandler
+    public void onBlockDrop(BlockDropItemEvent e) {
+        if (!hasUHCStarted()) return;
+        var cfg = plugin.configValues();
+
+        Material blockMaterial = e.getBlock().getType();
+        List<Item> items = e.getItems();
+
+        if (cfg.autoSmelt()) {
+            if (AUTO_SMELT_MAP.containsKey(blockMaterial)) {
+                var transformer = AUTO_SMELT_MAP.get(blockMaterial);
+                
+                for (Item it : items) transformer.transform(it);
+            }
+        }
+        if (cfg.alwaysFlint()) {
+            if (blockMaterial == Material.GRAVEL) {
+                for (Item it : items) GRAVEL_TRANSFORMER.transform(it);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onMobDrop(EntityDropItemEvent e) {
+        if (!hasUHCStarted()) return;
+        var cfg = plugin.configValues();
+
+        if (cfg.autoCook()) {
+            ItemStack stack = e.getItemDrop().getItemStack();
+            Material m = stack.getType();
+    
+            if (GORDON_RAMSEYS_RECIPE_BOOK.containsKey(m)) {
+                stack.setType(m);
+            }
         }
     }
 
