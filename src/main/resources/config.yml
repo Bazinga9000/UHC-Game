@@ -16,6 +16,12 @@ global:
   nether_spawn: false
   dn_cycle: 2
   spreadplayers: 0
+  auto_smelt: false
+  auto_cook: false
+  always_flint: false
+  apple_drop_rate: 1
+  shear_apple: false
+  all_leaves: false
 
 team:
   hide_teams: 0
@@ -33,5 +39,8 @@ player:
   fall_damage: true
   fire_damage: true
   freeze_damage: true
+  hasty_boys: 0
+  lucky_boys: 0
+  prox_track: false
 
 kit: none

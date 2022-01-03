@@ -281,6 +281,42 @@ xyz:
                 options:
                   - "By Teams"
                   - "Individually"
+              auto_smelt:
+                name: "Auto Smelt"
+                desc: |-
+                  Iron, gold, and copper 
+                  automatically smelt when mined
+              auto_cook:
+                name: "Auto Cook"
+                desc: |-
+                  Animals are automatically 
+                  cooked when killed
+                options:
+              always_flint:
+                name: "Always Flint"
+                desc: |-
+                  Gravel always drops flint
+              apple_drop_rate:
+                name: "Apple Drop Rate"
+                desc: |-
+                  Change how frequently 
+                  apples drop from leaves
+                options:
+                  - "0x"
+                  - "1x"
+                  - "2x"
+                  - "4x"
+                  - "8x"
+              shear_apple:
+                name: "Shears Drop Apples"
+                desc: |-
+                  Using shears can give apples
+                  (1/50 by default)
+              all_leaves:
+                name: "Taigas Aren't Shit Anymore!"
+                desc: |-
+                  That's a lie.
+                  All leaves can drop apples.
             team:
               root:
                 name: "Team Settings"
@@ -349,6 +385,20 @@ xyz:
                 desc: |-
                   Determine whether players can heal
                   by eating food.
+              hasty_boys:
+                name: "Hasty Boys"
+                desc: |-
+                  All tools are given Efficiency {0}
+                  and Unbreaking 3.
+              lucky_boys:
+                name: "Lucky Boys"
+                desc: |-
+                  All tools are given Fortune {0}.
+              prox_track:
+                name: "Dream Manhunt"
+                desc: |-
+                  Compasses point to the nearest non-team player,
+                  and the compass recipe is buffed.
               drowning_damage:
                 name: "Drowning Damage"
                 desc: "Enable/disable drowning damage"
@@ -419,5 +469,11 @@ xyz:
                 name: "Presets"
                 desc: "Enable premade presets for UHC"
               default:
-                name: "Default"
+                name: "Classical"
+                desc: ""
+              blitz:
+                name: "Blitz"
+                desc: ""
+              bullet:
+                name: "Bullet"
                 desc: ""

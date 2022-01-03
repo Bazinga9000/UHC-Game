@@ -172,6 +172,17 @@ public class MenuTree {
         return ctrlRoot;
     }
 
+    // TODO impl 
+    // global.auto_smelt
+    // global.auto_cook
+    // global.always_flint
+    // global.apple_drop_rate
+    // global.shear_apple
+    // global.all_leaves
+    // player.hasty_boys
+    // player.lucky_boys
+    // player.prox_track
+    
     private BranchNode createConfigBranch(BranchNode root) {
         BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties<>(Material.GOLDEN_PICKAXE), 4)
             .lock(plugin.getGameManager()::hasUHCStarted);
@@ -204,16 +215,28 @@ public class MenuTree {
         new ValuedNode(globalSettings, i++, "wither_bonus",   new ItemProperties<>(Material.WITHER_SKELETON_SKULL).style(TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
         new ValuedNode(globalSettings, i++, "nether_spawn",   new ItemProperties<>(Material.NETHERRACK).style(TextColor.color(0x9C4040)),            ValuedNode.Type.BOOLEAN);
         new OptionValuedNode(globalSettings, i++, "dn_cycle", new ItemProperties<>().style(TextColor.color(0xFFEB85)),
-            Material.CLOCK,
-            Material.COMPASS,
-            Material.SNOWBALL,
-            Material.GLOWSTONE,
-            Material.LIGHT_GRAY_CONCRETE
+        Material.CLOCK,
+        Material.COMPASS,
+        Material.SNOWBALL,
+        Material.GLOWSTONE,
+        Material.LIGHT_GRAY_CONCRETE
         );
         new OptionValuedNode(globalSettings, i++, "spreadplayers", new ItemProperties<>(),
-            Material.WHEAT_SEEDS,
-            Material.WHEAT
+        Material.WHEAT_SEEDS,
+        Material.WHEAT
         );
+        new ValuedNode(globalSettings, i++, "auto_smelt",      new ItemProperties<>(Material.IRON_INGOT).style(TextColor.color(0xCFCFCF)),      ValuedNode.Type.BOOLEAN);
+        new ValuedNode(globalSettings, i++, "auto_cook",       new ItemProperties<>(Material.COOKED_PORKCHOP).style(TextColor.color(0xF9E9C9)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(globalSettings, i++, "always_flint",    new ItemProperties<>(Material.FLINT).style(TextColor.color(0x9F9F9F)),           ValuedNode.Type.BOOLEAN);
+        new OptionValuedNode(globalSettings, i++, "apple_drop_rate", new ItemProperties<>().style(TextColor.color(0x50BC50)),
+            Material.POISONOUS_POTATO,
+            Material.OAK_SAPLING,
+            Material.OAK_LEAVES,
+            Material.APPLE,
+            Material.GOLDEN_APPLE
+        );
+        new ValuedNode(globalSettings, i++, "shear_apple", new ItemProperties<>(Material.SHEARS).style(TextColor.color(0x9C7C40)),        ValuedNode.Type.BOOLEAN);
+        new ValuedNode(globalSettings, i++, "all_leaves",  new ItemProperties<>(Material.SPRUCE_LEAVES).style(TextColor.color(0x309C00)), ValuedNode.Type.BOOLEAN);
 
         /* TEAM SETTINGS */
         i = 0;
@@ -259,7 +282,8 @@ public class MenuTree {
                     return getTimeString(secs);
                 }), 
             ValuedNode.Type.INTEGER, 
-            n -> Math.max(-1, (int) n));
+            n -> Math.max(-1, (int) n)
+        );
         new ValuedNode(playerSettings, i++, "final_heal",
             new ItemProperties<>(v -> (int) v >= 0 ? Material.GLOW_BERRIES : Material.BLACK_CONCRETE)
                 .formatArg(v -> {
@@ -268,8 +292,22 @@ public class MenuTree {
                     return getTimeString(secs);
                 }), 
             ValuedNode.Type.INTEGER, 
-            n -> Math.max(-1, (int) n));
+            n -> Math.max(-1, (int) n)
+        );
         new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, i++, "hasty_boys",
+            new ItemProperties<>(Material.GOLDEN_PICKAXE)
+                .formatArg(v -> Component.translatable(String.format("enchantment.level.%s", v))),
+                ValuedNode.Type.INTEGER, 
+                v -> clamp(0, (int) v, 255)
+        );
+        new ValuedNode(playerSettings, i++, "lucky_boys",
+            new ItemProperties<>(Material.GOLD_INGOT)
+                .formatArg(v -> Component.translatable(String.format("enchantment.level.%s", v))),
+                ValuedNode.Type.INTEGER, 
+                v -> clamp(0, (int) v, 255)
+        );
+        new ValuedNode(playerSettings, i++, "prox_track",    new ItemProperties<>(Material.COMPASS), ValuedNode.Type.BOOLEAN);
         
         new ValuedNode(playerSettings, 9,  "drowning_damage", new ItemProperties<>(Material.TURTLE_HELMET),      ValuedNode.Type.BOOLEAN);
         new ValuedNode(playerSettings, 10, "fall_damage",     new ItemProperties<>(Material.FEATHER),            ValuedNode.Type.BOOLEAN);
@@ -304,7 +342,6 @@ public class MenuTree {
         }
 
         /* PRESETS */
-        // TODO, add more presets
         var presetsYml = loadYMLResource("presets.yml");
         var presetPropsList = presetsYml.getMapList("presets");
 
