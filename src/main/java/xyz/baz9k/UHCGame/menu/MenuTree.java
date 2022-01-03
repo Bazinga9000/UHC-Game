@@ -279,7 +279,7 @@ public class MenuTree {
         /* KIT SETTINGS */
         var kitsYml = loadYMLResource("kits.yml");
         var kitPropsList = kitsYml.getMapList("kits");
-        List<Kit> kits = new ArrayList<>();
+        Map<String, Kit> kits = new HashMap<>();
 
         var kitNode = new KitNode(kitSettings, 52, "custom", 
             new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)),
@@ -295,12 +295,11 @@ public class MenuTree {
 
             Material mat = Material.valueOf(matType);
             TextColor clr = TextColor.color(clrHex);
-            kits.add(kit);
+            kits.put(nodeName, kit);
 
-            int ki = j;
             new ActionNode(kitSettings, j, nodeName,
                 new ItemProperties<>(mat).style(clr), 
-                p -> kitNode.set(ki)
+                p -> kitNode.set(nodeName)
             );
         }
 

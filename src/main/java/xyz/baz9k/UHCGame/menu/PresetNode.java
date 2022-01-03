@@ -154,17 +154,16 @@ public final class PresetNode extends Node {
      */
     private Component kitSettings() {
         Object kit = fromPreset("kit");
-        var kitParent = ValuedNode.cfgRoot.findDescendant("kit");
+        var kitNode = ValuedNode.cfgRoot.findDescendant("kit.custom");
 
         String kitKey = "none";
 
-        
         if (kit instanceof Kit) {
             kitKey = "custom";
-        } else if (kit instanceof Integer ki && ki != 0) {
-            if (kitParent.isPresent()) {
-                var p = (BranchNode) kitParent.get();
-                kitKey = p.getChildren()[ki].nodeName;
+        } else if (kit instanceof String kn) {
+            if (kitNode.isPresent()) {
+                var n = (KitNode) kitNode.get();
+                if (n.kits().containsKey(kn)) kitKey = kn;
             }
         }
 

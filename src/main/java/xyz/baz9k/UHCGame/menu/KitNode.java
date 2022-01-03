@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.bukkit.Material;
@@ -25,7 +26,7 @@ public class KitNode extends InventoryNode implements ValueHolder {
 
     private boolean grantXP = false;
     private final NodeItemStack xpStack;
-    private final List<Kit> kits;
+    private final Map<String, Kit> kits;
 
     /**
      * @param parent Parent node
@@ -34,7 +35,7 @@ public class KitNode extends InventoryNode implements ValueHolder {
      * @param props {@link NodeItemStack.ItemProperties}
      * @param kits Mapping of kit indexes to kits
      */
-    public KitNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props, List<Kit> kits) {
+    public KitNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props, Map<String, Kit> kits) {
         super(parent, slot, nodeName, props, 5, new ReserveSlots(9 * 5 - 4));
 
         this.fillReserved = Material.GRAY_STAINED_GLASS_PANE;
@@ -42,7 +43,7 @@ public class KitNode extends InventoryNode implements ValueHolder {
         new ItemProperties<Boolean>(b -> b ? Material.EXPERIENCE_BOTTLE : Material.GLASS_BOTTLE)
             .useObject(() -> this.grantXP)
         );
-        this.kits = Collections.unmodifiableList(kits);
+        this.kits = Collections.unmodifiableMap(kits);
     }
 
     @Override
@@ -134,14 +135,21 @@ public class KitNode extends InventoryNode implements ValueHolder {
         return "kit";
     }
 
+    /**
+     * @return unmodifiable view of the kits
+     */
+    public Map<String, Kit> kits() {
+        return kits;
+    }
+
     @Override
     public void set(Object o) {
         // config can either store a number or a kit index
         Kit kit;
         if (o instanceof Kit k) {
             kit = k;
-        } else if (o instanceof Integer ki && 0 <= ki && ki < kits.size()) {
-            kit = kits.get(ki);
+        } else if (o instanceof String kn && kits.containsKey(kn)) {
+            kit = kits.get(kn);
         } else {
             throw new IllegalArgumentException("Kit must be a kit index or a kit");
         }

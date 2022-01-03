@@ -34,4 +34,4 @@ presets:
         fall_damage: true
         fire_damage: true
         freeze_damage: true
-      kit: 0
+      kit: none
