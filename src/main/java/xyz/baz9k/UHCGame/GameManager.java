@@ -18,7 +18,6 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -409,10 +408,10 @@ public class GameManager implements Listener {
 
             for (Player p : teamManager.getCombatants().online()) {
                 p.addPotionEffects(Arrays.asList(
-                    PotionEffectType.DAMAGE_RESISTANCE.createEffect(10 * 20, 10),
-                    PotionEffectType.SLOW.createEffect(10 * 20, 10),
-                    PotionEffectType.JUMP.createEffect(10 * 20, 128),
-                    PotionEffectType.BLINDNESS.createEffect(10 * 20, 10)
+                    PotType.RESISTANCE.createEffect(10 * 20, 10),
+                    PotType.SLOWNESS.createEffect(10 * 20, 10),
+                    PotType.JUMP_BOOST.createEffect(10 * 20, 128),
+                    PotType.BLINDNESS.createEffect(10 * 20, 10)
                 ));
             }
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -700,7 +699,7 @@ public class GameManager implements Listener {
             resetStatuses(p);
 
             // 60s grace period
-            PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
+            PotType.RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
         }
     }
 
@@ -721,7 +720,7 @@ public class GameManager implements Listener {
 
     private void prepareToSpectate(Player p) {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, true, true, false)
+            new PotionEffect(PotType.NIGHT_VISION, Integer.MAX_VALUE, 0, true, true, false)
                 .apply(p);
         }, 1);
     }

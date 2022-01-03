@@ -1,8 +1,9 @@
 package xyz.baz9k.UHCGame.menu;
 
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import xyz.baz9k.UHCGame.util.Ench;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
@@ -73,9 +74,9 @@ public class ValuedNode extends Node {
             props.metaChanges((o, m) -> {
                 var active = (boolean) o;
                 if (active) {
-                    m.addEnchant(Enchantment.SILK_TOUCH, 1, true);
+                    m.addEnchant(Ench.SILK_TOUCH, 1, true);
                 } else {
-                    m.removeEnchant(Enchantment.SILK_TOUCH);
+                    m.removeEnchant(Ench.SILK_TOUCH);
                 }
             }).extraLore(NodeItemStack.ExtraLore.fromBool());
         }
