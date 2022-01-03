@@ -31,10 +31,10 @@ public record Kit(ItemStack[] storage, ItemStack[] armor, ItemStack offhand, int
 
     @SuppressWarnings("unchecked")
     public static Kit deserialize(Map<String, Object> map) {
-        var storage  = (List<ItemStack>) map.get("storage");
-        var armor    = (List<ItemStack>) map.get("armor");
-        var offhand  = (ItemStack) map.get("offhand");
-        var xpLevels = (int) map.get("xpLevels");
+        var storage  = (List<ItemStack>) map.getOrDefault("storage", List.of());
+        var armor    = (List<ItemStack>) map.getOrDefault("armor", List.of());
+        var offhand  = (ItemStack) map.getOrDefault("offhand", new ItemStack(Material.AIR));
+        var xpLevels = (int) map.getOrDefault("xpLevels", 0);
 
         if (offhand.getType() == Material.AIR) offhand = null;
         return new Kit(
