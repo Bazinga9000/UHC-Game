@@ -16,6 +16,7 @@ import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import xyz.baz9k.UHCGame.drops.DropTransformer;
+import xyz.baz9k.UHCGame.drops.LeafDropProducer;
 import xyz.baz9k.UHCGame.exception.UHCCheckFailException;
 import xyz.baz9k.UHCGame.exception.UHCException;
 import xyz.baz9k.UHCGame.util.*;
@@ -774,14 +777,6 @@ public class GameManager implements Listener {
         }
     }
 
-    private record DropTransformer(Material fromMat, Material toMat) {
-        public void transform(ItemStack s) {
-            if (s.getType() == fromMat) s.setType(toMat);
-        }
-        public void transform(Item it) {
-            transform(it.getItemStack());
-        }
-    }
     private static final Map<Material, DropTransformer> AUTO_SMELT_MAP = Map.ofEntries(
         Map.entry(Material.IRON_ORE, new DropTransformer(Material.RAW_IRON, Material.IRON_INGOT)),
         Map.entry(Material.GOLD_ORE, new DropTransformer(Material.RAW_GOLD, Material.GOLD_INGOT)),
@@ -803,7 +798,7 @@ public class GameManager implements Listener {
         if (!hasUHCStarted()) return;
         var cfg = plugin.configValues();
 
-        Material blockMaterial = e.getBlock().getType();
+        Material blockMaterial = e.getBlockState().getType();
         List<Item> items = e.getItems();
 
         if (cfg.autoSmelt()) {
@@ -818,6 +813,8 @@ public class GameManager implements Listener {
                 for (Item it : items) GRAVEL_TRANSFORMER.transform(it);
             }
         }
+
+        new LeafDropProducer(e, cfg).addDrops();
     }
 
     @EventHandler
@@ -830,9 +827,17 @@ public class GameManager implements Listener {
             Material m = stack.getType();
     
             if (GORDON_RAMSEYS_RECIPE_BOOK.containsKey(m)) {
-                stack.setType(m);
+                stack.setType(GORDON_RAMSEYS_RECIPE_BOOK.get(m));
             }
         }
+    }
+
+    @EventHandler
+    public void onLeafDecay(LeavesDecayEvent e) {
+        if (!hasUHCStarted()) return;
+
+        var cfg = plugin.configValues();
+        new LeafDropProducer(e, cfg).addDrops();
     }
 
     private void prepareToGame(Player p, boolean onGameStart) {

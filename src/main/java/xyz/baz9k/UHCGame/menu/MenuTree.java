@@ -173,9 +173,6 @@ public class MenuTree {
     }
 
     // TODO impl 
-    // global.apple_drop_rate
-    // global.shear_apple
-    // global.all_leaves
     // player.hasty_boys
     // player.lucky_boys
     // player.prox_track
