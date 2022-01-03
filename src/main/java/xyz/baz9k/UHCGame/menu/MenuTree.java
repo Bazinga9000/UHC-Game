@@ -270,6 +270,11 @@ public class MenuTree {
             ValuedNode.Type.INTEGER, 
             n -> Math.max(-1, (int) n));
         new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
+        
+        new ValuedNode(playerSettings, 9,  "drowning_damage", new ItemProperties<>(Material.TURTLE_HELMET),      ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, 10, "fall_damage",     new ItemProperties<>(Material.FEATHER),            ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, 11, "fire_damage",     new ItemProperties<>(Material.FLINT_AND_STEEL),    ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, 12, "freeze_damage",   new ItemProperties<>(Material.POWDER_SNOW_BUCKET), ValuedNode.Type.BOOLEAN);
 
         /* KIT SETTINGS */
         var kitsYml = loadYMLResource("kits.yml");

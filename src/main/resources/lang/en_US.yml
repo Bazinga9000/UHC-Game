@@ -349,6 +349,18 @@ xyz:
                 desc: |-
                   Determine whether players can heal
                   by eating food.
+              drowning_damage:
+                name: "Drowning Damage"
+                desc: "Enable/disable drowning damage"
+              fall_damage:
+                name: "Fall Damage"
+                desc: "Enable/disable fall damage"
+              fire_damage:
+                name: "Fire Damage"
+                desc: "Enable/disable fire damage"
+              freeze_damage:
+                name: "Freeze Damage"
+                desc: "Enable/disable freeze damage"
             kit:
               root:
                 name: "Kit"

@@ -186,4 +186,32 @@ public class ConfigValues {
     public boolean naturalRegen() {
         return cfg.getBoolean("player.natural_regen");
     }
+
+    /**
+     * @return if drowning damage is enabled
+     */
+    public boolean drowningDamage() {
+        return cfg.getBoolean("player.drowning_damage");
+    }
+
+    /**
+     * @return if fall damage is enabled
+     */
+    public boolean fallDamage() {
+        return cfg.getBoolean("player.fall_damage");
+    }
+
+    /**
+     * @return if fire damage is enabled
+     */
+    public boolean fireDamage() {
+        return cfg.getBoolean("player.fire_damage");
+    }
+
+    /**
+     * @return if freeze damage is enabled
+     */
+    public boolean freezeDamage() {
+        return cfg.getBoolean("player.freeze_damage");
+    }
 }

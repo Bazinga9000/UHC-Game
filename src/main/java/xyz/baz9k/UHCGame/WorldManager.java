@@ -92,8 +92,8 @@ public class WorldManager {
     public void initWorlds() {
         worldsRegened = false;
 
-        boolean natRegen = plugin.configValues().naturalRegen();
-        int dnCycle = plugin.configValues().dnCycle();
+        var cfg = plugin.configValues();
+        int dnCycle = cfg.dnCycle();
         // 0: 05:00 per cycle
         // 1: 10:00 per cycle
         // 2: 20:00 per cycle
@@ -112,8 +112,12 @@ public class WorldManager {
             w.getWorldBorder().setDamageAmount(1);
             
             setDefaultGamerules(w);
-            w.setGameRule(GameRule.NATURAL_REGENERATION, natRegen);
-            w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, dnCycle == 2);
+            w.setGameRule(GameRule.NATURAL_REGENERATION, cfg.naturalRegen());
+            w.setGameRule(GameRule.DROWNING_DAMAGE,      cfg.drowningDamage());
+            w.setGameRule(GameRule.FALL_DAMAGE,          cfg.fallDamage());
+            w.setGameRule(GameRule.FIRE_DAMAGE,          cfg.fireDamage());
+            w.setGameRule(GameRule.FREEZE_DAMAGE,        cfg.freezeDamage());
+            w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE,    dnCycle == 2);
             purgeWorld(w);
 
             // create beacon in worlds
@@ -262,11 +266,11 @@ public class WorldManager {
         w.setGameRule(GameRule.DO_TILE_DROPS, true);
         w.setGameRule(GameRule.DO_TRADER_SPAWNING, true);
         w.setGameRule(GameRule.DO_WEATHER_CYCLE, true);
-        w.setGameRule(GameRule.DROWNING_DAMAGE, true);
-        w.setGameRule(GameRule.FALL_DAMAGE, true);
-        w.setGameRule(GameRule.FIRE_DAMAGE, true);
+        // w.setGameRule(GameRule.DROWNING_DAMAGE, true); // set elsewhere
+        // w.setGameRule(GameRule.FALL_DAMAGE, true); // set elsewhere
+        // w.setGameRule(GameRule.FIRE_DAMAGE, true); // set elsewhere
         w.setGameRule(GameRule.FORGIVE_DEAD_PLAYERS, true);
-        w.setGameRule(GameRule.FREEZE_DAMAGE, true);
+        // w.setGameRule(GameRule.FREEZE_DAMAGE, true); // set elsewhere
         w.setGameRule(GameRule.KEEP_INVENTORY, false);
         w.setGameRule(GameRule.LOG_ADMIN_COMMANDS, true);
         w.setGameRule(GameRule.MAX_COMMAND_CHAIN_LENGTH, 65536);
