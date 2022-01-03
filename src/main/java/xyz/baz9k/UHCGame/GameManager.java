@@ -19,11 +19,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -487,10 +487,10 @@ public class GameManager implements Listener {
 
             for (Player p : teamManager.getCombatants().online()) {
                 p.addPotionEffects(Arrays.asList(
-                    PotType.RESISTANCE.createEffect(10 * 20, 10),
-                    PotType.SLOWNESS.createEffect(10 * 20, 10),
-                    PotType.JUMP_BOOST.createEffect(10 * 20, 128),
-                    PotType.BLINDNESS.createEffect(10 * 20, 10)
+                    PotionEffectType.DAMAGE_RESISTANCE.createEffect(10 * 20, 10),
+                    PotionEffectType.SLOW.createEffect(10 * 20, 10),
+                    PotionEffectType.JUMP.createEffect(10 * 20, 128),
+                    PotionEffectType.BLINDNESS.createEffect(10 * 20, 10)
                 ));
             }
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -841,27 +841,6 @@ public class GameManager implements Listener {
         new LeafDropProducer(e, cfg).addDrops();
     }
 
-    @EventHandler
-    public void onCraftTool(CraftItemEvent e) {
-        if (!hasUHCStarted()) return;
-        var cfg = plugin.configValues();
-
-        var result = e.getRecipe().getResult();
-
-        var hastyBoys = cfg.hastyBoys();
-        if (hastyBoys.isPresent()) {
-            result.addUnsafeEnchantments(Map.ofEntries(
-                Map.entry(Ench.EFFICIENCY, hastyBoys.getAsInt()),
-                Map.entry(Ench.UNBREAKING, 3)
-            ));
-        }
-
-        var luckyBoys = cfg.luckyBoys();
-        if (luckyBoys.isPresent()) {
-            result.addUnsafeEnchantment(Ench.FORTUNE, luckyBoys.getAsInt());
-        }
-    }
-
     private void prepareToGame(Player p, boolean onGameStart) {
         bbManager.enable(p);
         hudManager.initPlayerHUD(p);
@@ -914,7 +893,7 @@ public class GameManager implements Listener {
 
 
             // 60s grace period
-            PotType.RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
+            PotionEffectType.DAMAGE_RESISTANCE.createEffect(60 * 20 /* ticks */, /* lvl */ 5).apply(p);
         }
     }
 
@@ -935,7 +914,7 @@ public class GameManager implements Listener {
 
     private void prepareToSpectate(Player p) {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            new PotionEffect(PotType.NIGHT_VISION, Integer.MAX_VALUE, 0, true, true, false)
+            new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, true, true, false)
                 .apply(p);
         }, 1);
     }
