@@ -20,6 +20,7 @@ public class UHCGamePlugin extends JavaPlugin {
     private MenuManager menuManager;
     private WorldManager worldManager;
     private SpreadPlayersManager spreadPlayersManager;
+    private SardinesManager sardinesManager;
     private Recipes recipes;
 
     @Override
@@ -38,11 +39,13 @@ public class UHCGamePlugin extends JavaPlugin {
         worldManager = new WorldManager(this);
         menuManager = new MenuManager(this);
         spreadPlayersManager = new SpreadPlayersManager(this);
+        sardinesManager = new SardinesManager(this);
         recipes = new Recipes(this);
 
         Bukkit.getPluginManager().registerEvents(gameManager, this);
         Bukkit.getPluginManager().registerEvents(hudManager, this);
         Bukkit.getPluginManager().registerEvents(menuManager, this);
+        Bukkit.getPluginManager().registerEvents(sardinesManager, this);
 
         Commands commands = new Commands(this);
         commands.registerAll();
@@ -82,6 +85,9 @@ public class UHCGamePlugin extends JavaPlugin {
     }
     public SpreadPlayersManager spreadPlayers() {
         return spreadPlayersManager;
+    }
+    public SardinesManager getSardinesManager() {
+        return sardinesManager;
     }
 
     public Recipes getRecipes() {

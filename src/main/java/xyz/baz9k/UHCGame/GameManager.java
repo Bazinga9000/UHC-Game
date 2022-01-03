@@ -818,6 +818,7 @@ public class GameManager implements Listener {
                 
                 resetStatuses(p);
                 kit.apply(p);
+                if (cfgValues.sardines()) plugin.getSardinesManager().giveSardineIfNeedy(p);
             }
 
 

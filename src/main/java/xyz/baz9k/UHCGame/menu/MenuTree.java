@@ -173,7 +173,6 @@ public class MenuTree {
     }
 
     private BranchNode createConfigBranch(BranchNode root) {
-        // TODO bind these onto game
         BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties<>(Material.GOLDEN_PICKAXE), 4)
             .lock(plugin.getGameManager()::hasUHCStarted);
         ValuedNode.cfgRoot = cfgRoot;
@@ -236,7 +235,7 @@ public class MenuTree {
             ValuedNode.Type.INTEGER, 
             v -> Math.max(0, (int) v)
         );
-        new ValuedNode(teamSettings, i++, "sardines", new ItemProperties<>(Material.TROPICAL_FISH).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN); // TODO
+        new ValuedNode(teamSettings, i++, "sardines", new ItemProperties<>(Material.TROPICAL_FISH).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
 
         /* PLAYER SETTINGS */
         i = 0;

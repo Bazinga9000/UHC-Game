@@ -146,8 +146,23 @@ public class TeamManager {
      * @param t Team to assign player to
      */
     public void assignPlayerToTeam(@NotNull Player p, int t) {
-        if (t <= 0 || t > numTeams) {
-            throw new Key("team.invalid").transErr(IllegalArgumentException.class);
+        assignPlayerToTeam(p, t, true);
+    }
+
+    /**
+     * Assigns a player to a combatant team.
+     * @param p Player to assign team to
+     * @param t Team to assign player to
+     * @param bounded Bound the team to the number of teams allowed. If true, an IllegalArgumentException will occur if bound is not met.
+     */
+    public void assignPlayerToTeam(@NotNull Player p, int t, boolean bounded) {
+        var invalidExc = new Key("team.invalid").transErr(IllegalArgumentException.class);
+
+        if (t < 0) throw invalidExc;
+        if (bounded && t > numTeams) {
+            throw invalidExc;
+        } else {
+            numTeams = Math.max(numTeams, t);
         }
 
         // set to comb alive unless they're dead then set to dead
@@ -235,7 +250,7 @@ public class TeamManager {
             shuffleAssign(combatantsToAssign, 2, numTeams);
 
         } else if (sardines) {
-
+            for (Player p : combatants) assignPlayerToTeam(p, 0);
         } else {
             if (combatants.size() == numTeams) { 
                 // solos assigning
@@ -435,8 +450,7 @@ public class TeamManager {
      */
     public int[] getAliveTeams() {
         return playerMap.values().stream()
-            .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
-            .mapToInt(n -> n.team)
+            .mapToInt(Node::team)
             .filter(n -> n > 0)
             .distinct()
             .toArray();
