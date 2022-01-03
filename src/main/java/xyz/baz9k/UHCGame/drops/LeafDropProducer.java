@@ -84,7 +84,7 @@ public class LeafDropProducer {
                 return;
         }
 
-        if (!Tag.LEAVES.getValues().contains(leafType)) return;
+        if (!Tag.LEAVES.isTagged(leafType)) return;
         if (!allLeaves() && leafType != Material.OAK_LEAVES) return;
 
         // clear out apple drops so we can register our own
