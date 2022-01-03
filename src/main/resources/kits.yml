@@ -15,6 +15,7 @@ kits:
         ==: org.bukkit.inventory.ItemStack
         v: 2865
         type: AIR
+  
   - node_name: gone_fishing
     material: FISHING_ROD
     style_color: 0x3730FF
@@ -45,6 +46,7 @@ kits:
         ==: org.bukkit.inventory.ItemStack
         v: 2865
         type: AIR
+  
   - node_name: always_elytra
     material: ELYTRA
     style_color: 0xB5B8FF
@@ -69,6 +71,7 @@ kits:
         ==: org.bukkit.inventory.ItemStack
         v: 2865
         type: AIR
+  
   - node_name: bomberman
     material: GUNPOWDER
     style_color: 0x800000
@@ -91,6 +94,52 @@ kits:
           meta-type: UNSPECIFIC
           Unbreakable: true
       xpLevels: 0
+      armor:
+      - null
+      - null
+      - null
+      - null
+      offhand:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: AIR
+  
+  - node_name: blitz
+    material: FEATHER
+    style_color: 0xAAAAFF
+    kit:
+      ==: xyz.baz9k.UHCGame.Kit
+      storage:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: COOKED_BEEF
+        amount: 64
+      xpLevels: 0
+      armor:
+      - null
+      - null
+      - null
+      - null
+      offhand:
+        ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: AIR
+  
+  - node_name: bullet
+    material: RABBIT_FOOT
+    style_color: 0xFFAAAA
+    kit:
+      ==: xyz.baz9k.UHCGame.Kit
+      storage:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: LAPIS_LAZULI
+        amount: 64
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2865
+        type: BOOK
+        amount: 1
+      xpLevels: 1000
       armor:
       - null
       - null

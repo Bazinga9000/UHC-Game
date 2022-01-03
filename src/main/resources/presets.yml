@@ -44,6 +44,52 @@ presets:
         lucky_boys: 0
         prox_track: false
       kit: none
+  
+  - node_name: blitz
+    material: FEATHER
+    style_color: 0xAAAAFF
+    preset:
+      wb_size:
+        initial: 1200
+        border1: 100
+        border2: 10
+        deathmatch: 20
+      intervals:
+        start: 2700
+        movement1: 900
+        stop: 900
+        movement2: 900
+        dmwait: 300
+      global:
+        auto_smelt: true
+        auto_cook: true
+        always_flint: true
+        apple_drop_rate: 3
+      player:
+        hasty_boys: 3
+      kit: blitz
+  
+  - node_name: bullet
+    material: RABBIT_FOOT
+    style_color: 0xFFAAAA
+    preset:
+      intervals:
+        start: 900
+        movement1: 300
+        stop: 300
+        movement2: 60
+        dmwait: 300
+      global:
+        auto_smelt: true
+        auto_cook: true
+        always_flint: true
+        apple_drop_rate: 4
+      player:
+        hasty_boys: 10
+        lucky_boys: 3
+
+      kit: bullet
+  
   - node_name: bomberman
     material: TNT
     style_color: 0x800000
