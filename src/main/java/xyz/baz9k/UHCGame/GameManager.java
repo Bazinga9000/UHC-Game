@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.attribute.Attribute;
@@ -28,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import xyz.baz9k.UHCGame.drops.DropTransformer;
+import xyz.baz9k.UHCGame.drops.BlockDropTransformer;
 import xyz.baz9k.UHCGame.drops.LeafDropProducer;
 import xyz.baz9k.UHCGame.exception.UHCCheckFailException;
 import xyz.baz9k.UHCGame.exception.UHCException;
@@ -777,12 +778,14 @@ public class GameManager implements Listener {
         }
     }
 
-    private static final Map<Material, DropTransformer> AUTO_SMELT_MAP = Map.ofEntries(
-        Map.entry(Material.IRON_ORE, new DropTransformer(Material.RAW_IRON, Material.IRON_INGOT)),
-        Map.entry(Material.GOLD_ORE, new DropTransformer(Material.RAW_GOLD, Material.GOLD_INGOT)),
-        Map.entry(Material.COPPER_ORE, new DropTransformer(Material.RAW_COPPER, Material.COPPER_INGOT))
-    );
-    private static final DropTransformer GRAVEL_TRANSFORMER = new DropTransformer(Material.GRAVEL, Material.FLINT);
+    private static final BlockDropTransformer AUTO_SMELT_TRANSFORMER = new BlockDropTransformer()
+        .add(Tag.IRON_ORES,   Material.RAW_IRON,   Material.IRON_INGOT)
+        .add(Tag.GOLD_ORES,   Material.RAW_GOLD,   Material.GOLD_INGOT)
+        .add(Tag.COPPER_ORES, Material.RAW_COPPER, Material.COPPER_INGOT);
+
+    private static final BlockDropTransformer GRAVEL_TRANSFORMER = new BlockDropTransformer()
+        .add(Material.GRAVEL, Material.GRAVEL, Material.FLINT);
+
     private static final Map<Material, Material> GORDON_RAMSEYS_RECIPE_BOOK = Map.ofEntries(
         Map.entry(Material.BEEF,      Material.COOKED_BEEF),
         Map.entry(Material.CHICKEN,   Material.COOKED_CHICKEN),
@@ -802,15 +805,13 @@ public class GameManager implements Listener {
         List<Item> items = e.getItems();
 
         if (cfg.autoSmelt()) {
-            if (AUTO_SMELT_MAP.containsKey(blockMaterial)) {
-                var transformer = AUTO_SMELT_MAP.get(blockMaterial);
-                
-                for (Item it : items) transformer.transform(it);
+            for (Item it : items) {
+                AUTO_SMELT_TRANSFORMER.transform(blockMaterial, it);
             }
         }
         if (cfg.alwaysFlint()) {
-            if (blockMaterial == Material.GRAVEL) {
-                for (Item it : items) GRAVEL_TRANSFORMER.transform(it);
+            for (Item it : items) {
+                GRAVEL_TRANSFORMER.transform(blockMaterial, it);
             }
         }
 
