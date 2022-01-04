@@ -172,9 +172,6 @@ public class MenuTree {
         return ctrlRoot;
     }
 
-    // TODO impl
-    // player.player_drops
-    
     private BranchNode createConfigBranch(BranchNode root) {
         BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties<>(Material.GOLDEN_PICKAXE), 4)
             .lock(plugin.getGameManager()::hasUHCStarted);

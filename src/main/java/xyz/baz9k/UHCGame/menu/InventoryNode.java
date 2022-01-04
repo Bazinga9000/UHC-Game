@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
 
 /**
  * {@link Node} that holds an Inventory, for whatever reason.
@@ -43,12 +44,12 @@ public abstract class InventoryNode extends Node {
      * @param parent Parent node
      * @param slot Slot of this node in parent's inventory
      * @param nodeName Name of the node
-     * @param props {@link NodeItemStack.ItemProperties}
+     * @param props {@link ItemProperties}
      * @param guiHeight Number of rows in this node's inventory
      * @param rs There are two types of slots: storage slots and reserve slots.
      * <p> Storage slots can be modified and edited, reserve slots are readonly and reserved for actions, as defined by the {@link #onClick} method.
      */
-    public InventoryNode(@Nullable BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties<?> props, int guiHeight, ReserveSlots rs) {
+    public InventoryNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props, int guiHeight, ReserveSlots rs) {
         super(parent, slot, nodeName, props);
         this.slotCount = 9 * guiHeight;
         this.rs = rs;
@@ -139,7 +140,7 @@ public abstract class InventoryNode extends Node {
         // set last reserve slot to go back button
         if (rs.contains(r - 1) && parent != null) {
             ItemStack goBack = new NodeItemStack("go_back", 
-                new NodeItemStack.ItemProperties<>(Material.ARROW).style(NamedTextColor.RED)
+                new ItemProperties<>(Material.ARROW).style(NamedTextColor.RED)
             );
             
             contents[r - 1] = goBack;

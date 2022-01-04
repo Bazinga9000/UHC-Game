@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import xyz.baz9k.UHCGame.UHCGamePlugin;
+import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
 import xyz.baz9k.UHCGame.util.Path;
 
 import java.util.Optional;
@@ -17,7 +18,7 @@ import java.util.function.Predicate;
 public abstract class Node {
     protected final BranchNode parent;
     private NodeItemStack itemStack;
-    protected final NodeItemStack.ItemProperties<?> itemProperties;
+    protected final ItemProperties<?> itemProperties;
     protected final int parentSlot;
     protected final String nodeName;
     protected BooleanSupplier lock = () -> false;
@@ -29,9 +30,9 @@ public abstract class Node {
      * @param parent Parent node
      * @param parentSlot Slot of this node in parent's inventory
      * @param nodeName Name of the node
-     * @param props {@link NodeItemStack.ItemProperties}
+     * @param props {@link ItemProperties}
      */
-    public Node(BranchNode parent, int parentSlot, String nodeName, NodeItemStack.ItemProperties<?> props) {
+    public Node(BranchNode parent, int parentSlot, String nodeName, ItemProperties<?> props) {
         this.parent = parent;
         this.nodeName = nodeName;
         this.itemProperties = props;

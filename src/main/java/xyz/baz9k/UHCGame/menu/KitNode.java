@@ -32,7 +32,7 @@ public class KitNode extends InventoryNode implements ValueHolder {
      * @param parent Parent node
      * @param slot Slot of this node in parent's inventory
      * @param nodeName Name of the node
-     * @param props {@link NodeItemStack.ItemProperties}
+     * @param props {@link ItemProperties}
      * @param kits Mapping of kit indexes to kits
      */
     public KitNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props, Map<String, Kit> kits) {

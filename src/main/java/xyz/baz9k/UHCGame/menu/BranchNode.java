@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
 import xyz.baz9k.UHCGame.util.Path;
 
 import java.util.Arrays;
@@ -33,10 +34,10 @@ public final class BranchNode extends InventoryNode {
      * @param parent Parent node
      * @param slot Slot of this node in parent's inventory
      * @param nodeName Name of the node
-     * @param props {@link NodeItemStack.ItemProperties}
+     * @param props {@link ItemProperties}
      * @param guiHeight Number of rows in this node's inventory
      */
-    public BranchNode(@Nullable BranchNode parent, int slot, String nodeName, NodeItemStack.ItemProperties<?> props, int guiHeight) {
+    public BranchNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props, int guiHeight) {
         super(parent, slot, nodeName, props, guiHeight, ReserveSlots.all());
 
         int arrLen = parent == null ? slotCount : slotCount - 1;
