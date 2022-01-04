@@ -32,12 +32,12 @@ import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import xyz.baz9k.UHCGame.drops.BlockDropTransformer;
-import xyz.baz9k.UHCGame.drops.LeafDropProducer;
 import xyz.baz9k.UHCGame.exception.UHCCheckFailException;
 import xyz.baz9k.UHCGame.exception.UHCException;
-import xyz.baz9k.UHCGame.tag.BooleanTagType;
 import xyz.baz9k.UHCGame.util.*;
+import xyz.baz9k.UHCGame.util.drops.BlockDropTransformer;
+import xyz.baz9k.UHCGame.util.drops.LeafDropProducer;
+import xyz.baz9k.UHCGame.util.tag.BooleanTagType;
 
 import java.time.*;
 import java.util.*;

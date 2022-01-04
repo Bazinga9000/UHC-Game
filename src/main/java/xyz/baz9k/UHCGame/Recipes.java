@@ -22,8 +22,8 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.format.NamedTextColor;
-import xyz.baz9k.UHCGame.tag.BooleanTagType;
 import xyz.baz9k.UHCGame.util.Ench;
+import xyz.baz9k.UHCGame.util.tag.BooleanTagType;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 

@@ -7,10 +7,10 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Damageable;
 import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
-import xyz.baz9k.UHCGame.tag.BooleanTagType;
 import xyz.baz9k.UHCGame.util.ColorGradient;
 import xyz.baz9k.UHCGame.util.Point2D;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
+import xyz.baz9k.UHCGame.util.tag.BooleanTagType;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

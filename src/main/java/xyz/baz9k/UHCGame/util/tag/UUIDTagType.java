@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.tag;
+package xyz.baz9k.UHCGame.util.tag;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;

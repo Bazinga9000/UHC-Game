@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.drops;
+package xyz.baz9k.UHCGame.util.drops;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package xyz.baz9k.UHCGame.tag;
+package xyz.baz9k.UHCGame.util.tag;
 
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;

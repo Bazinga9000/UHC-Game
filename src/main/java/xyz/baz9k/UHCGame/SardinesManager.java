@@ -24,7 +24,7 @@ import org.bukkit.inventory.ItemStack;
 
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import xyz.baz9k.UHCGame.tag.UUIDTagType;
+import xyz.baz9k.UHCGame.util.tag.UUIDTagType;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
