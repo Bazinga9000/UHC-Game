@@ -135,6 +135,7 @@ public final class BranchNode extends InventoryNode {
      */
     private Optional<Node> findChild(String name) {
         return Arrays.stream(children)
+            .filter(Objects::nonNull)
             .filter(c -> Objects.equals(c.nodeName, name))
             .findAny();
     }

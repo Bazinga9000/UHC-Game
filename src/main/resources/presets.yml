@@ -95,5 +95,6 @@ presets:
     material: TNT
     style_color: 0x800000
     preset:
-      grace_period: 2147483647 # 24855 days, 11647s; if the game doesn't end by then, we have other problems
+      player:
+        grace_period: 2147483647 # 24855 days, 11647s; if the game doesn't end by then, we have other problems
       kit: bomberman

@@ -459,22 +459,28 @@ xyz:
               extra_lore: |-
                 Duration: {0} / {1} / {2} / {3} / {4}
                 World Border: {5} → {6} → {7} / {8}
-                Global: 
                 {9}
-                Teams: 
                 {10}
-                Players: 
                 {11}
                 Kit: {12}
               # Duration: {start} / {movement1} / {stop} / {movement2} / {dmwait}
               # World Border: {initial} → {border1} → {border2} / {deathmatch}
-              # Global:
-              # { - etc}
-              # Teams:
-              # { - etc}
-              # Players:
-              # { - etc}
+              # {Global:
+              #  - etc}
+              # {Teams:
+              #  - etc}
+              # {Players:
+              #  - etc}
               # Kit: {name @ index, or Custom}
+              extra_lore_global: |-
+                Global:
+                {0}
+              extra_lore_teams: |-
+                Teams:
+                {0}
+              extra_lore_players: |-
+                Players:
+                {0}
               disabled: "Disabled"
               root:
                 name: "Presets"
@@ -487,6 +493,9 @@ xyz:
                 desc: ""
               bullet:
                 name: "Bullet"
+                desc: ""
+              bomberman:
+                name: "Bomberman"
                 desc: ""
 
       item:

@@ -243,8 +243,8 @@ public class MenuTree {
                 .style(TextColor.color(0xA100FF)) 
                 .formatArg(v -> {
                     int nPlayers = (int) v;
-                    if (nPlayers < 1) return new Key("menu.inv.presets.disabled").trans();
-                    Key k = new Key("menu.inv.global.boss_team.players_%s", nPlayers == 1 ? "1" : "n");
+                    if (nPlayers < 1) return new Key("menu.inv.config.presets.disabled").trans();
+                    Key k = new Key("menu.inv.team.boss_team.players_%s", nPlayers == 1 ? "1" : "n");
                     return k.trans(nPlayers);
                 }),
             ValuedNode.Type.INTEGER, 
@@ -270,7 +270,7 @@ public class MenuTree {
             new ItemProperties<>(v -> (int) v >= 0 ? Material.SHIELD : Material.BLACK_CONCRETE)
                 .formatArg(v -> {
                     int secs = (int) v;
-                    if (secs < 0) return new Key("menu.inv.presets.disabled").trans();
+                    if (secs < 0) return new Key("menu.inv.config.presets.disabled").trans();
                     return getTimeString(secs);
                 }), 
             ValuedNode.Type.INTEGER, 
@@ -280,7 +280,7 @@ public class MenuTree {
             new ItemProperties<>(v -> (int) v >= 0 ? Material.GLOW_BERRIES : Material.BLACK_CONCRETE)
                 .formatArg(v -> {
                     int secs = (int) v;
-                    if (secs < 0) return new Key("menu.inv.presets.disabled").trans();
+                    if (secs < 0) return new Key("menu.inv.config.presets.disabled").trans();
                     return getTimeString(secs);
                 }), 
             ValuedNode.Type.INTEGER, 

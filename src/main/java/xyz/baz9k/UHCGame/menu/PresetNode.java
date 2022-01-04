@@ -116,7 +116,7 @@ public final class PresetNode extends Node {
      * @param path the path
      * @return formatted settings for path. This doesn't evaluate deeply.
      */
-    private String settingsText(String path) {
+    private Component settingsText(String path) {
         Path p = new Path(path);
         Optional<Object> o = p.traverse(preset);
 
@@ -142,11 +142,17 @@ public final class PresetNode extends Node {
             })
             .filter(Objects::nonNull)
             .collect(Collectors.joining("\n"));
+        } else if (o.isPresent()) {
+            text = String.valueOf(o.get());
         } else {
-            text = String.valueOf(o.orElse(null));
+            text = null;
         }
 
-        return "\n" + text;
+        if (text != null) {
+            return new Key("menu.inv.config.presets.extra_lore_%s", path).trans("\n" + text);
+        } else {
+            return Component.empty(); // smth broke here
+        }
     }
 
     /**

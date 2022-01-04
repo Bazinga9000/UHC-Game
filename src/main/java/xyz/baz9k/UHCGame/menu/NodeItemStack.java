@@ -96,7 +96,13 @@ public class NodeItemStack extends ItemStack {
         public ItemProperties<T> mat(Material mat) { return mat(v -> mat); }
         public ItemProperties<T> style(Style s) { return style(v -> s); }
         public ItemProperties<T> style(TextColor clr) { return style(noDeco(clr)); }
-        public ItemProperties<T> formatArg(Function<T, Object> formatArg) { return formatArgs(formatArg.andThen(o -> new Object[]{o})); }
+        public ItemProperties<T> formatArg(Function<T, Object> formatArg) {
+            return formatArgs(
+                formatArg
+                    .andThen(o -> o instanceof Component c ? renderString(c) : o)
+                    .andThen(o -> new Object[]{o})
+            );
+        }
 
         // querying
         public Material getMat() {
