@@ -1,6 +1,5 @@
 package xyz.baz9k.UHCGame.menu;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.*;
 
@@ -96,13 +95,7 @@ public class NodeItemStack extends ItemStack {
         public ItemProperties<T> mat(Material mat) { return mat(v -> mat); }
         public ItemProperties<T> style(Style s) { return style(v -> s); }
         public ItemProperties<T> style(TextColor clr) { return style(noDeco(clr)); }
-        public ItemProperties<T> formatArg(Function<T, Object> formatArg) {
-            return formatArgs(
-                formatArg
-                    .andThen(o -> o instanceof Component c ? renderString(c) : o)
-                    .andThen(o -> new Object[]{o})
-            );
-        }
+        public ItemProperties<T> formatArg(Function<T, Object> formatArg) { return formatArgs(formatArg.andThen(o -> new Object[]{o})); }
 
         // querying
         public Material getMat() {
@@ -200,15 +193,8 @@ public class NodeItemStack extends ItemStack {
      * @return the description
      */
     public List<Component> desc() {
-        return descFromID(langKey).stream()
-            .map(c -> {
-                if (c instanceof TextComponent tc) {
-                    String content = tc.content();
-                    Object[] fmtArgs = props.getFormatArgs();
-                    return tc.content(MessageFormat.format(content, fmtArgs));
-                } else return c;
-            })
-            .toList();
+        Object[] fmtArgs = props.getFormatArgs();
+        return descFromID(langKey, fmtArgs);
     }
 
     /**
@@ -254,8 +240,8 @@ public class NodeItemStack extends ItemStack {
      * @param langKey lang key
      * @return rendered {@link Component}
      */
-    public static Component nameFromID(String langKey) {
-        return nameFromID(langKey, DEFAULT_NAME_STYLE);
+    public static Component nameFromID(String langKey, Object... args) {
+        return nameFromID(langKey, DEFAULT_NAME_STYLE, args);
     }
 
     /**
@@ -265,9 +251,9 @@ public class NodeItemStack extends ItemStack {
      * @param s Style of component
      * @return rendered {@link Component}
      */
-    public static Component nameFromID(String langKey, Style s) {
+    public static Component nameFromID(String langKey, Style s, Object... args) {
         Key fullLangKey = NAME_KEY_FORMAT.args(langKey);
-        return render(fullLangKey.trans().style(s));
+        return render(fullLangKey.trans(args).style(s));
     }
 
     /**
@@ -276,8 +262,8 @@ public class NodeItemStack extends ItemStack {
      * @param langKey lang key
      * @return lines of rendered Component
      */
-    public static List<Component> descFromID(String langKey) {
-        return descFromID(langKey, DEFAULT_DESC_STYLE);
+    public static List<Component> descFromID(String langKey, Object... args) {
+        return descFromID(langKey, DEFAULT_DESC_STYLE, args);
     }
     /**
      * Gets a rendered description by translating the lang key<p>
@@ -286,8 +272,8 @@ public class NodeItemStack extends ItemStack {
      * @param s Style of component
      * @return lines of rendered Component
      */
-    public static List<Component> descFromID(String langKey, Style s) {
+    public static List<Component> descFromID(String langKey, Style s, Object... args) {
         Key fullLangKey = DESC_KEY_FORMAT.args(langKey);
-        return fullLangKey.transMultiline(s);
+        return fullLangKey.transMultiline(s, args);
     }
 }

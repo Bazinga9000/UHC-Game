@@ -52,6 +52,9 @@ public final class ComponentUtils {
         // watch this already be a thing
         // does the work for transMultiline
         private List<Component> splitLines(Component transComp) {
+            // if there's no text, just trash the component
+            if (renderString(transComp).isBlank()) return List.of();
+
             var rendered = render(transComp);
             Style topStyle = rendered.style();
 
@@ -184,7 +187,7 @@ public final class ComponentUtils {
         }
     }
 
-    private static Component componentize(Object o) {
+    public static Component componentize(Object o) {
         if (o instanceof ComponentLike cl) return cl.asComponent();
         return Component.text(String.valueOf(o));
     }

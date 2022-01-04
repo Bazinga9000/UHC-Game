@@ -429,23 +429,23 @@ xyz:
                 name: "Gone Fishing"
                 desc: |-
                   Each player receives:
-                    - An unbreakable maxed Fishing Rod
-                    - 64 Anvils
-                    - 1000 Levels
+                   - An unbreakable maxed Fishing Rod
+                   - 64 Anvils
+                   - 1000 Levels
               always_elytra:
                 name: "Always Elytra"
                 desc: |-
                   Everyone is in a flying state 
                   for the entire game.
                   Each player receives:
-                      - Unbreakable Elytra w/ Curse of Binding
+                   - Unbreakable Elytra w/ Curse of Binding
               bomberman:
                 name: "Bomberman"
                 desc: |-
                   Direct combat is disabled.
                   Each player receives:
-                      - 128 TNT
-                      - Unbreakable Flint & Steel
+                   - 128 TNT
+                   - Unbreakable Flint & Steel
               blitz:
                 name: "Blitz"
                 desc: ""

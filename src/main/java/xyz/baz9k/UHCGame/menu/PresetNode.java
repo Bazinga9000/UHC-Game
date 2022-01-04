@@ -97,13 +97,13 @@ public final class PresetNode extends Node {
             // VN & OVN have specialized formatting
             if (n instanceof OptionValuedNode ovn) {
                 // option selected
-                return String.valueOf(ovn.optDesc((int) o));
+                return ovn.optDesc((int) o);
             }
             if (n instanceof ValuedNode vn) {
                 // the format argument
                 Object[] fmtArgs = ((ItemProperties<Object>) vn.itemProperties).format(o);
                 if (fmtArgs.length == 1) {
-                    return String.valueOf(fmtArgs[0]);
+                    return renderString(componentize(fmtArgs[0]));
                 }
                 return Arrays.toString(fmtArgs);
             }
