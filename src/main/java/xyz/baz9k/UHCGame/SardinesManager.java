@@ -1,6 +1,5 @@
 package xyz.baz9k.UHCGame;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +21,10 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataAdapterContext;
-import org.bukkit.persistence.PersistentDataType;
 
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import xyz.baz9k.UHCGame.tag.UUIDTagType;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
@@ -269,34 +267,4 @@ public class SardinesManager implements Listener {
         Player p = e.getPlayer();
         giveSardineIfNeedy(p);
     }
-
-    // this is literally just a copy of the UUIDTagType example in spigot's docs
-    private static class UUIDTagType implements PersistentDataType<byte[], UUID> {
-        @Override
-        public Class<byte[]> getPrimitiveType() {
-            return byte[].class;
-        }
-
-        @Override
-        public Class<UUID> getComplexType() {
-            return UUID.class;
-        }
-
-        @Override
-        public byte[] toPrimitive(UUID complex, PersistentDataAdapterContext context) {
-            ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
-            bb.putLong(complex.getMostSignificantBits());
-            bb.putLong(complex.getLeastSignificantBits());
-            return bb.array();
-        }
-
-        @Override
-        public UUID fromPrimitive(byte[] primitive, PersistentDataAdapterContext context) {
-            ByteBuffer bb = ByteBuffer.wrap(primitive);
-            long firstLong = bb.getLong();
-            long secondLong = bb.getLong();
-            return new UUID(firstLong, secondLong);
-        }
-    }
-
 }

@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
@@ -24,6 +25,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +36,7 @@ import xyz.baz9k.UHCGame.drops.BlockDropTransformer;
 import xyz.baz9k.UHCGame.drops.LeafDropProducer;
 import xyz.baz9k.UHCGame.exception.UHCCheckFailException;
 import xyz.baz9k.UHCGame.exception.UHCException;
+import xyz.baz9k.UHCGame.tag.BooleanTagType;
 import xyz.baz9k.UHCGame.util.*;
 
 import java.time.*;
@@ -704,6 +707,13 @@ public class GameManager implements Listener {
         Player dead = e.getEntity();
         
         e.deathMessage(includeGameTimestamp(e.deathMessage()));
+
+        // drop bonus items
+        plugin.configValues().playerDrops(dead)
+            .ifPresent(s -> {
+                dead.getWorld().dropItem(dead.getLocation(), s);
+            });
+
         dead.setGameMode(GameMode.SPECTATOR);
         if (teamManager.getPlayerState(dead) == PlayerState.COMBATANT_ALIVE) {
             teamManager.setCombatantAliveStatus(dead, false);
@@ -871,6 +881,19 @@ public class GameManager implements Listener {
         } else {
             e.setCurrentItem(new ItemStack(Material.AIR));
             e.getWhoClicked().sendMessage(Component.text("This recipe is disabled!"));
+        }
+    }
+
+    @EventHandler
+    public void onConsumeFood(PlayerItemConsumeEvent e) {
+        if (!hasUHCStarted()) return;
+
+        ItemStack food = e.getItem();
+        ItemMeta m = food.getItemMeta();
+        var container = m.getPersistentDataContainer();
+        // this is a golden head
+        if (container.get(new NamespacedKey(plugin, "golden_head"), new BooleanTagType())) {
+            // TODO impl golden head
         }
     }
 

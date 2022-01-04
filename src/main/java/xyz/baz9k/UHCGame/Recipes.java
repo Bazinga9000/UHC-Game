@@ -6,6 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -15,10 +16,18 @@ import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.jetbrains.annotations.NotNull;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import xyz.baz9k.UHCGame.tag.BooleanTagType;
+import xyz.baz9k.UHCGame.util.Ench;
+
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 public final class Recipes {
     private final UHCGamePlugin plugin;
@@ -124,5 +133,62 @@ public final class Recipes {
             )
             .setIngredient('G', Material.GOLD_BLOCK)
             .setIngredient('A', Material.APPLE);
+    }
+
+    /* RECIPES */
+    @DeclaredRecipe(enable = EnableWhen.PLAYER_DROPS_HEAD)
+    private Recipe goldenHead() {
+        NamespacedKey key = key("golden_head");
+        ItemStack goldenHead = new ItemStack(Material.GOLDEN_APPLE);
+
+        goldenHead.editMeta(m -> {
+            m.displayName(new Key("item.golden_head.name").trans());
+            m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            m.addEnchant(Ench.SILK_TOUCH, 1, true);
+
+            var container = m.getPersistentDataContainer();
+            container.set(key, new BooleanTagType(), true);
+        });
+
+        return new ShapedRecipe(key, goldenHead)
+            .shape(
+                "GGG",
+                "GPG",
+                "GGG"
+            )
+            .setIngredient('G', Material.GOLD_INGOT)
+            .setIngredient('P', Material.PLAYER_HEAD);
+    }
+
+    /* RECIPES */
+    @DeclaredRecipe(enable = EnableWhen.PROX_TRACK)
+    private Recipe proxCompass() {
+        NamespacedKey key = key("prox_compass");
+        ItemStack proxCompass = new ItemStack(Material.CLOCK);
+
+        proxCompass.editMeta(m -> {
+            m.displayName(new Key("item.golden_head.name").trans());
+            m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            m.addEnchant(Ench.SILK_TOUCH, 1, true);
+            
+            var d = Arrays.stream(renderString(new Key("item.golden_head.desc").trans()).split("\n"))
+                .<Component>map(Component::text)
+                .map(c -> c.style(noDeco(NamedTextColor.GRAY)))
+                .toList();
+
+            m.lore(d);
+
+            var container = m.getPersistentDataContainer();
+            container.set(key, new BooleanTagType(), true);
+        });
+
+        return new ShapedRecipe(key, proxCompass)
+            .shape(
+                "GGG",
+                "GCG",
+                "GGG"
+            )
+            .setIngredient('G', Material.GOLD_INGOT)
+            .setIngredient('C', Material.COMPASS);
     }
 }

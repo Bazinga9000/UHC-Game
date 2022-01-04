@@ -307,8 +307,8 @@ public class ConfigValues {
      */
     public Optional<ItemStack> playerDrops(Player p) {
         return switch (playerDropsIndex()) {
-            case 1  -> Optional.of(new ItemStack(Material.GOLDEN_APPLE));
-            case 2  -> {
+            case 1 -> Optional.of(new ItemStack(Material.GOLDEN_APPLE));
+            case 2 -> {
                 ItemStack stack = new ItemStack(Material.PLAYER_HEAD);
                 stack.editMeta(SkullMeta.class, m -> {
                     m.setOwningPlayer(p);
