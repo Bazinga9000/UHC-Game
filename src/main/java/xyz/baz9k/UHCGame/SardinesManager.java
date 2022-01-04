@@ -65,13 +65,13 @@ public class SardinesManager implements Listener {
         ItemStack sardine = new ItemStack(Material.COD);
         sardine.editMeta(m -> {
             m.displayName(
-                new Key("sardines.item.name")
+                new Key("item.sardines.name")
                     .trans()
                     .style(noDeco(TextColor.color(0xF9C9A9)))
             );
             m.lore(
                 List.of(
-                    new Key("sardines.item.desc")
+                    new Key("item.sardines.desc")
                         .trans(p.getName())
                         .style(noDeco(NamedTextColor.GRAY))
                 )

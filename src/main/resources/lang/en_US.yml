@@ -141,10 +141,6 @@ xyz:
             check_start_failed: "These issues need to be resolved before starting:"
             check_end_failed: "These issues need to be resolved before ending:"
       
-      sardines:
-        item:
-          name: "Cod of Fate"
-          desc: "Bound to {0}"
       menu:
         prompt:
           ask: "Enter new value for \"{0}\" (type ''cancel'' to cancel): "
@@ -492,3 +488,16 @@ xyz:
               bullet:
                 name: "Bullet"
                 desc: ""
+
+      item:
+        sardines:
+          name: "Cod of Fate"
+          desc: "Bound to {0}"
+        golden_head:
+          name: "Golden Head"
+        prox_compass:
+          name: "Proximity Compass"
+          desc: |-
+            Find the nearest enemy to you.
+            What do you mean it's a watch
+            shut up
