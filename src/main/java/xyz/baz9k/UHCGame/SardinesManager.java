@@ -171,7 +171,7 @@ public class SardinesManager implements Listener {
      */
     public void eatOtherSardines(Player p) {
         for (ItemStack s : p.getInventory().getContents()) {
-            if (isSardine(s) && !p.equals(whoseSardine(s).orElse(null))) {
+            if (isSardine(s) && p != whoseSardine(s).orElse(null)) {
                 s.setType(Material.AIR);
             }
         }
@@ -196,7 +196,7 @@ public class SardinesManager implements Listener {
                 Player giver = oGiver.get(),
                        recipient = oRecipient.get();
                 
-                if (giver.equals(recipient)) { // same person, don't do anything
+                if (giver == recipient) { // same person, don't do anything
 
                 } else if (tm.isWildcard(recipient)) { // two wildcards, create new team
                     int t = tm.getNumTeams() + 1;
@@ -235,7 +235,7 @@ public class SardinesManager implements Listener {
         if (e.getView().getTopInventory().getType() == InventoryType.CRAFTING) return; // this is a player inventory do whatever
 
         // if there's a click on the player inventory, cancel if it's a sardine
-        if (e.getClickedInventory().equals(iview.getBottomInventory())) {
+        if (e.getClickedInventory() == iview.getBottomInventory()) {
             ItemStack maybeSardine = e.getView().getItem(e.getRawSlot());
             if (isSardine(maybeSardine)) {
                 e.setCancelled(true);

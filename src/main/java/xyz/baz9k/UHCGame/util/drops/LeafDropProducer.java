@@ -56,7 +56,7 @@ public class LeafDropProducer {
 
     private Optional<ItemStack> tool() {
         return player.map(p -> p.getInventory().getItemInMainHand())
-            .filter(s -> !s.getType().equals(Material.AIR));
+            .filter(s -> s.getType() != Material.AIR);
     }
 
     private double appleDropRate() {
@@ -80,7 +80,7 @@ public class LeafDropProducer {
     public void addDrops() {
         if (!shearApple() 
             && tool().isPresent() 
-            && tool().get().getType().equals(Material.SHEARS)) {
+            && tool().get().getType() == Material.SHEARS) {
                 return;
         }
 
@@ -88,7 +88,7 @@ public class LeafDropProducer {
         if (!allLeaves() && leafType != Material.OAK_LEAVES) return;
 
         // clear out apple drops so we can register our own
-        drops.removeIf(it -> it.getItemStack().getType().equals(Material.APPLE));
+        drops.removeIf(it -> it.getItemStack().getType() == Material.APPLE);
 
         // if drop rate matches, spawn an apple
         if (r.nextDouble() < appleDropRate()) {

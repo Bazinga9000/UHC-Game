@@ -469,7 +469,7 @@ public class HUDManager implements Listener {
         }
 
         Iterable<Player> tmates = teammateSet.stream()
-            .filter(e -> !e.equals(p))
+            .filter(e -> e != p)
             .sorted(sorter)
             .limit(5)
             ::iterator;
