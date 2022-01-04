@@ -450,6 +450,12 @@ xyz:
                   Each player receives:
                       - 128 TNT
                       - Unbreakable Flint & Steel
+              blitz:
+                name: "Blitz"
+                desc: ""
+              bullet:
+                name: "Bullet"
+                desc: ""
               custom:
                 name: "Custom Set"
                 desc: ""
