@@ -1,7 +1,11 @@
 package xyz.baz9k.UHCGame.util;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 
@@ -34,18 +38,81 @@ public final class ComponentUtils {
         /**
          * Shorthand for {@link Component#translatable}. 
          * Creates a translatable component that uses this key as the key and the specified objects as parameters.
-         * @param args Objects which are passed as parameters to the translatable component. (Components stay as components)
+         * @param args Objects passed as parameters to the translatable component. (Components stay as components)
          * @return component
          */
         public TranslatableComponent trans(Object... args) {
             Component[] cargs = Arrays.stream(args)
-            .map(o -> {
-                if (o instanceof ComponentLike cl) return cl.asComponent();
-                return Component.text(String.valueOf(o));
-            })
+            .map(ComponentUtils::componentize)
             .toArray(Component[]::new);
 
             return Component.translatable(key()).args(cargs);
+        }
+
+        // watch this already be a thing
+        // does the work for transMultiline
+        private List<Component> splitLines(Component transComp) {
+            var rendered = render(transComp);
+            Style topStyle = rendered.style();
+
+            if (rendered instanceof TextComponent tc) {
+                // create list of components in a sequential order
+                List<TextComponent> components = new ArrayList<>();
+                components.add(tc);
+    
+                for (Component child : tc.children()) {
+                    if (child instanceof TextComponent tch) {
+                        components.add(tch);
+                    } else {
+                        Style s = topStyle.merge(child.style());
+                        components.add(Component.text(renderString(child), s));
+                    }
+                }
+
+                // create the lines
+                List<Component> lines = new ArrayList<>();
+                for (TextComponent c : components) {
+                    List<String> content = new ArrayList<>(Arrays.asList(c.content().split("\n")));
+                    Iterator<String> it = content.iterator();
+                    Style s = topStyle.merge(c.style());
+
+                    // there's no new lines between iterations
+                    // so, if lines has an element, then the connectors have to be joined
+                    if (lines.size() > 0 && it.hasNext()) {
+                        int lastIndex = lines.size() - 1;
+                        Component seg = Component.text(it.next(), s);
+                        lines.set(lastIndex, lines.get(lastIndex).append(seg));
+                    }
+                    
+                    it.forEachRemaining(cline -> {
+                        lines.add(Component.text(cline, s));
+                    });
+                }
+
+                return Collections.unmodifiableList(lines);
+            } else {
+                // something went wrong?
+                // c should be text component but it's not so, best we can do
+                return List.of(rendered);
+            }
+        }
+        
+        /**
+         * Creates a rendered component of the key and breaks it into a list of lines. Useful for lore.
+         * @param s Style of the text by default
+         * @param args Objects passed as parameters to translatable component.
+         * @return a list of lines
+         */
+        public List<Component> transMultiline(Style s, Object... args) {
+            return splitLines(trans(args).style(s));
+        }
+        /**
+         * Creates a rendered component of the key and breaks it into a list of lines. Useful for lore.
+         * @param args Objects passed as parameters to translatable component.
+         * @return a list of lines
+         */
+        public List<Component> transMultiline(Object... args) {
+            return splitLines(trans(args));
         }
 
         /**
@@ -115,5 +182,10 @@ public final class ComponentUtils {
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Component componentize(Object o) {
+        if (o instanceof ComponentLike cl) return cl.asComponent();
+        return Component.text(String.valueOf(o));
     }
 }

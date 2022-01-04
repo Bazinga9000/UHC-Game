@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -22,7 +21,6 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.jetbrains.annotations.NotNull;
 
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.tag.BooleanTagType;
 import xyz.baz9k.UHCGame.util.Ench;
@@ -142,7 +140,7 @@ public final class Recipes {
         ItemStack goldenHead = new ItemStack(Material.GOLDEN_APPLE);
 
         goldenHead.editMeta(m -> {
-            m.displayName(new Key("item.golden_head.name").trans());
+            m.displayName(render(new Key("item.golden_head.name").trans()));
             m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             m.addEnchant(Ench.SILK_TOUCH, 1, true);
 
@@ -167,15 +165,11 @@ public final class Recipes {
         ItemStack proxCompass = new ItemStack(Material.CLOCK);
 
         proxCompass.editMeta(m -> {
-            m.displayName(new Key("item.golden_head.name").trans());
+            m.displayName(render(new Key("item.prox_compass.name").trans()));
             m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             m.addEnchant(Ench.SILK_TOUCH, 1, true);
             
-            var d = Arrays.stream(renderString(new Key("item.golden_head.desc").trans()).split("\n"))
-                .<Component>map(Component::text)
-                .map(c -> c.style(noDeco(NamedTextColor.GRAY)))
-                .toList();
-
+            var d = new Key("item.prox_compass.desc").transMultiline(noDeco(NamedTextColor.GRAY));
             m.lore(d);
 
             var container = m.getPersistentDataContainer();

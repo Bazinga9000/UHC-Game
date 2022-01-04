@@ -158,9 +158,7 @@ public class NodeItemStack extends ItemStack {
                 })
                 .toArray();
 
-            List<Component> lines = splitLines(render(tKey.trans(args)));
-            lines.replaceAll(l -> l.style(DEFAULT_DESC_STYLE));
-            return lines;
+            return tKey.transMultiline(DEFAULT_DESC_STYLE, args);
         }
 
         /**
@@ -247,40 +245,6 @@ public class NodeItemStack extends ItemStack {
         return this;
     }
 
-    /**
-     * Splits a component into a list consisting of lines
-     * @param comp Component to split into
-     * @apiNote Don't put non-text/-translatable components in.
-     * @return list
-     */
-    private static List<Component> splitLines(Component comp) {
-        if (!(comp instanceof TextComponent text)) return List.of(comp); // "fuck it i dunno"
-        List<TextComponent> components = new ArrayList<>();
-        components.add(text);
-        for (Component child : text.children()) {
-            if (child instanceof TextComponent tc) components.add(tc);
-            else components.add(Component.text(child.toString(), child.style())); // "fuck it i dunno"
-        }
-
-        List<Component> lines = new ArrayList<>();
-
-        for (TextComponent c : components) {
-            var content = new ArrayList<>(Arrays.asList(c.content().split("\n")));
-
-            if (lines.size() > 0) {
-                int i = lines.size() - 1;
-                Component segment = Component.text(content.remove(0), c.style());
-                lines.set(i, lines.get(i).append(segment));
-            }
-
-            for (String cline : content) {
-                lines.add(Component.text(cline, c.style()));
-            }
-        }
-
-        return lines;
-    }
-
     private static final Key NAME_KEY_FORMAT = new Key("menu.inv.%s.name");
     private static final Key DESC_KEY_FORMAT = new Key("menu.inv.%s.desc");
 
@@ -324,10 +288,6 @@ public class NodeItemStack extends ItemStack {
      */
     public static List<Component> descFromID(String langKey, Style s) {
         Key fullLangKey = DESC_KEY_FORMAT.args(langKey);
-
-        Component rendered = render(fullLangKey.trans().style(s));
-        if (renderString(rendered).equals("")) return List.of();
-
-        return splitLines(rendered);
+        return fullLangKey.transMultiline(s);
     }
 }
