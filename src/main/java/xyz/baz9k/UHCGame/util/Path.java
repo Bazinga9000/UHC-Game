@@ -1,7 +1,9 @@
 package xyz.baz9k.UHCGame.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,62 +16,132 @@ import java.util.stream.Stream;
  * <p> Nulls are ignored and filtered out of arguments.
  */
 public final class Path implements Iterable<String> {
+
+    private static class Builder {
+        private List<String> path = new ArrayList<>();
+        
+        private Builder() {}
+        private Builder(String[] p) {
+            path.addAll(Arrays.asList(p));
+        }
+
+        Builder append(String[] p, boolean check) {
+            for (String n : p) {
+                if (!check || (n != null && !n.isBlank())) {
+                    path.add(n);
+                }
+            }
+            return this;
+        }
+        
+        Builder append(Path p) { 
+            if (p == null) return this;
+            return append(p.path, false); 
+        }
+        Builder append(String p) {
+            if (p == null) return this;
+            return append(p.split("\\."), true); 
+        }
+
+        Builder appendAll(Path... p) { 
+            if (p == null) return this;
+            for (Path n : p) append(n);
+            return this;
+        }
+        Builder appendAll(String... p) {
+            if (p == null) return this;
+            for (String n : p) append(n);
+            return this;
+        }
+
+        Path build() { return new Path(path.toArray(String[]::new)); }
+    }
     private final String[] path;
 
     /**
-     * @param splitString whether or not to break up path strings into node components
-     * @param path the path
+     * Should only be used if assured that every String passed is a valid node.
+     * <p> Node: Non-null, non-blank, does not contain separators
+     * @param path Array of nodes
      */
-    private Path(boolean splitString, String... path) {
+    private Path(String... path) {
         Objects.requireNonNull(path);
-        if (splitString) {
-            this.path = stream(path)
-                .toArray(String[]::new);
-        } else {
-            this.path = path;
-        }
-
-    }
-
-    public Path(String... path) {
-        this(true, path);
+        this.path = path;
     }
 
     public String toString() {
         return String.join(".", path);
     }
 
+    private Builder builder() {
+        return new Builder(path);
+    }
+
+    /**
+     * Construct a path from an array of strings
+     * @param path path
+     * @return new Path
+     */
+    public static Path of(String... path) {
+        Objects.requireNonNull(path);
+
+        return new Builder()
+            .appendAll(path)
+            .build();
+    }
+
+    /**
+     * Join a set of paths
+     * @param paths paths to join
+     * @return the joined path
+     */
     public static Path join(Path... paths) {
         Objects.requireNonNull(paths);
-        return new Path(false,
-            Arrays.stream(paths)
-                .filter(Objects::nonNull)
-                .flatMap(p -> Arrays.stream(p.path))
-                .toArray(String[]::new)
-        );
+
+        return new Builder()
+            .appendAll(paths)
+            .build();
     }
 
+    /**
+     * Join strings together as if they were paths
+     * @param paths Strings to join
+     * @return the joined path returned as a string
+     */
     public static String join(String... paths) {
         Objects.requireNonNull(paths);
-        return new Path(paths).toString();
+        return Path.of(paths).toString();
     }
 
+    /**
+     * Create a new path with the nodes appended
+     * @param nodes new nodes
+     * @return new path
+     */
     public Path append(String... nodes) {
         Objects.requireNonNull(nodes);
-        Path other = new Path(nodes);
-        return this.append(other);
+        
+        return builder()
+            .appendAll(nodes)
+            .build();
     }
 
+    /**
+     * Create a new path with the paths appended
+     * @param paths new paths
+     * @return new path
+     */
     public Path append(Path... paths) {
         Objects.requireNonNull(paths);
 
-        Path[] allPaths = new Path[paths.length + 1];
-        allPaths[0] = this;
-        System.arraycopy(paths, 0, allPaths, 1, paths.length);
-
-        return Path.join(allPaths);
+        return builder()
+            .appendAll(paths)
+            .build();
     }
 
+    /**
+     * Check if this path is empty
+     * @return true/false
+     */
     public boolean isRoot() {
         return path.length == 0;
     }
@@ -128,6 +200,23 @@ public final class Path implements Iterable<String> {
         return traverse(root, (m, s) -> Optional.ofNullable(m.get(s)));
     }
 
+    /**
+     * Find the path relative to a given parent.
+     * @param parent the parent
+     * @return the path relative to a given parent, or empty if the path isn't relative to this parent/
+     */
+    public Optional<Path> relativeTo(Path parent) {
+        Objects.requireNonNull(parent);
+
+        int mismatch = Arrays.mismatch(parent.path, path);
+        if (mismatch == -1) return Optional.of(new Path());
+        if (mismatch == parent.path.length) {
+            String[] p = Arrays.copyOfRange(path, mismatch, path.length);
+            return Optional.of(new Path(p));
+        }
+        return Optional.empty();
+    }
+
     // pregenerated
     @Override
     public int hashCode() {
@@ -152,18 +241,12 @@ public final class Path implements Iterable<String> {
     }
     //
     
-    private static Stream<String> stream(String[] path) {
-        return Arrays.stream(path)
-            .filter(Objects::nonNull)
-            .flatMap(n -> Arrays.stream(n.split("\\.")));
-    }
-    
     public Stream<String> stream() {
-        return stream(path);
+        return Arrays.stream(path);
     }
 
     @Override
     public Iterator<String> iterator() {
-        return stream().iterator();
+        return Arrays.asList(path).iterator();
     }
 }

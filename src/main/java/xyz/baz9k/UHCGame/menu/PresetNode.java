@@ -76,7 +76,7 @@ public final class PresetNode extends Node {
      * @return get a format arg located at the specified config key
      */
     private String fromPreset(String path) {
-        Optional<Object> o = new Path(path).traverse(preset);
+        Optional<Object> o = Path.of(path).traverse(preset);
         return formatted(path, o.orElseGet(() -> cfg.get(path)));
     }
 
@@ -117,7 +117,7 @@ public final class PresetNode extends Node {
      * @return formatted settings for path. This doesn't evaluate deeply.
      */
     private String settingsText(String path) {
-        Path p = new Path(path);
+        Path p = Path.of(path);
         Optional<Object> o = p.traverse(preset);
 
         String text;

@@ -146,7 +146,7 @@ public final class BranchNode extends InventoryNode {
      * @return the descendant with the matching path
      */
     public Optional<Node> findDescendant(String path) {
-        return new Path(path).traverse(this, BranchNode::findChild);
+        return Path.of(path).traverse(this, BranchNode::findChild);
     }
     
     /**

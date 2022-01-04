@@ -111,7 +111,7 @@ public abstract class Node {
      * @return path relative to the root node
      */
     public Path path() {
-        if (parent == null) return new Path();
+        if (parent == null) return Path.of();
         return parent.path().append(nodeName);
     }
 
@@ -120,9 +120,7 @@ public abstract class Node {
      * @return path relative to the specified node
      */
     public Optional<Path> pathRelativeTo(BranchNode b) {
-        if (this.equals(b)) return Optional.of(new Path());
-        if (parent == null) return Optional.empty();
-        return parent.pathRelativeTo(b).map(p -> p.append(nodeName));
+        return path().relativeTo(b.path());
     }
 
     /**
