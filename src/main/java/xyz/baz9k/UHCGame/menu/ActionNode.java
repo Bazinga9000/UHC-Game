@@ -7,8 +7,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import xyz.baz9k.UHCGame.exception.UHCException;
-import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
 import xyz.baz9k.UHCGame.util.Debug;
+import xyz.baz9k.UHCGame.util.stack.ItemProperties;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -58,7 +58,7 @@ public class ActionNode extends Node {
      * @param props {@link ItemProperties}
      * @param fn Function to run when this node is clicked
      */
-    public ActionNode(@NotNull BranchNode parent, int slot, @NotNull String nodeName, @NotNull ItemProperties<?> props, @NotNull NodeAction fn) {
+    public ActionNode(@NotNull BranchNode parent, int slot, @NotNull String nodeName, @NotNull ItemProperties props, @NotNull NodeAction fn) {
         super(parent, slot, nodeName, props);
         this.fn = fn;
     }

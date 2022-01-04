@@ -22,6 +22,9 @@ public record StaticItemProperties(
         if (formatArgs == null) formatArgs = new Object[0];
     }
 
+    public StaticItemProperties(Material mat) { this(mat, null, null, null, false, m -> {}); }
+    public StaticItemProperties(Material mat, Style nameStyle) { this(mat, nameStyle, null, null, false, m -> {}); }
+
     public void editMeta(ItemMeta m) {
         metaEditor.accept(m);
     }

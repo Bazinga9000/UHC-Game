@@ -8,8 +8,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import xyz.baz9k.UHCGame.UHCGamePlugin;
-import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
 import xyz.baz9k.UHCGame.util.Path;
+import xyz.baz9k.UHCGame.util.stack.ItemProperties;
+import xyz.baz9k.UHCGame.util.stack.TransItemStack;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -17,8 +18,8 @@ import java.util.function.Predicate;
 
 public abstract class Node {
     protected final BranchNode parent;
-    private NodeItemStack itemStack;
-    protected final ItemProperties<?> itemProperties;
+    private TransItemStack itemStack;
+    protected final ItemProperties itemProperties;
     protected final int parentSlot;
     protected final String nodeName;
     protected BooleanSupplier lock = () -> false;
@@ -32,7 +33,7 @@ public abstract class Node {
      * @param nodeName Name of the node
      * @param props {@link ItemProperties}
      */
-    public Node(BranchNode parent, int parentSlot, String nodeName, ItemProperties<?> props) {
+    public Node(BranchNode parent, int parentSlot, String nodeName, ItemProperties props) {
         this.parent = parent;
         this.nodeName = nodeName;
         this.itemProperties = props;
@@ -101,10 +102,10 @@ public abstract class Node {
         }
         if (itemStack == null) {
             // item stack is accessed for first time. make it
-            itemStack = itemProperties != null ? new NodeItemStack(langKey(), itemProperties) : null;
+            itemStack = itemProperties != null ? new TransItemStack(langKey(), itemProperties) : null;
             return itemStack;
         }
-        return itemStack.updateAll();
+        return itemStack.refresh();
     }
     
     /**
@@ -128,11 +129,11 @@ public abstract class Node {
       * Lang key is just the path + .root if the node is a Branch Node.
       */
     public String langKey() {
-        // it looks cleaner to have all the langKey node in one place since it's so small
+        Path p = Path.of("menu.inv").append(path());
         if (this instanceof BranchNode) {
-            return path().append("root").toString();
+            p = p.append("root");
         }
-        return path().toString();
+        return p.toString();
     }
 
 }

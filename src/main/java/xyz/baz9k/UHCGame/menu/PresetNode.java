@@ -11,9 +11,10 @@ import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import xyz.baz9k.UHCGame.Kit;
-import xyz.baz9k.UHCGame.menu.NodeItemStack.ExtraLore;
-import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
 import xyz.baz9k.UHCGame.util.Path;
+import xyz.baz9k.UHCGame.util.stack.MappedItemProperties;
+import xyz.baz9k.UHCGame.util.stack.TransItemStack;
+import xyz.baz9k.UHCGame.util.stack.MappedItemProperties.ExtraLore;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 // sorry
@@ -34,7 +35,7 @@ public final class PresetNode extends Node {
 
     private final Map<?, ?> preset; // nested map of preset settings
 
-    public PresetNode(BranchNode parent, int parentSlot, String nodeName, ItemProperties<?> props, Map<?, ?> preset) {
+    public PresetNode(BranchNode parent, int parentSlot, String nodeName, MappedItemProperties<?> props, Map<?, ?> preset) {
         super(parent, parentSlot, nodeName, props);
         this.preset = preset;
 
@@ -101,7 +102,7 @@ public final class PresetNode extends Node {
             }
             if (n instanceof ValuedNode vn) {
                 // the format argument
-                Object[] fmtArgs = ((ItemProperties<Object>) vn.itemProperties).format(o);
+                Object[] fmtArgs = ((MappedItemProperties<Object>) vn.itemProperties).format(o);
                 if (fmtArgs.length == 1) {
                     return renderString(componentize(fmtArgs[0]));
                 }
@@ -132,7 +133,7 @@ public final class PresetNode extends Node {
                     String langKey = n.langKey();
 
                     // name of node
-                    String k = renderString(NodeItemStack.nameFromID(langKey));
+                    String k = renderString(TransItemStack.nameFromID(langKey));
                     String v = formatted(cfgKey, e.getValue());
                     return String.format(" - %s: %s", k, v);
                 }
@@ -173,6 +174,6 @@ public final class PresetNode extends Node {
             }
         }
 
-        return NodeItemStack.nameFromID("config.kit." + kitKey);
+        return TransItemStack.nameFromID("menu.inv.config.kit." + kitKey);
     }
 }

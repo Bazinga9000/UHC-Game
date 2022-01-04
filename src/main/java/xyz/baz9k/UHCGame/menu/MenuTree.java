@@ -9,8 +9,10 @@ import net.kyori.adventure.text.format.TextColor;
 import xyz.baz9k.UHCGame.Kit;
 import xyz.baz9k.UHCGame.UHCGamePlugin;
 import xyz.baz9k.UHCGame.util.Debug;
+import xyz.baz9k.UHCGame.util.stack.MappedItemProperties;
+import xyz.baz9k.UHCGame.util.stack.StaticItemProperties;
+import xyz.baz9k.UHCGame.util.stack.MappedItemProperties.ExtraLore;
 
-import static xyz.baz9k.UHCGame.menu.NodeItemStack.*;
 import static xyz.baz9k.UHCGame.util.Utils.*;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
@@ -58,7 +60,7 @@ public class MenuTree {
         BranchNode ctrlRoot = new BranchNode(6);
         
         new ActionNode(ctrlRoot, slotAt(1, 2), "start_game",
-            new ItemProperties<List<String>>(l -> l.size() == 0 ? Material.IRON_SWORD : Material.NETHERITE_SWORD)
+            new MappedItemProperties<List<String>>(l -> l.size() == 0 ? Material.IRON_SWORD : Material.NETHERITE_SWORD)
                 .useObject(plugin.getGameManager()::checkStartPanel)
                 .extraLore(checks -> {
                     var lines = new ArrayList<Component>();
@@ -78,7 +80,7 @@ public class MenuTree {
             }
         );
         new ActionNode(ctrlRoot, slotAt(1, 6), "end_game",
-            new ItemProperties<List<String>>(l -> l.size() == 0 ? Material.IRON_SHOVEL : Material.NETHERITE_SHOVEL)
+            new MappedItemProperties<List<String>>(l -> l.size() == 0 ? Material.IRON_SHOVEL : Material.NETHERITE_SHOVEL)
                 .useObject(plugin.getGameManager()::checkEndPanel)
                 .extraLore(checks -> {
                     var lines = new ArrayList<Component>();
@@ -99,14 +101,14 @@ public class MenuTree {
         );
 
         new ActionNode(ctrlRoot, slotAt(3, 1), "reseed_worlds", 
-            new ItemProperties<>(Material.APPLE), 
+            new StaticItemProperties(Material.APPLE), 
             p -> {
                 p.closeInventory();
                 plugin.getWorldManager().reseedWorlds();
             }
         ).lock(plugin.getGameManager()::hasUHCStarted);
         new ActionNode(ctrlRoot, slotAt(3, 2), "debug_toggle",
-            new ItemProperties<Boolean>(d -> d ? Material.GLOWSTONE : Material.BLACKSTONE)
+            new MappedItemProperties<Boolean>(d -> d ? Material.GLOWSTONE : Material.BLACKSTONE)
                 .useObject(Debug::isDebugging)
                 .extraLore(ExtraLore.fromBool()),
             p -> {
@@ -114,14 +116,14 @@ public class MenuTree {
             }
         );
         new ActionNode(ctrlRoot, slotAt(3, 3), "stage_next", 
-            new ItemProperties<>(Material.SUNFLOWER), 
+            new StaticItemProperties(Material.SUNFLOWER), 
             p -> {
                 plugin.getGameManager().incrementStage();
             }
         );
 
         new ActionNode(ctrlRoot, slotAt(4, 1), "assign_teams_x", 
-            new ItemProperties<Void>(Material.DIAMOND)
+            new MappedItemProperties<Void>(Material.DIAMOND)
                 .extraLore(o -> {
                     var tm = plugin.getTeamManager();
                     int n_combs = tm.getCombatants().online().size();
@@ -151,7 +153,7 @@ public class MenuTree {
         for (int i = 1; i <= 5; i++) {
             final int n = i;
             new ActionNode(ctrlRoot, slotAt(4, 1 + i), String.format("assign_teams_%s", i), 
-                new ItemProperties<>(mats[i - 1]), 
+                new StaticItemProperties(mats[i - 1]), 
                 p -> {
                     p.closeInventory();
                     var tm = plugin.getTeamManager();
@@ -161,7 +163,7 @@ public class MenuTree {
             ).lock(plugin.getGameManager()::hasUHCStarted);
         }
         new ActionNode(ctrlRoot, slotAt(4, 7), "clear_teams",
-                new ItemProperties<>(Material.BLACK_DYE),
+                new StaticItemProperties(Material.BLACK_DYE),
                 p -> {
                     p.closeInventory();
                     var tm = plugin.getTeamManager();
@@ -173,71 +175,71 @@ public class MenuTree {
     }
 
     private BranchNode createConfigBranch(BranchNode root) {
-        BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties<>(Material.GOLDEN_PICKAXE), 4)
+        BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new StaticItemProperties(Material.GOLDEN_PICKAXE), 4)
             .lock(plugin.getGameManager()::hasUHCStarted);
         ValuedNode.cfgRoot = cfgRoot;
 
-        BranchNode intervals = new BranchNode(cfgRoot, slotAt(1, 3), "intervals",  new ItemProperties<>(Material.CLOCK),                   3);
-        BranchNode wbSize    = new BranchNode(cfgRoot, slotAt(1, 5), "wb_size",    new ItemProperties<>(Material.BLUE_STAINED_GLASS_PANE), 3);
+        BranchNode intervals = new BranchNode(cfgRoot, slotAt(1, 3), "intervals",  new StaticItemProperties(Material.CLOCK),                   3);
+        BranchNode wbSize    = new BranchNode(cfgRoot, slotAt(1, 5), "wb_size",    new StaticItemProperties(Material.BLUE_STAINED_GLASS_PANE), 3);
 
-        BranchNode globalSettings = new BranchNode(cfgRoot, slotAt(2, 2), "global",  new ItemProperties<>(Material.GRASS_BLOCK), 6);
-        BranchNode teamSettings   = new BranchNode(cfgRoot, slotAt(2, 3), "team",    new ItemProperties<>(Material.COOKED_BEEF), 6);
-        BranchNode playerSettings = new BranchNode(cfgRoot, slotAt(2, 4), "player",  new ItemProperties<>(Material.PLAYER_HEAD), 6);
-        BranchNode kitSettings    = new BranchNode(cfgRoot, slotAt(2, 5), "kit",     new ItemProperties<>(Material.GOLDEN_SWORD), 6);
-        BranchNode presetSettings = new BranchNode(cfgRoot, slotAt(2, 6), "presets", new ItemProperties<>(Material.ACACIA_BOAT), 6);
+        BranchNode globalSettings = new BranchNode(cfgRoot, slotAt(2, 2), "global",  new StaticItemProperties(Material.GRASS_BLOCK),  6);
+        BranchNode teamSettings   = new BranchNode(cfgRoot, slotAt(2, 3), "team",    new StaticItemProperties(Material.COOKED_BEEF),  6);
+        BranchNode playerSettings = new BranchNode(cfgRoot, slotAt(2, 4), "player",  new StaticItemProperties(Material.PLAYER_HEAD),  6);
+        BranchNode kitSettings    = new BranchNode(cfgRoot, slotAt(2, 5), "kit",     new StaticItemProperties(Material.GOLDEN_SWORD), 6);
+        BranchNode presetSettings = new BranchNode(cfgRoot, slotAt(2, 6), "presets", new StaticItemProperties(Material.ACACIA_BOAT),  6);
         
         /* INTERVALS (in secs) */
-        new ValuedNode(intervals, slotAt(1, 2), "start",     new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.RED_CONCRETE)   .formatArg(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
-        new ValuedNode(intervals, slotAt(1, 3), "movement1", new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.ORANGE_CONCRETE).formatArg(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
-        new ValuedNode(intervals, slotAt(1, 4), "stop",      new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.YELLOW_CONCRETE).formatArg(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
-        new ValuedNode(intervals, slotAt(1, 5), "movement2", new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.GREEN_CONCRETE) .formatArg(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
-        new ValuedNode(intervals, slotAt(1, 6), "dmwait",    new ItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.BLUE_CONCRETE)  .formatArg(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 2), "start",     new MappedItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.RED_CONCRETE)   .formatArg(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 3), "movement1", new MappedItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.ORANGE_CONCRETE).formatArg(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 4), "stop",      new MappedItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.YELLOW_CONCRETE).formatArg(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 5), "movement2", new MappedItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.GREEN_CONCRETE) .formatArg(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
+        new ValuedNode(intervals, slotAt(1, 6), "dmwait",    new MappedItemProperties<>(v -> (int) v == 0 ? Material.BLACK_CONCRETE : Material.BLUE_CONCRETE)  .formatArg(i -> getTimeString((int) i)), ValuedNode.Type.INTEGER, i -> clamp(0, i.intValue(), 7200));
 
         /* WB SIZE (diameter) */
-        new ValuedNode(wbSize, slotAt(1, 2), "initial",    new ItemProperties<>(Material.RED_STAINED_GLASS),    ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
-        new ValuedNode(wbSize, slotAt(1, 3), "border1",    new ItemProperties<>(Material.ORANGE_STAINED_GLASS), ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
-        new ValuedNode(wbSize, slotAt(1, 5), "border2",    new ItemProperties<>(Material.GREEN_STAINED_GLASS),  ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
-        new ValuedNode(wbSize, slotAt(1, 6), "deathmatch", new ItemProperties<>(Material.PURPLE_STAINED_GLASS), ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
+        new ValuedNode(wbSize, slotAt(1, 2), "initial",    new MappedItemProperties<>(Material.RED_STAINED_GLASS),    ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
+        new ValuedNode(wbSize, slotAt(1, 3), "border1",    new MappedItemProperties<>(Material.ORANGE_STAINED_GLASS), ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
+        new ValuedNode(wbSize, slotAt(1, 5), "border2",    new MappedItemProperties<>(Material.GREEN_STAINED_GLASS),  ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
+        new ValuedNode(wbSize, slotAt(1, 6), "deathmatch", new MappedItemProperties<>(Material.PURPLE_STAINED_GLASS), ValuedNode.Type.DOUBLE, d -> clamp(0, d.doubleValue(), 60000000));
 
         /* GLOBAL SETTINGS */
         int i = 0;
-        new ValuedNode(globalSettings, i++, "wither_bonus",   new ItemProperties<>(Material.WITHER_SKELETON_SKULL).style(TextColor.color(0x503754)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(globalSettings, i++, "nether_spawn",   new ItemProperties<>(Material.NETHERRACK).style(TextColor.color(0x9C4040)),            ValuedNode.Type.BOOLEAN);
-        new OptionValuedNode(globalSettings, i++, "dn_cycle", new ItemProperties<>().style(TextColor.color(0xFFEB85)),
+        new ValuedNode(globalSettings, i++, "wither_bonus",   new MappedItemProperties<>(Material.WITHER_SKELETON_SKULL).nameStyle(0x503754), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(globalSettings, i++, "nether_spawn",   new MappedItemProperties<>(Material.NETHERRACK).nameStyle(0x9C4040),            ValuedNode.Type.BOOLEAN);
+        new OptionValuedNode(globalSettings, i++, "dn_cycle", new MappedItemProperties<>().nameStyle(0xFFEB85),
             Material.CLOCK,
             Material.COMPASS,
             Material.SNOWBALL,
             Material.GLOWSTONE,
             Material.LIGHT_GRAY_CONCRETE
         );
-        new OptionValuedNode(globalSettings, i++, "spreadplayers", new ItemProperties<>(),
+        new OptionValuedNode(globalSettings, i++, "spreadplayers", new MappedItemProperties<>(),
             Material.WHEAT_SEEDS,
             Material.WHEAT
         );
-        new ValuedNode(globalSettings, i++, "auto_smelt",      new ItemProperties<>(Material.IRON_INGOT).style(TextColor.color(0xCFCFCF)),      ValuedNode.Type.BOOLEAN);
-        new ValuedNode(globalSettings, i++, "auto_cook",       new ItemProperties<>(Material.COOKED_PORKCHOP).style(TextColor.color(0xF9E9C9)), ValuedNode.Type.BOOLEAN);
-        new ValuedNode(globalSettings, i++, "always_flint",    new ItemProperties<>(Material.FLINT).style(TextColor.color(0x9F9F9F)),           ValuedNode.Type.BOOLEAN);
-        new OptionValuedNode(globalSettings, i++, "apple_drop_rate", new ItemProperties<>().style(TextColor.color(0x50BC50)),
+        new ValuedNode(globalSettings, i++, "auto_smelt",   new MappedItemProperties<>(Material.IRON_INGOT).nameStyle(0xCFCFCF),      ValuedNode.Type.BOOLEAN);
+        new ValuedNode(globalSettings, i++, "auto_cook",    new MappedItemProperties<>(Material.COOKED_PORKCHOP).nameStyle(0xF9E9C9), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(globalSettings, i++, "always_flint", new MappedItemProperties<>(Material.FLINT).nameStyle(0x9F9F9F),           ValuedNode.Type.BOOLEAN);
+        new OptionValuedNode(globalSettings, i++, "apple_drop_rate", new MappedItemProperties<>().nameStyle(0x50BC50),
             Material.POISONOUS_POTATO,
             Material.OAK_SAPLING,
             Material.OAK_LEAVES,
             Material.APPLE,
             Material.GOLDEN_APPLE
         );
-        new ValuedNode(globalSettings, i++, "shear_apple", new ItemProperties<>(Material.SHEARS).style(TextColor.color(0x9C7C40)),        ValuedNode.Type.BOOLEAN);
-        new ValuedNode(globalSettings, i++, "all_leaves",  new ItemProperties<>(Material.SPRUCE_LEAVES).style(TextColor.color(0x309C00)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(globalSettings, i++, "shear_apple", new MappedItemProperties<>(Material.SHEARS).nameStyle(0x9C7C40),        ValuedNode.Type.BOOLEAN);
+        new ValuedNode(globalSettings, i++, "all_leaves",  new MappedItemProperties<>(Material.SPRUCE_LEAVES).nameStyle(0x309C00), ValuedNode.Type.BOOLEAN);
 
         /* TEAM SETTINGS */
         i = 0;
-        new OptionValuedNode(teamSettings, i++, "hide_teams", new ItemProperties<>(),
+        new OptionValuedNode(teamSettings, i++, "hide_teams", new MappedItemProperties<>(),
             Material.RED_STAINED_GLASS,
             Material.RED_TERRACOTTA,
             Material.RED_CONCRETE
         );
-        new ValuedNode(teamSettings, i++, "friendly_fire", new ItemProperties<>(Material.FLINT_AND_STEEL).style(TextColor.color(0xFF9F5F)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(teamSettings, i++, "friendly_fire", new MappedItemProperties<>(Material.FLINT_AND_STEEL).nameStyle(0xFF9F5F), ValuedNode.Type.BOOLEAN);
         new ValuedNode(teamSettings, i++, "boss_team", 
-            new ItemProperties<>(v -> (int) v == 0 ? Material.DRAGON_EGG : Material.DRAGON_HEAD)
-                .style(TextColor.color(0xA100FF)) 
+            new MappedItemProperties<>(v -> (int) v == 0 ? Material.DRAGON_EGG : Material.DRAGON_HEAD)
+                .nameStyle(0xA100FF) 
                 .formatArg(v -> {
                     int nPlayers = (int) v;
                     if (nPlayers < 1) return new Key("menu.inv.config.presets.disabled").trans();
@@ -247,24 +249,24 @@ public class MenuTree {
             ValuedNode.Type.INTEGER, 
             v -> Math.max(0, (int) v)
         );
-        new ValuedNode(teamSettings, i++, "sardines", new ItemProperties<>(Material.TROPICAL_FISH).style(TextColor.color(0xFFBC70)), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(teamSettings, i++, "sardines", new MappedItemProperties<>(Material.TROPICAL_FISH).nameStyle(0xFFBC70), ValuedNode.Type.BOOLEAN);
 
         /* PLAYER SETTINGS */
         i = 0;
-        new OptionValuedNode(playerSettings, i++, "max_health", new ItemProperties<>().style(TextColor.color(0xFF2121)),
+        new OptionValuedNode(playerSettings, i++, "max_health", new MappedItemProperties<>().nameStyle(0xFF2121),
             Material.SPIDER_EYE,
             Material.APPLE,
             Material.GOLDEN_APPLE,
             Material.ENCHANTED_GOLDEN_APPLE
         );
-        new OptionValuedNode(playerSettings, i++, "mv_speed", new ItemProperties<>().style(TextColor.color(0x61A877)),
+        new OptionValuedNode(playerSettings, i++, "mv_speed", new MappedItemProperties<>().nameStyle(0x61A877),
             Material.SOUL_SAND,
             Material.GRASS_BLOCK,
             Material.ICE,
             Material.EMERALD_BLOCK
         );
         new ValuedNode(playerSettings, i++, "grace_period",
-            new ItemProperties<>(v -> (int) v >= 0 ? Material.SHIELD : Material.BLACK_CONCRETE)
+            new MappedItemProperties<>(v -> (int) v >= 0 ? Material.SHIELD : Material.BLACK_CONCRETE)
                 .formatArg(v -> {
                     int secs = (int) v;
                     if (secs < 0) return new Key("menu.inv.config.presets.disabled").trans();
@@ -274,7 +276,7 @@ public class MenuTree {
             n -> Math.max(-1, (int) n)
         );
         new ValuedNode(playerSettings, i++, "final_heal",
-            new ItemProperties<>(v -> (int) v >= 0 ? Material.GLOW_BERRIES : Material.BLACK_CONCRETE)
+            new MappedItemProperties<>(v -> (int) v >= 0 ? Material.GLOW_BERRIES : Material.BLACK_CONCRETE)
                 .formatArg(v -> {
                     int secs = (int) v;
                     if (secs < 0) return new Key("menu.inv.config.presets.disabled").trans();
@@ -283,30 +285,30 @@ public class MenuTree {
             ValuedNode.Type.INTEGER, 
             n -> Math.max(-1, (int) n)
         );
-        new ValuedNode(playerSettings, i++, "natural_regen", new ItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, i++, "natural_regen", new MappedItemProperties<>(Material.CARROT), ValuedNode.Type.BOOLEAN);
         new ValuedNode(playerSettings, i++, "hasty_boys",
-            new ItemProperties<>(Material.GOLDEN_PICKAXE)
+            new MappedItemProperties<>(Material.GOLDEN_PICKAXE)
                 .formatArg(v -> Component.translatable(String.format("enchantment.level.%s", v))),
                 ValuedNode.Type.INTEGER, 
                 v -> clamp(0, (int) v, 255)
         );
         new ValuedNode(playerSettings, i++, "lucky_boys",
-            new ItemProperties<>(Material.GOLD_INGOT)
+            new MappedItemProperties<>(Material.GOLD_INGOT)
                 .formatArg(v -> Component.translatable(String.format("enchantment.level.%s", v))),
                 ValuedNode.Type.INTEGER, 
                 v -> clamp(0, (int) v, 255)
         );
-        new ValuedNode(playerSettings, i++, "prox_track",    new ItemProperties<>(Material.COMPASS), ValuedNode.Type.BOOLEAN);
-        new OptionValuedNode(playerSettings, i++, "player_drops", new ItemProperties<>().style(TextColor.color(0xDFCFAF)),
+        new ValuedNode(playerSettings, i++, "prox_track", new MappedItemProperties<>(Material.COMPASS), ValuedNode.Type.BOOLEAN);
+        new OptionValuedNode(playerSettings, i++, "player_drops", new MappedItemProperties<>().nameStyle(0xDFCFAF),
             Material.SKELETON_SKULL,
             Material.ZOMBIE_HEAD,
             Material.PLAYER_HEAD
         );
 
-        new ValuedNode(playerSettings, 18,  "drowning_damage", new ItemProperties<>(Material.TURTLE_HELMET),      ValuedNode.Type.BOOLEAN);
-        new ValuedNode(playerSettings, 19, "fall_damage",     new ItemProperties<>(Material.FEATHER),            ValuedNode.Type.BOOLEAN);
-        new ValuedNode(playerSettings, 20, "fire_damage",     new ItemProperties<>(Material.FLINT_AND_STEEL),    ValuedNode.Type.BOOLEAN);
-        new ValuedNode(playerSettings, 21, "freeze_damage",   new ItemProperties<>(Material.POWDER_SNOW_BUCKET), ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, 18,  "drowning_damage", new MappedItemProperties<>(Material.TURTLE_HELMET),      ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, 19, "fall_damage",      new MappedItemProperties<>(Material.FEATHER),            ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, 20, "fire_damage",      new MappedItemProperties<>(Material.FLINT_AND_STEEL),    ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, 21, "freeze_damage",    new MappedItemProperties<>(Material.POWDER_SNOW_BUCKET), ValuedNode.Type.BOOLEAN);
 
         /* KIT SETTINGS */
         var kitsYml = loadYMLResource("kits.yml");
@@ -314,7 +316,7 @@ public class MenuTree {
         Map<String, Kit> kits = new HashMap<>();
 
         var kitNode = new KitNode(kitSettings, 52, "custom", 
-            new ItemProperties<>(Material.DIAMOND_PICKAXE).style(TextColor.color(0x7FCFCF)),
+            new MappedItemProperties<>(Material.DIAMOND_PICKAXE).nameStyle(0x7FCFCF),
             kits);
 
         for (int j = 0; j < kitPropsList.size(); j++) {
@@ -330,7 +332,7 @@ public class MenuTree {
             kits.put(nodeName, kit);
 
             new ActionNode(kitSettings, j, nodeName,
-                new ItemProperties<>(mat).style(clr), 
+                new StaticItemProperties(mat, noDeco(clr)), 
                 p -> kitNode.set(nodeName)
             );
         }
@@ -351,7 +353,7 @@ public class MenuTree {
             TextColor clr = TextColor.color(clrHex);
 
             new PresetNode(presetSettings, j, nodeName, 
-                new ItemProperties<>(mat).style(clr), preset
+                new MappedItemProperties<>(mat).nameStyle(clr), preset
             );
         }
         

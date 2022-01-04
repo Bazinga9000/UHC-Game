@@ -16,7 +16,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import xyz.baz9k.UHCGame.Kit;
-import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
+import xyz.baz9k.UHCGame.util.stack.ItemProperties;
+import xyz.baz9k.UHCGame.util.stack.MappedItemProperties;
+import xyz.baz9k.UHCGame.util.stack.StaticItemProperties;
+import xyz.baz9k.UHCGame.util.stack.TransItemStack;
+
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 /**
@@ -25,7 +29,7 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 public class KitNode extends InventoryNode implements ValueHolder {
 
     private boolean grantXP = false;
-    private final NodeItemStack xpStack;
+    private final TransItemStack xpStack;
     private final Map<String, Kit> kits;
 
     /**
@@ -35,12 +39,12 @@ public class KitNode extends InventoryNode implements ValueHolder {
      * @param props {@link ItemProperties}
      * @param kits Mapping of kit indexes to kits
      */
-    public KitNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props, Map<String, Kit> kits) {
+    public KitNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties props, Map<String, Kit> kits) {
         super(parent, slot, nodeName, props, 5, new ReserveSlots(9 * 5 - 4));
 
         this.fillReserved = Material.GRAY_STAINED_GLASS_PANE;
-        this.xpStack = new NodeItemStack("kit_xp", 
-        new ItemProperties<Boolean>(b -> b ? Material.EXPERIENCE_BOTTLE : Material.GLASS_BOTTLE)
+        this.xpStack = new TransItemStack("menu.inv.kit_xp", 
+        new MappedItemProperties<Boolean>(b -> b ? Material.EXPERIENCE_BOTTLE : Material.GLASS_BOTTLE)
             .useObject(() -> this.grantXP)
         );
         this.kits = Collections.unmodifiableMap(kits);
@@ -51,7 +55,9 @@ public class KitNode extends InventoryNode implements ValueHolder {
         super.initInventory();
         inventory.setItem(rsLeft(), xpStack);
 
-        ItemStack saveStack = new NodeItemStack("kit_save", new ItemProperties<>(Material.STRUCTURE_BLOCK));
+        ItemStack saveStack = new TransItemStack("menu.inv.kit_save", 
+            new StaticItemProperties(Material.STRUCTURE_BLOCK)
+        );
         inventory.setItem(rsRight() - 2, saveStack);
         updateInventory();
     }
@@ -123,7 +129,7 @@ public class KitNode extends InventoryNode implements ValueHolder {
 
     private void grantXP(boolean gxp) {
         grantXP = gxp;
-        inventory.setItem(rsRight() - 4, xpStack.updateAll());
+        inventory.setItem(rsRight() - 4, xpStack.refresh());
     }
 
     private Kit kit() {

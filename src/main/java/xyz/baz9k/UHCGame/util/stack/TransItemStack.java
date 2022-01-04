@@ -67,16 +67,13 @@ public class TransItemStack extends ItemStack {
         refresh();
     }
 
-    private static final Key NAME_KEY_FORMAT = new Key("%s.name");
-    private static final Key DESC_KEY_FORMAT = new Key("%s.desc");
-
     /**
      * Gets the formatted description of the item.
      * @return the description
      */
     public Component transName() {
         Style s = Optional.ofNullable(props.nameStyle()).orElse(DEFAULT_NAME_STYLE);
-        return nameFromID(NAME_KEY_FORMAT.sub(langKey), s);
+        return nameFromID(langKey, s);
     }
 
     /**
@@ -84,9 +81,19 @@ public class TransItemStack extends ItemStack {
      * @return the description
      */
     public List<Component> transLore() {
+        // desc + extra lore
         Object[] fmtArgs = props.formatArgs();
         Style s = Optional.ofNullable(props.descStyle()).orElse(DEFAULT_DESC_STYLE);
-        return descFromID(DESC_KEY_FORMAT.sub(langKey), s, fmtArgs);
+        
+        List<Component> lines = new ArrayList<>(descFromID(langKey, s, fmtArgs));
+        List<Component> el = props.extraLore();
+
+        if (el.size() > 0) {
+            if (lines.size() > 0) lines.add(Component.empty());
+            lines.addAll(el);
+        }
+
+        return lines;
     }
 
     /**
@@ -109,13 +116,16 @@ public class TransItemStack extends ItemStack {
         return this;
     }
 
+    private static final Key NAME_KEY_FORMAT = new Key("%s.name");
+    private static final Key DESC_KEY_FORMAT = new Key("%s.desc");
+
     /**
      * Gets rendered name by translating the lang key<p>
      * Rendered components are text components that are already translated.
      * @param langKey lang key
      * @return rendered {@link Component}
      */
-    public static Component nameFromID(Key langKey, Object... args) {
+    public static Component nameFromID(String langKey, Object... args) {
         return nameFromID(langKey, DEFAULT_NAME_STYLE, args);
     }
 
@@ -126,8 +136,9 @@ public class TransItemStack extends ItemStack {
      * @param s Style of component
      * @return rendered {@link Component}
      */
-    public static Component nameFromID(Key langKey, Style s, Object... args) {
-        return render(langKey.trans(args).style(s));
+    public static Component nameFromID(String langKey, Style s, Object... args) {
+        Key fullLangKey = NAME_KEY_FORMAT.sub(langKey);
+        return render(fullLangKey.trans(args).style(s));
     }
 
     /**
@@ -136,7 +147,7 @@ public class TransItemStack extends ItemStack {
      * @param langKey lang key
      * @return lines of rendered Component
      */
-    public static List<Component> descFromID(Key langKey, Object... args) {
+    public static List<Component> descFromID(String langKey, Object... args) {
         return descFromID(langKey, DEFAULT_DESC_STYLE, args);
     }
     /**
@@ -146,7 +157,8 @@ public class TransItemStack extends ItemStack {
      * @param s Style of component
      * @return lines of rendered Component
      */
-    public static List<Component> descFromID(Key langKey, Style s, Object... args) {
-        return langKey.transMultiline(s, args);
+    public static List<Component> descFromID(String langKey, Style s, Object... args) {
+        Key fullLangKey = DESC_KEY_FORMAT.sub(langKey);
+        return fullLangKey.transMultiline(s, args);
     }
 }

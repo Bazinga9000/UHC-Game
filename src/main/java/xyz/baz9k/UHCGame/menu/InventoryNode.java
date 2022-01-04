@@ -14,7 +14,11 @@ import org.jetbrains.annotations.Nullable;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import xyz.baz9k.UHCGame.menu.NodeItemStack.ItemProperties;
+import xyz.baz9k.UHCGame.util.stack.ItemProperties;
+import xyz.baz9k.UHCGame.util.stack.StaticItemProperties;
+import xyz.baz9k.UHCGame.util.stack.TransItemStack;
+
+import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 /**
  * {@link Node} that holds an Inventory, for whatever reason.
@@ -49,13 +53,13 @@ public abstract class InventoryNode extends Node {
      * @param rs There are two types of slots: storage slots and reserve slots.
      * <p> Storage slots can be modified and edited, reserve slots are readonly and reserved for actions, as defined by the {@link #onClick} method.
      */
-    public InventoryNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties<?> props, int guiHeight, ReserveSlots rs) {
+    public InventoryNode(@Nullable BranchNode parent, int slot, String nodeName, ItemProperties props, int guiHeight, ReserveSlots rs) {
         super(parent, slot, nodeName, props);
         this.slotCount = 9 * guiHeight;
         this.rs = rs;
         this.fillReserved = Material.LIGHT_GRAY_STAINED_GLASS_PANE;
 
-        inventory = Bukkit.createInventory(null, slotCount, NodeItemStack.nameFromID(langKey()));
+        inventory = Bukkit.createInventory(null, slotCount, TransItemStack.nameFromID(langKey()));
     }
 
     /**
@@ -139,8 +143,8 @@ public abstract class InventoryNode extends Node {
 
         // set last reserve slot to go back button
         if (rs.contains(r - 1) && parent != null) {
-            ItemStack goBack = new NodeItemStack("go_back", 
-                new ItemProperties<>(Material.ARROW).style(NamedTextColor.RED)
+            ItemStack goBack = new TransItemStack("menu.inv.go_back",
+                new StaticItemProperties(Material.ARROW, noDeco(NamedTextColor.RED))
             );
             
             contents[r - 1] = goBack;
