@@ -7,12 +7,14 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Damageable;
 import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
+import xyz.baz9k.UHCGame.tag.BooleanTagType;
 import xyz.baz9k.UHCGame.util.ColorGradient;
 import xyz.baz9k.UHCGame.util.Point2D;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +22,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scoreboard.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -402,9 +406,18 @@ public class HUDManager implements Listener {
     private void updateTeammateHUD(@NotNull Player p) {
         Scoreboard b = p.getScoreboard();
 
+        var cfg = plugin.configValues();
         int team = teamManager.getTeam(p);
-        Set<Player> teammateSet;
 
+        Comparator<Player> proxPriority = (p1, p2) -> {
+            if (cfg.proxTrack()) {
+                return -Boolean.compare(
+                teamManager.onSameTeam(p, p1), 
+                teamManager.onSameTeam(p, p2));
+            } else {
+                return 0;
+            }
+        };
         Comparator<Player> compareByAliveness = (t1, t2) -> {
             PlayerState t1s = teamManager.getPlayerState(t1),
                         t2s = teamManager.getPlayerState(t2);
@@ -421,13 +434,38 @@ public class HUDManager implements Listener {
             return Comparator.nullsLast(Double::compare).compare(dist2d(pl, t1l), dist2d(pl, t2l));
         };
 
+
+        Set<Player> teammateSet = new HashSet<>();
         Comparator<Player> sorter;
+
+        if (cfg.proxTrack()) {
+            boolean hasProxCompass = Arrays.stream(p.getInventory().getContents())
+                .map(ItemStack::getItemMeta)
+                .map(ItemMeta::getPersistentDataContainer)
+                .anyMatch(c -> c.get(new NamespacedKey(plugin, "prox_compass"), new BooleanTagType()));
+            
+            if (hasProxCompass) {
+                teamManager.getCombatants().online().stream()
+                    .filter(q -> !teamManager.onSameTeam(p, q))
+                    .min(compareByProximity)
+                    .ifPresent(teammateSet::add);
+            }
+        }
+
         if (teamManager.isAssignedCombatant(p)) {
-            teammateSet = teamManager.getCombatantsOnTeam(team).cached();
-            sorter = compareByAliveness.thenComparing(compareByHealth);
+            teammateSet.addAll(
+                teamManager.getCombatantsOnTeam(team).cached()
+            );
+            sorter = proxPriority
+                .thenComparing(compareByAliveness)
+                .thenComparing(compareByHealth);
         } else {
-            teammateSet = teamManager.getCombatants().cached();
-            sorter = compareByAliveness.thenComparing(compareByProximity);
+            teammateSet.addAll(
+                teamManager.getCombatants().cached()
+            );
+            sorter = proxPriority
+                .thenComparing(compareByAliveness)
+                .thenComparing(compareByProximity);
         }
 
         Iterable<Player> tmates = teammateSet.stream()

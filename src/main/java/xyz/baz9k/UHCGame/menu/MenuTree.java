@@ -173,7 +173,6 @@ public class MenuTree {
     }
 
     // TODO impl
-    // player.prox_track
     // player.player_drops
     
     private BranchNode createConfigBranch(BranchNode root) {
