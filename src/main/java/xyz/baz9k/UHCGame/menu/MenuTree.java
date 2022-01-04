@@ -174,6 +174,7 @@ public class MenuTree {
 
     // TODO impl
     // player.prox_track
+    // player.player_drops
     
     private BranchNode createConfigBranch(BranchNode root) {
         BranchNode cfgRoot = new BranchNode(root, slotAt(3, 7), "config", new ItemProperties<>(Material.GOLDEN_PICKAXE), 4)
@@ -300,11 +301,16 @@ public class MenuTree {
                 v -> clamp(0, (int) v, 255)
         );
         new ValuedNode(playerSettings, i++, "prox_track",    new ItemProperties<>(Material.COMPASS), ValuedNode.Type.BOOLEAN);
-        
-        new ValuedNode(playerSettings, 9,  "drowning_damage", new ItemProperties<>(Material.TURTLE_HELMET),      ValuedNode.Type.BOOLEAN);
-        new ValuedNode(playerSettings, 10, "fall_damage",     new ItemProperties<>(Material.FEATHER),            ValuedNode.Type.BOOLEAN);
-        new ValuedNode(playerSettings, 11, "fire_damage",     new ItemProperties<>(Material.FLINT_AND_STEEL),    ValuedNode.Type.BOOLEAN);
-        new ValuedNode(playerSettings, 12, "freeze_damage",   new ItemProperties<>(Material.POWDER_SNOW_BUCKET), ValuedNode.Type.BOOLEAN);
+        new OptionValuedNode(playerSettings, i++, "player_drops", new ItemProperties<>().style(TextColor.color(0xDFCFAF)),
+            Material.SKELETON_SKULL,
+            Material.ZOMBIE_HEAD,
+            Material.PLAYER_HEAD
+        );
+
+        new ValuedNode(playerSettings, 18,  "drowning_damage", new ItemProperties<>(Material.TURTLE_HELMET),      ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, 19, "fall_damage",     new ItemProperties<>(Material.FEATHER),            ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, 20, "fire_damage",     new ItemProperties<>(Material.FLINT_AND_STEEL),    ValuedNode.Type.BOOLEAN);
+        new ValuedNode(playerSettings, 21, "freeze_damage",   new ItemProperties<>(Material.POWDER_SNOW_BUCKET), ValuedNode.Type.BOOLEAN);
 
         /* KIT SETTINGS */
         var kitsYml = loadYMLResource("kits.yml");

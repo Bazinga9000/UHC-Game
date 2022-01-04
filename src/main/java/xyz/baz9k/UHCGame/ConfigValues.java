@@ -5,7 +5,11 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import xyz.baz9k.UHCGame.util.Path;
 
@@ -288,5 +292,23 @@ public class ConfigValues {
      */
     public boolean proxTrack() {
         return cfg.getBoolean("player.prox_track");
+    }
+
+    /**
+     * @param p Player who just died
+     * @return extra item stack to give on player death
+     */
+    public Optional<ItemStack> playerDrops(Player p) {
+        return switch (cfg.getInt("player.player_drops")) {
+            case 1  -> Optional.of(new ItemStack(Material.GOLDEN_APPLE));
+            case 2  -> {
+                ItemStack stack = new ItemStack(Material.PLAYER_HEAD);
+                stack.editMeta(SkullMeta.class, m -> {
+                    m.setOwningPlayer(p);
+                });
+                yield Optional.of(stack);
+            }
+            default -> Optional.empty();
+        };
     }
 }

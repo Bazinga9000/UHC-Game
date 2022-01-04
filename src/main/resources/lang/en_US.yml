@@ -399,6 +399,15 @@ xyz:
                 desc: |-
                   Compasses point to the nearest non-team player,
                   and the compass recipe is buffed.
+              player_drops:
+                name: "Player Drops"
+                desc: |-
+                  Select whether player will drop
+                  extra items.
+                options:
+                  - "None"
+                  - "Golden Apple"
+                  - "Player Head"
               drowning_damage:
                 name: "Drowning Damage"
                 desc: "Enable/disable drowning damage"
