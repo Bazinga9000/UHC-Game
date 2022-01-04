@@ -475,10 +475,10 @@ xyz:
               extra_lore_global: |-
                 Global:
                 {0}
-              extra_lore_teams: |-
+              extra_lore_team: |-
                 Teams:
                 {0}
-              extra_lore_players: |-
+              extra_lore_player: |-
                 Players:
                 {0}
               disabled: "Disabled"

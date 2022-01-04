@@ -148,9 +148,8 @@ public final class PresetNode extends Node {
             text = null;
         }
 
-        // TODO check if this works
         if (text != null) {
-            return renderString(new Key("menu.inv.config.presets.extra_lore_%s", path).trans("\n" + text));
+            return "\n" + renderString(new Key("menu.inv.config.presets.extra_lore_%s", path).trans(text));
         } else {
             return "";
         }
