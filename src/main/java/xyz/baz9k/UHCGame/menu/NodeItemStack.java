@@ -252,7 +252,7 @@ public class NodeItemStack extends ItemStack {
      * @return rendered {@link Component}
      */
     public static Component nameFromID(String langKey, Style s, Object... args) {
-        Key fullLangKey = NAME_KEY_FORMAT.args(langKey);
+        Key fullLangKey = NAME_KEY_FORMAT.sub(langKey);
         return render(fullLangKey.trans(args).style(s));
     }
 
@@ -273,7 +273,7 @@ public class NodeItemStack extends ItemStack {
      * @return lines of rendered Component
      */
     public static List<Component> descFromID(String langKey, Style s, Object... args) {
-        Key fullLangKey = DESC_KEY_FORMAT.args(langKey);
+        Key fullLangKey = DESC_KEY_FORMAT.sub(langKey);
         return fullLangKey.transMultiline(s, args);
     }
 }

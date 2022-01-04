@@ -21,18 +21,37 @@ public final class ComponentUtils {
     private ComponentUtils() {}
 
     public static record Key(String key) {
-        public static final String PREFIX = "xyz.baz9k.uhc";
+        public static final Path prefix = Path.of("xyz.baz9k.uhc");
 
         public Key {
-            if (!key.startsWith(PREFIX)) key = PREFIX + "." + key;
+            Path kp = Path.of(key);
+            key = kp.relativeTo(prefix)
+                .orElse(kp)
+                .toString();
         }
 
         public Key(String key, Object... args) {
-            this(String.format(key, args));
+            this(String.format(key, parseArgs(args)));
         }
 
-        public Key args(Object... args) {
-            return new Key(key(), args);
+        public Key sub(Object... args) {
+            return new Key(key, args);
+        }
+
+        /**
+         * @return the full translation key for this Key
+         */
+        public String key() {
+            return prefix.append(key).toString();
+        }
+        
+        private static Object[] parseArgs(Object... args) {
+            return Arrays.stream(args)
+                .map(o -> {
+                    if (o instanceof Key k) return k.key;
+                    return o;
+                })
+                .toArray();
         }
 
         /**

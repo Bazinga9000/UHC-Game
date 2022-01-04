@@ -52,7 +52,7 @@ public final class OptionValuedNode extends ValuedNode {
      */
     public String optDesc(int i) {
         var langYaml = plugin.getLangManager().langYaml();
-        var optDescs = langYaml.getStringList(OPT_DESC_ID_FORMAT.args(langKey()).key());
+        var optDescs = langYaml.getStringList(OPT_DESC_ID_FORMAT.sub(langKey()).key());
         if (optDescs.size() == 0) {
             return String.format(OPT_DESC_ID_FORMAT + "[%s]", langKey(), i);
         } else {
