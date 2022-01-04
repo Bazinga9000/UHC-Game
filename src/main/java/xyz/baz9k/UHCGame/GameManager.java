@@ -22,6 +22,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
@@ -798,9 +799,10 @@ public class GameManager implements Listener {
         // Map.entry(Material.SALMON, Material.COOKED_SALMON)
     );
 
+    // TODO fix
     @EventHandler
     public void onBlockDrop(BlockDropItemEvent e) {
-        if (!hasUHCStarted()) return;
+        // if (!hasUHCStarted()) return;
         var cfg = plugin.configValues();
 
         Material blockMaterial = e.getBlockState().getType();
@@ -820,6 +822,7 @@ public class GameManager implements Listener {
         new LeafDropProducer(e, cfg).addDrops();
     }
 
+    // TODO fix
     @EventHandler
     public void onMobDrop(EntityDropItemEvent e) {
         if (!hasUHCStarted()) return;
@@ -835,6 +838,7 @@ public class GameManager implements Listener {
         }
     }
 
+    // TODO probably fix
     @EventHandler
     public void onLeafDecay(LeavesDecayEvent e) {
         if (!hasUHCStarted()) return;
@@ -844,14 +848,14 @@ public class GameManager implements Listener {
     }
 
     @EventHandler
-    public void onCraftTool(CraftItemEvent e) {
+    public void onCraft(CraftItemEvent e) {
         if (!hasUHCStarted()) return;
         var cfg = plugin.configValues();
         var hastyBoys = cfg.hastyBoys();
         var luckyBoys = cfg.luckyBoys();
 
-        
-        ItemStack result = e.getRecipe().getResult();
+        Recipe r = e.getRecipe();
+        ItemStack result = r.getResult();
         if (MaterialTags.ENCHANTABLE.isTagged(result)) {
             if (hastyBoys.isPresent()) {
                 result.addUnsafeEnchantments(Map.ofEntries(
@@ -863,6 +867,13 @@ public class GameManager implements Listener {
             if (luckyBoys.isPresent()) {
                 result.addUnsafeEnchantment(Ench.FORTUNE, luckyBoys.getAsInt());
             }
+        }
+
+        if (recipes.isRecipeEnabled(r)) {
+            e.setCurrentItem(result);
+        } else {
+            e.setCurrentItem(new ItemStack(Material.AIR));
+            e.getWhoClicked().sendMessage(Component.text("This recipe is disabled!"));
         }
     }
 
