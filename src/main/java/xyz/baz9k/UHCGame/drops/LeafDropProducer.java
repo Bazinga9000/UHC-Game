@@ -8,7 +8,6 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockDropItemEvent;
@@ -17,6 +16,7 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.inventory.ItemStack;
 
 import xyz.baz9k.UHCGame.ConfigValues;
+import xyz.baz9k.UHCGame.util.Ench;
 
 public class LeafDropProducer {
     private final Material leafType;
@@ -55,16 +55,16 @@ public class LeafDropProducer {
     }
 
     private Optional<ItemStack> tool() {
-        return player.map(Player::getItemInUse)
+        return player.map(p -> p.getInventory().getItemInMainHand())
             .filter(s -> !s.getType().equals(Material.AIR));
     }
 
     private double appleDropRate() {
         int fortune = tool()
-            .map(t -> t.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS))
+            .map(t -> t.getEnchantmentLevel(Ench.FORTUNE))
             .orElse(0);
         
-            int baseDivisor = switch (fortune) {
+        int baseDivisor = switch (fortune) {
             case 0  -> 200;
             case 1  -> 180;
             case 2  -> 160;
@@ -92,10 +92,10 @@ public class LeafDropProducer {
 
         // if drop rate matches, spawn an apple
         if (r.nextDouble() < appleDropRate()) {
-            Item apple = spawnLoc.getWorld().spawn(spawnLoc, Item.class);
-            apple.setItemStack(new ItemStack(Material.APPLE));
+            ItemStack apple = new ItemStack(Material.APPLE);
+            Item appleDrop = spawnLoc.getWorld().dropItem(spawnLoc, apple);
 
-            drops.add(apple);
+            drops.add(appleDrop);
         }
     }
 }

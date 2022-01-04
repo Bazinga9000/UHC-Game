@@ -799,10 +799,9 @@ public class GameManager implements Listener {
         // Map.entry(Material.SALMON, Material.COOKED_SALMON)
     );
 
-    // TODO fix
     @EventHandler
     public void onBlockDrop(BlockDropItemEvent e) {
-        // if (!hasUHCStarted()) return;
+        if (!hasUHCStarted()) return;
         var cfg = plugin.configValues();
 
         Material blockMaterial = e.getBlockState().getType();
@@ -822,7 +821,6 @@ public class GameManager implements Listener {
         new LeafDropProducer(e, cfg).addDrops();
     }
 
-    // TODO fix
     @EventHandler
     public void onMobDrop(EntityDropItemEvent e) {
         if (!hasUHCStarted()) return;
@@ -838,7 +836,6 @@ public class GameManager implements Listener {
         }
     }
 
-    // TODO probably fix
     @EventHandler
     public void onLeafDecay(LeavesDecayEvent e) {
         if (!hasUHCStarted()) return;

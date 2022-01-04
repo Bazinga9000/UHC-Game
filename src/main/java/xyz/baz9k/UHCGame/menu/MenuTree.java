@@ -172,13 +172,7 @@ public class MenuTree {
         return ctrlRoot;
     }
 
-    // 
-    // global.auto_smelt
-    // global.auto_cook
-    // global.always_flint
-    // global.apple_drop_rate
-    // global.shear_apple
-    // global.all_leaves
+    // TODO impl
     // player.prox_track
     // player.player_drops
     
