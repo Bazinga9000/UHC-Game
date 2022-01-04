@@ -42,5 +42,6 @@ player:
   hasty_boys: 0
   lucky_boys: 0
   prox_track: false
+  player_drops: 0
 
 kit: none

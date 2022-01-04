@@ -295,11 +295,18 @@ public class ConfigValues {
     }
 
     /**
+     * @return config value of player.player_drops
+     */
+    public int playerDropsIndex() {
+        return cfg.getInt("player.player_drops");
+    }
+
+    /**
      * @param p Player who just died
      * @return extra item stack to give on player death
      */
     public Optional<ItemStack> playerDrops(Player p) {
-        return switch (cfg.getInt("player.player_drops")) {
+        return switch (playerDropsIndex()) {
             case 1  -> Optional.of(new ItemStack(Material.GOLDEN_APPLE));
             case 2  -> {
                 ItemStack stack = new ItemStack(Material.PLAYER_HEAD);
