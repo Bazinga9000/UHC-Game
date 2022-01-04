@@ -15,17 +15,15 @@ import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.jetbrains.annotations.NotNull;
 
-import net.kyori.adventure.text.format.NamedTextColor;
-import xyz.baz9k.UHCGame.util.Ench;
+import xyz.baz9k.UHCGame.util.stack.StaticItemProperties;
+import xyz.baz9k.UHCGame.util.stack.TransItemStack;
 import xyz.baz9k.UHCGame.util.tag.BooleanTagType;
 
-import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 public final class Recipes {
     private final UHCGamePlugin plugin;
@@ -137,16 +135,19 @@ public final class Recipes {
     @DeclaredRecipe(enable = EnableWhen.PLAYER_DROPS_HEAD)
     private Recipe goldenHead() {
         NamespacedKey key = key("golden_head");
-        ItemStack goldenHead = new ItemStack(Material.GOLDEN_APPLE);
-
-        goldenHead.editMeta(m -> {
-            m.displayName(render(new Key("item.golden_head.name").trans()));
-            m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            m.addEnchant(Ench.SILK_TOUCH, 1, true);
-
-            var container = m.getPersistentDataContainer();
-            container.set(key, new BooleanTagType(), true);
-        });
+        TransItemStack goldenHead = new TransItemStack("item.golden_head", 
+            new StaticItemProperties(
+                Material.GOLDEN_APPLE, 
+                null,
+                null,
+                null,
+                true,
+                m -> {
+                    var container = m.getPersistentDataContainer();
+                    container.set(key, new BooleanTagType(), true);
+                }
+            )
+        );
 
         return new ShapedRecipe(key, goldenHead)
             .shape(
@@ -162,19 +163,19 @@ public final class Recipes {
     @DeclaredRecipe(enable = EnableWhen.PROX_TRACK)
     private Recipe proxCompass() {
         NamespacedKey key = key("prox_compass");
-        ItemStack proxCompass = new ItemStack(Material.CLOCK);
-
-        proxCompass.editMeta(m -> {
-            m.displayName(render(new Key("item.prox_compass.name").trans()));
-            m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            m.addEnchant(Ench.SILK_TOUCH, 1, true);
-            
-            var d = new Key("item.prox_compass.desc").transMultiline(noDeco(NamedTextColor.GRAY));
-            m.lore(d);
-
-            var container = m.getPersistentDataContainer();
-            container.set(key, new BooleanTagType(), true);
-        });
+        TransItemStack proxCompass = new TransItemStack("item.prox_compass", 
+            new StaticItemProperties(
+                Material.CLOCK,
+                null,
+                null,
+                null,
+                true,
+                m -> {
+                    var container = m.getPersistentDataContainer();
+                    container.set(key, new BooleanTagType(), true);
+                }
+            )
+        );
 
         return new ShapedRecipe(key, proxCompass)
             .shape(

@@ -1,7 +1,6 @@
 package xyz.baz9k.UHCGame;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,8 +21,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import xyz.baz9k.UHCGame.util.stack.StaticItemProperties;
+import xyz.baz9k.UHCGame.util.stack.TransItemStack;
 import xyz.baz9k.UHCGame.util.tag.UUIDTagType;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
@@ -60,24 +60,19 @@ public class SardinesManager implements Listener {
      * @return the created sardine
      */
     private ItemStack createSardine(OfflinePlayer p) {
-        ItemStack sardine = new ItemStack(Material.COD);
-        sardine.editMeta(m -> {
-            m.displayName(
-                new Key("item.sardines.name")
-                    .trans()
-                    .style(noDeco(TextColor.color(0xF9C9A9)))
-            );
-            m.lore(
-                List.of(
-                    new Key("item.sardines.desc")
-                        .trans(p.getName())
-                        .style(noDeco(NamedTextColor.GRAY))
-                )
-            );
-
-            var container = m.getPersistentDataContainer();
-            container.set(sardineKey, new UUIDTagType(), p.getUniqueId());
-        });
+        TransItemStack sardine = new TransItemStack("item.sardines", 
+            new StaticItemProperties(
+                Material.COD, 
+                noDeco(TextColor.color(0xF9C9A9)),
+                null, 
+                new Object[]{p.getName()},
+                true,
+                m -> {
+                    var container = m.getPersistentDataContainer();
+                    container.set(sardineKey, new UUIDTagType(), p.getUniqueId());
+                }
+            )
+        );
         return sardine;
     }
 
