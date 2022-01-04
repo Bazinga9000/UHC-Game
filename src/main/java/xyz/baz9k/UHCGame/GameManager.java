@@ -888,12 +888,16 @@ public class GameManager implements Listener {
     public void onConsumeFood(PlayerItemConsumeEvent e) {
         if (!hasUHCStarted()) return;
 
+        Player p = e.getPlayer();
         ItemStack food = e.getItem();
         ItemMeta m = food.getItemMeta();
         var container = m.getPersistentDataContainer();
         // this is a golden head
         if (container.get(new NamespacedKey(plugin, "golden_head"), new BooleanTagType())) {
-            // TODO impl golden head
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                p.removePotionEffect(PotType.REGENERATION);
+                new PotionEffect(PotType.REGENERATION, 25 * 8, 1).apply(p);
+            }, 1);
         }
     }
 
