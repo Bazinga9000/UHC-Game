@@ -4,6 +4,7 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -41,48 +42,42 @@ public class LangManager {
         pluginLocale = l;
     }
 
+    private void loadLang(Locale l) {
+        if (cfgCache.containsKey(l)) return; // already loaded
+        reg.registerAll(l, langEntries(l));
+    }
+
     private YamlConfiguration langYaml(Locale l) {
-        if (yamlFileCache.containsKey(l)) return yamlFileCache.get(l);
-
-        InputStreamReader langResource;
-        String filename = String.format("lang/%s.yml", l);
-        try {
-            langResource = new InputStreamReader(plugin.getResource(filename));
-        } catch (NullPointerException e) {
-            throw new Key("err.lang.missing_file").transErr(IllegalArgumentException.class, filename);
-        }
-
-        var yaml = YamlConfiguration.loadConfiguration(langResource);
-        yamlFileCache.put(l, yaml);
-        return yaml;
+        return yamlFileCache.computeIfAbsent(l, locale -> {
+            String filename = String.format("lang/%s.yml", l);
+            InputStreamReader langResource;
+            try {
+                langResource = new InputStreamReader(plugin.getResource(filename));
+            } catch (NullPointerException e) {
+                throw new Key("err.lang.missing_file").transErr(IllegalArgumentException.class, filename);
+            }
+    
+            return YamlConfiguration.loadConfiguration(langResource);
+        });
     }
 
     public YamlConfiguration langYaml() {
         return langYaml(getLocale());
     }
 
-    private void loadLang(Locale l) {
-        if (cfgCache.containsKey(l)) return; // already loaded
-        reg.registerAll(pluginLocale, langEntries(pluginLocale));
-    }
-
     private Map<String, MessageFormat> langEntries(Locale l) {
-        if (cfgCache.containsKey(l)) return cfgCache.get(l);
-        
-        // get file in yml form
-        var langCfg = langYaml(l);
-
-        Map<String, MessageFormat> langEnts = new HashMap<>();
-        for (var e : langCfg.getValues(true).entrySet()) {
-            var k = e.getKey();
-            var v = e.getValue();
-            
-            if (v instanceof String msg) {
-                langEnts.put(k, new MessageFormat(msg));
+        return cfgCache.computeIfAbsent(l, locale -> {
+            // get file in yml form
+            var langYaml = langYaml(l);
+    
+            Map<String, MessageFormat> entries = new HashMap<>();
+            for (var e : langYaml.getValues(true).entrySet()) {
+                if (e.getValue() instanceof String msg) {
+                    entries.put(e.getKey(), new MessageFormat(msg));
+                }
             }
-        }
 
-        cfgCache.put(l, langEnts);
-        return langEnts;
+            return Collections.unmodifiableMap(entries);
+        });
     }
 }
