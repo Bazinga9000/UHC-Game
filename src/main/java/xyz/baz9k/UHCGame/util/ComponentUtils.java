@@ -1,15 +1,20 @@
 package xyz.baz9k.UHCGame.util;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.*;
+import net.kyori.adventure.text.flattener.ComponentFlattener;
+import net.kyori.adventure.text.flattener.FlattenerListener;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -70,53 +75,43 @@ public final class ComponentUtils {
 
         // watch this already be a thing
         // does the work for transMultiline
-        private List<Component> splitLines(Component transComp) {
+        private static List<Component> splitLines(Component transComp) {
             // if there's no text, just trash the component
             if (renderString(transComp).isBlank()) return List.of();
 
             var rendered = render(transComp);
-            Style topStyle = rendered.style();
+            
+            List<Component> lines = new ArrayList<>();
+            Deque<Style> styles = new ArrayDeque<>();
+            // trans text is already rendered, so this should work fine
+            ComponentFlattener.basic().flatten(rendered, new FlattenerListener() {
 
-            if (rendered instanceof TextComponent tc) {
-                // create list of components in a sequential order
-                List<TextComponent> components = new ArrayList<>();
-                components.add(tc);
-    
-                for (Component child : tc.children()) {
-                    if (child instanceof TextComponent tch) {
-                        components.add(tch);
-                    } else {
-                        Style s = topStyle.merge(child.style());
-                        components.add(Component.text(renderString(child), s));
-                    }
-                }
-
-                // create the lines
-                List<Component> lines = new ArrayList<>();
-                for (TextComponent c : components) {
-                    List<String> content = new ArrayList<>(Arrays.asList(c.content().split("\n")));
-                    Iterator<String> it = content.iterator();
-                    Style s = topStyle.merge(c.style());
+                @Override
+                public void component(@NotNull String text) {
+                    Style cs = styles.stream().reduce(Style.empty(), Style::merge); // computed style
+                    Iterator<String> it = Arrays.asList(text.split("\n")).iterator();
 
                     // there's no new lines between iterations
-                    // so, if lines has an element, then the connectors have to be joined
+                    // so, if lines has an element, then the ends of iteration have to be joined
                     if (lines.size() > 0 && it.hasNext()) {
                         int lastIndex = lines.size() - 1;
-                        Component seg = Component.text(it.next(), s);
+                        Component seg = Component.text(it.next(), cs);
                         lines.set(lastIndex, lines.get(lastIndex).append(seg));
                     }
-                    
                     it.forEachRemaining(cline -> {
-                        lines.add(Component.text(cline, s));
+                        lines.add(Component.text(cline, cs));
                     });
                 }
 
-                return Collections.unmodifiableList(lines);
-            } else {
-                // something went wrong?
-                // c should be text component but it's not so, best we can do
-                return List.of(rendered);
-            }
+                @Override
+                public void pushStyle(@NotNull Style s) { styles.push(s); }
+                
+                @Override
+                public void popStyle(@NotNull Style s) { styles.pop(); }
+                
+            });
+
+            return Collections.unmodifiableList(lines);
         }
         
         /**
