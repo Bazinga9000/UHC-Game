@@ -89,6 +89,8 @@ public class TransItemStack extends ItemStack {
             if (props.customEnchGlint()) {
                 m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 m.addEnchant(Ench.SILK_TOUCH, 1, true);
+            } else {
+                m.removeEnchant(Ench.SILK_TOUCH);
             }
 
             props.editMeta(m);

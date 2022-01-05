@@ -336,8 +336,7 @@ xyz:
                 desc: |-
                   Team 1 gets more health,
                   but has fewer people ({0}).
-                players_1: "{0} player"
-                players_n: "{0} players"
+                players: "{0,choice,1#1 player|1<{0} players}"
               sardines:
                 name: "Sardines"
                 desc: |-
@@ -504,6 +503,7 @@ xyz:
           desc: "Bound to {0}"
         golden_head:
           name: "Golden Head"
+          desc: ""
         prox_compass:
           name: "Proximity Compass"
           desc: |-

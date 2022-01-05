@@ -104,10 +104,10 @@ public final class ComponentUtils {
                 }
 
                 @Override
-                public void pushStyle(@NotNull Style s) { styles.push(s); }
+                public void pushStyle(@NotNull Style s) { styles.addLast(s); }
                 
                 @Override
-                public void popStyle(@NotNull Style s) { styles.pop(); }
+                public void popStyle(@NotNull Style s) { styles.removeLast(); }
                 
             });
 

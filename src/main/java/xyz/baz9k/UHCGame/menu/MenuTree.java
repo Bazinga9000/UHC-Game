@@ -243,8 +243,7 @@ public class MenuTree {
                 .formatArg(v -> {
                     int nPlayers = (int) v;
                     if (nPlayers < 1) return new Key("menu.inv.config.presets.disabled").trans();
-                    Key k = new Key("menu.inv.team.boss_team.players_%s", nPlayers == 1 ? "1" : "n");
-                    return k.trans(nPlayers);
+                    return new Key("menu.inv.team.boss_team.players").trans(nPlayers);
                 }),
             ValuedNode.Type.INTEGER, 
             v -> Math.max(0, (int) v)
