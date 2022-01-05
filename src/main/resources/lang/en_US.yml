@@ -309,9 +309,9 @@ xyz:
                   Using shears can give apples
                   (1/50 by default)
               all_leaves:
-                name: "Taigas Aren't Shit Anymore!"
+                name: "Taigas Aren''t Shit Anymore!"
                 desc: |-
-                  That's a lie.
+                  That''s a lie.
                   All leaves can drop apples.
             team:
               root:
@@ -508,5 +508,5 @@ xyz:
           name: "Proximity Compass"
           desc: |-
             Find the nearest enemy to you.
-            What do you mean it's a watch
+            What do you mean it''s a watch
             shut up
