@@ -11,10 +11,8 @@ import xyz.baz9k.UHCGame.util.Ench;
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 /**
- * {@link ItemStack} modified to be more simple for {@link Node} use.
- * 
- * The material, display name, description, and extra lore are modifiable through this class directly.
- * The lore consists of a formatted description with the extra lore.
+ * {@link ItemStack} modified to use a translation key for its name and description, 
+ * as well as handling other utilities for this plugin (f.e. ench glint).
  */
 public class TransItemStack extends ItemStack {
     /**
@@ -37,22 +35,6 @@ public class TransItemStack extends ItemStack {
      */
     public static final Style DEFAULT_DESC_STYLE = noDeco(NamedTextColor.GRAY);
     //
-
-    /**
-     * Class provides additional properties about the ItemStack.<p>
-     * This class stores functions to map "an object" to the specified property.
-     * If this ItemStack is for a {@link ValuedNode}, the used object is the config value for the node.
-     * Otherwise, there is no object by default (and all the functions can be treated as suppliers).
-     * An object can be defined via the {@link ItemProperties#useObject} method.
-     * <p>
-     * The properties this class defines:
-     * <p> - Material
-     * <p> - Name style
-     * <p> - Format arguments for the description
-     * <p> - Function to perform miscellaneous ItemMeta edits (ench hide flags, ench glint)
-     * <p> - extra lore, which provides information other than the description of the node
-     * @param <T> type of object passed through each function
-     */
 
     /**
      * @param langKey the node's lang key

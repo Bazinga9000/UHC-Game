@@ -17,6 +17,9 @@ import net.kyori.adventure.text.format.TextColor;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
+/**
+ * Class implementing {@link ItemProperties} that allows for the ItemStack to update based on the value of a given property object.
+ */
 public class DynItemProperties<T> implements ItemProperties {
     private static final Style DEFAULT_NAME_STYLE = TransItemStack.DEFAULT_NAME_STYLE;
     private static final Style DEFAULT_DESC_STYLE = TransItemStack.DEFAULT_DESC_STYLE;
