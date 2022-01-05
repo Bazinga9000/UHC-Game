@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import net.kyori.adventure.text.Component;
 import xyz.baz9k.UHCGame.Kit;
 import xyz.baz9k.UHCGame.util.Path;
-import xyz.baz9k.UHCGame.util.stack.MappedItemProperties;
+import xyz.baz9k.UHCGame.util.stack.DynItemProperties;
 import xyz.baz9k.UHCGame.util.stack.TransItemStack;
-import xyz.baz9k.UHCGame.util.stack.MappedItemProperties.ExtraLore;
+import xyz.baz9k.UHCGame.util.stack.DynItemProperties.ExtraLore;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 // sorry
@@ -35,7 +35,7 @@ public final class PresetNode extends Node {
 
     private final Map<?, ?> preset; // nested map of preset settings
 
-    public PresetNode(BranchNode parent, int parentSlot, String nodeName, MappedItemProperties<?> props, Map<?, ?> preset) {
+    public PresetNode(BranchNode parent, int parentSlot, String nodeName, DynItemProperties<?> props, Map<?, ?> preset) {
         super(parent, parentSlot, nodeName, props);
         this.preset = preset;
 
@@ -102,7 +102,7 @@ public final class PresetNode extends Node {
             }
             if (n instanceof ValuedNode vn) {
                 // the format argument
-                Object[] fmtArgs = ((MappedItemProperties<Object>) vn.itemProperties).format(o);
+                Object[] fmtArgs = ((DynItemProperties<Object>) vn.itemProperties).format(o);
                 if (fmtArgs.length == 1) {
                     return renderString(componentize(fmtArgs[0]));
                 }

@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import xyz.baz9k.UHCGame.Kit;
 import xyz.baz9k.UHCGame.util.stack.ItemProperties;
-import xyz.baz9k.UHCGame.util.stack.MappedItemProperties;
+import xyz.baz9k.UHCGame.util.stack.DynItemProperties;
 import xyz.baz9k.UHCGame.util.stack.StaticItemProperties;
 import xyz.baz9k.UHCGame.util.stack.TransItemStack;
 
@@ -44,7 +44,7 @@ public class KitNode extends InventoryNode implements ValueHolder {
 
         this.fillReserved = Material.GRAY_STAINED_GLASS_PANE;
         this.xpStack = new TransItemStack("menu.inv.kit_xp", 
-        new MappedItemProperties<Boolean>(b -> b ? Material.EXPERIENCE_BOTTLE : Material.GLASS_BOTTLE)
+        new DynItemProperties<Boolean>(b -> b ? Material.EXPERIENCE_BOTTLE : Material.GLASS_BOTTLE)
             .useObject(() -> this.grantXP)
         );
         this.kits = Collections.unmodifiableMap(kits);

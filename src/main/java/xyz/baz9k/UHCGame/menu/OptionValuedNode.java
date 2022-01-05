@@ -7,8 +7,8 @@ import org.bukkit.entity.Player;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import xyz.baz9k.UHCGame.util.stack.MappedItemProperties;
-import xyz.baz9k.UHCGame.util.stack.MappedItemProperties.ExtraLore;
+import xyz.baz9k.UHCGame.util.stack.DynItemProperties;
+import xyz.baz9k.UHCGame.util.stack.DynItemProperties.ExtraLore;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +24,7 @@ public final class OptionValuedNode extends ValuedNode {
      * @param nodeName Name of the node
      * @param optMaterials Materials for the options supported
      */
-    public OptionValuedNode(BranchNode parent, int slot, String nodeName, MappedItemProperties<Object> props, Material... optMaterials) {
+    public OptionValuedNode(BranchNode parent, int slot, String nodeName, DynItemProperties<Object> props, Material... optMaterials) {
         super(parent, slot, nodeName, props.mat(v -> optMaterials[(int) v]), ValuedNode.Type.OPTION, i -> (int) i % optMaterials.length);
         props.formatArg(v -> this.optDesc((int) v))
             .extraLore(v -> {

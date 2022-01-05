@@ -4,8 +4,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import xyz.baz9k.UHCGame.util.Path;
-import xyz.baz9k.UHCGame.util.stack.MappedItemProperties;
-import xyz.baz9k.UHCGame.util.stack.MappedItemProperties.ExtraLore;
+import xyz.baz9k.UHCGame.util.stack.DynItemProperties;
+import xyz.baz9k.UHCGame.util.stack.DynItemProperties.ExtraLore;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
@@ -52,7 +52,7 @@ public class ValuedNode extends Node implements ValueHolder {
      * WITH A RESTRICTING FUNCTION, THE TYPE MUST BE NUMERIC.
      * @param restrict This function maps invalid numeric values to the correct values.
      */
-    public ValuedNode(BranchNode parent, int slot, String nodeName, MappedItemProperties<Object> props, Type type, UnaryOperator<Number> restrict) {
+    public ValuedNode(BranchNode parent, int slot, String nodeName, DynItemProperties<Object> props, Type type, UnaryOperator<Number> restrict) {
         this(parent, slot, nodeName, props, type.requireNumeric());
         
         this.restrict = restrict;
@@ -67,7 +67,7 @@ public class ValuedNode extends Node implements ValueHolder {
      * those will be substituted with the config value.
      * @param type Type of data this value stores
      */
-    public ValuedNode(BranchNode parent, int slot, String nodeName, MappedItemProperties<Object> props, Type type) {
+    public ValuedNode(BranchNode parent, int slot, String nodeName, DynItemProperties<Object> props, Type type) {
         super(parent, slot, nodeName, props);
         this.type = type;
         

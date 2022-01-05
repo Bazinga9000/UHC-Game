@@ -17,7 +17,7 @@ import net.kyori.adventure.text.format.TextColor;
 
 import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
-public class MappedItemProperties<T> implements ItemProperties {
+public class DynItemProperties<T> implements ItemProperties {
     private static final Style DEFAULT_NAME_STYLE = TransItemStack.DEFAULT_NAME_STYLE;
     private static final Style DEFAULT_DESC_STYLE = TransItemStack.DEFAULT_DESC_STYLE;
 
@@ -30,51 +30,51 @@ public class MappedItemProperties<T> implements ItemProperties {
     private BiConsumer<T, ItemMeta> miscMetaChanges = (v, m) -> {};
     private Function<T, ExtraLore> elGet = v -> new ExtraLore();
 
-    public MappedItemProperties() {}
-    public MappedItemProperties(Function<T, Material> mat) { mat(mat); }
-    public MappedItemProperties(Material mat) { mat(mat); }
+    public DynItemProperties() {}
+    public DynItemProperties(Function<T, Material> mat) { mat(mat); }
+    public DynItemProperties(Material mat) { mat(mat); }
 
-    public MappedItemProperties<T> useObject(Supplier<T> uo) {
+    public DynItemProperties<T> useObject(Supplier<T> uo) {
         this.propertyObject = uo;
         return this;
     }
-    public MappedItemProperties<T> mat(Function<T, Material> mat) {
+    public DynItemProperties<T> mat(Function<T, Material> mat) {
         this.matGet = mat;
         return this;
     }
-    public MappedItemProperties<T> nameStyle(Function<T, Style> style) {
+    public DynItemProperties<T> nameStyle(Function<T, Style> style) {
         this.nameStyle = style;
         return this;
     }
-    public MappedItemProperties<T> descStyle(Function<T, Style> style) {
+    public DynItemProperties<T> descStyle(Function<T, Style> style) {
         this.descStyle = style;
         return this;
     }
-    public MappedItemProperties<T> formatArgs(Function<T, Object[]> formatArgs) {
+    public DynItemProperties<T> formatArgs(Function<T, Object[]> formatArgs) {
         this.formatArgs = formatArgs;
         return this;
     }
-    public MappedItemProperties<T> enchGlint(Predicate<T> eg) {
+    public DynItemProperties<T> enchGlint(Predicate<T> eg) {
         this.enchGlint = eg;
         return this;
     }
-    public MappedItemProperties<T> metaChanges(BiConsumer<T, ItemMeta> mc) {
+    public DynItemProperties<T> metaChanges(BiConsumer<T, ItemMeta> mc) {
         this.miscMetaChanges = mc;
         return this;
     }
-    public MappedItemProperties<T> extraLore(Function<T, ExtraLore> el) {
+    public DynItemProperties<T> extraLore(Function<T, ExtraLore> el) {
         this.elGet = el;
         return this;
     }
     
-    public MappedItemProperties<T> mat(Material mat) { return mat(v -> mat); }
-    public MappedItemProperties<T> nameStyle(Style s) { return nameStyle(v -> s); }
-    public MappedItemProperties<T> nameStyle(TextColor clr) { return nameStyle(noDeco(clr)); }
-    public MappedItemProperties<T> nameStyle(int clr) { return nameStyle(TextColor.color(clr)); }
-    public MappedItemProperties<T> descStyle(Style s) { return descStyle(v -> s); }
-    public MappedItemProperties<T> descStyle(TextColor clr) { return descStyle(noDeco(clr)); }
-    public MappedItemProperties<T> descStyle(int clr) { return descStyle(TextColor.color(clr)); }
-    public MappedItemProperties<T> formatArg(Function<T, Object> formatArg) { return formatArgs(formatArg.andThen(o -> new Object[]{o})); }
+    public DynItemProperties<T> mat(Material mat) { return mat(v -> mat); }
+    public DynItemProperties<T> nameStyle(Style s) { return nameStyle(v -> s); }
+    public DynItemProperties<T> nameStyle(TextColor clr) { return nameStyle(noDeco(clr)); }
+    public DynItemProperties<T> nameStyle(int clr) { return nameStyle(TextColor.color(clr)); }
+    public DynItemProperties<T> descStyle(Style s) { return descStyle(v -> s); }
+    public DynItemProperties<T> descStyle(TextColor clr) { return descStyle(noDeco(clr)); }
+    public DynItemProperties<T> descStyle(int clr) { return descStyle(TextColor.color(clr)); }
+    public DynItemProperties<T> formatArg(Function<T, Object> formatArg) { return formatArgs(formatArg.andThen(o -> new Object[]{o})); }
 
     private T propertyObject() {
         return propertyObject.get();
