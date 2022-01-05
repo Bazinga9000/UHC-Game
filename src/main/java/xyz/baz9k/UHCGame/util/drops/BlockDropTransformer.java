@@ -8,6 +8,9 @@ import org.bukkit.Tag;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Set rules to change items dropped from a specified block (or tag).
+ */
 public final class BlockDropTransformer {
     private Set<Mapping> transforms = new HashSet<>();
 

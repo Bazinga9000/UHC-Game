@@ -18,6 +18,9 @@ import org.bukkit.inventory.ItemStack;
 import xyz.baz9k.UHCGame.ConfigValues;
 import xyz.baz9k.UHCGame.util.Ench;
 
+/**
+ * If the event involves breaking leaves, this class can add apples to the drops.
+ */
 public class LeafDropProducer {
     private final Material leafType;
     private final List<Item> drops;
@@ -26,6 +29,10 @@ public class LeafDropProducer {
     private final ConfigValues cfg;
     private final Random r;
 
+    /**
+     * @param e Event to handle
+     * @param cfg Current config values
+     */
     public LeafDropProducer(BlockEvent e, ConfigValues cfg) {
         if (e instanceof BlockDropItemEvent drop) {
             this.drops = drop.getItems();
@@ -75,7 +82,7 @@ public class LeafDropProducer {
     }
 
     /**
-     * Adds drops to the drop list.
+     * Adds apple drops if applicable.
      */
     public void addDrops() {
         if (!shearApple() 
