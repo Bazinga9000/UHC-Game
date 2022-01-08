@@ -442,7 +442,7 @@ public class HUDManager implements Listener {
             boolean hasProxCompass = Arrays.stream(p.getInventory().getContents())
                 .map(ItemStack::getItemMeta)
                 .map(ItemMeta::getPersistentDataContainer)
-                .anyMatch(c -> c.get(new NamespacedKey(plugin, "prox_compass"), new BooleanTagType()));
+                .anyMatch(c -> c.getOrDefault(new NamespacedKey(plugin, "prox_compass"), new BooleanTagType(), false));
             
             if (hasProxCompass) {
                 teamManager.getCombatants().online().stream()

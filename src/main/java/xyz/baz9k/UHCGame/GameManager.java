@@ -893,7 +893,7 @@ public class GameManager implements Listener {
         ItemMeta m = food.getItemMeta();
         var container = m.getPersistentDataContainer();
         // this is a golden head
-        if (container.get(new NamespacedKey(plugin, "golden_head"), new BooleanTagType())) {
+        if (container.getOrDefault(new NamespacedKey(plugin, "golden_head"), new BooleanTagType(), false)) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 p.removePotionEffect(PotType.REGENERATION);
                 new PotionEffect(PotType.REGENERATION, 25 * 8, 1).apply(p);
