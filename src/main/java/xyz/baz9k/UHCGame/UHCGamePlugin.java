@@ -6,6 +6,7 @@ import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import xyz.baz9k.UHCGame.util.Debug;
@@ -22,6 +23,11 @@ public class UHCGamePlugin extends JavaPlugin {
     private SpreadPlayersManager spreadPlayersManager;
     private SardinesManager sardinesManager;
     private Recipes recipes;
+
+    @Override
+    public void onLoad() {
+        ConfigurationSerialization.registerClass(Kit.class);
+    }
 
     @Override
     public void onEnable() {

@@ -8,17 +8,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 public record Kit(ItemStack[] storage, ItemStack[] armor, ItemStack offhand, int xpLevels) implements ConfigurationSerializable {
-    static {
-        ConfigurationSerialization.registerClass(Kit.class);
-    }
-
     @Override
     public @NotNull Map<String, Object> serialize() {
         return Map.ofEntries(
