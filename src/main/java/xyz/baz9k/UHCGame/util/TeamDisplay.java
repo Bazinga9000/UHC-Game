@@ -90,7 +90,7 @@ public final class TeamDisplay {
      */
     public static org.bukkit.Color getBukkitColor(PlayerState s, int t) {
         Color clr = getColor(s, t);
-        return org.bukkit.Color.fromRGB(clr.getRGB());
+        return org.bukkit.Color.fromRGB(clr.getRed(), clr.getGreen(), clr.getBlue());
     }
 
     /**
