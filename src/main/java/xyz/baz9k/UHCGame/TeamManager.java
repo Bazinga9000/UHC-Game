@@ -453,8 +453,9 @@ public class TeamManager {
      */
     public int[] getAliveTeams() {
         var x = playerMap.values().stream()
+            .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
             .mapToInt(Node::team)
-            .filter(n -> n > 0)
+            .filter(t -> t > 0)
             .distinct()
             .toArray();
         Debug.printDebug("Current alive teams: %s".formatted(Arrays.toString(x)));
@@ -477,7 +478,7 @@ public class TeamManager {
         }
 
         public Component getName() {
-            if (team > 0) return TeamDisplay.getPrefix(PlayerState.COMBATANT_ALIVE, team);
+            if (team > 0) return TeamDisplay.getName(PlayerState.COMBATANT_ALIVE, team);
             return Component.text(Bukkit.getOfflinePlayer(uuid).getName());
         }
     }
