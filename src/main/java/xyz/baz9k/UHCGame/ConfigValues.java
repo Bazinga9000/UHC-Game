@@ -182,11 +182,14 @@ public class ConfigValues {
     public BossMode bossMode() {
         int bossN = cfg.getInt("team.boss_team");
         
-        int normalHealth = maxHealth();
-        int normalN = plugin.getTeamManager().getCombatantsOnTeam(2).size();
-        
-        int bossHealth = bossN > 0 ? normalHealth * normalN / bossN : 0;
-        return new BossMode(bossN > 0, bossN, bossHealth);
+        if (bossN > 0) {
+            int normalHealth = maxHealth();
+            int normalN = plugin.getTeamManager().getCombatantsOnTeam(2).size();
+            
+
+            return new BossMode(true, bossN, normalHealth * normalN / bossN);
+        }
+        return BossMode.disabled();
     }
 
     /**
