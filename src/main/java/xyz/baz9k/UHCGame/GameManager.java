@@ -385,11 +385,13 @@ public class GameManager implements Listener {
             }
 
             // run thru all the events that have been registered and whose time have passed
-            TimedEvent e = timedEvents.first();
-            while (e.when().isBefore(Instant.now())) {
-                timedEvents.pollFirst();
-                e.action.run();
-                e = timedEvents.first();
+            if (!timedEvents.isEmpty()) {
+                TimedEvent e = timedEvents.first();
+                while (e.when().isBefore(Instant.now())) {
+                    timedEvents.pollFirst();
+                    e.action.run();
+                    e = timedEvents.first();
+                }
             }
 
             for (Player p : Bukkit.getOnlinePlayers()) {
