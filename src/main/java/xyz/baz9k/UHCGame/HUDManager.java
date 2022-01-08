@@ -233,7 +233,8 @@ public class HUDManager implements Listener {
      * Update all prefixes on player's HUD
      * @param p Player to update scoreboard of
      */
-    public void updatePrefixesOnHUD(Player p) {
+    public void updatePrefixesHUD(Player p) {
+        setHUDLine(p, "state", formatState(p));
         for (Player q : Bukkit.getOnlinePlayers()) {
             applyPrefixOnPlayerScoreboard(p, q);
         }
@@ -319,7 +320,7 @@ public class HUDManager implements Listener {
         Scoreboard sb = Bukkit.getScoreboardManager().getNewScoreboard();
         p.setScoreboard(sb);
 
-        updatePrefixesOnHUD(p);
+        updatePrefixesHUD(p);
         dispatchPrefixUpdate(p);
     }
 
@@ -342,7 +343,6 @@ public class HUDManager implements Listener {
         addHUDLine(p, "newline",     2);
         addHUDLine(p, "elapsedTime", 1);
 
-        setHUDLine(p, "state", formatState(p));
         updateTeammateHUD(p);
         updateMovementHUD(p);
         updateWBHUD(p);
@@ -351,7 +351,7 @@ public class HUDManager implements Listener {
         updateKillsHUD(p);
         updateElapsedTimeHUD(p);
         updateHealthHUD(p);
-        updatePrefixesOnHUD(p);
+        updatePrefixesHUD(p);
         dispatchPrefixUpdate(p);
     }
 
@@ -701,6 +701,7 @@ public class HUDManager implements Listener {
                         updateTeamsAliveHUD(p);
                     }
                     // they might've switched teams
+                    updatePrefixesHUD(pl);
                     dispatchPrefixUpdate(pl);
                 }
             } else {
