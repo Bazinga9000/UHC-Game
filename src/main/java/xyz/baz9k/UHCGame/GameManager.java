@@ -627,7 +627,6 @@ public class GameManager implements Listener {
         // check if qualify for win message
         if (win) return; // if win message already triggered, don't trigger it again
 
-        Debug.printDebug("Attempting win check");
         var aliveGroups = teamManager.getAliveGroups();
         if (aliveGroups.length != 1) return; // only 1 group
 

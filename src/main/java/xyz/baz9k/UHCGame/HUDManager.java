@@ -8,7 +8,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Damageable;
 import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
 import xyz.baz9k.UHCGame.util.ColorGradient;
-import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.Point2D;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 import xyz.baz9k.UHCGame.util.tag.BooleanTagType;
@@ -569,7 +568,6 @@ public class HUDManager implements Listener {
     }
 
     public void updateTeamsAliveHUD(@NotNull Player p) {
-        Debug.printDebug("Updating teams alive HUD");
         int nAlive = teamManager.getAliveTeams().length,
             nTeams = teamManager.getNumTeams();
         

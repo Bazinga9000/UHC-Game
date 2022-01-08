@@ -13,7 +13,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import xyz.baz9k.UHCGame.ConfigValues.BossMode;
 import xyz.baz9k.UHCGame.event.PlayerStateChangeEvent;
 import xyz.baz9k.UHCGame.exception.UHCException;
-import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.TeamDisplay;
 
 import java.util.Set;
@@ -27,7 +26,6 @@ import static xyz.baz9k.UHCGame.util.ComponentUtils.*;
 
 import java.util.AbstractSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -364,7 +362,6 @@ public class TeamManager {
 
         PlayerState s = alive ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
         setState(p, s);
-        Debug.printDebug("Set %s to %s".formatted(p, alive));
     }
 
     /* LIST OF PLAYERS */
@@ -452,14 +449,12 @@ public class TeamManager {
      * @return an array of the alive teams by int
      */
     public int[] getAliveTeams() {
-        var x = playerMap.values().stream()
+        return playerMap.values().stream()
             .filter(n -> n.state == PlayerState.COMBATANT_ALIVE)
             .mapToInt(Node::team)
             .filter(t -> t > 0)
             .distinct()
             .toArray();
-        Debug.printDebug("Current alive teams: %s".formatted(Arrays.toString(x)));
-        return x;
     }
 
     public record AliveGroup(int team, UUID uuid) {
