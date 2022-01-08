@@ -52,7 +52,7 @@ public class ValueRequest {
                     Map.entry("requestKey", requestKey),
                     Map.entry("consumer", consumer),
                     Map.entry("reopenInventory", reopenInventory),
-                    Map.entry("returnNode", returnNode)))
+                    Map.entry("returnNode", returnNode == null ? 0 : returnNode))) // dumb hack. theoretically returnNode is never accessed unless reopenInventory is true (& thus returnNode is non-null) 
             .withTimeout(60)
             .withFirstPrompt(firstPrompt)
             .withEscapeSequence("cancel")
