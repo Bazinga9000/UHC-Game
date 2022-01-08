@@ -364,6 +364,7 @@ public class TeamManager {
 
         PlayerState s = alive ? PlayerState.COMBATANT_ALIVE : PlayerState.COMBATANT_DEAD;
         setState(p, s);
+        Debug.printDebug("Set %s to %s".formatted(p, alive));
     }
 
     /* LIST OF PLAYERS */
@@ -456,7 +457,7 @@ public class TeamManager {
             .filter(n -> n > 0)
             .distinct()
             .toArray();
-        Debug.printDebug(Arrays.toString(x));
+        Debug.printDebug("Current alive teams: %s".formatted(Arrays.toString(x)));
         return x;
     }
 
