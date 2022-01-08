@@ -592,7 +592,7 @@ public class GameManager implements Listener {
         Optional<Duration> elapsedTime = getElapsedTime();
 
         if (elapsedTime.isPresent() && grace.isPresent()) {
-            return grace.get().compareTo(elapsedTime.get()) <= 0;
+            return elapsedTime.get().compareTo(grace.get()) <= 0;
         }
         return false;
     }
