@@ -1,6 +1,7 @@
 package xyz.baz9k.UHCGame;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -112,6 +113,7 @@ public class SardinesManager implements Listener {
      * @return true/false
      */
     public boolean isSardine(ItemStack s) {
+        if (s == null) return false;
         var m = s.getItemMeta();
         var container = m.getPersistentDataContainer();
         return container.has(sardineKey, new UUIDTagType());
@@ -124,6 +126,7 @@ public class SardinesManager implements Listener {
      */
     public boolean hasSardine(Player p) {
         return Arrays.stream(p.getInventory().getContents())
+            .filter(Objects::nonNull)
             .map(this::uuidOfSardine)           // convert inv to list of UUIDs (or empty if not sardine)
             .flatMap(Optional::stream)          // remove all empties
             .anyMatch(p.getUniqueId()::equals); // check if any UUID matches our UUID
@@ -151,6 +154,7 @@ public class SardinesManager implements Listener {
      * @return the UUID of the owner of the item stack if it's a sardine, otherwise empty
      */
     public Optional<UUID> uuidOfSardine(ItemStack s) {
+        if (s == null) return Optional.empty();
         var m = s.getItemMeta();
         var container = m.getPersistentDataContainer();
         UUID uuid = container.get(sardineKey, new UUIDTagType());
