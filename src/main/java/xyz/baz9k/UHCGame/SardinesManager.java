@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -18,6 +19,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -119,16 +121,20 @@ public class SardinesManager implements Listener {
         return container.has(sardineKey, new UUIDTagType());
     }
 
+    private Stream<ItemStack> sardinesInInventory(Player p) {
+        return Arrays.stream(p.getInventory().getContents())
+            .filter(Objects::nonNull)
+            .filter(this::isSardine);
+    }
     /**
      * Check if player has their own sardine
      * @param p player
      * @return true/false
      */
     public boolean hasSardine(Player p) {
-        return Arrays.stream(p.getInventory().getContents())
-            .filter(Objects::nonNull)
+        return sardinesInInventory(p)
             .map(this::uuidOfSardine)           // convert inv to list of UUIDs (or empty if not sardine)
-            .flatMap(Optional::stream)          // remove all empties
+            .flatMap(Optional::stream)          // conv Optional<UUID> to UUID
             .anyMatch(p.getUniqueId()::equals); // check if any UUID matches our UUID
     }
     /**
@@ -173,12 +179,29 @@ public class SardinesManager implements Listener {
      * Remove any sardines from the player's inventory that isn't theirs
      * @param p player to remove sardines from
      */
-    public void eatOtherSardines(Player p) {
-        for (ItemStack s : p.getInventory().getContents()) {
-            if (isSardine(s) && p != whoseSardine(s).orElse(null)) {
-                s.setType(Material.AIR);
-            }
+    public void eatSardines(Player p, boolean preserveOwn) {
+        var sardines = sardinesInInventory(p);
+
+        if (preserveOwn) sardines = sardines.filter(s -> p != whoseSardine(s).get());
+
+        sardines.forEach(s -> s.setType(Material.AIR));
+    }
+
+    private void initAssign(Player giver, Player recipient) {
+        if (giver == recipient) return; // not successful, do not assign
+        var tm = plugin.getTeamManager();
+        
+        if (tm.isWildcard(recipient)) { // two wildcard interaction, new team
+            int t = tm.getNumTeams() + 1;
+            tm.assignPlayerToTeam(giver, t, false);
+            tm.assignPlayerToTeam(recipient, t, false);
+        } else { // wildcard gives to team, join team
+            int t = tm.getTeam(recipient);
+            tm.assignPlayerToTeam(giver, t);
         }
+
+        eatSardines(giver, false);
+        eatSardines(recipient, false);
     }
 
     @EventHandler
@@ -196,25 +219,15 @@ public class SardinesManager implements Listener {
                 .filter(tm::isAssignedCombatant);
 
             if (oGiver.isPresent() && oRecipient.isPresent()) {
-                // should be valid from here
                 Player giver = oGiver.get(),
                        recipient = oRecipient.get();
                 
-                if (giver == recipient) { // same person, don't do anything
-
-                } else if (tm.isWildcard(recipient)) { // two wildcards, create new team
-                    int t = tm.getNumTeams() + 1;
-                    tm.assignPlayerToTeam(giver, t, false);
-                    tm.assignPlayerToTeam(recipient, t, false);
-                } else { // wildcard gives to team, join team
-                    int t = tm.getTeam(recipient);
-                    tm.assignPlayerToTeam(giver, t);
-                }
+                initAssign(giver, recipient);
 
             }
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (oGiver.isPresent()) giveSardineIfNeedy(oGiver.get());
-                if (oRecipient.isPresent()) eatOtherSardines(oRecipient.get());
+                if (oRecipient.isPresent()) eatSardines(oRecipient.get(), true);
             }, 1);
         }
     }
@@ -257,6 +270,15 @@ public class SardinesManager implements Listener {
         
         whoseSardine(ms)
             .ifPresent(this::giveSardineIfNeedy);
+    }
+
+    @EventHandler
+    public void onSardineConsume(PlayerItemConsumeEvent e) {
+        if (!enabled()) return;
+
+        if (isSardine(e.getItem())) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
