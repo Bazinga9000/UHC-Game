@@ -346,7 +346,7 @@ public final class Commands {
             new LiteralArgument("set"),
             new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
             new LiteralArgument("combatant"),
-            new IntegerArgument("team", 1)
+            new IntegerArgument("team", 0)
         )
         .executes(
             (sender, args) -> {

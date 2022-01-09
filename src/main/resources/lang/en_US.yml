@@ -71,7 +71,7 @@ xyz:
           pronoun: "It"
         warning:
           # base, "the world border", radius, duration 
-          wb_will_shrink: "{0} will begin shrinking to ±{1} in {2}!"
+          wb_will_shrink: "{0} will shrink to ±{1} in {2}!"
           wb_will_instant_shrink: "{0} will immediately shrink to ±{1} in {2}! Watch out!"
           wb_just_shrink: "{0} will stop at ±{1} in {2}."
           wb_just_instant_shrink: "{0} has immediately shrank to ±{1}!"

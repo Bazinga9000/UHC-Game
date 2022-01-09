@@ -505,7 +505,7 @@ public class GameManager implements Listener {
                 ));
             }
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.teleport(worldManager.getCenterAtY(255));
+                p.teleport(worldManager.getHighCenter());
             }
 
             double rad = GameStage.DEATHMATCH.wbRadius() - 1;

@@ -156,7 +156,7 @@ public class TeamManager {
      * @param bounded Bound the team to the number of teams allowed. If true, an IllegalArgumentException will occur if bound is not met.
      */
     public void assignPlayerToTeam(@NotNull Player p, int t, boolean bounded) {
-        var invalidExc = new Key("team.invalid").transErr(IllegalArgumentException.class);
+        var invalidExc = new Key("err.team.invalid").transErr(IllegalArgumentException.class);
 
         if (t < 0) throw invalidExc;
         if (bounded && t > numTeams) {
@@ -254,7 +254,7 @@ public class TeamManager {
         } else {
             if (combatants.size() == numTeams) { 
                 // solos assigning
-                combatants.sort((p1, p2) -> p1.getName().compareTo(p2.getName()));
+                combatants.sort((p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()));
                 for (int i = 0; i < numTeams; i++) {
                     assignPlayerToTeam(combatants.get(i), i + 1);
                 }
