@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.bukkit.*;
 import org.bukkit.World.Environment;
@@ -248,6 +250,14 @@ public class WorldManager {
         return Arrays.asList(getGameWorlds()).contains(p.getWorld());
     }
 
+    public void forEachWorld(Consumer<World> cons) {
+        for (World w : getGameWorlds()) cons.accept(w);
+    }
+
+    public void forEachWorld(BiConsumer<World, WorldManager> cons) {
+        for (World w : getGameWorlds()) cons.accept(w, this);
+    }
+
     // GAMERULE STUFF
     public static void setDefaultGamerules(World w) {
         w.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, true);
@@ -287,7 +297,4 @@ public class WorldManager {
         w.setGameRule(GameRule.UNIVERSAL_ANGER, false);
     }
 
-    public <T> void setGamerule(GameRule<T> rule, T value) {
-        for (World w : getGameWorlds()) w.setGameRule(rule, value);
-    }
 }
