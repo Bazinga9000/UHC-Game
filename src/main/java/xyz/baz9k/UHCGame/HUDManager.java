@@ -440,6 +440,7 @@ public class HUDManager implements Listener {
 
         if (cfg.proxTrack()) {
             boolean hasProxCompass = Arrays.stream(p.getInventory().getContents())
+                .filter(Objects::nonNull)
                 .map(ItemStack::getItemMeta)
                 .map(ItemMeta::getPersistentDataContainer)
                 .anyMatch(c -> c.getOrDefault(new NamespacedKey(plugin, "prox_compass"), new BooleanTagType(), false));
