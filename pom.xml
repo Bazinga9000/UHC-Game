@@ -14,7 +14,7 @@
     </properties>
     <repositories>
         <repository>
-            <id>papermc</id>
+            <id>87papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
@@ -23,7 +23,7 @@
         </repository>
         <repository>
             <id>OnARandomBox</id>
-            <url>http://repo.onarandombox.com/content/groups/public/</url>
+            <url>https://repo.onarandombox.com/content/groups/public/</url>
         </repository>
         <repository>
             <id>sonatype-oss-snapshots</id>
