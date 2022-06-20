@@ -30,7 +30,7 @@ public class LangManager {
         reg = TranslationRegistry.create(new NamespacedKey(plugin, "lang"));
         reg.defaultLocale(DEFAULT_LOCALE);
         
-        GlobalTranslator.get().addSource(reg);
+        GlobalTranslator.translator().addSource(reg);
 
         loadLang(DEFAULT_LOCALE);
     }

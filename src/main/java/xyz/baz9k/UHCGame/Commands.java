@@ -4,7 +4,6 @@ import dev.jorel.commandapi.*;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.arguments.ScoreHolderArgument.*;
 import dev.jorel.commandapi.arguments.CustomArgument.*;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.*;
 import dev.jorel.commandapi.wrappers.*;
 import net.kyori.adventure.audience.Audience;
@@ -79,8 +78,8 @@ public final class Commands {
         uhc.register();
     }
 
-    private void fail(Key key, Object... args) throws WrapperCommandSyntaxException {
-        CommandAPI.fail(renderString(key.trans(args)));
+    private WrapperCommandSyntaxException fail(Key key, Object... args) {
+        return CommandAPI.fail(renderString(key.trans(args)));
     }
 
     /*
@@ -234,7 +233,7 @@ public final class Commands {
     private CommandAPICommand respawn() {
         return new CommandAPICommand("respawn")
         .withArguments(
-            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
+            new EntitySelectorArgument<Collection<Player>>("target", EntitySelector.MANY_PLAYERS)
         )
         .executes(
             (sender, args) -> {
@@ -266,7 +265,7 @@ public final class Commands {
     private CommandAPICommand respawnLoc() {
         return new CommandAPICommand("respawn")
         .withArguments(
-            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
+            new EntitySelectorArgument<Collection<Player>>("target", EntitySelector.MANY_PLAYERS),
             new LocationArgument("location", LocationType.PRECISE_POSITION)
         )
         .executes(
@@ -301,7 +300,7 @@ public final class Commands {
         return new CommandAPICommand("state")
         .withArguments(
             new LiteralArgument("get"),
-            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS)
+            new EntitySelectorArgument<Collection<Player>>("target", EntitySelector.MANY_PLAYERS)
         )
         .executes(
             (sender, args) -> {
@@ -321,7 +320,7 @@ public final class Commands {
         return new CommandAPICommand("state")
         .withArguments(
             new LiteralArgument("set"),
-            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
+            new EntitySelectorArgument<Collection<Player>>("target", EntitySelector.MANY_PLAYERS),
             new MultiLiteralArgument("spectator", "combatant")
         )
         .executes(
@@ -344,7 +343,7 @@ public final class Commands {
         return new CommandAPICommand("state")
         .withArguments(
             new LiteralArgument("set"),
-            new EntitySelectorArgument("target", EntitySelector.MANY_PLAYERS),
+            new EntitySelectorArgument<Collection<Player>>("target", EntitySelector.MANY_PLAYERS),
             new LiteralArgument("combatant"),
             new IntegerArgument("team", 0)
         )
@@ -358,7 +357,7 @@ public final class Commands {
                         sender.sendMessage(new Key("cmd.state_set.succ").trans(p.getName(), tm.getPlayerState(p), tm.getTeam(p)));
                     }
                 } catch (IllegalArgumentException e) {
-                    CommandAPI.fail(e.getMessage());
+                    throw CommandAPI.fail(e.getMessage());
                 }
             }
         );
@@ -381,15 +380,19 @@ public final class Commands {
         );
     }
 
-    private Argument gameStageArgument(String nodeName) {
-        return new CustomArgument<GameStage>(nodeName, info -> {
+    private Argument<GameStage> gameStageArgument(String nodeName) {
+        return new CustomArgument<GameStage, String>(new StringArgument(nodeName), info -> {
             try {
                 return GameStage.valueOf(info.input());
             } catch (IllegalArgumentException | NullPointerException e) {
                 throw new CustomArgumentException(new MessageBuilder("Unknown stage: ").appendArgInput());
             }
             // cmd requires getting the exact GS name, so use GameStage::name, not GameStage::toString
-        }).replaceSuggestions(info -> Arrays.stream(GameStage.values()).map(GameStage::name).toArray(String[]::new));
+        }).replaceSuggestions(
+            ArgumentSuggestions.strings(
+                Arrays.stream(GameStage.values()).map(GameStage::name).toArray(String[]::new)
+            )
+        );
     }
 
     // uhc stage set <stage: stage>
@@ -513,11 +516,11 @@ public final class Commands {
     @RegisterCommand
     private CommandAPICommand invSee() {
         return new CommandAPICommand("invsee")
-        .withArguments(new EntitySelectorArgument("target", EntitySelector.ONE_PLAYER))
+        .withArguments(new EntitySelectorArgument<Player>("target", EntitySelector.ONE_PLAYER))
         .executesPlayer((sender, args) -> {
             requireStarted();
             if (!plugin.getTeamManager().getPlayerState(sender).isSpectating()) {
-                fail(new Key("cmd.invsee.fail.combatant"));
+                throw fail(new Key("cmd.invsee.fail.combatant"));
             }
 
             plugin.getMenuManager().invSee(sender, (Player) args[0]);
@@ -533,7 +536,7 @@ public final class Commands {
                 requireStarted();
                 int hideTeams = plugin.configValues().hideTeams();
                 if (hideTeams == 2) {
-                    CommandAPI.fail("/tc is disabled, since teams are hidden");
+                    throw CommandAPI.fail("/tc is disabled, since teams are hidden");
                 }
 
                 String msg = (String) args[0];
@@ -596,8 +599,11 @@ public final class Commands {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), itercmd);
                 }
             } catch (CommandException e) {
-                CommandAPI.fail("An error occurred while running the commands: " + e.getMessage());
+                throw CommandAPI.fail("An error occurred while running the commands: " + e.getMessage());
             }
+
+            // For some inexplicable, accursed reason, this line is required or there will be a compiler error.
+            return;
         });
     }
 
@@ -631,8 +637,11 @@ public final class Commands {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), itercmd);
                     }
                 } catch (CommandException e) {
-                    CommandAPI.fail("An error occurred while running the commands: " + e.getMessage());
+                    throw CommandAPI.fail("An error occurred while running the commands: " + e.getMessage());
                 }
+
+                // For some inexplicable, accursed reason, this line is required or there will be a compiler error.
+                return;
             });
     }
 
@@ -647,7 +656,7 @@ public final class Commands {
         .withArguments(
             new FunctionArgument("function"),
             new LiteralArgument("with"),
-            new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+            new ScoreHolderArgument<String>("player", ScoreHolderType.SINGLE),
             new ObjectiveArgument("objective"),
             new LiteralArgument("as"),
             new IntegerArgument("value")
@@ -671,9 +680,8 @@ public final class Commands {
                 if (sender instanceof Player && !(sender instanceof ProxiedCommandSender)) sender.sendMessage("Function returned " + Integer.toString(retVal));
                 return retVal; 
             } catch (IllegalArgumentException | IllegalStateException e) {
-                CommandAPI.fail("Entry no longer exists");
+                throw CommandAPI.fail("Entry no longer exists");
             }
-            return 0;
         });
     }
 
@@ -683,10 +691,10 @@ public final class Commands {
         .withArguments(
             new FunctionArgument("function"),
             new LiteralArgument("with"),
-            new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+            new ScoreHolderArgument<String>("player", ScoreHolderType.SINGLE),
             new ObjectiveArgument("objective"),
             new LiteralArgument("as"),
-            new ScoreHolderArgument("player value", ScoreHolderType.SINGLE),
+            new ScoreHolderArgument<String>("player value", ScoreHolderType.SINGLE),
             new ObjectiveArgument("objective value")
         )
         .withPermission(CommandPermission.OP)
@@ -713,9 +721,8 @@ public final class Commands {
                 if (sender instanceof Player && !(sender instanceof ProxiedCommandSender)) sender.sendMessage("Function returned " + Integer.toString(retVal));
                 return retVal; 
             } catch (IllegalArgumentException | IllegalStateException e) {
-                CommandAPI.fail("Entry no longer exists");
+                throw CommandAPI.fail("Entry no longer exists");
             }
-            return 0;
         });
     }
 
@@ -726,7 +733,7 @@ public final class Commands {
         .withArguments(
             new StringArgument("var"),
             new LiteralArgument("="),
-            new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+            new ScoreHolderArgument<String>("player", ScoreHolderType.SINGLE),
             new ObjectiveArgument("objective"),
             new LiteralArgument("run"),
             new GreedyStringArgument("cmd")
@@ -753,7 +760,7 @@ public final class Commands {
         .withArguments(
             new StringArgument("var"),
             new LiteralArgument("="),
-            new ScoreHolderArgument("player", ScoreHolderType.SINGLE),
+            new ScoreHolderArgument<String>("player", ScoreHolderType.SINGLE),
             new ObjectiveArgument("objective"),
             new DoubleArgument("scale"),
             new LiteralArgument("run"),
@@ -776,11 +783,12 @@ public final class Commands {
     }
 
     @RegisterBrigadierCommand
+    @SuppressWarnings("rawtypes") // can't do anything about it
     private void ifPlayerState() {
         var playerState = Brigadier.fromLiteralArgument(new LiteralArgument("playerstate")).build();
         for (PlayerState state : PlayerState.values()) {
             List<Argument> arguments = List.of(
-                new EntitySelectorArgument("target", EntitySelector.ONE_PLAYER)
+                new EntitySelectorArgument<Player>("target", EntitySelector.ONE_PLAYER)
             );
             var playerNode = Brigadier.fromArgument(arguments, "target");
             var stateNode = Brigadier.fromLiteralArgument(new LiteralArgument(state.name()))
@@ -797,10 +805,11 @@ public final class Commands {
     }
 
     @RegisterBrigadierCommand
+    @SuppressWarnings("rawtypes") // can't do anything about it
     private void ifPlayerTeam() {
         var playerState = Brigadier.fromLiteralArgument(new LiteralArgument("playerteam")).build();
         List<Argument> arguments = List.of(
-            new EntitySelectorArgument("target", EntitySelector.ONE_PLAYER),
+            new EntitySelectorArgument<Player>("target", EntitySelector.ONE_PLAYER),
             new IntegerArgument("team")
         );
         var playerNode = Brigadier.fromArgument(arguments, "target");
