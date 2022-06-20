@@ -14,7 +14,7 @@
     </properties>
     <repositories>
         <repository>
-            <id>87papermc</id>
+            <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
