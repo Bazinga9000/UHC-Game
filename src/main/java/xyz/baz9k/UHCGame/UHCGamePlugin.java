@@ -52,6 +52,7 @@ public class UHCGamePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(hudManager, this);
         Bukkit.getPluginManager().registerEvents(menuManager, this);
         Bukkit.getPluginManager().registerEvents(sardinesManager, this);
+        Bukkit.getPluginManager().registerEvents(worldManager, this);
 
         Commands commands = new Commands(this);
         commands.registerAll();

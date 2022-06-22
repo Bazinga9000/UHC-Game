@@ -14,12 +14,14 @@ import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
-
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldInitEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.baz9k.UHCGame.util.Debug;
 import xyz.baz9k.UHCGame.util.Point2D;
 
-public class WorldManager {
+public class WorldManager implements Listener {
     private final UHCGamePlugin plugin;
     private boolean worldsRegened = false;
     private final List<String> worldNames = new ArrayList<>();
@@ -256,6 +258,15 @@ public class WorldManager {
 
     public void forEachWorld(BiConsumer<World, WorldManager> cons) {
         for (World w : getGameWorlds()) cons.accept(w, this);
+    }
+
+    @EventHandler
+    public void onWorldInit(WorldInitEvent e) {
+        // https://github.com/PaperMC/Paper/issues/2270
+        // You can speed up world creation by calling World#keepSpawnInMemory(false) 
+        // inside a listener of WorldInitEvent. In this way, I've confirmed that 
+        // Paper skipped generating the chunks around spawn area.
+        e.getWorld().setKeepSpawnInMemory(false);
     }
 
     // GAMERULE STUFF
